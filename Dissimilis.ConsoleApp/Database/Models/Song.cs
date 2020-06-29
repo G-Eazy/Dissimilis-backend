@@ -36,10 +36,17 @@ namespace Dissimilis.ConsoleApp.Database.Models
         public string TimeSignature { get; set; }
 
         /// <summary>
+        /// The collection of parts found in a song
+        /// </summary>
+        public ICollection<Part> Parts { get; set; }
+
+        /// <summary>
         /// Time and date of creation of voice
         /// </summary>
+        [DataType(DataType.Date)]
         public DateTime? CreationTime { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime? UpdatedLast { get; set; }
 
         public Song() { }

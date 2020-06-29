@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.ConsoleApp.Database.Models
 {
-    class Bar
+    public class Bar
     {
         /// <summary>
         /// The id of this bar

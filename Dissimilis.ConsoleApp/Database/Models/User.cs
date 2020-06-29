@@ -28,11 +28,15 @@ namespace Dissimilis.ConsoleApp.Database.Models
 		[Required]
 		public string Name { get; set; }
 
+		public ICollection<Song> Songs { get; set; }
+
 		/// <summary>
 		/// The user group this user belongs to (eg. admin)
 		/// </summary>
 		public UserGroup UserGroup { get; }
 		public int UserGroupId { get; set;  }
+
+		public ICollection<Part> Parts { get; set; }
 
 		/// <summary>
 		/// Date of birth of the user

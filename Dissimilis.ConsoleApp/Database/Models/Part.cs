@@ -15,18 +15,21 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// The Song that this Part belongs too
         /// </summary>
         public Song Song { get; }
-        public int SongId { get; }
 
         /// <summary>
-        /// ID of the creator, eg. instructor
+        /// The foregin key of the Song it belongs too
         /// </summary>
-        public int CreatorId { get; set; }
+        public int SongId { get; }
 
         /// <summary>
         /// A string containing name of instrument(should be it's own entity)
         /// </summary>
-        [Column(TypeName = "text")]
-        public string Instrument { get; set; }
+        public Instrument Instrument { get; set; }
+
+        /// <summary>
+        /// The collections of bars found in this part
+        /// </summary>
+        public ICollection<Bar> Bars { get; set; }
 
         /// <summary>
         /// Time and date of creation of voice

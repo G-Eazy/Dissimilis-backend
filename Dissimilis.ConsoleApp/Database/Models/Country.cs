@@ -8,7 +8,7 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class Country
     {
         [Key]
-        public int ID { get; set; }
+        public int CountryId { get; set; }
 
         /// <summary>
         /// The name of the country
@@ -20,11 +20,17 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// </summary>
         public string Language { get; set; }
 
+        /// <summary>
+        /// The collection of users belonging to this country
+        /// </summary>
+        public ICollection<User> Users { get; set; }
+
         public Country() { }
 
-        public Country(string country)
+        public Country(string country, string language)
         {
             this.CountryName = country;
+            this.Language = language;
         }
     }
 }
