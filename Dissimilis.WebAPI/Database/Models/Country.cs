@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Dissimilis.ConsoleApp.Database.Models
+namespace Dissimilis.WebAPI.Database.Models
 {
     public class Country
     {
@@ -20,11 +20,20 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// </summary>
         public string Language { get; set; }
 
+        /// <summary>
+        /// Empty constructor for Country
+        /// </summary>
         public Country() { }
 
-        public Country(string country)
+        /// <summary>
+        /// Constructor for Country with parameteres
+        /// </summary>
+        /// <param name="country"></param>
+        /// <param name="language"></param>
+        public Country(string country, string language)
         {
             this.CountryName = country;
+            this.Language = language;
         }
     }
 }
