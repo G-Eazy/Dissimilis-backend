@@ -29,6 +29,11 @@ namespace Dissimilis.WebAPI.Database
 			this.Database.EnsureCreated();
 		}
 
+		public DissimilisDbContext(DbContextOptions dbOptions) : base (dbOptions)
+        {
+
+        }
+
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (!optionsBuilder.IsConfigured)
@@ -85,7 +90,7 @@ namespace Dissimilis.WebAPI.Database
 				var entity = modelBuilder.Entity<Part>();
 
 				//set unique ID
-				entity.HasIndex(x => x.ID).IsUnique();
+				entity.HasIndex(x => x.Id).IsUnique();
 
 				//set foregin key for creator id
 				entity.HasOne(x => x.Song).WithMany()
@@ -116,7 +121,7 @@ namespace Dissimilis.WebAPI.Database
 				});
 
 				entity.HasOne(x => x.Part).WithMany()
-					.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Cascade);
+					.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
 
 
             }
