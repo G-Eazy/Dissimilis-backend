@@ -64,8 +64,8 @@ namespace Dissimilis.WebAPI.Database
 					.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 				//Set one to many relationshop between UserGroup and Users
-				entity.HasOne(x => x.UserGroup).WithMany()
-					.HasForeignKey(x => x.UserGroupId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+				entity.HasOne(x => x.UserGrp).WithMany()
+					.HasForeignKey(x => x.UserGrpId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 			}
 			#endregion
 

@@ -22,11 +22,6 @@ namespace Dissimilis.WebAPI.Database.Models
         public string ResourceGroup { get; set; }
 
         /// <summary>
-        /// The collection of users belonging to this usergroup
-        /// </summary>
-        public ICollection<User> Users { get; set; }
-
-        /// <summary>
         /// Empty constructor for UserGroup
         /// </summary>
         public UserGroup() { }

@@ -25,18 +25,17 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// Name of the user
 		/// </summary>
-		[Required]
-		public string Name { get; set; }
-
-		public ICollection<Song> Songs { get; set; }
+		[Required]		public string Name { get; set; }
 
 		/// <summary>
 		/// The user group this user belongs to (eg. admin)
 		/// </summary>
-		public UserGroup UserGroup { get; }
-		public int UserGroupId { get; set;  }
+		public UserGroup UserGrp { get; set; }
 
-		public ICollection<Part> Parts { get; set; }
+		/// <summary>
+		/// The usergroup Id this user is connected to
+		/// </summary>
+		public int UserGrpId { get; set; }
 
 		/// <summary>
 		/// Date of birth of the user
@@ -72,7 +71,7 @@ namespace Dissimilis.WebAPI.Database.Models
 			this.Username = username;
 			this.Email = email;
 			this.Name = name;
-			this.UserGroup = usergroup;
+			this.UserGrp = usergroup;
 			this.Country = country;
 			this.DateOfBirth = date_of_birth;
 		}
