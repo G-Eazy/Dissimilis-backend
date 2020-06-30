@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Dissimilis.ConsoleApp.Database
 {
@@ -18,10 +19,17 @@ namespace Dissimilis.ConsoleApp.Database
 		public DbSet<Song> Songs { get; set; }
 		public DbSet<Part> Part { get; set; }
 		public DbSet<Resource> Resources { get; set; }
+		public DbSet<Bar> Bars { get; set; }
+		public DbSet<Country> Countries { get; set; }
+		public DbSet<Instrument> Instruments { get; set; }
+		public DbSet<UserGroup> UserGroups { get; set; }
 
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
 		{
-			this.Database.EnsureDeleted();
+			#if DEBUG
+				this.Database.EnsureDeleted();
+			#endif
+
 			this.Database.EnsureCreated();
 		}
 
@@ -42,7 +50,7 @@ namespace Dissimilis.ConsoleApp.Database
 				var entity = modelBuilder.Entity<User>();
 
 				//Set unique ID for music sheet
-				entity.HasIndex(x => x.UserId).IsUnique();
+				entity.HasIndex(x => x.ID).IsUnique();
 
 				//Set unique username
 				entity.HasIndex(x => x.Username).IsUnique();
@@ -51,12 +59,12 @@ namespace Dissimilis.ConsoleApp.Database
 				entity.HasIndex(x => x.Email).IsUnique();
 
 				//set one to many relationshop between Country and Users
-				entity.HasOne(x => x.Country).WithMany(x => x.Users)
-					.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.CountryId).OnDelete(DeleteBehavior.Restrict);
+				entity.HasOne(x => x.Country).WithMany()
+					.HasForeignKey(x => x.ID).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 
 				//Set one to many relationshop between UserGroup and Users
-				entity.HasOne(x => x.UserGroup).WithMany(x => x.Users)
-					.HasForeignKey(x => x.UserGroupId).HasPrincipalKey(x => x.UserGroupId).OnDelete(DeleteBehavior.Restrict);
+				entity.HasOne(x => x.UserGroup).WithMany()
+					.HasForeignKey(x => x.ID).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 			}
 			#endregion
 
@@ -70,9 +78,9 @@ namespace Dissimilis.ConsoleApp.Database
 				entity.HasIndex(x => x.CreatorId).IsUnique();
 
 				//set foregin key for creator id
-				entity.HasOne(x => x.Creator).WithMany(x => x.Songs)
-					.HasForeignKey(x => x.CreatorId).HasPrincipalKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
-            }
+				entity.HasOne(x => x.Creator).WithMany()
+					.HasForeignKey(x => x.CreatorId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+			}
 			#endregion
 
 			//insert some new data
@@ -81,28 +89,44 @@ namespace Dissimilis.ConsoleApp.Database
 				var entity = modelBuilder.Entity<Part>();
 
 				//set unique ID
-				entity.HasIndex(x => x.PartId).IsUnique();
+				entity.HasIndex(x => x.ID).IsUnique();
 
 				//set foregin key for creator id
-				entity.HasOne(x => x.Song).WithMany(x => x.Parts)
-					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.SongId).OnDelete(DeleteBehavior.Restrict);
+				entity.HasOne(x => x.Song).WithMany()
+					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 
-				entity.HasOne(x => x.Instrument).WithMany(x => x.Parts)
+				entity.HasOne(x => x.Instrument).WithMany()
 					.HasForeignKey(x => x.Instrument);
-			
+
+			}
+			#endregion
+
+			#region Instrument data model
+			{
+				var entity = modelBuilder.Entity<Instrument>();
+
+				entity.HasIndex(x => x.ID).IsUnique();
+
 			}
             #endregion
 
-            #region Instrument data model
+            #region bar entity
             {
-				var entity = modelBuilder.Entity<Instrument>();
+				var entity = modelBuilder.Entity<Bar>();
 
-				entity.HasIndex(x => x.InstrumentId).IsUnique();
+				entity.HasIndex(x => new
+				{
+					x.PartId, x.BarNumber
+				});
+
+				entity.HasOne(x => x.Part).WithMany()
+					.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Cascade);
+
 
             }
-			#endregion
+            #endregion
 
 
-		}
+        }
     }
 }

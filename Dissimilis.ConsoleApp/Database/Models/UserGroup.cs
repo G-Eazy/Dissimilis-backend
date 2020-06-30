@@ -8,11 +8,12 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class UserGroup
     {
         [Key]
-        public int UserGroupId { get; set; }
+        public int ID { get; set; }
 
         /// <summary>
         /// Name of the grouptype for users
         /// </summary>
+        [Required]
         public string GroupName { get; set; }
 
         /// <summary>

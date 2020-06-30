@@ -8,7 +8,7 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class User
     {
 		[Key]
-		public int UserId { get; set; }
+		public int ID { get; set; }
 
 		/// <summary>
 		/// User name of logged in user
@@ -47,19 +47,34 @@ namespace Dissimilis.ConsoleApp.Database.Models
 		/// Country the user is from or belongs to
 		/// </summary>
 		public Country Country { get; set; }
+		/// <summary>
+		/// Foreign key for Country.ID
+		/// </summary>
 		public int CountryId { get; set; }
 
-
+		/// <summary>
+		/// Empty constructor for User
+		/// </summary>
 		public User() { }
 
+		/// <summary>
+		/// Constructor for User
+		/// </summary>
+		/// <param name="username"></param>
+		/// <param name="name"></param>
+		/// <param name="email"></param>
+		/// <param name="usergroup"></param>
+		/// <param name="country"></param>
+		/// <param name="date_of_birth"></param>
 		public User(string username, string name, string email, 
-					UserGroup usergroup, Country country, DateTime? datetime)
+					UserGroup usergroup, Country country, DateTime? date_of_birth)
 		{
 			this.Username = username;
 			this.Email = email;
 			this.Name = name;
 			this.UserGroup = usergroup;
 			this.Country = country;
+			this.DateOfBirth = date_of_birth;
 		}
 	}
 }

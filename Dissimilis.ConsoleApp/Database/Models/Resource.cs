@@ -8,17 +8,12 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class Resource
     {
         [Key]
-        public int ResourceId { get; set; }
+        public int ID { get; set; }
 
         /// <summary>
         /// the type of resource a user has, eg. printing, deleting etc
         /// </summary>
         public string ResourceType { get; set; }
-
-        /// <summary>
-        /// The collection of user groups that uses this resource
-        /// </summary>
-        public ICollection<UserGroup> Usergroups { get; set; }
 
         /// <summary>
         /// Empty constructor for Resource

@@ -2,7 +2,11 @@
 using System;
 using Dissimilis.ConsoleApp.Database.Models;
 using System.Linq;
-
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.ConsoleApp
 {
@@ -10,11 +14,12 @@ namespace Dissimilis.ConsoleApp
 	{
 		static void Main(string[] args)
 		{
-
-			Console.WriteLine("Hello World!");
+			//Hello line to console
+			Console.WriteLine("Hello Dissimilis!");
 
 			var context = new DissimilisDbContext();
 
+			//Set up initial database values
 			var cNo = new Country("Norway", "Norwegian");
 			var cSwe = new Country("Sweden", "Swedish");
 			var gAdmin = new UserGroup("Admin");
@@ -82,7 +87,7 @@ namespace Dissimilis.ConsoleApp
 					+ "\n Country: " + person.Country.CountryName
 					+ "\n Usergroup: " + person.UserGroup.GroupName
 					+ "\n Email: " + person.Email
-					+ "\n ID: " + person.UserId + "\n");
+					+ "\n ID: " + person.ID + "\n");
 
 			}
 			else
@@ -91,6 +96,5 @@ namespace Dissimilis.ConsoleApp
 			}
 		}
 	}
-
 }
 

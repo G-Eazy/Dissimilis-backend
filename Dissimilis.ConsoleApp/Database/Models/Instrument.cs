@@ -8,17 +8,25 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class Instrument
     {
         [Key]
-        public int InstrumentId { get; set; }
+        public int ID { get; set; }
 
+        /// <summary>
+        /// String containing the InstrumentType
+        /// </summary>
         public string InstrumentType { get; set; }
 
+        /// <summary>
+        /// Empty constructor for Instrument
+        /// </summary>
         public Instrument() { }
 
+        /// <summary>
+        /// Instrument constructor
+        /// </summary>
+        /// <param name="instrument"></param>
         public Instrument(string instrument)
         {
             this.InstrumentType = instrument;
         }
-
-        public ICollection<Part> Parts { get; set; }
     }
 }

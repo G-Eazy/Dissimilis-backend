@@ -9,7 +9,7 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class Part
     {
         [Key]
-        public int PartId { get; set; }
+        public int ID { get; set; }
 
         /// <summary>
         /// The Song that this Part belongs too
@@ -19,17 +19,12 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// <summary>
         /// The foregin key of the Song it belongs too
         /// </summary>
-        public int SongId { get; }
+        public int SongId { get; set; }
 
         /// <summary>
         /// A string containing name of instrument(should be it's own entity)
         /// </summary>
         public Instrument Instrument { get; set; }
-
-        /// <summary>
-        /// The collections of bars found in this part
-        /// </summary>
-        public ICollection<Bar> Bars { get; set; }
 
         /// <summary>
         /// Time and date of creation of voice
@@ -39,6 +34,7 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// <summary>
         /// The priority the voice has over other voices
         /// </summary>
+        [Column(TypeName = "TINYINT")]
         public int Priority { get; set; }
 
     }

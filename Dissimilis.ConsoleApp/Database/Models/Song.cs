@@ -10,7 +10,7 @@ namespace Dissimilis.ConsoleApp.Database.Models
     public class Song
     {
         [Key]
-        public int SongId { get; set; }
+        public int ID { get; set; }
 
         /// <summary>
         /// The song title of the music scheet (NO: Partitur)
@@ -21,7 +21,6 @@ namespace Dissimilis.ConsoleApp.Database.Models
         /// <summary>
         /// ID of the creator, eg. instructor
         /// </summary>
-        [Required]
         public User Creator { get; set; }
         public int CreatorId { get; set; }
 
@@ -36,29 +35,39 @@ namespace Dissimilis.ConsoleApp.Database.Models
         public string TimeSignature { get; set; }
 
         /// <summary>
-        /// The collection of parts found in a song
-        /// </summary>
-        public ICollection<Part> Parts { get; set; }
-
-        /// <summary>
         /// Time and date of creation of voice
         /// </summary>
         [DataType(DataType.Date)]
         public DateTime? CreationTime { get; set; }
 
+        /// <summary>
+        /// Date of when the song was last updated
+        /// </summary>
         [DataType(DataType.Date)]
         public DateTime? UpdatedLast { get; set; }
 
+        /// <summary>
+        /// Empty constructor for Song
+        /// </summary>
         public Song() { }
 
+        /// <summary>
+        /// COnstructor for Song
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="creator"></param>
+        /// <param name="composer"></param>
+        /// <param name="time_signature"></param>
+        /// <param name="creation_time"></param>
+
         public Song(string title, User creator,
-                    string composer, string TS, DateTime datetime)
+                    string composer, string time_signature, DateTime creation_time)
         {
             this.Title = title;
             this.Creator = creator;
             this.Composer = composer;
-            this.TimeSignature = TS;
-            this.CreationTime = datetime;
+            this.TimeSignature = time_signature;
+            this.CreationTime = creation_time;
         }
     }
 }
