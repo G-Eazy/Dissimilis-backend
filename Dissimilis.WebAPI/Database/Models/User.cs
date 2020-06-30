@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class User
     {
 		[Key]
-		public int ID { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// User name of logged in user

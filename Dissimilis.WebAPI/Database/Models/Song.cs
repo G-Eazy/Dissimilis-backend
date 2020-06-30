@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class Song
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The song title of the music scheet (NO: Partitur)

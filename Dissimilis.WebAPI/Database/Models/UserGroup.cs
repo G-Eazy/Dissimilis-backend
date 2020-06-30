@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class UserGroup
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Name of the grouptype for users

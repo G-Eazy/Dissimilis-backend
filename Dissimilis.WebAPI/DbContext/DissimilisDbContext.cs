@@ -46,7 +46,7 @@ namespace Dissimilis.WebAPI.Database
 				var entity = modelBuilder.Entity<User>();
 
 				//Set unique ID for music sheet
-				entity.HasIndex(x => x.ID).IsUnique();
+				entity.HasIndex(x => x.Id).IsUnique();
 
 				//Set unique username
 				entity.HasIndex(x => x.Username).IsUnique();
@@ -56,11 +56,11 @@ namespace Dissimilis.WebAPI.Database
 
 				//set one to many relationshop between Country and Users
 				entity.HasOne(x => x.Country).WithMany()
-					.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 				//Set one to many relationshop between UserGroup and Users
 				entity.HasOne(x => x.UserGroup).WithMany()
-					.HasForeignKey(x => x.UserGroupId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.UserGroupId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 			}
 			#endregion
 
@@ -75,7 +75,7 @@ namespace Dissimilis.WebAPI.Database
 
 				//set foregin key for creator id
 				entity.HasOne(x => x.Creator).WithMany()
-					.HasForeignKey(x => x.CreatorId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.CreatorId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 			}
 			#endregion
 
@@ -89,10 +89,10 @@ namespace Dissimilis.WebAPI.Database
 
 				//set foregin key for creator id
 				entity.HasOne(x => x.Song).WithMany()
-					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 				entity.HasOne(x => x.Instrument).WithMany()
-					.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Cascade);
+					.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
 
 			}
 			#endregion
@@ -101,7 +101,7 @@ namespace Dissimilis.WebAPI.Database
 			{
 				var entity = modelBuilder.Entity<Instrument>();
 
-				entity.HasIndex(x => x.ID).IsUnique();
+				entity.HasIndex(x => x.Id).IsUnique();
 
 			}
             #endregion

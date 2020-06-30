@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class Resource
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// the type of resource a user has, eg. printing, deleting etc

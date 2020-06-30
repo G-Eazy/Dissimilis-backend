@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class Country
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The name of the country

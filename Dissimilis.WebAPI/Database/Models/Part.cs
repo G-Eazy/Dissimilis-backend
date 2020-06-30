@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class Part
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// The Song that this Part belongs too
