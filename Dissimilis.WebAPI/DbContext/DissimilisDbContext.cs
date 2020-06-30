@@ -92,7 +92,7 @@ namespace Dissimilis.WebAPI.Database
 					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 
 				entity.HasOne(x => x.Instrument).WithMany()
-					.HasForeignKey(x => x.Instrument);
+					.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Cascade);
 
 			}
 			#endregion

@@ -27,6 +27,11 @@ namespace Dissimilis.WebAPI.Database.Models
         public Instrument Instrument { get; set; }
 
         /// <summary>
+        /// The id of the corresponding instrument
+        /// </summary>
+        public int InstrumentId { get; set; }
+
+        /// <summary>
         /// Time and date of creation of voice
         /// </summary>
         public DateTime? CreationTime { get; set; }

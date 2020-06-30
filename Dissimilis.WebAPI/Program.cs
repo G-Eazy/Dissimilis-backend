@@ -14,7 +14,7 @@ namespace Dissimilis.WebAPI
     {
         public static void Main(string[] args)
         {
-            var context = new DissimilisDbContext();
+            /*var context = new DissimilisDbContext();*/
 
             CreateHostBuilder(args).Build().Run();
         }
