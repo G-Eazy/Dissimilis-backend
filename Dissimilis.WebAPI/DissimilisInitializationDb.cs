@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Dissimilis.ConsoleApp.Database.Models;
+using Dissimilis.WebAPI.Database.Models;
 
-namespace Dissimilis.ConsoleApp.Database
+namespace Dissimilis.WebAPI.Database
 {
     public class DissimilisInitializationDb : DissimilisDbContext
 	{

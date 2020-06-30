@@ -1,6 +1,6 @@
-﻿using Dissimilis.ConsoleApp.Database;
+﻿using Dissimilis.WebAPI.Database;
 using System;
-using Dissimilis.ConsoleApp.Database.Models;
+using Dissimilis.WebAPI.Database.Models;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +8,7 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.ConsoleApp
+namespace Dissimilis.WebAPI
 {
 	class Program
 	{

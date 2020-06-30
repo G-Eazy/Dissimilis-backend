@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Dissimilis.ConsoleApp.Database.Models;
-using Dissimilis.ConsoleApp.Database;
+using Dissimilis.WebAPI.Database.Models;
+using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Logging;
 
-namespace Dissimilis.ConsoleApp.Database
+namespace Dissimilis.WebAPI.Database
 {
 	public class DissimilisDbContext : DbContext
 	{

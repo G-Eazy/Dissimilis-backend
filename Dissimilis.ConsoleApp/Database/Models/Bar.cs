@@ -4,7 +4,7 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dissimilis.ConsoleApp.Database.Models
+namespace Dissimilis.WebAPI.Database.Models
 {
     public class Bar
     {

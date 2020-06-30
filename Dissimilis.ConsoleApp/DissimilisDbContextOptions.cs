@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Dissimilis.ConsoleApp.Database
+namespace Dissimilis.WebAPI.Database
 {
     class DissimilisDbContextOptions : DbContextOptionsBuilder
 	{

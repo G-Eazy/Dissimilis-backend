@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dissimilis.ConsoleApp.Database.Models
+namespace Dissimilis.WebAPI.Database.Models
 {
     public class Song
     {

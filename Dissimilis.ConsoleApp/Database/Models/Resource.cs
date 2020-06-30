@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dissimilis.ConsoleApp.Database.Models
+namespace Dissimilis.WebAPI.Database.Models
 {
     public class Resource
     {

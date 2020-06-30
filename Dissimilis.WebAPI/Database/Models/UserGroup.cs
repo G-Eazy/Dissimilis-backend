@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Dissimilis.ConsoleApp.Database.Models
+namespace Dissimilis.WebAPI.Database.Models
 {
     public class UserGroup
     {
