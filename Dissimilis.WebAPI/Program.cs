@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +14,8 @@ namespace Dissimilis.WebAPI
     {
         public static void Main(string[] args)
         {
+            var context = new DissimilisDbContext();
+
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -56,11 +56,11 @@ namespace Dissimilis.WebAPI.Database
 
 				//set one to many relationshop between Country and Users
 				entity.HasOne(x => x.Country).WithMany()
-					.HasForeignKey(x => x.ID).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 
 				//Set one to many relationshop between UserGroup and Users
 				entity.HasOne(x => x.UserGroup).WithMany()
-					.HasForeignKey(x => x.ID).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
+					.HasForeignKey(x => x.UserGroupId).HasPrincipalKey(x => x.ID).OnDelete(DeleteBehavior.Restrict);
 			}
 			#endregion
 
