@@ -17,10 +17,4 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Data\appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

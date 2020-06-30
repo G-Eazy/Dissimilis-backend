@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.ConsoleApp", "Dissimilis.ConsoleApp\Dissimilis.ConsoleApp.csproj", "{E8E66735-1E91-4DBA-9E82-C307FA3C772B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.WebAPI", "Dissimilis.WebAPI\Dissimilis.WebAPI.csproj", "{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}"
 EndProject
 Global
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E8E66735-1E91-4DBA-9E82-C307FA3C772B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8E66735-1E91-4DBA-9E82-C307FA3C772B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8E66735-1E91-4DBA-9E82-C307FA3C772B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8E66735-1E91-4DBA-9E82-C307FA3C772B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
