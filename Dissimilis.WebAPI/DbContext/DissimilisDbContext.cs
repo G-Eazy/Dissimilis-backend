@@ -11,6 +11,7 @@ namespace Dissimilis.WebAPI.Database
 {
     public class DissimilisDbContext : DbContext
 	{
+		//Create Database set for all the models
 		public DbSet<User> Users { get; set; }
 		public DbSet<Song> Songs { get; set; }
 		public DbSet<Part> Part { get; set; }
@@ -22,6 +23,7 @@ namespace Dissimilis.WebAPI.Database
 
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
 		{
+			//Only ensure delete if in debug mode
 			#if DEBUG
 				this.Database.EnsureDeleted();
 			#endif
@@ -31,21 +33,19 @@ namespace Dissimilis.WebAPI.Database
 
 		public DissimilisDbContext(DbContextOptions dbOptions) : base (dbOptions)
         {
-
+			//Empty constructor with parameters to be used in startup.cs
         }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			if (!optionsBuilder.IsConfigured)
-			{
-			}
+			//Empty constructor to be used later for configuring the dbcontext
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 
-
+			//Here we are building the models and creating the different keys
 			#region model builder for User
 			{
 				var entity = modelBuilder.Entity<User>();
@@ -96,6 +96,7 @@ namespace Dissimilis.WebAPI.Database
 				entity.HasOne(x => x.Song).WithMany()
 					.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
+				//Set foregin key linked to Instrument and InstrumentId
 				entity.HasOne(x => x.Instrument).WithMany()
 					.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
 
@@ -106,6 +107,7 @@ namespace Dissimilis.WebAPI.Database
 			{
 				var entity = modelBuilder.Entity<Instrument>();
 
+				//Set instrument.Id to be unique
 				entity.HasIndex(x => x.Id).IsUnique();
 
 			}
@@ -115,11 +117,15 @@ namespace Dissimilis.WebAPI.Database
             {
 				var entity = modelBuilder.Entity<Bar>();
 
+				//Set a unique Id for barnumber that is related to PartId
+				//Each barnumber needs to be unique but only within it's
+				//corresponding Part.
 				entity.HasIndex(x => new
 				{
 					x.PartId, x.BarNumber
 				});
 
+				//Set foregin key for PartId linked to the Id of Part
 				entity.HasOne(x => x.Part).WithMany()
 					.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
 

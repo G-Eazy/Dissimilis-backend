@@ -33,6 +33,11 @@ namespace Dissimilis.WebAPI
         
         }
 
+        /// <summary>
+        /// Configure the DbOptions. We get the connectionstring 
+        /// that is placed in appsettings.Development.json
+        /// </summary>
+        /// <param name="dbCob"></param>
         protected virtual void ConfigureDbOptions(ref DbContextOptionsBuilder dbCob)
         {
             var conn = this.Configuration.GetConnectionString("default");
@@ -52,6 +57,7 @@ namespace Dissimilis.WebAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //create a service scope
             using(var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 using var context = serviceScope.ServiceProvider.GetRequiredService<DissimilisDbContext>();
