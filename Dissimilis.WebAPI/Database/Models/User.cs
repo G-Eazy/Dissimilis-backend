@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
@@ -16,6 +17,9 @@ namespace Dissimilis.WebAPI.Database.Models
 		[Required]
 		public string Username { get; set; }
 
+		[PasswordPropertyText]
+		public string Password { get; set; }
+
 		/// <summary>
 		/// Email address of user
 		/// </summary>
@@ -25,7 +29,8 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// Name of the user
 		/// </summary>
-		[Required]		public string Name { get; set; }
+		[Required]	
+		public string Name { get; set; }
 
 		/// <summary>
 		/// The user group this user belongs to (eg. admin)
