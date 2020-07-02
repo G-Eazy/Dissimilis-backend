@@ -1,12 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\gmarti\Home\Project\DissimilisBackend\Dissimilis.WebAPI\Dissimilis.WebAPI.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1" />
   </ItemGroup>
 
 
