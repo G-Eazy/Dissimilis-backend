@@ -51,7 +51,11 @@ namespace Dissimilis.WebAPI
 
         protected virtual void AddContextData(DissimilisDbContext dbContext)
         {
-            DissimilisSeeder.SeedData(dbContext);
+            //dont run if there are any users in the database
+            //No points as it will already have run the seeder.
+            if(!dbContext.Users.Any()){
+                DissimilisSeeder.SeedData(dbContext);
+            }
             //To do seeding of data
         }
 

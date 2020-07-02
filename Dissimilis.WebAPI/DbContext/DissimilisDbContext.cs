@@ -15,7 +15,7 @@ namespace Dissimilis.WebAPI.Database
 {
     public class DissimilisDbContext : DbContext
 	{
-        protected readonly IUserService userService;
+        protected readonly IUserService UserService;
 
         //Create Database set for all the models
         public DbSet<User> Users { get; set; }
@@ -32,8 +32,8 @@ namespace Dissimilis.WebAPI.Database
 
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
 		{
-			//Only ensure delete if in debug mode
-/*			#if DEBUG
+			//Only ensure delete if in debug mode, commented out as it isn't working right now
+			/*#if DEBUG
 				this.Database.EnsureDeleted();
 			#endif*/
 
@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Database
 
 		public DissimilisDbContext(DbContextOptions dbOptions, IUserService userService) : base (dbOptions)
         {
-			this.userService = userService;
+			this.UserService = userService ?? throw new ArgumentNullException(nameof(userService));
 			//Empty constructor with parameters to be used in startup.cs
         }
 
@@ -69,10 +69,12 @@ namespace Dissimilis.WebAPI.Database
 			BuildUserGroupResource(modelBuilder);
 		}
 
+
+		#region builder for all the models
 		/*This region builds all the models, BuildNAMEOFMODEL is
 		 the naming convention.*/
-		static void BuildUser (ModelBuilder builder)
-        {
+		static void BuildUser(ModelBuilder builder)
+		{
 			var entity = builder.Entity<User>();
 
 			//Set unique username
@@ -87,13 +89,13 @@ namespace Dissimilis.WebAPI.Database
 
 			entity.HasOne(x => x.Organisation).WithMany()
 				.HasForeignKey(x => x.OrganisationId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+
 		}
 
 		static void BuildSong (ModelBuilder builder)
         {
 			var entity = builder.Entity<Song>();
 
-		
 		}
 	
 		static void BuildPart (ModelBuilder builder)
@@ -112,6 +114,7 @@ namespace Dissimilis.WebAPI.Database
 			//Set foregin key linked to Instrument and InstrumentId
 			entity.HasOne(x => x.Instrument).WithMany()
 				.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+
 		}
 
 		static void BuildBar(ModelBuilder builder)
@@ -139,20 +142,39 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set instrument.Id to be unique
 			entity.HasIndex(x => x.Name).IsUnique();
+
 		}
 		
 		static void BuildCountry (ModelBuilder builder)
         {
 			var entity = builder.Entity<Country>();
 
-			entity.HasIndex(x => x.Id).IsUnique();
-        }
+			entity.HasIndex(x => x.Name).IsUnique();
+
+		}
 
 		static void BuildUserGroup(ModelBuilder builder)
 		{
 			var entity = builder.Entity<UserGroup>();
 
-			entity.HasIndex(x => x.Id).IsUnique();
+			entity.HasIndex(x => x.Name).IsUnique();
+
+		}
+
+		static void BuildResources(ModelBuilder builder)
+		{
+			var entity = builder.Entity<Resource>();
+
+			entity.HasIndex(x => x.Name).IsUnique();
+
+		}
+
+		static void BuildOrganisation(ModelBuilder builder)
+		{
+			var entity = builder.Entity<Organisation>();
+
+			entity.HasIndex(x => x.Name).IsUnique();
+
 		}
 
 		static void BuildUserGroupMembers(ModelBuilder builder)
@@ -190,39 +212,33 @@ namespace Dissimilis.WebAPI.Database
                 .HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
         }
 
-		static void BuildResources(ModelBuilder builder)
-		{
-			var entity = builder.Entity<Resource>();
+        #endregion 
 
-			entity.HasIndex(x => x.Name).IsUnique();
-		}
-
-		static void BuildOrganisation(ModelBuilder builder)
-		{
-			var entity = builder.Entity<Organisation>();
-
-			entity.HasIndex(x => x.Name).IsUnique();
-
-		}
-
-		public override int SaveChanges()
+        public override int SaveChanges()
 		{
 			var entries = ChangeTracker
 				.Entries()
-				.Where(e => e.Entity is BaseEntity && (
-						e.State == EntityState.Added
+				.Where(e =>	e.State == EntityState.Added
 						|| e.State == EntityState.Modified 
-						|| e.State == EntityState.Deleted));
+						|| e.State == EntityState.Deleted);
 
-			/*var IdentityName = 1;*/
+            //var UserIdentity = 1;
 
 			foreach (var item in entries)
 			{
-				((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-
-				if (item.State == EntityState.Added)
+				if (item.Entity is BaseEntity entity)
 				{
-					((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+					if (item.State == EntityState.Added)
+					{
+						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
+						//((BaseEntity)item.Entity).CreatedById = UserIdentity;
+					}
+
+					if (item.State == EntityState.Modified)
+					{
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						//((BaseEntity)item.Entity).UpdatedById = UserIdentity; ;
+					}
 				}
 			}
 
