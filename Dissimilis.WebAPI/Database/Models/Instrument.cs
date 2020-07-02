@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Instrument
+    public class Instrument : BaseEntity
     {
         [Key]
         public int Id { get; set; }

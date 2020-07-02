@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class UserGroup
+    public class UserGroup : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -16,10 +16,6 @@ namespace Dissimilis.WebAPI.Database.Models
         [Required]
         public string GroupName { get; set; }
 
-        /// <summary>
-        /// The resource group(s) a user belongs too
-        /// </summary>
-        public string ResourceGroup { get; set; }
 
         /// <summary>
         /// Empty constructor for UserGroup

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Country
+    public class Country : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -14,11 +14,6 @@ namespace Dissimilis.WebAPI.Database.Models
         /// The name of the country
         /// </summary>
         public string CountryName { get; set; }
-
-        /// <summary>
-        /// Country code for current country (eg. Norway == No)
-        /// </summary>
-        public string Language { get; set; }
 
         /// <summary>
         /// Empty constructor for Country
@@ -30,10 +25,9 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         /// <param name="country"></param>
         /// <param name="language"></param>
-        public Country(string country, string language)
+        public Country(string country)
         {
             this.CountryName = country;
-            this.Language = language;
         }
     }
 }

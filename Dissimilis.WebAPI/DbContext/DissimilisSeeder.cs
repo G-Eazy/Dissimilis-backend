@@ -13,13 +13,19 @@ namespace Dissimilis.WebAPI.Database
 			context.Database.EnsureCreated();
 
 			//Check if there is any data called Admin in the database first
-			var UserGroup1 = context.UserGroups.FirstOrDefault(b => b.GroupName == "Admin");
+			var Instructor = context.UserGroups.FirstOrDefault(b => b.GroupName == "Instructor");
 				
 			//If null, add a usergroup
-			if (UserGroup1 == null)
+			if (Instructor == null)
 			{
-				context.UserGroups.Add(new UserGroup("Admin"));
+				context.UserGroups.Add(new UserGroup("Instructor"));
 			}
+
+			var Sweden = context.Countries.FirstOrDefault(x => x.CountryName == "Sweden");
+			if (Sweden is null)
+            {
+				context.Countries.Add(new Country("Sweden"));
+            }
 
 			context.SaveChanges();
 			

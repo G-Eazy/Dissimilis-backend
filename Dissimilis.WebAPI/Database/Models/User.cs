@@ -6,8 +6,8 @@ using System.ComponentModel;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class User
-    {
+	public class User : BaseEntity
+	{
 		[Key]
 		public int Id { get; set; }
 
@@ -29,13 +29,8 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// Name of the user
 		/// </summary>
-		[Required]	
+		[Required]
 		public string Name { get; set; }
-
-		/// <summary>
-		/// The user group this user belongs to (eg. admin)
-		/// </summary>
-		public UserGroup UserGrp { get; set; }
 
 		/// <summary>
 		/// The usergroup Id this user is connected to
@@ -70,13 +65,12 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="usergroup"></param>
 		/// <param name="country"></param>
 		/// <param name="date_of_birth"></param>
-		public User(string username, string name, string email, 
+		public User(string username, string name, string email,
 					UserGroup usergroup, Country country, DateTime? date_of_birth)
 		{
 			this.Username = username;
 			this.Email = email;
 			this.Name = name;
-			this.UserGrp = usergroup;
 			this.Country = country;
 			this.DateOfBirth = date_of_birth;
 		}

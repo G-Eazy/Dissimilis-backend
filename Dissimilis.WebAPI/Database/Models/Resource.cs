@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Resource
+    public class Resource : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// the type of resource a user has, eg. printing, deleting etc
         /// </summary>
-        public string ResourceType { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// Empty constructor for Resource
@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="ResourceType"></param>
         public Resource(string ResourceType)
         {
-            this.ResourceType = ResourceType;
+            this.Type = ResourceType;
         }
     }
 }

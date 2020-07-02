@@ -30,7 +30,6 @@ namespace Dissimilis.WebAPI.Controllers
             //This return will return the users + their country and usergroup
             return this.context.Users
                 .Include(x => x.Country)
-                .Include(x => x.UserGrp)
                 .ToArray();
         }
 

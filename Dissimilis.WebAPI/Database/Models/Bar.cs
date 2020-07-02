@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Bar
+    public class Bar : BaseEntity
     {
         /// <summary>
         /// The id of this bar
