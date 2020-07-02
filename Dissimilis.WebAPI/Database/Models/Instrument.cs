@@ -13,7 +13,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// String containing the InstrumentType
         /// </summary>
-        public string InstrumentType { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Empty constructor for Instrument
@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="instrument"></param>
         public Instrument(string instrument)
         {
-            this.InstrumentType = instrument;
+            this.Name = instrument;
         }
     }
 }

@@ -26,15 +26,16 @@ namespace Dissimilis.WebAPI.Database
 		public DbSet<Country> Countries { get; set; }
 		public DbSet<Instrument> Instruments { get; set; }
 		public DbSet<UserGroup> UserGroups { get; set; }
+		public DbSet<Organisation> Organisations { get; set; }
 		public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
 		public DbSet<UserGroupResources> UserGroupResources { get; set; }
 
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
 		{
 			//Only ensure delete if in debug mode
-			#if DEBUG
+/*			#if DEBUG
 				this.Database.EnsureDeleted();
-			#endif
+			#endif*/
 
 			this.Database.EnsureCreated();
 		}
@@ -67,6 +68,7 @@ namespace Dissimilis.WebAPI.Database
 			BuildResources(modelBuilder);
 			BuildUserGroupResource(modelBuilder);
 		}
+
 		/*This region builds all the models, BuildNAMEOFMODEL is
 		 the naming convention.*/
 		static void BuildUser (ModelBuilder builder)
@@ -82,6 +84,9 @@ namespace Dissimilis.WebAPI.Database
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
 				.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
+			entity.HasOne(x => x.Organisation).WithMany()
+				.HasForeignKey(x => x.OrganisationId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
 		}
 
 		static void BuildSong (ModelBuilder builder)
@@ -133,7 +138,7 @@ namespace Dissimilis.WebAPI.Database
 			var entity = builder.Entity<Instrument>();
 
 			//Set instrument.Id to be unique
-			entity.HasIndex(x => x.Id).IsUnique();
+			entity.HasIndex(x => x.Name).IsUnique();
 		}
 		
 		static void BuildCountry (ModelBuilder builder)
@@ -142,13 +147,6 @@ namespace Dissimilis.WebAPI.Database
 
 			entity.HasIndex(x => x.Id).IsUnique();
         }
-
-		static void BuildOrganisation(ModelBuilder builder)
-		{
-			var entity = builder.Entity<Country>();
-
-			entity.HasIndex(x => x.Id).IsUnique();
-		}
 
 		static void BuildUserGroup(ModelBuilder builder)
 		{
@@ -196,8 +194,15 @@ namespace Dissimilis.WebAPI.Database
 		{
 			var entity = builder.Entity<Resource>();
 
-			entity.HasIndex(x => x.Id).IsUnique();
-			entity.HasIndex(x => x.Type).IsUnique();
+			entity.HasIndex(x => x.Name).IsUnique();
+		}
+
+		static void BuildOrganisation(ModelBuilder builder)
+		{
+			var entity = builder.Entity<Organisation>();
+
+			entity.HasIndex(x => x.Name).IsUnique();
+
 		}
 
 		public override int SaveChanges()

@@ -33,11 +33,6 @@ namespace Dissimilis.WebAPI.Database.Models
 		public string Name { get; set; }
 
 		/// <summary>
-		/// The usergroup Id this user is connected to
-		/// </summary>
-		public int UserGrpId { get; set; }
-
-		/// <summary>
 		/// Date of birth of the user
 		/// </summary>
 		public DateTime? DateOfBirth { get; set; }
@@ -52,6 +47,16 @@ namespace Dissimilis.WebAPI.Database.Models
 		public int CountryId { get; set; }
 
 		/// <summary>
+		/// The Organisation object associated with this user
+		/// </summary>
+		public Organisation Organisation { get; set; }
+
+		/// <summary>
+		/// The Id of the organisation this user belongs to
+		/// </summary>
+		public int OrganisationId { get; set; }
+
+		/// <summary>
 		/// Empty constructor for User
 		/// </summary>
 		public User() { }
@@ -62,16 +67,16 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="username"></param>
 		/// <param name="name"></param>
 		/// <param name="email"></param>
-		/// <param name="usergroup"></param>
 		/// <param name="country"></param>
 		/// <param name="date_of_birth"></param>
-		public User(string username, string name, string email,
-					UserGroup usergroup, Country country, DateTime? date_of_birth)
+		public User(string username, string name, string email, int organisationId,
+					int countryId, DateTime? date_of_birth)
 		{
 			this.Username = username;
 			this.Email = email;
+			this.OrganisationId = organisationId;
 			this.Name = name;
-			this.Country = country;
+			this.CountryId = countryId;
 			this.DateOfBirth = date_of_birth;
 		}
 	}

@@ -13,7 +13,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// The name of the country
         /// </summary>
-        public string CountryName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Empty constructor for Country
@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="language"></param>
         public Country(string country)
         {
-            this.CountryName = country;
+            this.Name = country;
         }
     }
 }

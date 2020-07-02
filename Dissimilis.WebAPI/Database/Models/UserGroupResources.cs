@@ -11,5 +11,13 @@ namespace Dissimilis.WebAPI.Database.Models
         public UserGroup UserGroup { get; set; }
         public int ResourceId { get; set; }
         public Resource Resource { get; set; }
+
+        public UserGroupResources() { }
+
+        public UserGroupResources(int resourceId, int userGroupId)
+        {
+            this.ResourceId = resourceId;
+            this.UserGroupId = userGroupId;
+        }
     }
 }

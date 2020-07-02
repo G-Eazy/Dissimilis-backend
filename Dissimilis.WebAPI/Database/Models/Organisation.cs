@@ -1,30 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Resource : BaseEntity
+    public class Organisation
     {
+        /// <summary>
+        /// ID of the organisation
+        /// </summary>
         [Key]
         public int Id { get; set; }
-
+        
         /// <summary>
-        /// the type of resource a user has, eg. printing, deleting etc
+        /// The name of the organisation
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Empty constructor for Resource
+        /// Empty constructor 
         /// </summary>
-        public Resource() { }
+        public Organisation() { }
 
         /// <summary>
-        /// Contructor for Resource
+        /// Constructor that takes a name of the organisation
         /// </summary>
-        /// <param name="ResourceType"></param>
-        public Resource(string name)
+        /// <param name="name"></param>
+        public Organisation(string name)
         {
             this.Name = name;
         }

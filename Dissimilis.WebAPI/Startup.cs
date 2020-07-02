@@ -51,6 +51,7 @@ namespace Dissimilis.WebAPI
 
         protected virtual void AddContextData(DissimilisDbContext dbContext)
         {
+            DissimilisSeeder.SeedData(dbContext);
             //To do seeding of data
         }
 
