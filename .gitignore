@@ -121,3 +121,6 @@ rcf/
 bin/
 obj/
 /Dissimilis.WebAPI/DbContext/DissimilisDataSeed.cs
+
+# Visual Studio Code
+.vscode
