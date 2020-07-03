@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Database
 		{
 			context.Database.EnsureCreated();
 			//Check if there is any data called Admin in the database first
-			var Instructor = context.UserGroups.FirstOrDefault(b => b.GroupName == "Admin");
+			var Instructor = context.UserGroups.FirstOrDefault(b => b.Name == "Admin");
 
 			//If null, add a usergroup
 			if (Instructor == null)

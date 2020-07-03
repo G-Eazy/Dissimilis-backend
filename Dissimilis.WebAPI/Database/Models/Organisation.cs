@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// Entity class for organisation
+    /// Contains Id and Name
+    /// </summary>
     public class Organisation
     {
         /// <summary>

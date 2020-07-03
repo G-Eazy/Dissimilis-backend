@@ -51,6 +51,10 @@ namespace Dissimilis.WebAPI.Database
 			//Empty constructor to be used later for configuring the dbcontext
 		}
 
+		/// <summary>
+		/// Created the models and configure them
+		/// </summary>
+		/// <param name="modelBuilder"></param>
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
@@ -78,7 +82,7 @@ namespace Dissimilis.WebAPI.Database
 			var entity = builder.Entity<User>();
 
 			//Set unique username
-			entity.HasIndex(x => x.Username).IsUnique();
+			//entity.HasIndex(x => x.Username).IsUnique();
 
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
@@ -214,6 +218,10 @@ namespace Dissimilis.WebAPI.Database
 
         #endregion 
 
+		/// <summary>
+		/// Ocerrideing the savechanges to add modified and added date
+		/// </summary>
+		/// <returns></returns>
         public override int SaveChanges()
 		{
 			var entries = ChangeTracker
@@ -222,7 +230,7 @@ namespace Dissimilis.WebAPI.Database
 						|| e.State == EntityState.Modified 
 						|| e.State == EntityState.Deleted);
 
-            //var UserIdentity = 1;
+            var UserIdentity = "SystemUser";
 
 			foreach (var item in entries)
 			{
@@ -231,13 +239,13 @@ namespace Dissimilis.WebAPI.Database
 					if (item.State == EntityState.Added)
 					{
 						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-						//((BaseEntity)item.Entity).CreatedById = UserIdentity;
+						((BaseEntity)item.Entity).CreatedBy = UserIdentity;
 					}
 
 					if (item.State == EntityState.Modified)
 					{
 						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						//((BaseEntity)item.Entity).UpdatedById = UserIdentity; ;
+						((BaseEntity)item.Entity).UpdatedBy = UserIdentity; ;
 					}
 				}
 			}

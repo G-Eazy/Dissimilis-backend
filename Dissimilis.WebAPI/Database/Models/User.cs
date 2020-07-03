@@ -6,19 +6,23 @@ using System.ComponentModel;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+	/// <summary>
+	/// User entity that contains: 
+	/// Id, email, name, DOB, org and country
+	/// </summary>
 	public class User : BaseEntity
 	{
 		[Key]
 		public int Id { get; set; }
 
-		/// <summary>
+		//Commented out because testing outsourcing to Google
+/*		/// <summary>
 		/// User name of logged in user
 		/// </summary>
 		[Required]
 		public string Username { get; set; }
 
-		[PasswordPropertyText]
-		public string Password { get; set; }
+		public string Password { get; set; }*/
 
 		/// <summary>
 		/// Email address of user
@@ -67,12 +71,12 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="username"></param>
 		/// <param name="name"></param>
 		/// <param name="email"></param>
+		/// <param name="organisationId"></param>
 		/// <param name="country"></param>
 		/// <param name="date_of_birth"></param>
 		public User(string username, string name, string email, int organisationId,
 					int countryId, DateTime? date_of_birth)
 		{
-			this.Username = username;
 			this.Email = email;
 			this.OrganisationId = organisationId;
 			this.Name = name;

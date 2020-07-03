@@ -5,8 +5,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// Entity class f
+    /// </summary>
     public class Resource : BaseEntity
     {
+        /// <summary>
+        /// The Id of this Resource
+        /// </summary>
         [Key]
         public int Id { get; set; }
 

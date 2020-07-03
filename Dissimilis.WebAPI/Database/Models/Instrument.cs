@@ -5,6 +5,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// Entity class for Instruemtn
+    /// Contains Id, Name
+    /// </summary>
     public class Instrument : BaseEntity
     {
         [Key]

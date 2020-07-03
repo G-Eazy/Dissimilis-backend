@@ -44,6 +44,23 @@
             Priority of the bar in a spesific part
             </summary>
         </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.BaseEntity">
+            <summary>
+            This entity class will be used when there are updates 
+            or additions to other entities, by updated the time created/updated
+            and who created/updated
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.CreatedBy">
+            <summary>
+            Who created this attribute
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.UpdatedBy">
+            <summary>
+            Who updated this attribute last
+            </summary>
+        </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.CreatedOn">
             <summary>
             When was this attribute created
@@ -71,6 +88,12 @@
             <param name="country"></param>
             <param name="language"></param>
         </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Instrument">
+            <summary>
+            Entity class for Instruemtn
+            Contains Id, Name
+            </summary>
+        </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.Instrument.Name">
             <summary>
             String containing the InstrumentType
@@ -86,6 +109,12 @@
             Instrument constructor
             </summary>
             <param name="instrument"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Organisation">
+            <summary>
+            Entity class for organisation
+            Contains Id and Name
+            </summary>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.Organisation.Id">
             <summary>
@@ -131,6 +160,16 @@
         <member name="P:Dissimilis.WebAPI.Database.Models.Part.PartNumber">
             <summary>
             The priority the voice has over other voices
+            </summary>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Resource">
+            <summary>
+            Entity class f
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Resource.Id">
+            <summary>
+            The Id of this Resource
             </summary>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.Resource.Name">
@@ -189,9 +228,10 @@
             <param name="time_signature"></param>
             <param name="creation_time"></param>
         </member>
-        <member name="P:Dissimilis.WebAPI.Database.Models.User.Username">
+        <member name="T:Dissimilis.WebAPI.Database.Models.User">
             <summary>
-            User name of logged in user
+            User entity that contains: 
+            Id, email, name, DOB, org and country
             </summary>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.User.Email">
@@ -241,10 +281,11 @@
             <param name="username"></param>
             <param name="name"></param>
             <param name="email"></param>
+            <param name="organisationId"></param>
             <param name="country"></param>
             <param name="date_of_birth"></param>
         </member>
-        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroup.GroupName">
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroup.Name">
             <summary>
             Name of the grouptype for users
             </summary>
@@ -259,6 +300,18 @@
             Constructor for UserGroup
             </summary>
             <param name="groupname"></param>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.DissimilisDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Created the models and configure them
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.DissimilisDbContext.SaveChanges">
+            <summary>
+            Ocerrideing the savechanges to add modified and added date
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Dissimilis.WebAPI.Program.CreateHostBuilder(System.String[])">
             <summary>

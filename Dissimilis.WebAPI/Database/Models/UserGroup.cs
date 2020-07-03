@@ -14,7 +14,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Name of the grouptype for users
         /// </summary>
         [Required]
-        public string GroupName { get; set; }
+        public string Name { get; set; }
 
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="groupname"></param>
         public UserGroup(string groupname)
         {
-            this.GroupName = groupname;
+            this.Name = groupname;
         }
     }
 }

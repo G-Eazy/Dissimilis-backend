@@ -5,19 +5,22 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// This entity class will be used when there are updates 
+    /// or additions to other entities, by updated the time created/updated
+    /// and who created/updated
+    /// </summary>
     public abstract class BaseEntity
     {
-/*        /// <summary>
+        /// <summary>
         /// Who created this attribute
         /// </summary>
-        public int CreatedBy { get; set; }
-        public User CreatedById { get; set; }
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// Who updated this attribute last
         /// </summary>
-        public int UpdatedBy { get; set; }
-        public User UpdatedById { get; set; }*/
+        public string UpdatedBy { get; set; }
 
         /// <summary>
         /// When was this attribute created
