@@ -3,21 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Database;
+using Experis.Ciber.Web.API.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
     [Route("api/oliver")]
     [ApiController]
-    public class TestController : ControllerBase
+    public class TestController : Experis.Ciber.Web.API.Controllers.UserControllerBase
     {
         //Private variable to get the DissimilisDbContext
         private DissimilisDbContext context;
         public TestController(DissimilisDbContext context)
         {
             this.context = context;
+        }
+
+        /// <summary>
+        /// Test method to get userId
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("userid")]
+        public ActionResult<string> MyTestMethod()
+        {
+            return base.Ok("My user ID is " + this.UserID);
         }
 
         /// <summary>
@@ -28,10 +40,13 @@ namespace Dissimilis.WebAPI.Controllers
         public ActionResult<Database.Models.User[]> GetAllUsers()
         {
             //This return will return the users + their country and usergroup
+            var userId = this.UserID;
+
             return this.context.Users
                 .Include(x => x.Country)
                 .ToArray();
         }
+
 
         /// <summary>
         /// This is a test method to fetch the api using a name and a number

@@ -30,6 +30,7 @@ namespace Dissimilis.WebAPI.Database
 		public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
 		public DbSet<UserGroupResources> UserGroupResources { get; set; }
 
+
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
 		{
 			//Only ensure delete if in debug mode, commented out as it isn't working right now

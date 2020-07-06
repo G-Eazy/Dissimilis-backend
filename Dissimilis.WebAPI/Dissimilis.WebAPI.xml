@@ -4,6 +4,19 @@
         <name>Dissimilis.WebAPI</name>
     </assembly>
     <members>
+        <member name="M:Dissimilis.WebAPI.Controllers.LoginController.FindUser(Experis.Ciber.Authentication.Microsoft.APIObjects.UserEntityMetadata)">
+            <summary>
+            Find if the user exists and return it if it does or create otherwise
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.TestController.MyTestMethod">
+            <summary>
+            Test method to get userId
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Dissimilis.WebAPI.Controllers.TestController.GetAllUsers">
             <summary>
             A test fucntion to fetch all users that are in the database
@@ -232,6 +245,16 @@
             <summary>
             User entity that contains: 
             Id, email, name, DOB, org and country
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Id">
+            <summary>
+            The Id of the user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.MsId">
+            <summary>
+            The microsoft Id of this user
             </summary>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.User.Email">

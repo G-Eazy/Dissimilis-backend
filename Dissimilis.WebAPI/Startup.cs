@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Experis.Ciber.Web.API.Middleware;
 
 namespace Dissimilis.WebAPI
 {
@@ -104,6 +105,8 @@ namespace Dissimilis.WebAPI
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "DissAPI V1");
             });
+
+            app.UseWebUserAuthentication();
 
             app.UseRouting();
 

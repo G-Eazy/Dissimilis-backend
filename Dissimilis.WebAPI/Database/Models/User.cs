@@ -12,8 +12,16 @@ namespace Dissimilis.WebAPI.Database.Models
 	/// </summary>
 	public class User : BaseEntity
 	{
+		/// <summary>
+		/// The Id of the user
+		/// </summary>
 		[Key]
 		public int Id { get; set; }
+
+		/// <summary>
+		/// The microsoft Id of this user
+		/// </summary>
+		public Guid MsId { get; set; }
 
 		//Commented out because testing outsourcing to Google
 /*		/// <summary>
@@ -21,7 +29,6 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// </summary>
 		[Required]
 		public string Username { get; set; }
-
 		public string Password { get; set; }*/
 
 		/// <summary>
