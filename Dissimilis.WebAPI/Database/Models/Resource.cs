@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Dissimilis.WebAPI.Database.Models
 {
     /// <summary>
-    /// Entity class f
+    /// Entity class for the resources users can access
     /// </summary>
     public class Resource : BaseEntity
     {

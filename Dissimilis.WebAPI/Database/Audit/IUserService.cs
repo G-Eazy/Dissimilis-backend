@@ -8,6 +8,6 @@ namespace Dissimilis.WebAPI.Database.Audit
     public interface IUserService
     {
         string GetUserId();
-        string GetUserName();
+        string GetName();
     }
 }

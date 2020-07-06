@@ -97,7 +97,6 @@ namespace Dissimilis.WebAPI
                 app.UseHttpsRedirection();
             }
 
-
             app.UseSwagger();
 
             app.UseSwaggerUI(c => 

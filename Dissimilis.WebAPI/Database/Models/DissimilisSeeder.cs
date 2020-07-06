@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.Database
 			var User = context.Users.FirstOrDefault(x => x.Name == "Bård B.");
 			if (User is null)
 			{
-				context.Users.Add(new User("Bård_diss", "Bård B.", "bård@dissimilis.no", 1, 1, new DateTime(1975, 08, 21)));
+				context.Users.Add(new User("Bård B.", "bård@dissimilis.no", 1, 1, new DateTime(1975, 08, 21)));
 			}
 
 			var Instrument = context.Instruments.FirstOrDefault(x => x.Name == "Piano");

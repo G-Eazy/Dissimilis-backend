@@ -72,9 +72,9 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="name"></param>
 		/// <param name="email"></param>
 		/// <param name="organisationId"></param>
-		/// <param name="country"></param>
+		/// <param name="countryId"></param>
 		/// <param name="date_of_birth"></param>
-		public User(string username, string name, string email, int organisationId,
+		public User(string name, string email, int organisationId,
 					int countryId, DateTime? date_of_birth)
 		{
 			this.Email = email;
