@@ -99,7 +99,6 @@
             Constructor for Country with parameteres
             </summary>
             <param name="country"></param>
-            <param name="language"></param>
         </member>
         <member name="T:Dissimilis.WebAPI.Database.Models.Instrument">
             <summary>
@@ -199,7 +198,7 @@
             <summary>
             Contructor for Resource
             </summary>
-            <param name="ResourceType"></param>
+            <param name="name"></param>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.Song.Title">
             <summary>
@@ -305,7 +304,7 @@
             <param name="name"></param>
             <param name="email"></param>
             <param name="organisationId"></param>
-            <param name="country"></param>
+            <param name="countryId"></param>
             <param name="date_of_birth"></param>
         </member>
         <member name="P:Dissimilis.WebAPI.Database.Models.UserGroup.Name">

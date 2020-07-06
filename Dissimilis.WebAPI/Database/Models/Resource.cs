@@ -29,7 +29,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// Contructor for Resource
         /// </summary>
-        /// <param name="ResourceType"></param>
+        /// <param name="name"></param>
         public Resource(string name)
         {
             this.Name = name;

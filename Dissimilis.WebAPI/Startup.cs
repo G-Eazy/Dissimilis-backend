@@ -61,7 +61,7 @@ namespace Dissimilis.WebAPI
             var conn = this.Configuration.GetConnectionString("default");
             if (conn is null)
             {
-                throw new Exception("Please set the connection string called default");
+                throw new Exception("The provided connection string is not valid");
             }
 
             dbCob.UseSqlServer(conn);

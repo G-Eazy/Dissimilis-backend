@@ -20,7 +20,7 @@ namespace Dissimilis.WebAPI.Database
         //Create Database set for all the models
         public DbSet<User> Users { get; set; }
 		public DbSet<Song> Songs { get; set; }
-		public DbSet<Part> Part { get; set; }
+		public DbSet<Part> Parts { get; set; }
 		public DbSet<Resource> Resources { get; set; }
 		public DbSet<Bar> Bars { get; set; }
 		public DbSet<Country> Countries { get; set; }

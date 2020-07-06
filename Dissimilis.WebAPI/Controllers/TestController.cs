@@ -11,7 +11,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/oliver")]
+    [Route("api/")]
     [ApiController]
     public class TestController : Experis.Ciber.Web.API.Controllers.UserControllerBase
     {
@@ -44,8 +44,11 @@ namespace Dissimilis.WebAPI.Controllers
 
             return this.context.Users
                 .Include(x => x.Country)
+                .Include(x => x.Organisation)
                 .ToArray();
         }
+
+
 
 
         /// <summary>

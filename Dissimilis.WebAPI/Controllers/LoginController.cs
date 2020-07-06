@@ -26,9 +26,9 @@ namespace Dissimilis.WebAPI.Controllers
             //TODO Notes
             //User the user information to look up or create a user
             //Extract the numberic UserId from the database
- /*           User webUser = FindUser(user);*/
+            User webUser = FindUser(user);
             error = null; //allows us to set an error. 
-            return new DissimilisWebCredentials(1);
+            return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id)); //Convert.ToUInt32(webUser.Id)
         }
 
         protected override DissimilisServicePrincipal GetServicePrincipal(string web_app_url)
@@ -47,11 +47,26 @@ namespace Dissimilis.WebAPI.Controllers
             var findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
             if (findUser is null)
             {
-                //Create user
-                this.context.Users.Add(new User() {Name = user.displayName, Email = user.Email(), MsId = user.id});
+                findUser = this.context.Users.FirstOrDefault(x => x.Name == user.displayName);
+                if (findUser is null)
+                {
+                    //Create user
+                    var newUser = new User() { Name = user.displayName, Email = user.Email(), MsId = user.id, OrganisationId = 1, CountryId = 1 };
+                    this.context.Users.Add(newUser);
+                    context.SaveChanges();
+
+                    findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
+                    this.context.UserGroupMembers.Add(new UserGroupMembers() { UserGroupId = 2, UserId = findUser.Id });
+                }
+                else
+                {
+                    // Create user that has same name with msID
+                    findUser.MsId = user.id;
+                }
             }
 
             context.SaveChanges();
+            findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
 
             return findUser;
         }

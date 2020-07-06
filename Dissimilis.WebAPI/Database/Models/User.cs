@@ -22,7 +22,7 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// The microsoft Id of this user
 		/// </summary>
 		public Guid MsId { get; set; }
-
+		
 		//Commented out because testing outsourcing to Google
 /*		/// <summary>
 		/// User name of logged in user
@@ -79,7 +79,7 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="name"></param>
 		/// <param name="email"></param>
 		/// <param name="organisationId"></param>
-		/// <param name="country"></param>
+		/// <param name="countryId"></param>
 		/// <param name="date_of_birth"></param>
 		public User(string username, string name, string email, int organisationId,
 					int countryId, DateTime? date_of_birth)
