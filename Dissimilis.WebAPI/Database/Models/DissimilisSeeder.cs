@@ -94,6 +94,14 @@ namespace Dissimilis.WebAPI.Database
 				context.UserGroupMembers.Add(new UserGroupMembers(1, 1));
 			}
 
+			var FirstSong = context.Songs.FirstOrDefault(x => x.Title == "Lisa Gikk Til Skolen");
+			if (FirstSong is null)
+            {
+				context.Songs.Add(new Song() { Title = "Lisa Gikk Til Skolen", Composer = "Unknown", ArrangerId = 1, TimeSignature = "4/4" });
+				context.Songs.Add(new Song() { Title = "Fade To Black", Composer = "Metallica", ArrangerId = 1, TimeSignature = "4/4" });
+				context.Songs.Add(new Song() { Title = "Be Yourself", Composer = "Audioslave", ArrangerId = 1, TimeSignature = "4/4" });
+			}
+
 			context.SaveChanges();
 
 		}
