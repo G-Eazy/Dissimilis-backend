@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MediatR;
 
 namespace Dissimilis.WebAPI
 {
@@ -35,6 +36,8 @@ namespace Dissimilis.WebAPI
             services.AddControllers();
 
             services.AddDbContext<DissimilisDbContext>(x => this.ConfigureDbOptions(ref x));
+
+            services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
             services.AddSwaggerGen(c =>
             {
