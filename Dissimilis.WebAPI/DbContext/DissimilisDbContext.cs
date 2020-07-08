@@ -99,7 +99,7 @@ namespace Dissimilis.WebAPI.Database
 		static void BuildSong (ModelBuilder builder)
         {
 			var entity = builder.Entity<Song>();
-
+			entity.HasOne(x => x.Arranger).WithMany().HasForeignKey(x => x.ArrangerId);
 		}
 	
 		static void BuildPart (ModelBuilder builder)
