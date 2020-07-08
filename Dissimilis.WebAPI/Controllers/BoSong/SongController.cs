@@ -17,7 +17,6 @@ namespace Dissimilis.WebAPI.Controllers
     public class SongController : ControllerBase
     {
         //Private variable to get the DissimilisDbContext
-        private DissimilisDbContext context;
         private IMediator _mediator;
         public SongController(IMediator _mediator)
         {
