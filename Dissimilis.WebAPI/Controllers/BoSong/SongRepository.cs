@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Database;
+﻿using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,6 +23,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var SongModelArray = await this._context.Songs.ToArrayAsync(cancellationToken);
             return SongModelArray;
+        }
+
+        public async Task<Song> CreateSong(CreateSongCommand request, CancellationToken cancellation)
+        {
+            var SongObject = new Song()
+            {
+                Title = request.NewSongObject.Title,
+                ArrangerId = 1  // TODO: Hardcoded for now. Should be set from request
+            };
+            await this._context.Songs.AddAsync(SongObject);
+            await this._context.SaveChangesAsync();
+            return SongObject;
         }
     }
 }

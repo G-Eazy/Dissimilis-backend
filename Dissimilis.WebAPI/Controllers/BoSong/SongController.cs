@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.Queries;
+using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 
 namespace Dissimilis.WebAPI.Controllers
 {
@@ -27,11 +29,25 @@ namespace Dissimilis.WebAPI.Controllers
         /// Fetch all songs in the database
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetAllSongs()
         {
             var SongDTOArray = await _mediator.Send(new QueryAllSongs());
             return Ok(SongDTOArray);
+        }
+
+        /// <summary>
+        /// Create new song
+        /// </summary>
+        /// <param name="NewSongDTO"></param>
+        /// <returns>201/returns>
+
+        [HttpPost]
+        public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
+        {
+            var SongDTO = await _mediator.Send(new CreateSongCommand(NewSongObject));
+            return Created("", SongDTO);
+
         }
     }
 }
