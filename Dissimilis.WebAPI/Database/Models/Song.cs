@@ -7,7 +7,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Song
+    /// <summary>
+    /// This is the whole songs, which contains one or more parts 
+    /// </summary>
+    public class Song : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -21,8 +24,12 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// ID of the creator, eg. instructor
         /// </summary>
-        public User Creator { get; set; }
-        public int CreatorId { get; set; }
+        public User Arranger { get; set; }
+
+        /// <summary>
+        /// The id of the corresponding creator aka. User.Id
+        /// </summary>
+        public int ArrangerId { get; set; }
 
         /// <summary>
         /// The composer of the song
@@ -33,18 +40,6 @@ namespace Dissimilis.WebAPI.Database.Models
         /// The time signature of the song (NO: Taktart)
         /// </summary>
         public string TimeSignature { get; set; }
-
-        /// <summary>
-        /// Time and date of creation of voice
-        /// </summary>
-        [DataType(DataType.Date)]
-        public DateTime? CreationTime { get; set; }
-
-        /// <summary>
-        /// Date of when the song was last updated
-        /// </summary>
-        [DataType(DataType.Date)]
-        public DateTime? UpdatedLast { get; set; }
 
         /// <summary>
         /// Empty constructor for Song
@@ -64,10 +59,8 @@ namespace Dissimilis.WebAPI.Database.Models
                     string composer, string time_signature, DateTime creation_time)
         {
             this.Title = title;
-            this.Creator = creator;
             this.Composer = composer;
             this.TimeSignature = time_signature;
-            this.CreationTime = creation_time;
         }
     }
 }

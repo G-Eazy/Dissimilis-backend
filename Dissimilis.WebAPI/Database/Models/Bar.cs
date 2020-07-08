@@ -6,7 +6,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Bar
+    /// <summary>
+    /// This is the bar, which is associated with a Part (norsk: Takt)
+    /// </summary>
+    public class Bar : BaseEntity
     {
         /// <summary>
         /// The id of this bar
@@ -34,5 +37,10 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Priority of the bar in a spesific part
         /// </summary>
         public byte BarNumber { get; set; }
+
+        /// <summary>
+        /// Empty constructor for Bar
+        /// </summary>
+        public Bar () { }
     }
 }

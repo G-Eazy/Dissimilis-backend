@@ -6,7 +6,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Part
+    /// <summary>
+    /// This is a part, which is associated with a Song and contains bars
+    /// </summary>
+    public class Part : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -32,15 +35,14 @@ namespace Dissimilis.WebAPI.Database.Models
         public int InstrumentId { get; set; }
 
         /// <summary>
-        /// Time and date of creation of voice
-        /// </summary>
-        public DateTime? CreationTime { get; set; }
-
-        /// <summary>
         /// The priority the voice has over other voices
         /// </summary>
-        [Column(TypeName = "TINYINT")]
-        public int Priority { get; set; }
+        public byte PartNumber { get; set; }
+
+        /// <summary>
+        /// Empty constructor for Part.cs
+        /// </summary>
+        public Part() { }
 
     }
 }

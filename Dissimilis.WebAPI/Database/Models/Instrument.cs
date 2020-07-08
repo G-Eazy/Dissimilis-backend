@@ -5,7 +5,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class Instrument
+    /// <summary>
+    /// Entity class for Instruemtn
+    /// Contains Id, Name
+    /// </summary>
+    public class Instrument : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -13,7 +17,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// String containing the InstrumentType
         /// </summary>
-        public string InstrumentType { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Empty constructor for Instrument
@@ -26,7 +30,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="instrument"></param>
         public Instrument(string instrument)
         {
-            this.InstrumentType = instrument;
+            this.Name = instrument;
         }
     }
 }

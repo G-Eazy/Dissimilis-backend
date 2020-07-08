@@ -14,11 +14,15 @@ namespace Dissimilis.WebAPI
     {
         public static void Main(string[] args)
         {
-            /*var context = new DissimilisDbContext();*/
-
+            //Run the hostbuilder
             CreateHostBuilder(args).Build().Run();
         }
 
+        /// <summary>
+        /// This function created the HostBuilder from Startup.cs
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>

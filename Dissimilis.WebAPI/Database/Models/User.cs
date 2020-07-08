@@ -2,19 +2,27 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class User
-    {
+	/// <summary>
+	/// User entity that contains: 
+	/// Id, email, name, DOB, org and country
+	/// </summary>
+	public class User : BaseEntity
+	{
 		[Key]
 		public int Id { get; set; }
 
-		/// <summary>
+		//Commented out because testing outsourcing to Google
+/*		/// <summary>
 		/// User name of logged in user
 		/// </summary>
 		[Required]
 		public string Username { get; set; }
+
+		public string Password { get; set; }*/
 
 		/// <summary>
 		/// Email address of user
@@ -27,16 +35,6 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// </summary>
 		[Required]
 		public string Name { get; set; }
-
-		public ICollection<Song> Songs { get; set; }
-
-		/// <summary>
-		/// The user group this user belongs to (eg. admin)
-		/// </summary>
-		public UserGroup UserGroup { get; }
-		public int UserGroupId { get; set;  }
-
-		public ICollection<Part> Parts { get; set; }
 
 		/// <summary>
 		/// Date of birth of the user
@@ -53,6 +51,16 @@ namespace Dissimilis.WebAPI.Database.Models
 		public int CountryId { get; set; }
 
 		/// <summary>
+		/// The Organisation object associated with this user
+		/// </summary>
+		public Organisation Organisation { get; set; }
+
+		/// <summary>
+		/// The Id of the organisation this user belongs to
+		/// </summary>
+		public int OrganisationId { get; set; }
+
+		/// <summary>
 		/// Empty constructor for User
 		/// </summary>
 		public User() { }
@@ -63,17 +71,16 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="username"></param>
 		/// <param name="name"></param>
 		/// <param name="email"></param>
-		/// <param name="usergroup"></param>
-		/// <param name="country"></param>
+		/// <param name="organisationId"></param>
+		/// <param name="countryId"></param>
 		/// <param name="date_of_birth"></param>
-		public User(string username, string name, string email, 
-					UserGroup usergroup, Country country, DateTime? date_of_birth)
+		public User(string name, string email, int organisationId,
+					int countryId, DateTime? date_of_birth)
 		{
-			this.Username = username;
 			this.Email = email;
+			this.OrganisationId = organisationId;
 			this.Name = name;
-			this.UserGroup = usergroup;
-			this.Country = country;
+			this.CountryId = countryId;
 			this.DateOfBirth = date_of_birth;
 		}
 	}

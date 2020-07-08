@@ -11,8 +11,7 @@ namespace Dissimilis.WebAPI.Database
     class DissimilisDbContextOptions : DbContextOptionsBuilder
 	{
 		public DissimilisDbContextOptions() {
-            
-            this.UseSqlServer("(localdb)\\mssqllocaldb; Database=DissimilisDB;Trusted_Connection=True;ConnectRetryCount=0");
+            this.UseSqlServer("Server=(localdb)\\mssqllocaldb; Database=DissimilisDB;Trusted_Connection=True;ConnectRetryCount=0");
         }
 
 	}

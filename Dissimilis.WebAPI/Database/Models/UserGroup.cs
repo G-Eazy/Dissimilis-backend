@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
-    public class UserGroup
+    public class UserGroup : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -14,17 +14,8 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Name of the grouptype for users
         /// </summary>
         [Required]
-        public string GroupName { get; set; }
+        public string Name { get; set; }
 
-        /// <summary>
-        /// The resource group(s) a user belongs too
-        /// </summary>
-        public string ResourceGroup { get; set; }
-
-        /// <summary>
-        /// The collection of users belonging to this usergroup
-        /// </summary>
-        public ICollection<User> Users { get; set; }
 
         /// <summary>
         /// Empty constructor for UserGroup
@@ -37,7 +28,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="groupname"></param>
         public UserGroup(string groupname)
         {
-            this.GroupName = groupname;
+            this.Name = groupname;
         }
     }
 }
