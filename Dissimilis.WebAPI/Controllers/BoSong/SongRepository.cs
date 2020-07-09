@@ -1,4 +1,5 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
 using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,26 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 await this._context.SaveChangesAsync();
             }
             return SongObject;
+        }
+        public async Task<Song[]> GetSongsByArranger(SongsByArrangerDTO SongsByArrangerObject, CancellationToken cancellationToken)
+        {
+            var Num = SongsByArrangerObject.Num;
+            var ArrangerId = SongsByArrangerObject.ArrangerId;
+            bool OrderByDateTime = SongsByArrangerObject.OrderByDateTime;
+
+            var SongQuery = this._context.Songs
+                .Where(s => s.ArrangerId == ArrangerId)
+                .AsQueryable();
+
+            if (OrderByDateTime)
+                SongQuery = SongQuery
+                    .OrderByDescending(s => s.UpdatedOn);
+
+            var SongModelArray = await SongQuery
+                .Take(Num)
+                .ToArrayAsync(cancellationToken);
+
+            return SongModelArray;
         }
     }
 }

@@ -80,6 +80,17 @@ namespace Dissimilis.WebAPI.Controllers
             else
                 return NoContent();
         }
+        
+        /// <summary>
+        /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
+        /// </summary>
+        /// <returns>200</returns>
+        [HttpGet("songs")]
+        public async Task<IActionResult> GetSongsOfArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
+        {
+            var SongDTOArray = await _mediator.Send(new SongsByArrangerQuery(SongsByArrangerObject));
+            return Ok(SongDTOArray);
+        }
 
     }
 }
