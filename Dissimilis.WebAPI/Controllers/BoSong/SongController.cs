@@ -36,19 +36,44 @@ namespace Dissimilis.WebAPI.Controllers
             var SongDTOArray = await _mediator.Send(new QueryAllSongs());
             return Ok(SongDTOArray);
         }
+        
+        /// <summary>
+        /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
+        /// </summary>
+        /// <returns>200</returns>
+        [HttpGet("songs")]
+        public async Task<IActionResult> GetSongsByArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
+        {
+            var SongDTOArray = await _mediator.Send(new SongsByArrangerQuery(SongsByArrangerObject));
+            return Ok(SongDTOArray);
+        }
 
         /// <summary>
         /// Create new song. Arranger must be id of somebody in DB, see below.
         /// </summary>
         /// <param name="NewSongDTO"></param>
         /// <returns>201</returns>
-
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
             var SongDTO = await _mediator.Send(new CreateSongCommand(NewSongObject));
             return Created("", SongDTO);
 
+        }
+        
+        /// <summary>
+        /// Update song by Id
+        /// </summary>
+        /// <returns>200</returns> 
+        [HttpPost("{Id:int}")]
+        public async Task<IActionResult> UpdateSong(int Id)
+        {
+            var UpdateSongObject = new UpdateSongDTO(Id);
+            var result = await _mediator.Send(new UpdateSongCommand(UpdateSongObject));
+            if (result != null)
+                return Ok("Updated song: " + result.Id);
+            else
+                return NoContent();
         }
 
         /// <summary>
@@ -66,31 +91,5 @@ namespace Dissimilis.WebAPI.Controllers
                 return NoContent();
         }
         
-        /// <summary>
-        /// Update song by Id
-        /// </summary>
-        /// <returns>200</returns> 
-        [HttpPost("{Id:int}")]
-        public async Task<IActionResult> UpdateSong(int Id)
-        {
-            var UpdateSongObject = new UpdateSongDTO(Id);
-            var result = await _mediator.Send(new UpdateSongCommand(UpdateSongObject));
-            if (result != null)
-                return Ok("Updated song: " + result.Id);
-            else
-                return NoContent();
-        }
-        
-        /// <summary>
-        /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
-        /// </summary>
-        /// <returns>200</returns>
-        [HttpGet("songs")]
-        public async Task<IActionResult> GetSongsOfArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
-        {
-            var SongDTOArray = await _mediator.Send(new SongsByArrangerQuery(SongsByArrangerObject));
-            return Ok(SongDTOArray);
-        }
-
     }
 }
