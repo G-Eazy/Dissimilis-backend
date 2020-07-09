@@ -9,5 +9,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DTOs
     public class NewSongDTO
     {
         public string Title { get; set; }
+        public int ArrangerId { get; set; }
+
     }
 }

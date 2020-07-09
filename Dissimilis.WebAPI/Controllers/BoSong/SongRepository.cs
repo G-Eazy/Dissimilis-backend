@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var SongObject = new Song()
             {
                 Title = request.NewSongObject.Title,
-                ArrangerId = 1  // TODO: Hardcoded for now. Should be set from request
+                ArrangerId = request.NewSongObject.ArrangerId
             };
             await this._context.Songs.AddAsync(SongObject);
             await this._context.SaveChangesAsync();

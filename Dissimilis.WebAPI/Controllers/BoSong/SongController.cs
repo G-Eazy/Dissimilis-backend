@@ -37,10 +37,10 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Create new song
+        /// Create new song. Arranger must be id of somebody in DB, see below.
         /// </summary>
         /// <param name="NewSongDTO"></param>
-        /// <returns>201/returns>
+        /// <returns>201</returns>
 
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
