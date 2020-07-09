@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Dissimilis.WebAPI.Database.Models;
+using Dissimilis.WebAPI.Controllers.SuperDTOs;
 using Dissimilis.WebAPI.Controllers.BoSong.Queries;
 using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
@@ -49,5 +50,21 @@ namespace Dissimilis.WebAPI.Controllers
             return Created("", SongDTO);
 
         }
+
+        /// <summary>
+        /// Delete song by Id
+        /// </summary>
+        /// <returns>200</returns> 
+        [HttpDelete("{Id:int}")]
+        public async Task<IActionResult> DeleteSong(int Id)
+        {
+            var DeleteSongObject = new SuperDTO(Id);
+            var result = await _mediator.Send(new DeleteSongCommand(DeleteSongObject));
+            if (result != null)
+                return Ok("Removed song: " + result.Id);
+            else
+                return NoContent();
+        }
+
     }
 }
