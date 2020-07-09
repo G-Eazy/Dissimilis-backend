@@ -65,6 +65,21 @@ namespace Dissimilis.WebAPI.Controllers
             else
                 return NoContent();
         }
+        
+        /// <summary>
+        /// Update song by Id
+        /// </summary>
+        /// <returns>200</returns> 
+        [HttpPost("{Id:int}")]
+        public async Task<IActionResult> UpdateSong(int Id)
+        {
+            var UpdateSongObject = new UpdateSongDTO(Id);
+            var result = await _mediator.Send(new UpdateSongCommand(UpdateSongObject));
+            if (result != null)
+                return Ok("Updated song: " + result.Id);
+            else
+                return NoContent();
+        }
 
     }
 }

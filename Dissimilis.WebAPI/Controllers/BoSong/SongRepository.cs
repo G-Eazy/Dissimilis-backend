@@ -47,5 +47,16 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             }
             return SongObject;
         }
+        public async Task<Song> UpdateSong(UpdateSongCommand request, CancellationToken cancellation)
+        {
+            var UpdateSongObjectId = request.UpdateSongObject.Id;
+            var SongObject = await this._context.Songs.FirstOrDefaultAsync(s => s.Id == UpdateSongObjectId, cancellation);
+            if (SongObject != null) 
+            {
+                SongObject.UpdatedOn = DateTime.UtcNow;
+                await this._context.SaveChangesAsync();
+            }
+            return SongObject;
+        }
     }
 }
