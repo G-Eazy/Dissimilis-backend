@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Fetch all users in the database
         /// </summary>
         /// <returns>AllUsers</returns>
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             var UserDTOArray = await _mediator.Send(new QueryAllUsers());
