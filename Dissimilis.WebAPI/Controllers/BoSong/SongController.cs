@@ -56,8 +56,12 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
-            var SongDTO = await _mediator.Send(new CreateSongCommand(NewSongObject));
-            return Created("", SongDTO);
+            var result = await _mediator.Send(new CreateSongCommand(NewSongObject));
+
+            if (result != null)
+                return Created("", "Created song: " + result.Id);
+            else
+                return NoContent();
 
         }
         

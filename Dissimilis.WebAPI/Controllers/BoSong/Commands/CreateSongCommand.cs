@@ -1,5 +1,6 @@
 using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
 using Dissimilis.WebAPI.Database;
+using Dissimilis.WebAPI.Controllers.BoUser;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -22,15 +23,27 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
     public class CreateSongCommandHandler : MediatR.IRequestHandler<CreateSongCommand, SongDTO>
     {
         private SongRepository _repository;
+
+        public UserRepository _user_repository { get; set; }
+
         public CreateSongCommandHandler(DissimilisDbContext context)
         {
             this._repository = new SongRepository(context);
+            this._user_repository = new UserRepository(context);
         }
         public async Task<SongDTO> Handle(CreateSongCommand request, CancellationToken cancellationToken)
         {
-            var SongModel = await _repository.CreateSong(request, cancellationToken);
-            var SongDTO = new SongDTO(SongModel);
-            return SongDTO;
+            var ArrangerId = request.NewSongObject.ArrangerId;
+            var ExistsArranger = await this._user_repository.GetUserById(ArrangerId, cancellationToken);
+            SongDTO SongObject = null;
+            if (ExistsArranger != null)
+            { 
+                var SongModel = await _repository.CreateSong(request, cancellationToken);
+                SongObject = new SongDTO(SongModel);
+            }
+
+
+            return SongObject;
         }
 
 
