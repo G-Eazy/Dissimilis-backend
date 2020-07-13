@@ -11,7 +11,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/")]
+    [Route("api/test")]
     [ApiController]
     public class TestController : Experis.Ciber.Web.API.Controllers.UserControllerBase
     {

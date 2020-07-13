@@ -44,9 +44,10 @@ namespace Dissimilis.WebAPI.Controllers
         /// <returns></returns>
         protected User FindUser (UserEntityMetadata user)
         {
-            var findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
+            var findUser = this.context.Users.Single(x => x.MsId == user.id);
             if (findUser is null)
             {
+                //IMPROVE
                 findUser = this.context.Users.FirstOrDefault(x => x.Name == user.displayName);
                 if (findUser is null)
                 {

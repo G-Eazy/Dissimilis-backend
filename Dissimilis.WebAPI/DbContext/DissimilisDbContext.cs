@@ -41,9 +41,8 @@ namespace Dissimilis.WebAPI.Database
 			this.Database.EnsureCreated();
 		}
 
-		public DissimilisDbContext(DbContextOptions dbOptions, IUserService userService) : base (dbOptions)
+		public DissimilisDbContext(DbContextOptions dbOptions) : base (dbOptions)
         {
-			this.UserService = userService ?? throw new ArgumentNullException(nameof(userService));
 			//Empty constructor with parameters to be used in startup.cs
         }
 
@@ -227,7 +226,8 @@ namespace Dissimilis.WebAPI.Database
 		{
 			var entries = ChangeTracker
 				.Entries()
-				.Where(e =>	e.State == EntityState.Added
+				.Where(e =>	
+				e.State == EntityState.Added
 						|| e.State == EntityState.Modified 
 						|| e.State == EntityState.Deleted);
 
