@@ -7,6 +7,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// This is the whole songs, which contains one or more parts 
+    /// </summary>
     public class Song : BaseEntity
     {
         [Key]

@@ -38,24 +38,28 @@ namespace Dissimilis.WebAPI.Database
 			if (Organisation is null)
             {
 				context.Organisations.Add(new Organisation("Dissimilis Norge"));
-            }
+				context.Organisations.Add(new Organisation("Dissimilis Kultursenter"));
+			}
 
 			var Sweden = context.Countries.FirstOrDefault(x => x.Name == "Norway");
 			if (Sweden is null)
 			{
 				context.Countries.Add(new Country("Norway"));
+				context.Countries.Add(new Country("Sweden"));
 			}
 
 			var User = context.Users.FirstOrDefault(x => x.Name == "Bård B.");
 			if (User is null)
 			{
-				context.Users.Add(new User("Bård_diss", "Bård B.", "bård@dissimilis.no", 1, 1, new DateTime(1975, 08, 21)));
+				context.Users.Add(new User("Bård B.", "bård@dissimilis.no", 1, 1, new DateTime(1975, 08, 21)));
 			}
 
 			var Instrument = context.Instruments.FirstOrDefault(x => x.Name == "Piano");
 			if (Instrument is null)
 			{
 				context.Instruments.Add(new Instrument("Piano"));
+				context.Instruments.Add(new Instrument("Guitar"));
+				context.Instruments.Add(new Instrument("Bass"));
 			}
 
 			context.SaveChanges();
@@ -65,19 +69,37 @@ namespace Dissimilis.WebAPI.Database
 			var resourceGroup = context.UserGroupResources.FirstOrDefault(x => x.ResourceId == 1);
 			if (resourceGroup is null)
 			{
-				//Add the resources to the group they belong to ADMIN:
+				//Add the resources to the group they belong to 
+				//ADMIN:
 				context.UserGroupResources.Add(new UserGroupResources(1, 1));
 				context.UserGroupResources.Add(new UserGroupResources(2, 1));
 				context.UserGroupResources.Add(new UserGroupResources(3, 1));
 				context.UserGroupResources.Add(new UserGroupResources(4, 1));
+				context.UserGroupResources.Add(new UserGroupResources(5, 1));
+				
 				//GUEST:
 				context.UserGroupResources.Add(new UserGroupResources(1, 2));
+				
+				//INSTRUCTOR:
+				context.UserGroupResources.Add(new UserGroupResources(1, 3));
+				context.UserGroupResources.Add(new UserGroupResources(2, 3));
+				context.UserGroupResources.Add(new UserGroupResources(4, 3));
+				context.UserGroupResources.Add(new UserGroupResources(5, 3));
+
 			}
 
 			var MemberGroup = context.UserGroupMembers.FirstOrDefault(x => x.UserId == 1);
 			if (MemberGroup is null)
 			{
 				context.UserGroupMembers.Add(new UserGroupMembers(1, 1));
+			}
+
+			var FirstSong = context.Songs.FirstOrDefault(x => x.Title == "Lisa Gikk Til Skolen");
+			if (FirstSong is null)
+            {
+				context.Songs.Add(new Song() { Title = "Lisa Gikk Til Skolen", Composer = "Unknown", ArrangerId = 1, TimeSignature = "4/4" });
+				context.Songs.Add(new Song() { Title = "Fade To Black", Composer = "Metallica", ArrangerId = 1, TimeSignature = "4/4" });
+				context.Songs.Add(new Song() { Title = "Be Yourself", Composer = "Audioslave", ArrangerId = 1, TimeSignature = "4/4" });
 			}
 
 			context.SaveChanges();

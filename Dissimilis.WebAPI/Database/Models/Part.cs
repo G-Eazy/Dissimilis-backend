@@ -6,6 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
+    /// <summary>
+    /// This is a part, which is associated with a Song and contains bars
+    /// </summary>
     public class Part : BaseEntity
     {
         [Key]
@@ -35,6 +38,11 @@ namespace Dissimilis.WebAPI.Database.Models
         /// The priority the voice has over other voices
         /// </summary>
         public byte PartNumber { get; set; }
+
+        /// <summary>
+        /// Empty constructor for Part.cs
+        /// </summary>
+        public Part() { }
 
     }
 }

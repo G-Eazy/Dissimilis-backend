@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Database
 			/*#if DEBUG
 				this.Database.EnsureDeleted();
 			#endif*/
-
+			this.Database.Migrate();
 			this.Database.EnsureCreated();
 		}
 
@@ -89,17 +89,17 @@ namespace Dissimilis.WebAPI.Database
 
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
-				.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+				.HasForeignKey(x => x.CountryId);
 
 			entity.HasOne(x => x.Organisation).WithMany()
-				.HasForeignKey(x => x.OrganisationId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+				.HasForeignKey(x => x.OrganisationId);
 
 		}
 
 		static void BuildSong (ModelBuilder builder)
         {
 			var entity = builder.Entity<Song>();
-
+			entity.HasOne(x => x.Arranger).WithMany().HasForeignKey(x => x.ArrangerId);
 		}
 	
 		static void BuildPart (ModelBuilder builder)
@@ -114,10 +114,10 @@ namespace Dissimilis.WebAPI.Database
 
 			//set foregin key for creator id
 			entity.HasOne(x => x.Song).WithMany()
-				.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+				.HasForeignKey(x => x.SongId);
 			//Set foregin key linked to Instrument and InstrumentId
 			entity.HasOne(x => x.Instrument).WithMany()
-				.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+				.HasForeignKey(x => x.InstrumentId);
 
 		}
 
@@ -136,7 +136,7 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Part).WithMany()
-				.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+				.HasForeignKey(x => x.PartId);
 
 		}
 
@@ -231,7 +231,7 @@ namespace Dissimilis.WebAPI.Database
 						|| e.State == EntityState.Modified 
 						|| e.State == EntityState.Deleted);
 
-            var UserIdentity = "SystemUser";
+            var UserIdentity = "System";
 
 			foreach (var item in entries)
 			{
