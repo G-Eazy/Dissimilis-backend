@@ -44,11 +44,6 @@ namespace Dissimilis.WebAPI.Database.Models
 		public string Name { get; set; }
 
 		/// <summary>
-		/// Date of birth of the user
-		/// </summary>
-		public DateTime? DateOfBirth { get; set; }
-
-		/// <summary>
 		/// Country the user is from or belongs to
 		/// </summary>
 		public Country Country { get; set; }
@@ -82,13 +77,12 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <param name="countryId"></param>
 		/// <param name="date_of_birth"></param>
 		public User(string name, string email, int organisationId,
-					int countryId, DateTime? date_of_birth)
+					int countryId)
 		{
 			this.Email = email;
 			this.OrganisationId = organisationId;
 			this.Name = name;
 			this.CountryId = countryId;
-			this.DateOfBirth = date_of_birth;
 		}
 	}
 }

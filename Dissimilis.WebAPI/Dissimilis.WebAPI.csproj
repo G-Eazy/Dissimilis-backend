@@ -27,10 +27,5 @@
     <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj" />
     <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\BoLogin\DTOs\" />
-    <Folder Include="Controllers\BoLogin\Queries\" />
-  </ItemGroup>
 	
 </Project>

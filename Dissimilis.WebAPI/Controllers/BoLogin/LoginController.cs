@@ -6,6 +6,7 @@ using Dissimilis.WebAPI.Authentication;
 using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +15,13 @@ namespace Dissimilis.WebAPI.Controllers
     public class LoginController : Experis.Ciber.Authentication.Microsoft.Controllers.LoginControllerBase
         <DissimilisServicePrincipal, DissimilisWebCredentials>
     {
-        private readonly DissimilisDbContext context;
-
+        private readonly DissimilisDbContext _context;
+        //Private variable to get the DissimilisDbContext
+        
+        
         public LoginController(DissimilisDbContext context)
         {
-            this.context = context;
+            this._context = context;
         }
 
         protected override DissimilisWebCredentials GetCredentials(UserEntityMetadata user, HttpContext httpContext, out string error)
@@ -26,7 +29,7 @@ namespace Dissimilis.WebAPI.Controllers
             //TODO Notes
             //User the user information to look up or create a user
             //Extract the numberic UserId from the database
-            User webUser = FindUser(user);
+            User webUser = FindLoggedinUser(user);
             error = null; //allows us to set an error. 
             return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id)); //Convert.ToUInt32(webUser.Id)
         }
@@ -42,34 +45,33 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        protected User FindUser (UserEntityMetadata user)
+        protected User FindLoggedinUser(UserEntityMetadata user)
         {
-            var findUser = this.context.Users.SingleOrDefault(x => x.MsId == user.id);
+
+            var findUser = _context.Users.SingleOrDefault(x => x.MsId == user.id);
             if (findUser is null)
             {
-                //IMPROVE
-                findUser = this.context.Users.FirstOrDefault(x => x.Name == user.displayName);
+                findUser = _context.Users.SingleOrDefault(x => x.Email == user.Email());
                 if (findUser is null)
                 {
                     //Create user
-                    var newUser = new User() { Name = user.displayName, Email = user.Email(), MsId = user.id, OrganisationId = 1, CountryId = 1 };
-                    this.context.Users.Add(newUser);
-                    context.SaveChanges();
+                    findUser = new User() { Name = user.displayName, Email = user.Email(), MsId = user.id, OrganisationId = 1, CountryId = 1 };
+                    this._context.Users.Add(findUser);
+                    _context.SaveChanges();
 
-                    findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
-                    this.context.UserGroupMembers.Add(new UserGroupMembers() { UserGroupId = 2, UserId = findUser.Id });
+                    this._context.UserGroupMembers.Add(new UserGroupMembers() { UserGroupId = 2, UserId = findUser.Id });
                 }
                 else
                 {
-                    // Create user that has same name with msID
+                    // Update user that has same name with msID
                     findUser.MsId = user.id;
                 }
             }
 
-            context.SaveChanges();
-            findUser = this.context.Users.FirstOrDefault(x => x.MsId == user.id);
+            _context.SaveChanges();
 
             return findUser;
         }
+
     }
 }
