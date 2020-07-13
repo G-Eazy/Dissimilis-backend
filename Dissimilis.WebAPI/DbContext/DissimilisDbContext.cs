@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Database
 			/*#if DEBUG
 				this.Database.EnsureDeleted();
 			#endif*/
-			this.Database.Migrate();
+			//this.Database.Migrate();
 			this.Database.EnsureCreated();
 		}
 

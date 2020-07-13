@@ -26,7 +26,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Queries
             var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
             return SongDTOArray;
         }
-
         
     }
 }

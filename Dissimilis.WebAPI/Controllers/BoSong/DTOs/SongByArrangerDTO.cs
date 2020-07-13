@@ -7,20 +7,14 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DTOs
 {
-    public class SongDTO : SuperDTO
+    public class SongsByArrangerDTO
     {
 
-        public string Title { get; set; }
+        public int Num { get; set; }
         
         public int ArrangerId { get; set; }
     
-        public DateTime? UpdatedOn { get; set; }
+        public bool OrderByDateTime { get; set; }
 
-        public SongDTO(Song s) : base(s.Id)
-        {
-            this.Title = s.Title;
-            this.ArrangerId = s.ArrangerId;
-            this.UpdatedOn = s.UpdatedOn;
-        }
     }
 }

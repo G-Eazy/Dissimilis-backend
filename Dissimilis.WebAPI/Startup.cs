@@ -91,6 +91,10 @@ namespace Dissimilis.WebAPI
                 context.Database.EnsureCreated();
                 this.AddContextData(context);
             }
+            app.UseCors(c =>
+            {
+                c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            });
 
             if (env.IsDevelopment())
             {

@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
 {
-    public class QueryAllUsers : MediatR.IRequest<UserDTO[]>
+    public class QueryAllUsers : IRequest<UserDTO[]>
     {
         public QueryAllUsers() { }
     }
 
-    public class QueryAllUsersHandler : MediatR.IRequestHandler<QueryAllUsers, UserDTO[]>
+    public class QueryAllUsersHandler : IRequestHandler<QueryAllUsers, UserDTO[]>
     {
         private UserRepository _repository;
         public QueryAllUsersHandler(DissimilisDbContext context)
