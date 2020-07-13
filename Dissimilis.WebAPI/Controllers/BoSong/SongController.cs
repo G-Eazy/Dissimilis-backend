@@ -36,7 +36,14 @@ namespace Dissimilis.WebAPI.Controllers
             var SongDTOArray = await _mediator.Send(new QueryAllSongs());
             return Ok(SongDTOArray);
         }
-        
+
+        [HttpGet("filtered")]
+        public async Task<IActionResult> GetFilterdSongs(string Query)
+        {
+            var SongDTOArray = await _mediator.Send(new QueryFilteredSongs(Query));
+            return Ok(SongDTOArray);
+        }
+
         /// <summary>
         /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
         /// </summary>
@@ -47,6 +54,7 @@ namespace Dissimilis.WebAPI.Controllers
             var SongDTOArray = await _mediator.Send(new SongsByArrangerQuery(SongsByArrangerObject));
             return Ok(SongDTOArray);
         }
+
 
         /// <summary>
         /// Create new song. Arranger must be id of somebody in DB, see below.
@@ -64,6 +72,7 @@ namespace Dissimilis.WebAPI.Controllers
                 return NoContent();
 
         }
+        
         
         /// <summary>
         /// Update song by Id
@@ -93,7 +102,6 @@ namespace Dissimilis.WebAPI.Controllers
                 return Ok("Removed song: " + result.Id);
             else
                 return NoContent();
-        }
-        
+        }        
     }
 }

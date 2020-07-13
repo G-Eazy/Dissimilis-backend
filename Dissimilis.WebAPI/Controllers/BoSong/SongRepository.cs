@@ -25,6 +25,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var SongModelArray = await this._context.Songs.ToArrayAsync(cancellationToken);
             return SongModelArray;
         }
+
+        public async Task<Song[]> GetFilteredSongs(string query, CancellationToken cancellationToken)
+        {
+            string Query = query;
+
+            var SongModelArray = await this._context.Songs
+                .Where(s => s.Title.Contains(Query))
+                .ToArrayAsync(cancellationToken); ;
+
+            return SongModelArray;
+        }
         public async Task<Song[]> GetSongsByArranger(SongsByArrangerDTO SongsByArrangerObject, CancellationToken cancellationToken)
         {
             var Num = SongsByArrangerObject.Num;
