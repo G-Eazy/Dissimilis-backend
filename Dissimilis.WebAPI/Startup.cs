@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Experis.Ciber.Web.API.Middleware;
+using MediatR;
 
 namespace Dissimilis.WebAPI
 {
