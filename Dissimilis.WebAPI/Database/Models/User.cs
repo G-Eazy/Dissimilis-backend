@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.Database.Models
 	/// User entity that contains: 
 	/// Id, email, name, DOB, org and country
 	/// </summary>
-	public class User : BaseEntity
+	public class User
 	{
 		/// <summary>
 		/// The Id of the user
@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// Foreign key for Country.ID
 		/// </summary>
-		public int CountryId { get; set; }
+		public int? CountryId { get; set; }
 
 		/// <summary>
 		/// The Organisation object associated with this user
@@ -60,7 +60,7 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// The Id of the organisation this user belongs to
 		/// </summary>
-		public int OrganisationId { get; set; }
+		public int? OrganisationId { get; set; }
 
 		/// <summary>
 		/// Empty constructor for User

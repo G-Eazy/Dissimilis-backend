@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.Database
 			{
 				//Add some different groups, new users that will automatically be guest
 				context.UserGroups.Add(new UserGroup("Admin"));
-				context.UserGroups.Add(new UserGroup("Guest"));
+				context.UserGroups.Add(new UserGroup("User"));
 				context.UserGroups.Add(new UserGroup("Instructor"));
 			}
 

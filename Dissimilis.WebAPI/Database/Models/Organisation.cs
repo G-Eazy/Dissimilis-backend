@@ -17,6 +17,8 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         [Key]
         public int Id { get; set; }
+
+        public Guid? MsId { get; set; }
         
         /// <summary>
         /// The name of the organisation
