@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.DTOs
+namespace Dissimilis.WebAPI.DTOs
 {
     public class UpdateSongDTO : SuperDTO
     {

@@ -1,5 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
-using Dissimilis.WebAPI.Controllers.SuperDTOs;
+﻿using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
