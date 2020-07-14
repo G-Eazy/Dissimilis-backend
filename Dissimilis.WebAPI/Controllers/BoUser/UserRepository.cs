@@ -12,23 +12,26 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     public class UserRepository
     {
-
-        private DissimilisDbContext _context;
-        public UserRepository(DissimilisDbContext _context)
+        private DissimilisDbContext context;
+        public UserRepository(DissimilisDbContext context)
         {
-            this._context = _context;
+            this.context = context;
         }
 
+        /// <summary>
+        /// Fetch all users in the database
+        /// </summary>
+        /// <returns>200</returns>
         public async Task<UserDTO[]> AllUsersQuery()
         {
-            var UserModelArray = await this._context.Users.ToArrayAsync();
+            var UserModelArray = await this.context.Users.ToArrayAsync();
             var UserDTOArray = UserModelArray.Select(u => new UserDTO(u)).ToArray();
             return UserDTOArray;
         }
 
         public async Task<UserDTO> UserByIdQuery(int UserId)
         {
-            var UserModel = await this._context.Users
+            var UserModel = await this.context.Users
                 .FirstOrDefaultAsync(u => u.Id == UserId);
 
             UserDTO UserObject = null;

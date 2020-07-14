@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Dissimilis.WebAPI.Controllers.BoUser;
 
 namespace Dissimilis.WebAPI.Controllers
