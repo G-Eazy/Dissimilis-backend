@@ -6,9 +6,8 @@ using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MediatR;
 using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
+using Dissimilis.WebAPI.Controllers.BoUser;
 
 namespace Dissimilis.WebAPI.Controllers
 {
@@ -17,10 +16,10 @@ namespace Dissimilis.WebAPI.Controllers
     public class UserController : ControllerBase
     {
         //Private variable to get the DissimilisDbContext
-        private IMediator _mediator;
-        public UserController(IMediator _mediator)
+        private UserRepository repository;
+        public UserController(DissimilisDbContext context)
         {
-            this._mediator = _mediator;
+            this.repository = new UserRepository(context);
         }
 
         /// <summary>
@@ -30,7 +29,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var UserDTOArray = await _mediator.Send(new QueryAllUsers());
+            var UserDTOArray = await repository.AllUsersQuery();
             return Ok(UserDTOArray);
         }
     }
