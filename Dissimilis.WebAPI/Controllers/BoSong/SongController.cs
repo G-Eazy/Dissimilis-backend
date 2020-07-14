@@ -6,12 +6,12 @@ using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MediatR;
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.Controllers.SuperDTOs;
-using Dissimilis.WebAPI.Controllers.BoSong.Queries;
 using Dissimilis.WebAPI.Controllers.BoSong.DTOs;
-using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Microsoft.EntityFrameworkCore.Migrations;
+using System.Threading;
+using Dissimilis.WebAPI.Controllers.BoSong;
 
 namespace Dissimilis.WebAPI.Controllers
 {
@@ -20,10 +20,11 @@ namespace Dissimilis.WebAPI.Controllers
     public class SongController : ControllerBase
     {
         //Private variable to get the DissimilisDbContext
-        private IMediator _mediator;
-        public SongController(IMediator _mediator)
+        private SongRepository _repository;
+        
+        public SongController(DissimilisDbContext context)
         {
-            this._mediator = _mediator;
+            this._repository = new SongRepository(context);
         }
 
         /// <summary>
@@ -33,14 +34,13 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllSongs()
         {
-            var SongDTOArray = await _mediator.Send(new QueryAllSongs());
+            var SongDTOArray = await _repository.AllSongsQuery();
             return Ok(SongDTOArray);
         }
-
         [HttpGet("filtered")]
-        public async Task<IActionResult> GetFilterdSongs(string Query)
+        public async Task<IActionResult> GetFilteredSongs(string Query)
         {
-            var SongDTOArray = await _mediator.Send(new QueryFilteredSongs(Query));
+            var SongDTOArray = await _repository.FilteredSongsQuery(Query);
             return Ok(SongDTOArray);
         }
 
@@ -51,7 +51,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet("songs")]
         public async Task<IActionResult> GetSongsByArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
         {
-            var SongDTOArray = await _mediator.Send(new SongsByArrangerQuery(SongsByArrangerObject));
+            var SongDTOArray = await _repository.SongsByArrangerQuery(SongsByArrangerObject);
             return Ok(SongDTOArray);
         }
 
@@ -64,7 +64,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
-            var result = await _mediator.Send(new CreateSongCommand(NewSongObject));
+            var result = await _repository.CreateSongCommand(NewSongObject);
 
             if (result != null)
                 return Created("", "Created song: " + result.Id);
@@ -82,7 +82,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> UpdateSong(int Id)
         {
             var UpdateSongObject = new UpdateSongDTO(Id);
-            var result = await _mediator.Send(new UpdateSongCommand(UpdateSongObject));
+            var result = await _repository.UpdateSongCommand(UpdateSongObject);
             if (result != null)
                 return Ok("Updated song: " + result.Id);
             else
@@ -97,7 +97,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> DeleteSong(int Id)
         {
             var DeleteSongObject = new SuperDTO(Id);
-            var result = await _mediator.Send(new DeleteSongCommand(DeleteSongObject));
+            var result = await _repository.DeleteSongCommand(DeleteSongObject);
             if (result != null)
                 return Ok("Removed song: " + result.Id);
             else
