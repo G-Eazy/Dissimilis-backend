@@ -13,16 +13,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 {
     public class SongRepository 
     {
-
-        private DissimilisDbContext _context;
-        public SongRepository(DissimilisDbContext _context)
+        private DissimilisDbContext context;
+        public SongRepository(DissimilisDbContext context)
         {
-            this._context = _context;
+            this.context = context;
         }
 
         public async Task<SongDTO[]> AllSongsQuery()
         {
-            var SongModelArray = await this._context.Songs.ToArrayAsync();
+            var SongModelArray = await this.context.Songs.ToArrayAsync();
             var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
             return SongDTOArray;
         }
@@ -30,8 +29,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<SongDTO[]> FilteredSongsQuery(string query)
         {
             string Query = query;
-
-            var SongModelArray = await this._context.Songs
+            var SongModelArray = await this.context.Songs
                 .Where(s => s.Title.Contains(Query))
                 .ToArrayAsync(); ;
 
@@ -44,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var ArrangerId = SongsByArrangerObject.ArrangerId;
             bool OrderByDateTime = SongsByArrangerObject.OrderByDateTime;
 
-            var SongQuery = this._context.Songs
+            var SongQuery = this.context.Songs
                 .Where(s => s.ArrangerId == ArrangerId)
                 .AsQueryable();
 
@@ -60,39 +58,47 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return SongDTOArray;
         }
 
-        public async Task<Song> CreateSongCommand(NewSongDTO NewSongObject)
+        public async Task<SongDTO> CreateSongCommand(NewSongDTO NewSongObject)
         {
-            var song= new Song()
-            {
-                Title = NewSongObject.Title,
-                ArrangerId = NewSongObject.ArrangerId
-            };
-            await this._context.Songs.AddAsync(song);
-            await this._context.SaveChangesAsync();
-            return song;
+            var ArrangerId = NewSongObject.ArrangerId;
+            var ExistsArranger = await this.context.Users.FirstOrDefaultAsync(u => u.Id == ArrangerId);
+            SongDTO SongObject = null;
+            if (ExistsArranger != null)
+            { 
+                var SongModelObject = new Song()
+                {
+                    Title = NewSongObject.Title,
+                    ArrangerId = NewSongObject.ArrangerId
+                };
+                await this.context.Songs.AddAsync(SongModelObject);
+                await this.context.SaveChangesAsync();
+                SongObject = new SongDTO(SongModelObject);
+            }
+            return SongObject;
         }
         public async Task<SuperDTO> UpdateSongCommand(UpdateSongDTO UpdateSongObject)
         {
             var UpdateSongObjectId = UpdateSongObject.Id;
-            var SongObject = await this._context.Songs.FirstOrDefaultAsync(s => s.Id == UpdateSongObjectId);
-            if (SongObject != null) 
+            var SongModelObject = await this.context.Songs.FirstOrDefaultAsync(s => s.Id == UpdateSongObjectId);
+            SuperDTO SongObject = null;
+            if (SongModelObject != null) 
             {
-                SongObject.UpdatedOn = DateTime.UtcNow;
-                await this._context.SaveChangesAsync();
-                return new SuperDTO(SongObject.Id);
+                SongModelObject.UpdatedOn = DateTime.UtcNow;
+                await this.context.SaveChangesAsync();
+                SongObject = new SuperDTO(SongModelObject.Id);
             }
-            return null;
+            return SongObject;
         }
 
         public async Task<SuperDTO> DeleteSongCommand(SuperDTO DeleteSongObject)
         {
             var DeleteSongObjectId = DeleteSongObject.Id;
-            var SongModelObject = await this._context.Songs.FirstOrDefaultAsync(s => s.Id == DeleteSongObjectId);
+            var SongModelObject = await this.context.Songs.FirstOrDefaultAsync(s => s.Id == DeleteSongObjectId);
             SuperDTO SongObject = null;
             if (SongModelObject != null) 
             { 
-                this._context.Songs.Remove(SongModelObject);
-                await this._context.SaveChangesAsync();
+                this.context.Songs.Remove(SongModelObject);
+                await this.context.SaveChangesAsync();
                 SongObject = new SuperDTO(SongModelObject.Id);
             }
             return SongObject;
