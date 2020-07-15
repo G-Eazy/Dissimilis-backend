@@ -22,9 +22,9 @@ namespace Dissimilis.WebAPI.Authentication
 
         protected override bool UseSingleTenant => false;
 
-        public DissimilisServicePrincipal()
+        public DissimilisServicePrincipal(string webAppUrl)
         {
-            this.WebAppURL = new Uri("https://localhost:5001");
+            this.WebAppURL = new Uri(webAppUrl);
         }
     }
 }

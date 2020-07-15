@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Dissimilis.WebAPI.Database.Audit;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Dissimilis.WebAPI.Database
 {
@@ -86,6 +88,7 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
+			entity.HasIndex(x => x.MsId).IsUnique();
 
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
@@ -216,13 +219,46 @@ namespace Dissimilis.WebAPI.Database
                 .HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
         }
 
-        #endregion 
+		#endregion
+		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		{
+			var entries = ChangeTracker
+				.Entries()
+				.Where(e =>
+				e.State == EntityState.Added
+						|| e.State == EntityState.Modified
+						|| e.State == EntityState.Deleted);
+
+			var UserIdentity = "System";
+
+			foreach (var item in entries)
+			{
+				if (item.Entity is BaseEntity entity)
+				{
+					if (item.State == EntityState.Added)
+					{
+						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+					}
+
+					if (item.State == EntityState.Modified)
+					{
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+					}
+				}
+			}
+
+			return await base.SaveChangesAsync();
+		}
 
 		/// <summary>
 		/// Ocerrideing the savechanges to add modified and added date
 		/// </summary>
 		/// <returns></returns>
-        public override int SaveChanges()
+		public override int SaveChanges()
 		{
 			var entries = ChangeTracker
 				.Entries()
@@ -241,12 +277,14 @@ namespace Dissimilis.WebAPI.Database
 					{
 						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
 						((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
 					}
 
 					if (item.State == EntityState.Modified)
 					{
 						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = UserIdentity; ;
+						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
 					}
 				}
 			}
