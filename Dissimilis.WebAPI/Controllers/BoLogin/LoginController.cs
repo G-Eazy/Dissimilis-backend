@@ -32,10 +32,16 @@ namespace Dissimilis.WebAPI.Controllers
             User webUser = this._repository.CreateOrFindUser(user, graph_api);
 
             //handle error if webuser is null
-            if (webUser is null) error = "There was an error loggin you in, your credentials are not valid";
-            else error = null; 
-
-            return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id)); //Convert.ToUInt32(webUser.Id)
+            if (webUser is null)
+            {
+                error = "There was an error loggin you in, your credentials are not valid";
+                return null;
+            }
+            else
+            {
+                error = null;
+                return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id));
+            }
         }
 
 
