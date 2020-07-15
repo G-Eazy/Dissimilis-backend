@@ -125,3 +125,4 @@ obj/
 
 # Visual Studio Code
 .vscode
+/Dissimilis.WebAPI/Authentication/AuditUser.cs

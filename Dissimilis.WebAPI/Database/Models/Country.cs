@@ -24,7 +24,6 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Constructor for Country with parameteres
         /// </summary>
         /// <param name="country"></param>
-        /// <param name="language"></param>
         public Country(string country)
         {
             this.Name = country;

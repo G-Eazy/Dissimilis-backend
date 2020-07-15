@@ -10,7 +10,7 @@ using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System.Threading;
-using Dissimilis.WebAPI.Controllers.BoSong;
+using Dissimilis.WebAPI.Repositories;
 
 namespace Dissimilis.WebAPI.Controllers
 {

@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Experis.Ciber.Web.API.Middleware;
 
 namespace Dissimilis.WebAPI
 {
@@ -35,7 +36,6 @@ namespace Dissimilis.WebAPI
             services.AddControllers();
 
             services.AddDbContext<DissimilisDbContext>(x => this.ConfigureDbOptions(ref x));
-
 
             services.AddSwaggerGen(c =>
             {
@@ -61,7 +61,7 @@ namespace Dissimilis.WebAPI
             var conn = this.Configuration.GetConnectionString("default");
             if (conn is null)
             {
-                throw new Exception("Please set the connection string called default");
+                throw new Exception("The provided connection string is not valid");
             }
 
             dbCob.UseSqlServer(conn);
@@ -109,6 +109,13 @@ namespace Dissimilis.WebAPI
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "DissAPI V1");
             });
 
+            //Doing this so that we don't need to log in everytime we 
+            //want to test a new controller!
+            if (!env.IsDevelopment())
+            {
+                app.UseWebUserAuthentication();
+            }
+            
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

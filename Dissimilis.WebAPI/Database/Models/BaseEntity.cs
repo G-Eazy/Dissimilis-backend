@@ -12,6 +12,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// </summary>
     public abstract class BaseEntity
     {
+
         /// <summary>
         /// Who created this attribute
         /// </summary>

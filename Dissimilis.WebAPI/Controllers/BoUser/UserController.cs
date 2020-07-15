@@ -6,8 +6,7 @@ using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Controllers.BoUser;
+using Dissimilis.WebAPI.Repositories;
 
 namespace Dissimilis.WebAPI.Controllers
 {
@@ -29,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
-            var UserDTOArray = await repository.AllUsersQuery();
+            var UserDTOArray = await repository.GetAllUsersAsync();
             return Ok(UserDTOArray);
         }
     }

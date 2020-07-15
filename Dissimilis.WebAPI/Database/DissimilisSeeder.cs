@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.Database
 			{
 				//Add some different groups, new users that will automatically be guest
 				context.UserGroups.Add(new UserGroup("Admin"));
-				context.UserGroups.Add(new UserGroup("Guest"));
+				context.UserGroups.Add(new UserGroup("User"));
 				context.UserGroups.Add(new UserGroup("Instructor"));
 			}
 
@@ -34,31 +34,32 @@ namespace Dissimilis.WebAPI.Database
 				context.Resources.Add(new Resource() { Name = "Update" });
             }
 
-			var Organisation = context.Organisations.FirstOrDefault(x => x.Name == "Dissimilis Norge");
+			var Organisation = context.Organisations.SingleOrDefault(x => x.Name == "Dissimilis Norge");
 			if (Organisation is null)
             {
+				context.Organisations.Add(new Organisation("Ukjent"));
 				context.Organisations.Add(new Organisation("Dissimilis Norge"));
 				context.Organisations.Add(new Organisation("Dissimilis Kultursenter"));
 			}
 
-			var Sweden = context.Countries.FirstOrDefault(x => x.Name == "Norway");
-			if (Sweden is null)
+			var Norway = context.Countries.SingleOrDefault(x => x.Name == "Norge");
+			if (Norway is null)
 			{
-				context.Countries.Add(new Country("Norway"));
-				context.Countries.Add(new Country("Sweden"));
+				context.Countries.Add(new Country("Norge"));
+				context.Countries.Add(new Country("Sverige"));
 			}
 
-			var User = context.Users.FirstOrDefault(x => x.Name == "Bård B.");
+			var User = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
 			if (User is null)
 			{
-				context.Users.Add(new User("Bård B.", "bård@dissimilis.no", 1, 1, new DateTime(1975, 08, 21)));
+				context.Users.Add(new User("Bård Bjørge", "bård@dissimilis.no", 1, 1));
 			}
 
-			var Instrument = context.Instruments.FirstOrDefault(x => x.Name == "Piano");
+			var Instrument = context.Instruments.SingleOrDefault(x => x.Name == "Piano");
 			if (Instrument is null)
 			{
 				context.Instruments.Add(new Instrument("Piano"));
-				context.Instruments.Add(new Instrument("Guitar"));
+				context.Instruments.Add(new Instrument("Gitar"));
 				context.Instruments.Add(new Instrument("Bass"));
 			}
 
@@ -66,7 +67,7 @@ namespace Dissimilis.WebAPI.Database
 
 			//Insert the many to many enteties as the ones above need to have been
 			//saved first
-			var resourceGroup = context.UserGroupResources.FirstOrDefault(x => x.ResourceId == 1);
+			var resourceGroup = context.UserGroupResources.SingleOrDefault(x => x.ResourceId == 1);
 			if (resourceGroup is null)
 			{
 				//Add the resources to the group they belong to 
@@ -88,13 +89,13 @@ namespace Dissimilis.WebAPI.Database
 
 			}
 
-			var MemberGroup = context.UserGroupMembers.FirstOrDefault(x => x.UserId == 1);
+			var MemberGroup = context.UserGroupMembers.SingleOrDefault(x => x.UserId == 1);
 			if (MemberGroup is null)
 			{
 				context.UserGroupMembers.Add(new UserGroupMembers(1, 1));
 			}
 
-			var FirstSong = context.Songs.FirstOrDefault(x => x.Title == "Lisa Gikk Til Skolen");
+			var FirstSong = context.Songs.SingleOrDefault(x => x.Title == "Lisa Gikk Til Skolen");
 			if (FirstSong is null)
             {
 				context.Songs.Add(new Song() { Title = "Lisa Gikk Til Skolen", Composer = "Unknown", ArrangerId = 1, TimeSignature = "4/4" });
