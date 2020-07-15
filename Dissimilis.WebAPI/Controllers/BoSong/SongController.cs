@@ -18,7 +18,6 @@ namespace Dissimilis.WebAPI.Controllers
     [ApiController]
     public class SongController : ControllerBase
     {
-        //Private variable to get the DissimilisDbContext
         private SongRepository _repository;
         
         public SongController(DissimilisDbContext context)
@@ -31,7 +30,6 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns> 
         [HttpGet("{Id:int:min(1)}")]
-        //TODO: test negative int
         public async Task<IActionResult> GetSongById(int Id)
         {
             var SuperObject = new SuperDTO(Id);
@@ -51,7 +49,6 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var SongDTOArray = await _repository.SearchQuery(SongSearchObject);
             if (SongDTOArray.Length == 0)
-                // TODO: check if we can send not-int and what happens
                 return base.BadRequest("No arranger by that Id");
             else 
                 return base.Ok(SongDTOArray);
@@ -61,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers
 
 
         /// <summary>
-        /// Create new song. Arranger must be id of somebody in DB, see below.
+        /// Create new song. Arranger must be id of somebody in DB, see all users below.
         /// </summary>
         /// <param name="NewSongDTO"></param>
         /// <returns>201</returns>
@@ -82,7 +79,6 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns> 
         [HttpPatch("{Id:int:min(1)}")]
-        //TODO: test negative int
         public async Task<IActionResult> UpdateSong(int Id)
         {
             var UpdateSongObject = new UpdateSongDTO(Id);

@@ -39,7 +39,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             bool OrderByDateTime = SongSearchObject.OrderByDateTime;
             var SongQuery = this.context.Songs.AsQueryable();
 
-            Console.WriteLine($"Title '{Title}', ArrangerId '{ArrangerId}', num '{Num}', OrderByDateTime '{OrderByDateTime}'");
             if (! String.IsNullOrEmpty(Title))
                 SongQuery = SongQuery
                     .Where(s => s.Title.Contains(Title))
@@ -50,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                     .AsQueryable();
             if (Num != 0)
                 SongQuery = SongQuery
-                    .Take(Num)
+                    .Take((int) Num)
                     .AsQueryable();
             if (OrderByDateTime)
                 SongQuery = SongQuery

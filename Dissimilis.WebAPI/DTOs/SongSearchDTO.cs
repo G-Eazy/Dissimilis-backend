@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.DTOs
     {
         public string Title { get; set; }
         public int ArrangerId { get; set; }
-        public int Num { get; set; }
+        public uint Num { get; set; }
         public bool OrderByDateTime { get; set; }
 
     }
