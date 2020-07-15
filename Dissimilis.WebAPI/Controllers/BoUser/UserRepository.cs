@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Database;
+﻿using Dissimilis.WebAPI.DTOs;
+using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,23 +12,34 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     public class UserRepository
     {
-
-        private DissimilisDbContext _context;
-        public UserRepository(DissimilisDbContext _context)
+        private DissimilisDbContext context;
+        public UserRepository(DissimilisDbContext context)
         {
-            this._context = _context;
+            this.context = context;
         }
 
-        public async Task<User[]> GetAllUsers(CancellationToken cancellationToken)
+        /// <summary>
+        /// Fetch all users in the database
+        /// </summary>
+        /// <returns>200</returns>
+        public async Task<UserDTO[]> AllUsersQuery()
         {
-            var UserModelArray = await this._context.Users.ToArrayAsync(cancellationToken);
-            return UserModelArray;
+            var UserModelArray = await this.context.Users.ToArrayAsync();
+            var UserDTOArray = UserModelArray.Select(u => new UserDTO(u)).ToArray();
+            return UserDTOArray;
         }
 
-        public async Task<User> GetUserById(int UserId, CancellationToken cancellationToken)
+        public async Task<UserDTO> UserByIdQuery(int UserId)
         {
-            return await this._context.Users
-                .FirstOrDefaultAsync(u => u.Id == UserId, cancellationToken);
+            var UserModel = await this.context.Users
+                .SingleOrDefaultAsync(u => u.Id == UserId);
+
+            UserDTO UserObject = null;
+            if (UserModel != null) {
+                UserObject = new UserDTO(UserModel);
+            }
+            return UserObject;
+
         }
         
     }

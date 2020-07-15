@@ -4,18 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.DTOs
+namespace Dissimilis.WebAPI.DTOs
 {
-    public class SongDTO
+    public class SongSearchDTO
     {
         public string Title { get; set; }
-        
         public int ArrangerId { get; set; }
+        public uint Num { get; set; }
+        public bool OrderByDateTime { get; set; }
 
-        public SongDTO(Song s)
-        {
-            this.Title = s.Title;
-            this.ArrangerId = s.ArrangerId;
-        }
     }
 }
