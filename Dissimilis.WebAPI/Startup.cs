@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Experis.Ciber.Web.API.Middleware;
+using Dissimilis.WebAPI.Authentication;
 
 namespace Dissimilis.WebAPI
 {
@@ -39,16 +40,20 @@ namespace Dissimilis.WebAPI
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo() 
-                { 
-                    Title="DissAPI", Version="v1"
+                c.SwaggerDoc("v1", new OpenApiInfo()
+                {
+                    Title = "DissAPI",
+                    Version = "v1"
                 });
+
+                //This can be commented out if you want to
+                c.OperationFilter<AddRequiredHeaderParameter>();
 
                 var XMLFile = Assembly.GetExecutingAssembly().GetName().Name + ".xml";
                 var XMLPath = Path.Combine(AppContext.BaseDirectory, XMLFile);
                 c.IncludeXmlComments(XMLPath);
             });
-        
+
         }
 
         /// <summary>
@@ -107,14 +112,11 @@ namespace Dissimilis.WebAPI
             app.UseSwaggerUI(c => 
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "DissAPI V1");
+                
             });
 
-            //Doing this so that we don't need to log in everytime we 
-            //want to test a new controller!
-            if (!env.IsDevelopment())
-            {
-                app.UseWebUserAuthentication();
-            }
+            //Comment out if you are not using authentication
+             app.UseWebUserAuthentication();
             
             app.UseRouting();
 

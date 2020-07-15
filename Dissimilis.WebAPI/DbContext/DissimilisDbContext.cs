@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Dissimilis.WebAPI.Database.Audit;
 using System.Threading.Tasks;
 using System.Threading;
+using Dissimilis.WebAPI.Authentication;
 
 namespace Dissimilis.WebAPI.Database
 {
@@ -229,7 +230,11 @@ namespace Dissimilis.WebAPI.Database
 						|| e.State == EntityState.Modified
 						|| e.State == EntityState.Deleted);
 
-			var UserIdentity = "System";
+			string UserIdentity = null;
+			if(UserIdentity is null)
+            {
+				UserIdentity = "System Admin";
+            }
 
 			foreach (var item in entries)
 			{
@@ -267,7 +272,11 @@ namespace Dissimilis.WebAPI.Database
 						|| e.State == EntityState.Modified 
 						|| e.State == EntityState.Deleted);
 
-            var UserIdentity = "System";
+			string UserIdentity = null;
+			if (UserIdentity is null)
+			{
+				UserIdentity = "System Admin";
+			}
 
 			foreach (var item in entries)
 			{
