@@ -26,6 +26,7 @@ namespace Dissimilis.WebAPI.Database
 		public DbSet<Part> Parts { get; set; }
 		public DbSet<Resource> Resources { get; set; }
 		public DbSet<Bar> Bars { get; set; }
+		public DbSet<Note> Notes { get; set; }
 		public DbSet<Country> Countries { get; set; }
 		public DbSet<Instrument> Instruments { get; set; }
 		public DbSet<UserGroup> UserGroups { get; set; }
@@ -68,6 +69,7 @@ namespace Dissimilis.WebAPI.Database
 			BuildPart(modelBuilder);
 			BuildInstrument(modelBuilder);
 			BuildBar(modelBuilder);
+			BuildNote(modelBuilder);
 			BuildCountry(modelBuilder);
 			BuildOrganisation(modelBuilder);
 			BuildUserGroup(modelBuilder);
@@ -141,6 +143,24 @@ namespace Dissimilis.WebAPI.Database
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Part).WithMany()
 				.HasForeignKey(x => x.PartId);
+
+		}
+		static void BuildNote(ModelBuilder builder)
+		{
+			var entity = builder.Entity<Note>();
+
+			//Set a unique Id for barnumber that is related to PartId
+			//Each barnumber needs to be unique but only within it's
+			//corresponding Part.
+			entity.HasIndex(x => new
+			{
+				x.BarId,
+				x.NoteNumber
+			});
+
+			//Set foregin key for PartId linked to the Id of Part
+			entity.HasOne(x => x.Bar).WithMany()
+				.HasForeignKey(x => x.BarId);
 
 		}
 

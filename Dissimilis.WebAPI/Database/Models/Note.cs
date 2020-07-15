@@ -7,9 +7,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Dissimilis.WebAPI.Database.Models
 {
     /// <summary>
-    /// This is the bar, which is associated with a Part (norsk: Stemme)
+    /// This is the Note, which is associated with a Bar (norsk: Takt)
     /// </summary>
-    public class Bar : BaseEntity
+    public class Note : BaseEntity
     {
         /// <summary>
         /// The id of this bar
@@ -18,29 +18,29 @@ namespace Dissimilis.WebAPI.Database.Models
         public int Id { get; set; }
 
         /// <summary>
-        /// The part it is linked to
-        /// and the corresponding PartId
+        /// The bar it is linked to
+        /// and the corresponding BarId
         /// </summary>
-        public Part Part { get; set; }
+        public Bar Bar { get; set; }
 
         /// <summary>
         /// THe ID for the corresponding Part 
         /// </summary>
-        public int PartId { get; set; }
-
-        /// <summary>
-        /// the actual ABC notation for this bar
-        /// </summary>
-        public string Notation { get; set; }
+        public int BarId { get; set; }
 
         /// <summary>
         /// Priority of the bar in a spesific part
         /// </summary>
-        public byte BarNumber { get; set; }
+        public byte NoteNumber { get; set; }
+
+
+        public uint Length { get; set; }
+
+        public string[] NoteValues { get; set; }
 
         /// <summary>
         /// Empty constructor for Bar
         /// </summary>
-        public Bar () { }
+        public Note () { }
     }
 }
