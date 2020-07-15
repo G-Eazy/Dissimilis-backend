@@ -1,4 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.BoUser.DTOs;
+﻿using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Database;
 using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         public async Task<UserDTO> UserByIdQuery(int UserId)
         {
             var UserModel = await this.context.Users
-                .FirstOrDefaultAsync(u => u.Id == UserId);
+                .SingleOrDefaultAsync(u => u.Id == UserId);
 
             UserDTO UserObject = null;
             if (UserModel != null) {
