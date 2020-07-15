@@ -14,7 +14,7 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/songs")]
     [ApiController]
     public class SongController : ControllerBase
     {
@@ -30,28 +30,39 @@ namespace Dissimilis.WebAPI.Controllers
         /// Fetch all songs in the database
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet]
-        public async Task<IActionResult> GetAllSongs()
+        [HttpGet("all")]
+        public async Task<ActionResult<SongDTO[]>> GetAllSongs()
         {
             var SongDTOArray = await _repository.AllSongsQuery();
-            return Ok(SongDTOArray);
+            return base.Ok(SongDTOArray);
         }
         [HttpGet("filtered")]
-        public async Task<IActionResult> GetFilteredSongs(string Query)
+        public async Task<ActionResult<SongDTO[]>> GetFilteredSongs([FromQuery] FindSongsDTO FindSongsObject)
         {
-            var SongDTOArray = await _repository.FilteredSongsQuery(Query);
-            return Ok(SongDTOArray);
+            var SongDTOArray = await _repository.FilteredSongsQuery(FindSongsObject);
+            if (SongDTOArray.Length == 0)
+            {
+                return base.NoContent();
+            }
+            else 
+            { 
+                return base.Ok(SongDTOArray);
+            }
         }
 
         /// <summary>
         /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet("songs")]
-        public async Task<IActionResult> GetSongsByArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
+        [HttpGet("byarranger")] // Can improve name later, if this method survives
+        public async Task<ActionResult<SongDTO[]>> GetSongsByArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
         {
             var SongDTOArray = await _repository.SongsByArrangerQuery(SongsByArrangerObject);
-            return Ok(SongDTOArray);
+            if (SongDTOArray.Length == 0)
+                // TODO: check if we can send not-int and what happens
+                return base.BadRequest("No arranger by that Id");
+            else 
+                return base.Ok(SongDTOArray);
         }
 
 
@@ -64,11 +75,10 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
             var result = await _repository.CreateSongCommand(NewSongObject);
-
             if (result != null)
-                return Created("", "Created song: " + result.Id);
+                return base.Created($"api/songs/{result.Id}", ""); // Add result.Id as second param if frontend wants it in body
             else
-                return NoContent();
+                return base.BadRequest("No arranger by that Id");
 
         }
         
@@ -77,30 +87,31 @@ namespace Dissimilis.WebAPI.Controllers
         /// Update song by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpPost("{Id:int}")]
+        [HttpPatch("{Id:int:min(1)}")]
+        //TODO: test negative int
         public async Task<IActionResult> UpdateSong(int Id)
         {
             var UpdateSongObject = new UpdateSongDTO(Id);
-            var result = await _repository.UpdateSongCommand(UpdateSongObject);
-            if (result != null)
-                return Ok("Updated song: " + result.Id);
+            bool result = await _repository.UpdateSongCommand(UpdateSongObject);
+            if (result)
+                return base.NoContent();
             else
-                return NoContent();
+                return base.BadRequest("No song by that Id");
         }
 
         /// <summary>
         /// Delete song by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpDelete("{Id:int}")]
+        [HttpDelete("{Id:int:min(1)}")]
         public async Task<IActionResult> DeleteSong(int Id)
         {
             var DeleteSongObject = new SuperDTO(Id);
-            var result = await _repository.DeleteSongCommand(DeleteSongObject);
-            if (result != null)
-                return Ok("Removed song: " + result.Id);
+            bool result = await _repository.DeleteSongCommand(DeleteSongObject);
+            if (result)
+                return base.NoContent();
             else
-                return NoContent();
+                return base.BadRequest("No song by that Id");
         }        
     }
 }
