@@ -42,10 +42,13 @@ namespace Dissimilis.WebAPI.Controllers
             //This return will return the users + their country and usergroup
             var userId = this.UserID;
 
-            return this.context.Users
+            var allUsers = this.context.Users
                 .Include(x => x.Country)
                 .Include(x => x.Organisation)
                 .ToArray();
+
+            if (allUsers.Count() == 0) return base.NoContent();
+            return allUsers;
         }
 
 

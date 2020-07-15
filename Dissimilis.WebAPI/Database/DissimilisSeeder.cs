@@ -42,8 +42,8 @@ namespace Dissimilis.WebAPI.Database
 				context.Organisations.Add(new Organisation("Dissimilis Kultursenter"));
 			}
 
-			var Sweden = context.Countries.SingleOrDefault(x => x.Name == "Norge");
-			if (Sweden is null)
+			var Norway = context.Countries.SingleOrDefault(x => x.Name == "Norge");
+			if (Norway is null)
 			{
 				context.Countries.Add(new Country("Norge"));
 				context.Countries.Add(new Country("Sverige"));
