@@ -1,4 +1,5 @@
 ﻿using Dissimilis.WebAPI.Database.Models;
+using Dissimilis.WebAPI.DTOs;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Experis.Ciber.Web.API.Interfaces;
 using System;
@@ -12,6 +13,7 @@ namespace Dissimilis.WebAPI.Reposities.Interfaces
     {
         Task<User> GetUserByIdAsync(int id);
         Task<User> GetUserByMsIdAsync(Guid id);
+        Task<UserDTO> GetUserDTOByIdAsync(int id);
         Task<User> GetUserByEmailAsync(string email);
         Task<User[]> GetAllUsersAsync();
         Task<User> CreateUserAsync(UserEntityMetadata user);

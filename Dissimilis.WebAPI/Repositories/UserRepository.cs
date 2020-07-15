@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Reposities;
+using Dissimilis.WebAPI.DTOs;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -78,6 +79,14 @@ namespace Dissimilis.WebAPI.Repositories
         {
             return await this.context.Users
                 .FirstOrDefaultAsync(u => u.Id == UserId);
+        }
+
+        public async Task<UserDTO> GetUserDTOByIdAsync(int id)
+        {
+            User user = await GetUserByIdAsync(id);
+            UserDTO userModel = new UserDTO(user);
+
+            return userModel;
         }
 
         /// <summary>
