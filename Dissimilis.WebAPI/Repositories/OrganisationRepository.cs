@@ -18,33 +18,46 @@ namespace Dissimilis.WebAPI.Reposities
             this._context = context;
         }
 
+        /// <summary>
+        /// Find or create an organisation depending on the organisaion metadata
+        /// </summary>
+        /// <param name="metadata"></param>
+        /// <returns></returns>
         public async Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata)
         {
-            String orgName;
-            if (metadata is null)
-            {
-                orgName = "Dissimilis Norge";
+            Organisation organisation;
+            //Check if metadata is null
+            if(metadata is null)
+            {   
+                //if null, get default organisation
+                organisation = await GetOrganisationByNameAsync("Ukjent");
             }
             else
             {
-                orgName = metadata.displayName;
+                //else check if the org is in database
+                organisation = await GetOrganisationByMsIdAsync(metadata);
+                if(organisation is null)
+                {
+                    //if null, add it to the database
+                    organisation = await CreateOrganisationAsync(metadata);
+                }
             }
-            var Organisation = GetOrganisationByNameAsync(orgName);
-            if(Organisation is null)
-            {
-                Organisation = CreateOrganisationAsync(metadata);
-            }
-            return await Organisation;
+
+            return organisation;
         }
 
 
+        /// <summary>
+        /// Create an organisation using the metadata. If its null, use default
+        /// </summary>
+        /// <param name="metadata"></param>
+        /// <returns></returns>
         public async Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata)
         {
             Organisation newOrg;
             if(metadata is null)
             {
-                var OrgName = "Dissimilis Norge";
-                newOrg = new Organisation() { Name = OrgName };
+                newOrg = await GetOrganisationByNameAsync("Ukjent");
             }
             else
             {
@@ -56,17 +69,32 @@ namespace Dissimilis.WebAPI.Reposities
             return newOrg;
         }
 
-        public async Task<Organisation> FindOrganisationByMsIdAsync(OrganizationMetadata metadata)
+        /// <summary>
+        /// Find the organisation by the ms id
+        /// </summary>
+        /// <param name="metadata"></param>
+        /// <returns></returns>
+        public async Task<Organisation> GetOrganisationByMsIdAsync(OrganizationMetadata metadata)
         {
             Organisation org = await this._context.Organisations.SingleOrDefaultAsync(o => o.MsId == metadata.id);
             return org;
         }
 
+        /// <summary>
+        /// Fidn the organisation by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Organisation> GetOrganisationByIdAsync(int id)
         {
             return await this._context.Organisations.SingleOrDefaultAsync(x => x.Id == id);
         }
 
+        /// <summary>
+        /// Find the organisation based on the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<Organisation> GetOrganisationByNameAsync(string name)
         {
             return await this._context.Organisations.SingleOrDefaultAsync(x => x.Name == name);

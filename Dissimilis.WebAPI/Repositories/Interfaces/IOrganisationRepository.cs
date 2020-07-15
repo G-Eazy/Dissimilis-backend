@@ -13,7 +13,7 @@ namespace Dissimilis.WebAPI.Reposities.Interfaces
         Task<Organisation> GetOrganisationByNameAsync(string name);
         Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata);
         Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata);
-        Task<Organisation> FindOrganisationByMsIdAsync(OrganizationMetadata metadata);
+        Task<Organisation> GetOrganisationByMsIdAsync(OrganizationMetadata metadata);
 
     }
 }

@@ -37,6 +37,7 @@ namespace Dissimilis.WebAPI.Database
 			var Organisation = context.Organisations.FirstOrDefault(x => x.Name == "Dissimilis Norge");
 			if (Organisation is null)
             {
+				context.Organisations.Add(new Organisation("Ukjent"));
 				context.Organisations.Add(new Organisation("Dissimilis Norge"));
 				context.Organisations.Add(new Organisation("Dissimilis Kultursenter"));
 			}
