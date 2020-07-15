@@ -18,43 +18,50 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             this.context = context;
         }
 
-        public async Task<SongDTO[]> AllSongsQuery()
+
+        public async Task<SongDTO> GetSongByIdQuery(SuperDTO SuperObject)
         {
-            var SongModelArray = await this.context.Songs.ToArrayAsync();
-            var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
-            return SongDTOArray;
+            var SongId = SuperObject.Id;
+            var SongModelObject = await this.context.Songs
+                .SingleOrDefaultAsync(s => s.Id == SongId);
+            
+            SongDTO SongObject = null;
+            if (SongModelObject != null)
+                SongObject = new SongDTO(SongModelObject);
+            return SongObject;
         }
-        
-        public async Task<SongDTO[]> FilteredSongsQuery(FindSongsDTO FindSongsObject)
-        {
-            string Query = FindSongsObject.Title;
-            var SongModelArray = await this.context.Songs
-                .Where(s => s.Title.Contains(Query))
-                .ToArrayAsync(); ;
 
-            var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
-            return SongDTOArray;
-        }
-        public async Task<SongDTO[]> SongsByArrangerQuery(SongsByArrangerDTO SongsByArrangerObject)
-        {
-            var Num = SongsByArrangerObject.Num;
-            var ArrangerId = SongsByArrangerObject.ArrangerId;
-            bool OrderByDateTime = SongsByArrangerObject.OrderByDateTime;
+        public async Task<SongDTO[]> SearchQuery(SongSearchDTO SongSearchObject) {
 
-            var SongQuery = this.context.Songs
-                .Where(s => s.ArrangerId == ArrangerId)
-                .AsQueryable();
+            var Title = SongSearchObject.Title;
+            var ArrangerId = SongSearchObject.ArrangerId;
+            var Num = SongSearchObject.Num;
+            bool OrderByDateTime = SongSearchObject.OrderByDateTime;
+            var SongQuery = this.context.Songs.AsQueryable();
 
+            Console.WriteLine($"Title '{Title}', ArrangerId '{ArrangerId}', num '{Num}', OrderByDateTime '{OrderByDateTime}'");
+            if (! String.IsNullOrEmpty(Title))
+                SongQuery = SongQuery
+                    .Where(s => s.Title.Contains(Title))
+                    .AsQueryable();
+            if (ArrangerId != 0) 
+                SongQuery = SongQuery
+                    .Where(s => s.ArrangerId == ArrangerId)
+                    .AsQueryable();
+            if (Num != 0)
+                SongQuery = SongQuery
+                    .Take(Num)
+                    .AsQueryable();
             if (OrderByDateTime)
                 SongQuery = SongQuery
                     .OrderByDescending(s => s.UpdatedOn);
 
             var SongModelArray = await SongQuery
-                .Take(Num)
                 .ToArrayAsync();
 
             var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
             return SongDTOArray;
+        
         }
 
         public async Task<SongDTO> CreateSongCommand(NewSongDTO NewSongObject)

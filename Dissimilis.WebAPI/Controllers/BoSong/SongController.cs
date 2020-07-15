@@ -27,43 +27,37 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Fetch all songs in the database
+        /// Get song by Id
         /// </summary>
-        /// <returns>200</returns>
-        [HttpGet("all")]
-        public async Task<ActionResult<SongDTO[]>> GetAllSongs()
+        /// <returns>200</returns> 
+        [HttpGet("{Id:int:min(1)}")]
+        //TODO: test negative int
+        public async Task<IActionResult> GetSongById(int Id)
         {
-            var SongDTOArray = await _repository.AllSongsQuery();
-            return base.Ok(SongDTOArray);
-        }
-        [HttpGet("filtered")]
-        public async Task<ActionResult<SongDTO[]>> GetFilteredSongs([FromQuery] FindSongsDTO FindSongsObject)
-        {
-            var SongDTOArray = await _repository.FilteredSongsQuery(FindSongsObject);
-            if (SongDTOArray.Length == 0)
-            {
-                return base.NoContent();
-            }
-            else 
-            { 
-                return base.Ok(SongDTOArray);
-            }
+            var SuperObject = new SuperDTO(Id);
+            var SongObject = await _repository.GetSongByIdQuery(SuperObject);
+            if (SongObject != null)
+                return base.Ok(SongObject);
+            else
+                return base.BadRequest("No song by that Id");
         }
 
         /// <summary>
-        /// Fetch {Num} songs from Arranger {ArrangerId} in the database. Set {OrderByDateTime} to true for ordering.
+        /// Fetch songs that contain {Title} and/or from Arranger {ArrangerId} in the database. Limit output to {Num} songs. Set {OrderByDateTime} to true for ordering.
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet("byarranger")] // Can improve name later, if this method survives
-        public async Task<ActionResult<SongDTO[]>> GetSongsByArranger([FromQuery] SongsByArrangerDTO SongsByArrangerObject)
+        [HttpGet("search")] 
+        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongSearchDTO SongSearchObject)
         {
-            var SongDTOArray = await _repository.SongsByArrangerQuery(SongsByArrangerObject);
+            var SongDTOArray = await _repository.SearchQuery(SongSearchObject);
             if (SongDTOArray.Length == 0)
                 // TODO: check if we can send not-int and what happens
                 return base.BadRequest("No arranger by that Id");
             else 
                 return base.Ok(SongDTOArray);
         }
+        
+
 
 
         /// <summary>
