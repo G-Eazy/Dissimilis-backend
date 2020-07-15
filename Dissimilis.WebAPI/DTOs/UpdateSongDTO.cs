@@ -1,5 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.SuperDTOs;
-using Dissimilis.WebAPI.Database.Models;
+﻿using Dissimilis.WebAPI.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
