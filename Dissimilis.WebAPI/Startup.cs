@@ -109,8 +109,13 @@ namespace Dissimilis.WebAPI
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "DissAPI V1");
             });
 
-            app.UseWebUserAuthentication();
-
+            //Doing this so that we don't need to log in everytime we 
+            //want to test a new controller!
+            if (!env.IsDevelopment())
+            {
+                app.UseWebUserAuthentication();
+            }
+            
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

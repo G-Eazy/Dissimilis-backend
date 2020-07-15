@@ -40,7 +40,7 @@ namespace Dissimilis.WebAPI.Controllers
         protected override DissimilisServicePrincipal GetServicePrincipal(string web_app_url)
         {
             //TODO pass web_app_url this in later into the service principal
-            return new DissimilisServicePrincipal();
+            return new DissimilisServicePrincipal(web_app_url);
         }
     }
 }
