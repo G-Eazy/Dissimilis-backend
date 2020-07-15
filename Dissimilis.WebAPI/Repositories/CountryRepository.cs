@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Repositories
             Country country;
             if(metaData is null)
             {
-                country = await GetCountryByNameAsync("Norway");
+                country = await GetCountryByNameAsync("Norge");
             }
             else
             {

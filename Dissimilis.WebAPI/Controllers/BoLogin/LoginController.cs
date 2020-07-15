@@ -8,7 +8,6 @@ using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.Repositories;
 using Experis.Ciber.Authentication.Microsoft;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +46,6 @@ namespace Dissimilis.WebAPI.Controllers
 
         protected override DissimilisServicePrincipal GetServicePrincipal(string web_app_url)
         {
-            //TODO pass web_app_url this in later into the service principal
             return new DissimilisServicePrincipal(web_app_url);
         }
     }
