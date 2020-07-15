@@ -41,24 +41,24 @@ namespace Dissimilis.WebAPI.Database
 				context.Organisations.Add(new Organisation("Dissimilis Kultursenter"));
 			}
 
-			var Sweden = context.Countries.FirstOrDefault(x => x.Name == "Norway");
+			var Sweden = context.Countries.FirstOrDefault(x => x.Name == "Norge");
 			if (Sweden is null)
 			{
-				context.Countries.Add(new Country("Norway"));
-				context.Countries.Add(new Country("Sweden"));
+				context.Countries.Add(new Country("Norge"));
+				context.Countries.Add(new Country("Sverige"));
 			}
 
-			var User = context.Users.FirstOrDefault(x => x.Name == "Bård B.");
+			var User = context.Users.FirstOrDefault(x => x.Name == "Bård Bjørge");
 			if (User is null)
 			{
-				context.Users.Add(new User("Bård B.", "bård@dissimilis.no", 1, 1));
+				context.Users.Add(new User("Bård Bjørge", "bård@dissimilis.no", 1, 1));
 			}
 
 			var Instrument = context.Instruments.FirstOrDefault(x => x.Name == "Piano");
 			if (Instrument is null)
 			{
 				context.Instruments.Add(new Instrument("Piano"));
-				context.Instruments.Add(new Instrument("Guitar"));
+				context.Instruments.Add(new Instrument("Gitar"));
 				context.Instruments.Add(new Instrument("Bass"));
 			}
 
