@@ -13,7 +13,6 @@ namespace Dissimilis.WebAPI.Authentication
 
         public DissimilisWebCredentials(uint userId) {
             this.UserID = userId;
-            //TODO do this later through the construtor
         }
     }
 }

@@ -28,11 +28,13 @@ namespace Dissimilis.WebAPI.Controllers
 
         protected override DissimilisWebCredentials GetCredentials(UserEntityMetadata user, MSGraphAPI graph_api, HttpContext httpContext, out string error)
         {
-            //TODO Notes
-            //User the user information to look up or create a user
-            //Extract the numberic UserId from the database
+            //Find the webuser in the db
             User webUser = this._repository.CreateOrFindUser(user, graph_api);
-            error = null; //allows us to set an error. 
+
+            //handle error if webuser is null
+            if (webUser is null) error = "There was an error loggin you in, your credentials are not valid";
+            else error = null; 
+
             return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id)); //Convert.ToUInt32(webUser.Id)
         }
 
