@@ -115,12 +115,8 @@ namespace Dissimilis.WebAPI
                 
             });
 
-            //Doing this so that we don't need to log in everytime we 
-            //want to test a new controller!
-            if (env.IsDevelopment())
-            {
-                app.UseWebUserAuthentication();
-            }
+            //Comment out if you are not using authentication
+             app.UseWebUserAuthentication();
             
             app.UseRouting();
 
