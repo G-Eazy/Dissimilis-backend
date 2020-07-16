@@ -1,7 +1,6 @@
 {
         title: "Lisa gikk til skolen",
-	arrangerId: 1, // hardcoded until frontend has access to current logged in user
-	t
+	timeSignature: "4/4"
         voices: [
             {
                 title: "master",
@@ -19,11 +18,12 @@
                             },
                             {
                                 length: 1,
-				order: 2, // TODO: fill rest
+				order: 2,
                                 notes: ["C", "A", "H"]
                             },
                             {
                                 length: 1,
+				order: 3, // Fill inn order param below
                                 notes: ["H", "A", "C"]
                             }
                         ],
