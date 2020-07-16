@@ -25,6 +25,7 @@ namespace Dissimilis.WebAPI.Controllers
             this._repository = new SongRepository(context);
         }
 
+        #region CRUD Song
         /// <summary>
         /// Get song by Id
         /// </summary>
@@ -45,9 +46,9 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns>
         [HttpGet("search")] 
-        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongSearchDTO SongSearchObject)
+        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
         {
-            var SongDTOArray = await _repository.SearchQuery(SongSearchObject);
+            var SongDTOArray = await _repository.SearchQuery(SongQueryObject);
             if (SongDTOArray.Length == 0)
                 return base.BadRequest("No arranger by that Id");
             else 
@@ -70,7 +71,6 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.Created($"api/songs/{result.Id}", ""); // Add result.Id as second param if frontend wants it in body
             else
                 return base.BadRequest("No arranger by that Id");
-
         }
         
         
@@ -79,9 +79,11 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns> 
         [HttpPatch("{Id:int:min(1)}")]
-        public async Task<IActionResult> UpdateSong(int Id)
+        public async Task<IActionResult> UpdateSong(int Id, [FromBody] UpdateSongDTO UpdateSongObject)
         {
-            var UpdateSongObject = new UpdateSongDTO(Id);
+            if (Id != UpdateSongObject.Id)
+                return base.BadRequest("Url Id must match SongId");
+
             bool result = await _repository.UpdateSongCommand(UpdateSongObject);
             if (result)
                 return base.NoContent();
@@ -102,6 +104,8 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.NoContent();
             else
                 return base.BadRequest("No song by that Id");
-        }        
-    }
+        }
+        #endregion
+    
+        }
 }

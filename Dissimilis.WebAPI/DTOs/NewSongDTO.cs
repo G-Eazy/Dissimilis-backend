@@ -10,6 +10,7 @@ namespace Dissimilis.WebAPI.DTOs
     {
         public string Title { get; set; }
         public int ArrangerId { get; set; }
+        public string TimeSignature { get; set; }
 
     }
 }

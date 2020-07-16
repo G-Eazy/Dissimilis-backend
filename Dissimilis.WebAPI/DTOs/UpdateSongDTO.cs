@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class UpdateSongDTO : SuperDTO
+    public class UpdateSongDTO : NewSongDTO
     {
-        // Useful properties for updating go here
-
-        public UpdateSongDTO(int Id) : base(Id)
-        { }
+        public int Id { get; set; }
     }
 }

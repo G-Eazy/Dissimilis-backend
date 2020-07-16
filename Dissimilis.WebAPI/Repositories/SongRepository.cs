@@ -31,12 +31,12 @@ namespace Dissimilis.WebAPI.Repositories
             return SongObject;
         }
 
-        public async Task<SongDTO[]> SearchQuery(SongSearchDTO SongSearchObject) {
+        public async Task<SongDTO[]> SearchQuery(SongQueryDTO SongQueryObject) {
 
-            var Title = SongSearchObject.Title;
-            var ArrangerId = SongSearchObject.ArrangerId;
-            var Num = SongSearchObject.Num;
-            bool OrderByDateTime = SongSearchObject.OrderByDateTime;
+            var Title = SongQueryObject.Title;
+            var ArrangerId = SongQueryObject.ArrangerId;
+            var Num = SongQueryObject.Num;
+            bool OrderByDateTime = SongQueryObject.OrderByDateTime;
             var SongQuery = this.context.Songs.AsQueryable();
 
             if (! String.IsNullOrEmpty(Title))
@@ -69,11 +69,12 @@ namespace Dissimilis.WebAPI.Repositories
             var ExistsArranger = await this.context.Users.SingleOrDefaultAsync(u => u.Id == ArrangerId);
             SongDTO SongObject = null;
             if (ExistsArranger != null)
-            { 
+            {
                 var SongModelObject = new Song()
                 {
                     Title = NewSongObject.Title,
-                    ArrangerId = NewSongObject.ArrangerId
+                    ArrangerId = NewSongObject.ArrangerId,
+                    TimeSignature = NewSongObject.TimeSignature
                 };
                 await this.context.Songs.AddAsync(SongModelObject);
                 await this.context.SaveChangesAsync();
@@ -84,11 +85,16 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSongCommand(UpdateSongDTO UpdateSongObject)
         {
             var UpdateSongObjectId = UpdateSongObject.Id;
+            var NewTitle = UpdateSongObject.Title;
+            var NewTimeSignature = UpdateSongObject.TimeSignature;
+
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObjectId);
             bool Updated =  false;
             if (SongModelObject != null) 
             {
                 SongModelObject.UpdatedOn = DateTime.UtcNow;
+                SongModelObject.Title = NewTitle;
+                SongModelObject.TimeSignature = NewTimeSignature;
                 await this.context.SaveChangesAsync();
                 Updated = true;
             }
