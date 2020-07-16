@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Reposities.Interfaces
 {
     public interface IUserHandlingRepository
     {
-        User CreateOrFindUser(UserEntityMetadata user, MSGraphAPI graph_api);
+        Task<User> CreateOrFindUser(UserEntityMetadata user, MSGraphAPI graph_api);
         
     }
 }

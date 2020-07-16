@@ -25,13 +25,13 @@ namespace Dissimilis.WebAPI.Repositories
             this.orgRepo = new OrganisationRepository(context);
             this.countryRepo = new CountryRepository(context);
         }
-        public User CreateOrFindUser(UserEntityMetadata userMeta, MSGraphAPI graph_api)
+        public async Task<User> CreateOrFindUser(UserEntityMetadata userMeta, MSGraphAPI graph_api)
         {
             User user = Task.Run(() => this.userRepo.CreateOrFindUserAsync(userMeta)).Result;
             OrganizationMetadata orgData;
             try
             {
-                orgData = graph_api.GetOrganization();
+                orgData = await graph_api.GetOrganizationAsync();
             }
             catch
             {
@@ -41,15 +41,15 @@ namespace Dissimilis.WebAPI.Repositories
             if(user.OrganisationId == null)
             {
                 //The create or find method handles null values
-                Organisation organisation = Task.Run(() => this.orgRepo.CreateOrFindOrganisationAsync(orgData)).Result;
-                user = Task.Run(() => this.userRepo.UpdateUserOrganisationAsync(user, organisation)).Result;
+                Organisation organisation = await this.orgRepo.CreateOrFindOrganisationAsync(orgData, (uint)user.Id);
+                user = await this.userRepo.UpdateUserOrganisationAsync(user, organisation);
             }
 
             if(user.CountryId == null)
             {
                 //The create or find method handles null values
-                Country country = Task.Run(() =>this.countryRepo.CreateOrFindCountryAsync(orgData)).Result;
-                user = Task.Run(() => this.userRepo.UpdateUserCountryAsync(user, country)).Result;
+                Country country = await this.countryRepo.CreateOrFindCountryAsync(orgData, (uint)user.Id);
+                user = await this.userRepo.UpdateUserCountryAsync(user, country);
             }
          
             return user;

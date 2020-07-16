@@ -18,7 +18,15 @@ namespace Dissimilis.WebAPI.Database
 {
     public class DissimilisDbContext : DbContext
 	{
-        protected readonly IUserService UserService;
+		private uint userId;
+
+		public uint UserId
+        {
+            set
+            {
+				this.userId = value;
+            }
+        }
 
         //Create Database set for all the models
         public DbSet<User> Users { get; set; }
@@ -226,32 +234,36 @@ namespace Dissimilis.WebAPI.Database
 			var entries = ChangeTracker
 				.Entries()
 				.Where(e =>
-				e.State == EntityState.Added
-						|| e.State == EntityState.Modified
-						|| e.State == EntityState.Deleted);
+				(e.State == EntityState.Added
+				|| e.State == EntityState.Modified)
+				&& e.Entity is BaseEntity entity);
 
-			string UserIdentity = null;
-			if(UserIdentity is null)
-            {
-				UserIdentity = "System Admin";
-            }
-
-			foreach (var item in entries)
+			if (entries != null)
 			{
-				if (item.Entity is BaseEntity entity)
+				int UserIdentityId = (int)userId;
+				if (UserIdentityId is 0)
 				{
-					if (item.State == EntityState.Added)
+					throw new Exception("The user Id has not been set, Saving changes cancelled");
+				}
+				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
+				string UserIdentity = AccessingUser.Name;
+				foreach (var item in entries)
+				{
+					if (item.Entity is BaseEntity entity)
 					{
-						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).CreatedBy = UserIdentity;
-						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
-					}
+						if (item.State == EntityState.Added)
+						{
+							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						}
 
-					if (item.State == EntityState.Modified)
-					{
-						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						if (item.State == EntityState.Modified)
+						{
+							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						}
 					}
 				}
 			}
@@ -267,33 +279,37 @@ namespace Dissimilis.WebAPI.Database
 		{
 			var entries = ChangeTracker
 				.Entries()
-				.Where(e =>	
+				.Where(e =>	(
 				e.State == EntityState.Added
-						|| e.State == EntityState.Modified 
-						|| e.State == EntityState.Deleted);
+				|| e.State == EntityState.Modified) 
+				&& e.Entity is BaseEntity entity);
 
-			string UserIdentity = null;
-			if (UserIdentity is null)
+			if (entries != null)
 			{
-				UserIdentity = "System Admin";
-			}
-
-			foreach (var item in entries)
-			{
-				if (item.Entity is BaseEntity entity)
+				int UserIdentityId = (int)userId;
+				if (UserIdentityId is 0)
 				{
-					if (item.State == EntityState.Added)
-					{
-						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).CreatedBy = UserIdentity;
-						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
-					}
+					throw new Exception("The user Id has not been set, Saving changes cancelled");
+				}
+				string UserIdentity = this.Users.SingleOrDefault(x => x.Id == UserIdentityId).Name;
 
-					if (item.State == EntityState.Modified)
+				foreach (var item in entries)
+				{
+					if (item.Entity is BaseEntity entity)
 					{
-						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						if (item.State == EntityState.Added)
+						{
+							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						}
+
+						if (item.State == EntityState.Modified)
+						{
+							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+						}
 					}
 				}
 			}
