@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Database.Models
     public class Note : BaseEntity
     {
         /// <summary>
-        /// The id of this bar
+        /// The id of this Note
         /// </summary>
         [Key]
         public int Id { get; set; }
@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Database.Models
         public byte NoteNumber { get; set; }
 
 
-        public uint Length { get; set; }
+        public byte Length { get; set; }
 
         public string NoteValues { get; set; }
 
