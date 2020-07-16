@@ -29,17 +29,17 @@ namespace Dissimilis.WebAPI.Database.Models
         public int BarId { get; set; }
 
         /// <summary>
-        /// Priority of the bar in a spesific part
+        /// Priority of the Note in a spesific Bar
         /// </summary>
         public byte NoteNumber { get; set; }
 
 
         public uint Length { get; set; }
 
-        public string[] NoteValues { get; set; }
+        public string NoteValues { get; set; }
 
         /// <summary>
-        /// Empty constructor for Bar
+        /// Empty constructor for Note
         /// </summary>
         public Note () { }
     }
