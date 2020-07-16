@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Dissimilis.WebAPI.Database.Models
 {
     /// <summary>
-    /// This is the bar, which is associated with a Part (norsk: Takt)
+    /// This is the bar, which is associated with a Part (norsk: Stemme)
     /// </summary>
     public class Bar : BaseEntity
     {
@@ -15,11 +15,11 @@ namespace Dissimilis.WebAPI.Database.Models
         /// The id of this bar
         /// </summary>
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
-        /// The song it is linked to
-        /// and the corresponding SongId
+        /// The part it is linked to
+        /// and the corresponding PartId
         /// </summary>
         public Part Part { get; set; }
 

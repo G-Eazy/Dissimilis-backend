@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class SongSearchDTO
+    public class SongQueryDTO
     {
         public string Title { get; set; }
         public int ArrangerId { get; set; }

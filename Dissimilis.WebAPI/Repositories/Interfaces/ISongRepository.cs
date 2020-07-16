@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<bool> DeleteSong(SuperDTO DeleteSongObject, uint userId);
         Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId);
         Task<SongDTO> CreateSong(NewSongDTO NewSongObject, uint userId);
-        Task<SongDTO[]> SearchSongs(SongSearchDTO SongSearchObject);
+        Task<SongDTO[]> SearchSongs(SongQueryDTO SongQueryObject);
         Task<SongDTO> GetSongById(SuperDTO SuperObject);
 
     }   

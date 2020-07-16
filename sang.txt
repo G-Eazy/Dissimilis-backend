@@ -1,0 +1,186 @@
+{
+        title: "Lisa gikk til skolen",
+	timeSignature: "4/4"
+        voices: [
+            {
+                title: "master",
+		priority: 1,
+                bars: [
+                    {
+                        barNumber: 1,
+                        repBefore: false,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+				order: 1,
+                                length: 4,
+                                notes: ["C"]
+                            },
+                            {
+                                length: 1,
+				order: 2,
+                                notes: ["C", "A", "H"]
+                            },
+                            {
+                                length: 1,
+				order: 3, // Fill inn order param below
+                                notes: ["H", "A", "C"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 2,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 6,
+                                notes: ["A"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 3,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 2,
+                                notes: ["A", "H", "C"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 4,
+                                notes: ["H"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 4,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 1,
+                                notes: ["A", "H", "C"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["H"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["H"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["C", "H", "D"]
+                            },
+
+
+                        ],
+                    },
+                ]
+            },
+            {
+                title: "Gitar",
+		priority: 2,
+                bars: [
+                    {
+                        barNumber: 1,
+                        repBefore: false,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 4,
+                                notes: [""]
+                            },
+                            {
+                                length: 1,
+                                notes: ["C", "A", "H"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["H", "A", "C"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 2,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 6,
+                                notes: ["A"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 3,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 2,
+                                notes: ["A", "H", "C"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 4,
+                                notes: ["H"]
+                            }
+                        ],
+                    },
+                    {
+                        barNumber: 4,
+                        repBefore: true,
+                        repAfter: false,
+                        chordsAndTones: [
+                            {
+                                length: 1,
+                                notes: ["A", "H", "C"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["H"]
+                            },
+                            {
+                                length: 1,
+                                notes: ["C", "H", "D"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["H"]
+                            },
+                            {
+                                length: 2,
+                                notes: ["C", "H", "D"]
+                            },
+
+
+                        ],
+                    },
+                ]
+            },
+        ],
+
+    }

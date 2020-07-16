@@ -34,6 +34,7 @@ namespace Dissimilis.WebAPI.Database
 		public DbSet<Part> Parts { get; set; }
 		public DbSet<Resource> Resources { get; set; }
 		public DbSet<Bar> Bars { get; set; }
+		public DbSet<Note> Notes { get; set; }
 		public DbSet<Country> Countries { get; set; }
 		public DbSet<Instrument> Instruments { get; set; }
 		public DbSet<UserGroup> UserGroups { get; set; }
@@ -76,6 +77,7 @@ namespace Dissimilis.WebAPI.Database
 			BuildPart(modelBuilder);
 			BuildInstrument(modelBuilder);
 			BuildBar(modelBuilder);
+			BuildNote(modelBuilder);
 			BuildCountry(modelBuilder);
 			BuildOrganisation(modelBuilder);
 			BuildUserGroup(modelBuilder);
@@ -92,8 +94,9 @@ namespace Dissimilis.WebAPI.Database
 		{
 			var entity = builder.Entity<User>();
 
-			//Set unique username
-			//entity.HasIndex(x => x.Username).IsUnique();
+			//set required
+			entity.Property(x => x.Email).IsRequired();
+			entity.Property(x => x.Name).IsRequired();
 
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
@@ -101,17 +104,21 @@ namespace Dissimilis.WebAPI.Database
 
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
-				.HasForeignKey(x => x.CountryId);
+				.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 			entity.HasOne(x => x.Organisation).WithMany()
-				.HasForeignKey(x => x.OrganisationId);
+				.HasForeignKey(x => x.OrganisationId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 		}
 
 		static void BuildSong (ModelBuilder builder)
         {
 			var entity = builder.Entity<Song>();
-			entity.HasOne(x => x.Arranger).WithMany().HasForeignKey(x => x.ArrangerId);
+			entity.Property(x => x.Title).IsRequired();
+
+			entity.HasOne(x => x.Arranger)
+				.WithMany()
+				.HasForeignKey(x => x.ArrangerId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict); ;
 		}
 	
 		static void BuildPart (ModelBuilder builder)
@@ -126,10 +133,11 @@ namespace Dissimilis.WebAPI.Database
 
 			//set foregin key for creator id
 			entity.HasOne(x => x.Song).WithMany()
-				.HasForeignKey(x => x.SongId);
+				.HasForeignKey(x => x.SongId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+
 			//Set foregin key linked to Instrument and InstrumentId
 			entity.HasOne(x => x.Instrument).WithMany()
-				.HasForeignKey(x => x.InstrumentId);
+				.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 		}
 
@@ -144,11 +152,30 @@ namespace Dissimilis.WebAPI.Database
 			{
 				x.PartId,
 				x.BarNumber
-			});
+			}).IsUnique();
 
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Part).WithMany()
-				.HasForeignKey(x => x.PartId);
+				.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+
+		}
+
+		static void BuildNote(ModelBuilder builder)
+		{
+			var entity = builder.Entity<Note>();
+
+			//Set a unique Id for barnumber that is related to PartId
+			//Each barnumber needs to be unique but only within it's
+			//corresponding Part.
+			entity.HasIndex(x => new
+			{
+				x.BarId,
+				x.NoteNumber
+			}).IsUnique();
+
+			//Set foregin key for PartId linked to the Id of Part
+			entity.HasOne(x => x.Bar).WithMany()
+				.HasForeignKey(x => x.BarId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade); ;
 
 		}
 
@@ -158,6 +185,7 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set instrument.Id to be unique
 			entity.HasIndex(x => x.Name).IsUnique();
+			entity.Property(x => x.Name).IsRequired();
 
 		}
 		
@@ -166,6 +194,7 @@ namespace Dissimilis.WebAPI.Database
 			var entity = builder.Entity<Country>();
 
 			entity.HasIndex(x => x.Name).IsUnique();
+			entity.Property(x => x.Name).IsRequired();
 
 		}
 
@@ -173,6 +202,7 @@ namespace Dissimilis.WebAPI.Database
 		{
 			var entity = builder.Entity<UserGroup>();
 
+			entity.Property(x => x.Name).IsRequired();
 			entity.HasIndex(x => x.Name).IsUnique();
 
 		}

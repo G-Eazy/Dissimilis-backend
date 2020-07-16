@@ -26,6 +26,7 @@ namespace Dissimilis.WebAPI.Controllers
             this.repository = new SongRepository(context);
         }
 
+        #region CRUD Song
         /// <summary>
         /// Get song by Id
         /// </summary>
@@ -45,13 +46,13 @@ namespace Dissimilis.WebAPI.Controllers
         /// Fetch songs that contain {Title} and/or from Arranger {ArrangerId} in the database. Limit output to {Num} songs. Set {OrderByDateTime} to true for ordering.
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet("search")] 
-        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongSearchDTO SongSearchObject)
+        [HttpGet("search")]
+        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
         {
-            var SongDTOArray = await repository.SearchSongs(SongSearchObject);
+            var SongDTOArray = await repository.SearchSongs(SongQueryObject);
             if (SongDTOArray.Length == 0)
                 return base.BadRequest("No arranger by that Id");
-            else 
+            else
                 return base.Ok(SongDTOArray);
         }
 
@@ -69,7 +70,6 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.Created($"api/songs/{result.Id}", ""); // Add result.Id as second param if frontend wants it in body
             else
                 return base.BadRequest("No arranger by that Id");
-
         }
         
         /// <summary>
@@ -77,9 +77,11 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns> 
         [HttpPatch("{Id:int:min(1)}")]
-        public async Task<IActionResult> UpdateSong(int Id)
+        public async Task<IActionResult> UpdateSong(int Id, [FromBody] UpdateSongDTO UpdateSongObject)
         {
-            var UpdateSongObject = new UpdateSongDTO(Id);
+            if (Id != UpdateSongObject.Id)
+                return base.BadRequest("Url Id must match SongId");
+
             bool result = await repository.UpdateSong(UpdateSongObject, base.UserID);
             if (result)
                 return base.NoContent();
@@ -100,6 +102,8 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.NoContent();
             else
                 return base.BadRequest("No song by that Id");
-        }        
+        }
+        #endregion
+
     }
 }
