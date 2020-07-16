@@ -11,18 +11,19 @@ using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System.Threading;
 using Dissimilis.WebAPI.Repositories;
+using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
     [Route("api/songs")]
     [ApiController]
-    public class SongController : ControllerBase
+    public class SongController : UserControllerBase
     {
-        private SongRepository _repository;
+        private SongRepository repository;
         
         public SongController(DissimilisDbContext context)
         {
-            this._repository = new SongRepository(context);
+            this.repository = new SongRepository(context);
         }
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> GetSongById(int Id)
         {
             var SuperObject = new SuperDTO(Id);
-            var SongObject = await _repository.GetSongByIdQuery(SuperObject);
+            var SongObject = await repository.GetSongById(SuperObject);
             if (SongObject != null)
                 return base.Ok(SongObject);
             else
@@ -47,32 +48,29 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet("search")] 
         public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongSearchDTO SongSearchObject)
         {
-            var SongDTOArray = await _repository.SearchQuery(SongSearchObject);
+            var SongDTOArray = await repository.SearchSongs(SongSearchObject);
             if (SongDTOArray.Length == 0)
                 return base.BadRequest("No arranger by that Id");
             else 
                 return base.Ok(SongDTOArray);
         }
-        
-
 
 
         /// <summary>
         /// Create new song. Arranger must be id of somebody in DB, see all users below.
         /// </summary>
-        /// <param name="NewSongDTO"></param>
+        /// <param name="NewSongObject"></param>
         /// <returns>201</returns>
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
-            var result = await _repository.CreateSongCommand(NewSongObject);
+            var result = await repository.CreateSong(NewSongObject, base.UserID);
             if (result != null)
                 return base.Created($"api/songs/{result.Id}", ""); // Add result.Id as second param if frontend wants it in body
             else
                 return base.BadRequest("No arranger by that Id");
 
         }
-        
         
         /// <summary>
         /// Update song by Id
@@ -82,7 +80,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> UpdateSong(int Id)
         {
             var UpdateSongObject = new UpdateSongDTO(Id);
-            bool result = await _repository.UpdateSongCommand(UpdateSongObject);
+            bool result = await repository.UpdateSong(UpdateSongObject, base.UserID);
             if (result)
                 return base.NoContent();
             else
@@ -97,7 +95,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> DeleteSong(int Id)
         {
             var DeleteSongObject = new SuperDTO(Id);
-            bool result = await _repository.DeleteSongCommand(DeleteSongObject);
+            bool result = await repository.DeleteSong(DeleteSongObject, base.UserID);
             if (result)
                 return base.NoContent();
             else

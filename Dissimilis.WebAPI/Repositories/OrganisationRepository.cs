@@ -23,7 +23,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="metadata"></param>
         /// <returns></returns>
-        public async Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata)
+        public async Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata, uint userId)
         {
             Organisation organisation;
             //Check if metadata is null
@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Repositories
                 if(organisation is null)
                 {
                     //if null, add it to the database
-                    organisation = await CreateOrganisationAsync(metadata);
+                    organisation = await CreateOrganisationAsync(metadata, userId);
                 }
             }
 
@@ -52,7 +52,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="metadata"></param>
         /// <returns></returns>
-        public async Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata)
+        public async Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata, uint userId)
         {
             Organisation newOrg;
             if(metadata is null)

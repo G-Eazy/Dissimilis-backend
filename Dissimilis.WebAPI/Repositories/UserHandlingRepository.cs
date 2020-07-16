@@ -41,14 +41,14 @@ namespace Dissimilis.WebAPI.Repositories
             if(user.OrganisationId == null)
             {
                 //The create or find method handles null values
-                Organisation organisation = Task.Run(() => this.orgRepo.CreateOrFindOrganisationAsync(orgData)).Result;
+                Organisation organisation = Task.Run(() => this.orgRepo.CreateOrFindOrganisationAsync(orgData, (uint)user.Id)).Result;
                 user = Task.Run(() => this.userRepo.UpdateUserOrganisationAsync(user, organisation)).Result;
             }
 
             if(user.CountryId == null)
             {
                 //The create or find method handles null values
-                Country country = Task.Run(() =>this.countryRepo.CreateOrFindCountryAsync(orgData)).Result;
+                Country country = Task.Run(() =>this.countryRepo.CreateOrFindCountryAsync(orgData, (uint)user.Id)).Result;
                 user = Task.Run(() => this.userRepo.UpdateUserCountryAsync(user, country)).Result;
             }
          

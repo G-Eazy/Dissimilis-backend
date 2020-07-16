@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Repositories.Interfaces;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class SongRepository 
+    public class SongRepository : ISongRepository
     {
         private DissimilisDbContext context;
         public SongRepository(DissimilisDbContext context)
@@ -18,20 +19,28 @@ namespace Dissimilis.WebAPI.Repositories
             this.context = context;
         }
 
-
-        public async Task<SongDTO> GetSongByIdQuery(SuperDTO SuperObject)
+        /// <summary>
+        /// Get song by id provided in DTO
+        /// </summary>
+        /// <param name="SuperObject"></param>
+        /// <returns></returns>
+        public async Task<SongDTO> GetSongById(SuperDTO SuperObject)
         {
             var SongId = SuperObject.Id;
             var SongModelObject = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == SongId);
             
-            SongDTO SongObject = null;
-            if (SongModelObject != null)
-                SongObject = new SongDTO(SongModelObject);
+            SongDTO SongObject = new SongDTO(SongModelObject);
+
             return SongObject;
         }
 
-        public async Task<SongDTO[]> SearchQuery(SongSearchDTO SongSearchObject) {
+        /// <summary>
+        /// Search songs with parameters in SongSearchDTO
+        /// </summary>
+        /// <param name="SongSearchObject"></param>
+        /// <returns></returns>
+        public async Task<SongDTO[]> SearchSongs(SongSearchDTO SongSearchObject) {
 
             var Title = SongSearchObject.Title;
             var ArrangerId = SongSearchObject.ArrangerId;
@@ -63,7 +72,13 @@ namespace Dissimilis.WebAPI.Repositories
         
         }
 
-        public async Task<SongDTO> CreateSongCommand(NewSongDTO NewSongObject)
+        /// <summary>
+        /// Create song using NewSongDTO
+        /// </summary>
+        /// <param name="NewSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<SongDTO> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
             var ArrangerId = NewSongObject.ArrangerId;
             var ExistsArranger = await this.context.Users.SingleOrDefaultAsync(u => u.Id == ArrangerId);
@@ -76,12 +91,20 @@ namespace Dissimilis.WebAPI.Repositories
                     ArrangerId = NewSongObject.ArrangerId
                 };
                 await this.context.Songs.AddAsync(SongModelObject);
+                this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
                 SongObject = new SongDTO(SongModelObject);
             }
             return SongObject;
         }
-        public async Task<bool> UpdateSongCommand(UpdateSongDTO UpdateSongObject)
+
+        /// <summary>
+        /// UpdateSong using UpdateSongDTO
+        /// </summary>
+        /// <param name="UpdateSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             var UpdateSongObjectId = UpdateSongObject.Id;
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObjectId);
@@ -89,13 +112,20 @@ namespace Dissimilis.WebAPI.Repositories
             if (SongModelObject != null) 
             {
                 SongModelObject.UpdatedOn = DateTime.UtcNow;
+                this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
                 Updated = true;
             }
             return Updated;
         }
 
-        public async Task<bool> DeleteSongCommand(SuperDTO DeleteSongObject)
+        /// <summary>
+        /// Delete song using deletesong DTO
+        /// </summary>
+        /// <param name="DeleteSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteSong(SuperDTO DeleteSongObject, uint userId)
         {
             var DeleteSongObjectId = DeleteSongObject.Id;
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == DeleteSongObjectId);
