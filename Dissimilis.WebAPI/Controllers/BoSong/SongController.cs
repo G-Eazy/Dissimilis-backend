@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
         {
-            var SongDTOArray = await repository.SearchSongs(SongSearchObject);
+            var SongDTOArray = await repository.SearchSongs(SongQueryObject);
             if (SongDTOArray.Length == 0)
                 return base.BadRequest("No arranger by that Id");
             else
@@ -82,7 +82,6 @@ namespace Dissimilis.WebAPI.Controllers
             if (Id != UpdateSongObject.Id)
                 return base.BadRequest("Url Id must match SongId");
 
-            var UpdateSongObject = new UpdateSongDTO(Id);
             bool result = await repository.UpdateSong(UpdateSongObject, base.UserID);
             if (result)
                 return base.NoContent();

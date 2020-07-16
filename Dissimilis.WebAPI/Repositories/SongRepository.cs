@@ -40,7 +40,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="SongSearchObject"></param>
         /// <returns></returns>
-        public async Task<SongDTO[]> SearchSongs(SongSearchDTO SongSearchObject) {
+        public async Task<SongDTO[]> SearchSongs(SongQueryDTO SongQueryObject) {
 
             var Title = SongQueryObject.Title;
             var ArrangerId = SongQueryObject.ArrangerId;
