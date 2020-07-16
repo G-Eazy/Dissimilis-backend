@@ -26,9 +26,11 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject)
         {
             var SongId = NewPartObject.SongId;
-            var InstrumentName = NewPartObject.Title;
             var ExistsSong = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == SongId);
-            var ExistsInstrument = await CreateOrFindInstrument(InstrumentName);
+            var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title);
+            // This will trigger BadRequest from controller, Will remove when we have exception handler
+            if (ExistsInstrument == null)
+                return null;
 
             SuperDTO PartObject = null;
 
@@ -54,8 +56,11 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="InstrumentName"></param>
         /// <returns>(Model) Instrument</returns>
         public async Task<Instrument> CreateOrFindInstrument(string InstrumentName)
-        { 
-            
+        {
+            if (String.IsNullOrWhiteSpace(InstrumentName))
+                //throw new ArgumentNullException(nameof(InstrumentName)); // Commenting out until we have exception handler
+                return null;
+
             var ExistsInstrument = await this.context.Instruments.SingleOrDefaultAsync(i => i.Name == InstrumentName);
             if (ExistsInstrument is null) {
                 ExistsInstrument = new Instrument(InstrumentName);
