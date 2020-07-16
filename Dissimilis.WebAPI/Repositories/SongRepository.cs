@@ -111,7 +111,6 @@ namespace Dissimilis.WebAPI.Repositories
             bool Updated =  false;
             if (SongModelObject != null) 
             {
-                SongModelObject.UpdatedOn = DateTime.UtcNow;
                 this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
                 Updated = true;
