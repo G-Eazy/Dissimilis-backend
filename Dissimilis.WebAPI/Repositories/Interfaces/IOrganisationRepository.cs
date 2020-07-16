@@ -11,8 +11,8 @@ namespace Dissimilis.WebAPI.Reposities.Interfaces
     {
         Task<Organisation> GetOrganisationByIdAsync(int id);
         Task<Organisation> GetOrganisationByNameAsync(string name);
-        Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata);
-        Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata);
+        Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata, uint userId);
+        Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata, uint userId);
         Task<Organisation> GetOrganisationByMsIdAsync(OrganizationMetadata metadata);
 
     }

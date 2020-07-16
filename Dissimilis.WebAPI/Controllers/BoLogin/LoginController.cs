@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
         protected override DissimilisWebCredentials GetCredentials(UserEntityMetadata user, MSGraphAPI graph_api, HttpContext httpContext, out string error)
         {
             //Find the webuser in the db
-            User webUser = this._repository.CreateOrFindUser(user, graph_api);
+            User webUser = Task.Run(() => this._repository.CreateOrFindUser(user, graph_api)).Result;
 
             //handle error if webuser is null
             if (webUser is null)

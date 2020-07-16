@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
     {
         Task<Country> GetCountryByIdAsync(int id);
         Task<Country> GetCountryByNameAsync(string name);
-        Task<Country> CreateCountryAsync(string name);
-        Task<Country> CreateOrFindCountryAsync(OrganizationMetadata metadata);
+        Task<Country> CreateCountryAsync(string name, uint userId);
+        Task<Country> CreateOrFindCountryAsync(OrganizationMetadata metadata, uint userId);
     }
 }
