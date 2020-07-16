@@ -44,9 +44,7 @@ namespace Dissimilis.WebAPI.Repositories
                 };
                 await this.context.Parts.AddAsync(PartModelObject);
                 await this.context.SaveChangesAsync();
-                PartObject = new SuperDTO(SongId);
-                // This will be changed to a better solution, but i need to return both SongId and PartId
-                PartObject.Id2 = NewPartObject.Priority;
+                PartObject = new SuperDTO(NewPartObject.Priority);
             }
             return PartObject;
         }

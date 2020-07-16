@@ -12,7 +12,6 @@ namespace Dissimilis.WebAPI.DTOs
         public int Id { get; set; }
 
         // Temporary
-        public int Id2 { get; set; }
         public SuperDTO() { }
         public SuperDTO(int Id) 
         {

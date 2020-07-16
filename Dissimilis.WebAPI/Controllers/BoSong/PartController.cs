@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="NewPartDTO"></param>
         /// <returns>201</returns>
-        [HttpPost("{song_id:int:min(1)}")]
+        [HttpPost("{song_id:int:min(1)}/parts")]
         public async Task<IActionResult> CreatePart(int song_id, [FromBody] NewPartDTO NewPartObject)
         {
             if (song_id != NewPartObject.SongId)
@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers
 
             var result = await _repository.CreatePartCommand(NewPartObject);
             if (result != null)
-                return base.Created($"api/songs/{result.Id}/parts/{result.Id2}", ""); // Add result.Id as second param if frontend wants it in body
+                return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
             else
                 return base.BadRequest("No song by that Id");
         }
