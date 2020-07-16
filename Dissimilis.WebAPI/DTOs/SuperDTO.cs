@@ -10,6 +10,7 @@ namespace Dissimilis.WebAPI.DTOs
     public class SuperDTO
     {
         public int Id { get; set; }
+        public int Id2 { get; set; }
         public SuperDTO() { }
         public SuperDTO(int Id) // TODO: generic?
         {

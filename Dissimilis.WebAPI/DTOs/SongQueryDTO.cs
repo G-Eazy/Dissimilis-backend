@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class SongsByArrangerDTO
+    public class SongQueryDTO
     {
-
-        public int Num { get; set; }
-        
+        public string Title { get; set; }
         public int ArrangerId { get; set; }
-    
+        public uint Num { get; set; }
         public bool OrderByDateTime { get; set; }
 
     }

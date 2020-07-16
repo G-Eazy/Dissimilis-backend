@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.Controllers
     public class SongController : ControllerBase
     {
         private SongRepository _repository;
-        
+
         public SongController(DissimilisDbContext context)
         {
             this._repository = new SongRepository(context);
@@ -45,16 +45,16 @@ namespace Dissimilis.WebAPI.Controllers
         /// Fetch songs that contain {Title} and/or from Arranger {ArrangerId} in the database. Limit output to {Num} songs. Set {OrderByDateTime} to true for ordering.
         /// </summary>
         /// <returns>200</returns>
-        [HttpGet("search")] 
+        [HttpGet("search")]
         public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
         {
             var SongDTOArray = await _repository.SearchQuery(SongQueryObject);
             if (SongDTOArray.Length == 0)
                 return base.BadRequest("No arranger by that Id");
-            else 
+            else
                 return base.Ok(SongDTOArray);
         }
-        
+
 
 
 
@@ -72,8 +72,8 @@ namespace Dissimilis.WebAPI.Controllers
             else
                 return base.BadRequest("No arranger by that Id");
         }
-        
-        
+
+
         /// <summary>
         /// Update song by Id
         /// </summary>
@@ -106,6 +106,6 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.BadRequest("No song by that Id");
         }
         #endregion
-    
-        }
+
+    }
 }
