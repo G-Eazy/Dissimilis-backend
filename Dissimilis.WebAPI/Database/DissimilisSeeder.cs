@@ -11,6 +11,16 @@ namespace Dissimilis.WebAPI.Database
 		public static void SeedData(DissimilisDbContext context)
 		{
 			context.Database.EnsureCreated();
+
+			var User = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
+			if (User is null)
+			{
+				context.Users.Add(new User() { Name = "AdminUser", Email = "admin@support.no" });
+				context.Users.Add(new User() { Name = "Bård Bjørge", Email = "bård@dissimilis.no" });
+			}
+
+			context.SaveChanges();
+			
 			//Check if there is any data called Admin in the database first
 			var Instructor = context.UserGroups.FirstOrDefault(b => b.Name == "Admin");
 
@@ -49,13 +59,6 @@ namespace Dissimilis.WebAPI.Database
 				context.Countries.Add(new Country("Sverige"));
 			}
 
-			var User = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
-			if (User is null)
-			{
-				context.Users.Add(new User("AdminUser", "admin@support.no", 1, 1));
-				context.Users.Add(new User("Bård Bjørge", "bård@dissimilis.no", 1, 1));
-			}
-
 			var Instrument = context.Instruments.SingleOrDefault(x => x.Name == "Piano");
 			if (Instrument is null)
 			{
@@ -66,6 +69,16 @@ namespace Dissimilis.WebAPI.Database
 
 			context.UserId = 1;
 			context.SaveChanges();
+
+			var Baard = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
+			if (Baard.OrganisationId is null)
+			{
+				Baard.OrganisationId = 1;
+				Baard.CountryId = 1;
+				var Admin = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
+				Admin.OrganisationId = 1;
+				Admin.CountryId = 1;
+			}
 
 			//Insert the many to many enteties as the ones above need to have been
 			//saved first

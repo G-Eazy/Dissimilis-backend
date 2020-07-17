@@ -271,16 +271,18 @@ namespace Dissimilis.WebAPI.Database
 				|| e.State == EntityState.Modified)
 				&& e.Entity is BaseEntity entity);
 
-			if (entries != null)
+			if (entries.Count() > 0)
 			{
 				string userName;
 				int UserIdentityId = (int)userId;
-				if (UserIdentityId is 0)
+				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
+				if (AccessingUser is null)
+					throw new Exception("The UserID has not been set or don't exist, saving cancelled");
+				else
 				{
-					userName = "SystemDefault";
+					userName = AccessingUser.Name;
 				}
-				//User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
-				
+
 				foreach (var item in entries)
 				{
 					if (item.Entity is BaseEntity entity)
@@ -318,17 +320,18 @@ namespace Dissimilis.WebAPI.Database
 				|| e.State == EntityState.Modified) 
 				&& e.Entity is BaseEntity entity);
 
-			if (entries != null)
+			if (entries.Count() > 0)
 			{
-				int UserIdentityId = (int)userId;
 				string userName;
-				if (UserIdentityId is 0)
+				int UserIdentityId = (int)userId;
+				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
+				if (AccessingUser is null)
+					throw new Exception("The UserID has not been set or don't exist, saving cancelled");
+				else
 				{
-					userName = "SystemDefault";
+					userName = AccessingUser.Name;
 				}
-				var UserIdentity = this.Users.SingleOrDefault(x => x.Id == UserIdentityId);
-				if (UserIdentity is null) userName = "SystemDefault";
-				else userName = UserIdentity.Name;
+
 				foreach (var item in entries)
 				{
 					if (item.Entity is BaseEntity entity)
