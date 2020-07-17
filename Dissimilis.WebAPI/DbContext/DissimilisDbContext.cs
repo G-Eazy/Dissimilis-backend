@@ -273,13 +273,14 @@ namespace Dissimilis.WebAPI.Database
 
 			if (entries != null)
 			{
+				string userName;
 				int UserIdentityId = (int)userId;
 				if (UserIdentityId is 0)
 				{
-					throw new Exception("The user Id has not been set, Saving changes cancelled");
+					userName = "SystemDefault";
 				}
-				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
-				string UserIdentity = AccessingUser.Name;
+				//User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
+				
 				foreach (var item in entries)
 				{
 					if (item.Entity is BaseEntity entity)
@@ -287,15 +288,15 @@ namespace Dissimilis.WebAPI.Database
 						if (item.State == EntityState.Added)
 						{
 							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+							((BaseEntity)item.Entity).CreatedBy = userName;
 							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedBy = userName;
 						}
 
 						if (item.State == EntityState.Modified)
 						{
 							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedBy = userName;
 						}
 					}
 				}
@@ -320,12 +321,12 @@ namespace Dissimilis.WebAPI.Database
 			if (entries != null)
 			{
 				int UserIdentityId = (int)userId;
+				string userName;
 				if (UserIdentityId is 0)
 				{
-					throw new Exception("The user Id has not been set, Saving changes cancelled");
+					userName = "SystemDefault";
 				}
 				var UserIdentity = this.Users.SingleOrDefault(x => x.Id == UserIdentityId);
-				string userName;
 				if (UserIdentity is null) userName = "SystemDefault";
 				else userName = UserIdentity.Name;
 				foreach (var item in entries)
