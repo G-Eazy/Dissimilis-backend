@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Database
 			context.UserId = 1;
 			context.SaveChanges();
 
-			var Admin = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
+			var Admin = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
 			if (Admin.OrganisationId is null)
 			{
 				Admin.OrganisationId = 1;

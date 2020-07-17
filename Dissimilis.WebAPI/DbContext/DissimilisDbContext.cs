@@ -78,7 +78,6 @@ namespace Dissimilis.WebAPI.Database
 			BuildUserGroupMembers(modelBuilder);
 			BuildResources(modelBuilder);
 			BuildUserGroupResource(modelBuilder);
-			BuildBaseEntity(modelBuilder);
 		}
 
 
@@ -106,16 +105,6 @@ namespace Dissimilis.WebAPI.Database
 
 		}
 
-		static void BuildBaseEntity(ModelBuilder builder)
-        {
-			var entity = builder.Entity<BaseEntity>();
-
-			entity.HasOne(x => x.CreatedBy).WithMany()
-				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
-			entity.HasOne(x => x.UpdatedBy).WithMany()
-				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
-		}
-
 		static void BuildSong (ModelBuilder builder)
         {
 			var entity = builder.Entity<Song>();
@@ -123,7 +112,11 @@ namespace Dissimilis.WebAPI.Database
 
 			entity.HasOne(x => x.Arranger)
 				.WithMany()
-				.HasForeignKey(x => x.ArrangerId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict); ;
+				.HasForeignKey(x => x.ArrangerId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 		}
 	
 		static void BuildPart (ModelBuilder builder)
@@ -143,6 +136,11 @@ namespace Dissimilis.WebAPI.Database
 			//Set foregin key linked to Instrument and InstrumentId
 			entity.HasOne(x => x.Instrument).WithMany()
 				.HasForeignKey(x => x.InstrumentId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 		}
 
@@ -162,6 +160,11 @@ namespace Dissimilis.WebAPI.Database
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Part).WithMany()
 				.HasForeignKey(x => x.PartId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
 		}
 
@@ -187,6 +190,11 @@ namespace Dissimilis.WebAPI.Database
 				v => string.Join(',', v),
 				v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 		}
 
 		static void BuildInstrument (ModelBuilder builder)
@@ -197,6 +205,11 @@ namespace Dissimilis.WebAPI.Database
 			entity.HasIndex(x => x.Name).IsUnique();
 			entity.Property(x => x.Name).IsRequired();
 
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 		}
 		
 		static void BuildCountry (ModelBuilder builder)
@@ -205,6 +218,12 @@ namespace Dissimilis.WebAPI.Database
 
 			entity.HasIndex(x => x.Name).IsUnique();
 			entity.Property(x => x.Name).IsRequired();
+
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 
 		}
 
@@ -215,6 +234,11 @@ namespace Dissimilis.WebAPI.Database
 			entity.Property(x => x.Name).IsRequired();
 			entity.HasIndex(x => x.Name).IsUnique();
 
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 		}
 
 		static void BuildResources(ModelBuilder builder)
@@ -222,7 +246,10 @@ namespace Dissimilis.WebAPI.Database
 			var entity = builder.Entity<Resource>();
 
 			entity.HasIndex(x => x.Name).IsUnique();
-
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 		}
 
 		static void BuildOrganisation(ModelBuilder builder)
@@ -230,6 +257,12 @@ namespace Dissimilis.WebAPI.Database
 			var entity = builder.Entity<Organisation>();
 
 			entity.HasIndex(x => x.Name).IsUnique();
+
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 
 		}
 

@@ -97,7 +97,7 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> DeleteSong(int Id)
         {
             var DeleteSongObject = new SuperDTO(Id);
-            bool result = await repository.DeleteSong(DeleteSongObject);
+            bool result = await repository.DeleteSong(DeleteSongObject, (int)base.UserID);
             if (result)
                 return base.NoContent();
             else
