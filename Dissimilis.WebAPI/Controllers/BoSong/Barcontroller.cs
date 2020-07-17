@@ -34,17 +34,13 @@ namespace Dissimilis.WebAPI.Controllers
         /// <param name="partId"></param>
         /// <returns>201</returns>
         [HttpPost("{song_id:int:min(1)}/parts/{part_id:int:min(1)}/bars")]
-        public async Task<IActionResult> CreateBar(int partId, [FromBody] NewBarDTO BarObject)
+        public async Task<IActionResult> CreateBar([FromBody] NewBarDTO BarObject)
         {
-            if (partId != BarObject.PartId)
-                return base.BadRequest("Url Id must match SongId");
-
-            var result = await repository.CreateBar(BarObject, partId, base.UserID);
+            var result = await repository.CreateBar(BarObject, base.UserID);
             if (result is null)
                 return base.BadRequest("No song by that Id");
             else
-                return base.Created($"api/songs/{partId}/parts/{result.Id}/bars", "");
-            
+                return base.Created($"api/songs/{result.PartId}/parts/{result.Id}/bars", "");
         }
 
         #endregion

@@ -11,18 +11,19 @@ using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System.Threading;
 using Dissimilis.WebAPI.Repositories;
+using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
     [Route("api/songs")]
     [ApiController]
-    public class PartController : ControllerBase
+    public class PartController : UserControllerBase
     {
-        private PartRepository _repository;
+        private PartRepository repository;
         
         public PartController(DissimilisDbContext context)
         {
-            this._repository = new PartRepository(context);
+            this.repository = new PartRepository(context);
         }
 
         #region CRUD Part
@@ -38,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers
             if (song_id != NewPartObject.SongId)
                 return base.BadRequest("Url Id must match SongId");
 
-            var result = await _repository.CreatePartCommand(NewPartObject);
+            var result = await repository.CreatePartCommand(NewPartObject, (int)base.UserID);
             if (result != null)
                 return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
             else

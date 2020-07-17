@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <param name="NewNoteObject"></param>
         /// <param name="bar_id"></param>
         /// <returns>201</returns>
-        [HttpPost("{song_id:int:min(1)}/parts")]
+        [HttpPost("{song_id:int:min(1)}/parts/{part_id:int:min(1)}/bars/{bar_id:int:min(1)}/notes")]
         public async Task<IActionResult> CreateNote(int bar_id, [FromBody] NewNoteDTO NewNoteObject)
         {
             if (bar_id != NewNoteObject.BarId)

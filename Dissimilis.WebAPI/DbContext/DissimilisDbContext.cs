@@ -19,6 +19,7 @@ namespace Dissimilis.WebAPI.Database
 	{
 		private uint userId;
 
+		//Set the userId before running savechanges(async)!
 		public uint UserId
         {
             set
@@ -41,14 +42,8 @@ namespace Dissimilis.WebAPI.Database
 		public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
 		public DbSet<UserGroupResources> UserGroupResources { get; set; }
 
-
 		public DissimilisDbContext() : base(new DissimilisDbContextOptions().Options)
-		{
-			//Only ensure delete if in debug mode, commented out as it isn't working right now
-			/*#if DEBUG
-				this.Database.EnsureDeleted();
-			#endif*/
-			//this.Database.Migrate();
+		{	
 			this.Database.EnsureCreated();
 		}
 
@@ -83,6 +78,7 @@ namespace Dissimilis.WebAPI.Database
 			BuildUserGroupMembers(modelBuilder);
 			BuildResources(modelBuilder);
 			BuildUserGroupResource(modelBuilder);
+			BuildBaseEntity(modelBuilder);
 		}
 
 
@@ -99,9 +95,7 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
-
-			//commented out because we have two "default users" with same msid
-			//entity.HasIndex(x => x.MsId).IsUnique(); 
+			entity.HasIndex(x => x.MsId).IsUnique(); 
 
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
@@ -110,6 +104,16 @@ namespace Dissimilis.WebAPI.Database
 			entity.HasOne(x => x.Organisation).WithMany()
 				.HasForeignKey(x => x.OrganisationId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
+		}
+
+		static void BuildBaseEntity(ModelBuilder builder)
+        {
+			var entity = builder.Entity<BaseEntity>();
+
+			entity.HasOne(x => x.CreatedBy).WithMany()
+				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+			entity.HasOne(x => x.UpdatedBy).WithMany()
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 		}
 
 		static void BuildSong (ModelBuilder builder)
@@ -264,7 +268,26 @@ namespace Dissimilis.WebAPI.Database
                 .HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
         }
 
-		#endregion
+        #endregion
+
+        #region Savechanges
+        /// <summary>
+        /// Run this instead of savechangesasync. It will return a true or false if it worked or not. 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> TrySaveChangesAsync()
+		{
+			try
+			{
+				await SaveChangesAsync();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+
+		}
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var entries = ChangeTracker
@@ -282,6 +305,8 @@ namespace Dissimilis.WebAPI.Database
 
 			return await base.SaveChangesAsync();
 		}
+
+		
 
 		/// <summary>
 		/// Ocerrideing the savechanges to add modified and added date
@@ -304,17 +329,13 @@ namespace Dissimilis.WebAPI.Database
 			return base.SaveChanges();
 		}
 
-		private IEnumerable<EntityEntry> UpdatedEntries(IEnumerable<EntityEntry> entries)
+		private void UpdatedEntries(IEnumerable<EntityEntry> entries)
 		{
-			string userName;
 			int UserIdentityId = (int)userId;
 			User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
 			if (AccessingUser is null)
 				throw new Exception("The UserID has not been set or don't exist, saving cancelled");
-			else
-			{
-				userName = AccessingUser.Name;
-			}
+			
 
 			foreach (var item in entries)
 			{
@@ -323,20 +344,19 @@ namespace Dissimilis.WebAPI.Database
 					if (item.State == EntityState.Added)
 					{
 						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).CreatedBy = userName;
+						((BaseEntity)item.Entity).CreatedById = UserIdentityId;
 						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = userName;
+						((BaseEntity)item.Entity).UpdatedById = UserIdentityId;
 					}
 
 					if (item.State == EntityState.Modified)
 					{
 						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-						((BaseEntity)item.Entity).UpdatedBy = userName;
+						((BaseEntity)item.Entity).UpdatedById = UserIdentityId;
 					}
 				}
 			}
-
-			return entries;
 		}
-	}
+        #endregion 
+    }
 }

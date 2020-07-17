@@ -22,15 +22,18 @@ namespace Dissimilis.WebAPI.Repositories
         /// Create new Bar using NewBarDTO
         /// </summary>
         /// <param name="bar"></param>
-        /// <param name="partId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<BarDTO> CreateBar(NewBarDTO bar, int partId, uint userId)
+        public async Task<BarDTO> CreateBar(NewBarDTO bar, uint userId)
         {
-            Bar BarModel = new Bar(bar.BarNumber, partId);
+            if (bar is null) return null;
+
+            Bar BarModel = new Bar(bar.BarNumber, bar.PartId);
+            if (!ValidateUser(userId, BarModel.Part.Song)) return null;
+
             await this.context.Bars.AddAsync(BarModel);
             this.context.UserId = userId;
-            await this.context.SaveChangesAsync();
+            await this.context.TrySaveChangesAsync();
 
             //Create a DTO object of the newly created Bar
             BarDTO BarModelDTO = new BarDTO() 
@@ -53,10 +56,13 @@ namespace Dissimilis.WebAPI.Repositories
         {
             bool Deleted = false;
             Bar barModel = await FindBarById(bar.Id);
-            this.context.Remove(barModel);
-            var entries = await this.context.SaveChangesAsync();
-            if (entries > 0)
-                Deleted = true;
+
+            //check if they are allowed to delete
+            if (ValidateUser(userId, barModel.Part.Song))
+            {
+                this.context.Remove(barModel);
+                Deleted = await this.context.TrySaveChangesAsync();
+            }
 
             return Deleted;
         }
@@ -70,7 +76,7 @@ namespace Dissimilis.WebAPI.Repositories
         {
             if(id == 0)
             {
-                throw new Exception("The Id is not provided");
+                throw new ArgumentException("The Id is not provided");
             }
             return await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
         }
@@ -83,15 +89,17 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="partId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<BarDTO> FindOrCreateBar(BarDTO bar, int partId, uint userId)
+        public async Task<BarDTO> FindOrCreateBar(BarDTO bar, uint userId)
         {
             Bar BarModel;
-            if(bar.Id is 0)
+            if (bar is null) return null;
+            
+            if(bar.Id <= 0)
             {
-                BarModel = new Bar(bar.BarNumber, partId);
+                BarModel = new Bar(bar.BarNumber, bar.PartId);
                 await this.context.Bars.AddAsync(BarModel);
                 this.context.UserId = userId;
-                await this.context.SaveChangesAsync();
+                await this.context.TrySaveChangesAsync();
             }
             else
             {
@@ -111,16 +119,36 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<bool> UpdateBarById(BarDTO bar, uint userId)
         {
-            bool Updated = false;
+            if (bar is null) return false;
             Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == bar.Id);
+            if(!ValidateUser(userId, BarModel.Part.Song))
             if(bar.BarNumber != BarModel.BarNumber)
                 BarModel.BarNumber = bar.BarNumber;
 
             this.context.UserId = userId;
-            var entries = await this.context.SaveChangesAsync();
-            if (entries > 0) Updated = true;
+            bool Updated = await this.context.TrySaveChangesAsync();
             
             return Updated;
+        }
+
+        /// <summary>
+        /// Check if the user belongs to the bar it is trying to access/edit
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="part"></param>
+        /// <returns></returns>
+        public bool ValidateUser(uint userId, Song song)
+        {
+            try
+            {
+                if(userId == song.CreatedById)
+                    return true;
+                return false;
+            }
+            catch
+            {
+                throw new ArgumentException("The user is not allowed to edit on this song");
+            }
         }
     }
 }

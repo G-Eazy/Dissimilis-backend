@@ -13,6 +13,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<Note> FindNoteById(int Id);
         Task<bool> UpdateNote(NoteDTO noteObject, int BarId, uint userId);
         Task<bool> DeleteNote(NoteDTO noteObject);
+        bool ValidateUser(int userId, Song bar);
 
     }
 }

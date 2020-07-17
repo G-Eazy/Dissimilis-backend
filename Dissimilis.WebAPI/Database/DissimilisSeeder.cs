@@ -12,11 +12,10 @@ namespace Dissimilis.WebAPI.Database
 		{
 			context.Database.EnsureCreated();
 
-			var User = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
+			var User = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
 			if (User is null)
 			{
 				context.Users.Add(new User() { Name = "AdminUser", Email = "admin@support.no" });
-				context.Users.Add(new User() { Name = "Bård Bjørge", Email = "bård@dissimilis.no" });
 			}
 
 			context.SaveChanges();
@@ -70,12 +69,9 @@ namespace Dissimilis.WebAPI.Database
 			context.UserId = 1;
 			context.SaveChanges();
 
-			var Baard = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
-			if (Baard.OrganisationId is null)
+			var Admin = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
+			if (Admin.OrganisationId is null)
 			{
-				Baard.OrganisationId = 1;
-				Baard.CountryId = 1;
-				var Admin = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
 				Admin.OrganisationId = 1;
 				Admin.CountryId = 1;
 			}

@@ -82,7 +82,13 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateNote(NoteDTO noteObject, int barId, uint userId)
         {
             bool Updated = false;
+
+            if (noteObject is null) return false;
             Note nodeModel = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteObject.Id);
+
+            //Validate user if they are allowed to edit here
+            if (!ValidateUser((int)userId, nodeModel.Bar.Part.Song)) return false;
+
             if (nodeModel is null) throw new Exception("The note with Id: " + noteObject.Id + " does not exist");
 
             if(nodeModel.Length != noteObject.Length)
@@ -100,6 +106,26 @@ namespace Dissimilis.WebAPI.Repositories
             if(entries > 0) Updated = true;
 
             return Updated;
+        }
+
+        /// <summary>
+        /// Check if the user belongs to the bar it is trying to access/edit
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="song"></param>
+        /// <returns></returns>
+        public bool ValidateUser(int userId, Song song)
+        {
+            try
+            {
+                if (userId == song.CreatedById)
+                    return true;
+                return false;
+            }
+            catch
+            {
+                throw new ArgumentException("The user is not allowed to edit on this song");
+            }
         }
     }
 }
