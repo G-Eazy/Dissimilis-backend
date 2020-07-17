@@ -11,40 +11,42 @@ using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System.Threading;
 using Dissimilis.WebAPI.Repositories;
+using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
     [Route("api/songs")]
     [ApiController]
-    public class PartController : ControllerBase
+    public class Barcontroller : UserControllerBase
     {
-        private PartRepository _repository;
-        
-        public PartController(DissimilisDbContext context)
+        private BarRepository repository;
+
+        public Barcontroller(DissimilisDbContext context)
         {
-            this._repository = new PartRepository(context);
+            this.repository = new BarRepository(context);
         }
 
-        #region CRUD Part
+        #region CRUD bar
         /// <summary>
         /// Create new part. Song must be id of some entity in DB.
         /// </summary>
-        /// <param name="NewPartObject"></param>
-        /// <param name="song_id"></param>
+        /// <param name="BarObject"></param>
+        /// <param name="partId"></param>
         /// <returns>201</returns>
-        [HttpPost("{song_id:int:min(1)}/parts")]
-        public async Task<IActionResult> CreatePart(int song_id, [FromBody] NewPartDTO NewPartObject)
+        [HttpPost("{song_id:int:min(1)}/parts/{part_id:int:min(1)}/bars")]
+        public async Task<IActionResult> CreateBar(int partId, [FromBody] NewBarDTO BarObject)
         {
-            if (song_id != NewPartObject.SongId)
+            if (partId != BarObject.PartId)
                 return base.BadRequest("Url Id must match SongId");
 
-            var result = await _repository.CreatePartCommand(NewPartObject);
-            if (result != null)
-                return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
-            else
+            var result = await repository.CreateBar(BarObject, partId, base.UserID);
+            if (result is null)
                 return base.BadRequest("No song by that Id");
+            else
+                return base.Created($"api/songs/{partId}/parts/{result.Id}/bars", "");
+            
         }
-        
+
         #endregion
     }
 }

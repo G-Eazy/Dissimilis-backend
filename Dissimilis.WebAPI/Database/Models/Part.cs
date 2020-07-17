@@ -44,5 +44,17 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         public Part() { }
 
+        /// <summary>
+        /// Constructor to create a part
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <param name="instrumentId"></param>
+        /// <param name="partNumber"></param>
+        public Part(int songId, int instrumentId, byte partNumber)
+        {
+            this.SongId = songId;
+            this.InstrumentId = instrumentId;
+            this.PartNumber = partNumber;
+        }
     }
 }

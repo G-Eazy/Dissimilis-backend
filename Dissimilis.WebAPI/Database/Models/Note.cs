@@ -33,9 +33,14 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         public byte NoteNumber { get; set; }
 
-
+        /// <summary>
+        /// The lenght of this note/chord
+        /// </summary>
         public byte Length { get; set; }
 
+        /// <summary>
+        /// Either a single note, two notes or chords ["C", "F", "A"]
+        /// </summary>
         public string NoteValues { get; set; }
 
         /// <summary>
