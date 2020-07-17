@@ -19,6 +19,13 @@ namespace Dissimilis.WebAPI.Repositories
             this.context = context;
         }
 
+        /// <summary>
+        /// Create a new note with the NewNoteDTO
+        /// </summary>
+        /// <param name="note"></param>
+        /// <param name="barId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<NoteDTO> CreateNote(NewNoteDTO note, int barId, uint userId)
         {
             Note BarModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
@@ -37,6 +44,11 @@ namespace Dissimilis.WebAPI.Repositories
             return noteDTO;
         }
 
+        /// <summary>
+        /// Delete a note, using the ID that is in NoteDTO
+        /// </summary>
+        /// <param name="noteObject"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteNote(NoteDTO noteObject)
         {
             bool Deleted = false;
@@ -50,11 +62,23 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Find a Note by Id
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
         public async Task<Note> FindNoteById(int Id)
         {
             return await this.context.Notes.SingleOrDefaultAsync(n => n.Id == Id);
         }
 
+        /// <summary>
+        /// Update the notes with the new values in NoteDTO
+        /// </summary>
+        /// <param name="noteObject"></param>
+        /// <param name="barId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateNote(NoteDTO noteObject, int barId, uint userId)
         {
             bool Updated = false;

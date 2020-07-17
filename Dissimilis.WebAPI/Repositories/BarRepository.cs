@@ -17,6 +17,14 @@ namespace Dissimilis.WebAPI.Repositories
         {
             this.context = context;
         }
+
+        /// <summary>
+        /// Create new Bar using NewBarDTO
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="partId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<BarDTO> CreateBar(NewBarDTO bar, int partId, uint userId)
         {
             Bar BarModel = new Bar(bar.BarNumber, partId);
@@ -35,6 +43,12 @@ namespace Dissimilis.WebAPI.Repositories
             return BarModelDTO;
         }
 
+        /// <summary>
+        /// Delete a bar by Id provided in BarDTO
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteBarById(BarDTO bar, uint userId)
         {
             bool Deleted = false;
@@ -47,6 +61,11 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Find bar by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Bar> FindBarById(int id)
         {
             if(id == 0)
@@ -56,6 +75,14 @@ namespace Dissimilis.WebAPI.Repositories
             return await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
         }
 
+        /// <summary>
+        /// Find or create a bar using BarDTO(if id empty, create new?)
+        /// TODO fix it if this is not working
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="partId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<BarDTO> FindOrCreateBar(BarDTO bar, int partId, uint userId)
         {
             Bar BarModel;
@@ -76,6 +103,12 @@ namespace Dissimilis.WebAPI.Repositories
             return NewBarDTO;
         }
 
+        /// <summary>
+        /// Update a bar by using its Id and BarDTO
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateBarById(BarDTO bar, uint userId)
         {
             bool Updated = false;
@@ -86,7 +119,7 @@ namespace Dissimilis.WebAPI.Repositories
             this.context.UserId = userId;
             var entries = await this.context.SaveChangesAsync();
             if (entries > 0) Updated = true;
-            //TODO set true or false if updated worked
+            
             return Updated;
         }
     }

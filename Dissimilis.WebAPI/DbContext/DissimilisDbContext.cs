@@ -100,6 +100,9 @@ namespace Dissimilis.WebAPI.Database
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
 
+			//commented out because we have two "default users" with same msid
+			//entity.HasIndex(x => x.MsId).IsUnique(); 
+
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
 				.HasForeignKey(x => x.CountryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
@@ -271,6 +274,7 @@ namespace Dissimilis.WebAPI.Database
 				|| e.State == EntityState.Modified)
 				&& e.Entity is BaseEntity entity);
 
+			//Check if there are any entires before going further
 			if (entries.Count() > 0)
 			{
 				string userName;
