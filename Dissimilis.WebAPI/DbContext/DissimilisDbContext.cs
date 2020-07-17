@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Dissimilis.WebAPI.Database.Audit;
 using System.Threading.Tasks;
 using System.Threading;
 using Dissimilis.WebAPI.Authentication;
