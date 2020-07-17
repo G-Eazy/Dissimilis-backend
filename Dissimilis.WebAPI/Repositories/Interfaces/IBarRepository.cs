@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<BarDTO> FindOrCreateBar(BarDTO bar, int partId, uint userId);
         Task<BarDTO> CreateBar(NewBarDTO bar, int partId, uint userId);
         Task<Bar> FindBarById(int id);
-        Task<Bar> FindBarByPriority(int priority);
         Task<bool> UpdateBarById(BarDTO bar, uint userId);
+        Task<bool> DeleteBarById(BarDTO bar, uint userId);
     }
 }

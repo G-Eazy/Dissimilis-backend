@@ -99,7 +99,6 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set unique email
 			entity.HasIndex(x => x.Email).IsUnique();
-			entity.HasIndex(x => x.MsId).IsUnique();
 
 			//set one to many relationshop between Country and Users
 			entity.HasOne(x => x.Country).WithMany()
@@ -174,7 +173,12 @@ namespace Dissimilis.WebAPI.Database
 
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Bar).WithMany()
-				.HasForeignKey(x => x.BarId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade); ;
+				.HasForeignKey(x => x.BarId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+			entity
+			.Property(e => e.NoteValues)
+			.HasConversion(
+				v => string.Join(',', v),
+				v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
 		}
 
@@ -320,8 +324,10 @@ namespace Dissimilis.WebAPI.Database
 				{
 					throw new Exception("The user Id has not been set, Saving changes cancelled");
 				}
-				string UserIdentity = this.Users.SingleOrDefault(x => x.Id == UserIdentityId).Name;
-
+				var UserIdentity = this.Users.SingleOrDefault(x => x.Id == UserIdentityId);
+				string userName;
+				if (UserIdentity is null) userName = "SystemDefault";
+				else userName = UserIdentity.Name;
 				foreach (var item in entries)
 				{
 					if (item.Entity is BaseEntity entity)
@@ -329,15 +335,15 @@ namespace Dissimilis.WebAPI.Database
 						if (item.State == EntityState.Added)
 						{
 							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).CreatedBy = UserIdentity;
+							((BaseEntity)item.Entity).CreatedBy = userName;
 							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedBy = userName;
 						}
 
 						if (item.State == EntityState.Modified)
 						{
 							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = UserIdentity;
+							((BaseEntity)item.Entity).UpdatedBy = userName;
 						}
 					}
 				}

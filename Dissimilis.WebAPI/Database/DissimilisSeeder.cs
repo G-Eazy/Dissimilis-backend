@@ -52,6 +52,7 @@ namespace Dissimilis.WebAPI.Database
 			var User = context.Users.SingleOrDefault(x => x.Name == "Bård Bjørge");
 			if (User is null)
 			{
+				context.Users.Add(new User("AdminUser", "admin@support.no", 1, 1));
 				context.Users.Add(new User("Bård Bjørge", "bård@dissimilis.no", 1, 1));
 			}
 
@@ -63,6 +64,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Instruments.Add(new Instrument("Bass"));
 			}
 
+			context.UserId = 1;
 			context.SaveChanges();
 
 			//Insert the many to many enteties as the ones above need to have been
@@ -103,6 +105,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Songs.Add(new Song() { Title = "Be Yourself", Composer = "Audioslave", ArrangerId = 1, TimeSignature = "4/4" });
 			}
 
+			context.UserId = 1;
 			context.SaveChanges();
 
 		}

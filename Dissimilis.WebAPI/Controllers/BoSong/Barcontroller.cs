@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD bar
         /// <summary>
-        /// Create new part. Song must be id of some entity in DB.
+        /// Create new Bar. We also need the par Id that it is related too.
         /// </summary>
         /// <param name="BarObject"></param>
         /// <param name="partId"></param>

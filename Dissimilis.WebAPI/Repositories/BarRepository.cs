@@ -35,6 +35,18 @@ namespace Dissimilis.WebAPI.Repositories
             return BarModelDTO;
         }
 
+        public async Task<bool> DeleteBarById(BarDTO bar, uint userId)
+        {
+            bool Deleted = false;
+            Bar barModel = await FindBarById(bar.Id);
+            this.context.Remove(barModel);
+            var entries = await this.context.SaveChangesAsync();
+            if (entries > 0)
+                Deleted = true;
+
+            return Deleted;
+        }
+
         public async Task<Bar> FindBarById(int id)
         {
             if(id == 0)
@@ -42,11 +54,6 @@ namespace Dissimilis.WebAPI.Repositories
                 throw new Exception("The Id is not provided");
             }
             return await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task<Bar> FindBarByPriority(int priority)
-        {
-            return await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == priority);
         }
 
         public async Task<BarDTO> FindOrCreateBar(BarDTO bar, int partId, uint userId)
@@ -74,12 +81,11 @@ namespace Dissimilis.WebAPI.Repositories
             bool Updated = false;
             Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == bar.Id);
             if(bar.BarNumber != BarModel.BarNumber)
-            {
                 BarModel.BarNumber = bar.BarNumber;
-                Updated = true;
-            }
+
             this.context.UserId = userId;
-            await this.context.SaveChangesAsync();
+            var entries = await this.context.SaveChangesAsync();
+            if (entries > 0) Updated = true;
             //TODO set true or false if updated worked
             return Updated;
         }

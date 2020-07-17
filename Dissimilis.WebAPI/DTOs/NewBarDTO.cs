@@ -12,6 +12,6 @@ namespace Dissimilis.WebAPI.DTOs
         public int PartId { get; set; }
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
-        public NotesDTO[] Notes { get; set; }
+        public NoteDTO[] Notes { get; set; }
     }
 }

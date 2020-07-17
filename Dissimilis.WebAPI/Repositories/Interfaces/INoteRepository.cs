@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Repositories.Interfaces
 {
-    interface INoteReposetory
+    interface INoteRepository
     {
-        Task<NotesDTO> CreateNote(NewNoteDTO note, int barId);
+        Task<NoteDTO> CreateNote(NewNoteDTO note, int barId, uint userId);
         Task<Note> FindNoteById(int Id);
-        Task<Note> FindNoteByPriority(int priority);
-        Task<bool> UpdateNoteById(int Id);
+        Task<bool> UpdateNote(NoteDTO noteObject, int BarId, uint userId);
+        Task<bool> DeleteNote(NoteDTO noteObject);
 
     }
 }
