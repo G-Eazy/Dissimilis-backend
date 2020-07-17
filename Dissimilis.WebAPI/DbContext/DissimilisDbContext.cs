@@ -277,35 +277,7 @@ namespace Dissimilis.WebAPI.Database
 			//Check if there are any entires before going further
 			if (entries.Count() > 0)
 			{
-				string userName;
-				int UserIdentityId = (int)userId;
-				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
-				if (AccessingUser is null)
-					throw new Exception("The UserID has not been set or don't exist, saving cancelled");
-				else
-				{
-					userName = AccessingUser.Name;
-				}
-
-				foreach (var item in entries)
-				{
-					if (item.Entity is BaseEntity entity)
-					{
-						if (item.State == EntityState.Added)
-						{
-							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).CreatedBy = userName;
-							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = userName;
-						}
-
-						if (item.State == EntityState.Modified)
-						{
-							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = userName;
-						}
-					}
-				}
+				UpdatedEntries(entries);
 			}
 
 			return await base.SaveChangesAsync();
@@ -326,39 +298,45 @@ namespace Dissimilis.WebAPI.Database
 
 			if (entries.Count() > 0)
 			{
-				string userName;
-				int UserIdentityId = (int)userId;
-				User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
-				if (AccessingUser is null)
-					throw new Exception("The UserID has not been set or don't exist, saving cancelled");
-				else
-				{
-					userName = AccessingUser.Name;
-				}
-
-				foreach (var item in entries)
-				{
-					if (item.Entity is BaseEntity entity)
-					{
-						if (item.State == EntityState.Added)
-						{
-							((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).CreatedBy = userName;
-							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = userName;
-						}
-
-						if (item.State == EntityState.Modified)
-						{
-							((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
-							((BaseEntity)item.Entity).UpdatedBy = userName;
-						}
-					}
-				}
+				UpdatedEntries(entries);
 			}
 
 			return base.SaveChanges();
 		}
 
+		private IEnumerable<EntityEntry> UpdatedEntries(IEnumerable<EntityEntry> entries)
+		{
+			string userName;
+			int UserIdentityId = (int)userId;
+			User AccessingUser = this.Users.SingleOrDefaultAsync(x => x.Id == UserIdentityId).Result;
+			if (AccessingUser is null)
+				throw new Exception("The UserID has not been set or don't exist, saving cancelled");
+			else
+			{
+				userName = AccessingUser.Name;
+			}
+
+			foreach (var item in entries)
+			{
+				if (item.Entity is BaseEntity entity)
+				{
+					if (item.State == EntityState.Added)
+					{
+						((BaseEntity)item.Entity).CreatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).CreatedBy = userName;
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).UpdatedBy = userName;
+					}
+
+					if (item.State == EntityState.Modified)
+					{
+						((BaseEntity)item.Entity).UpdatedOn = DateTime.Now;
+						((BaseEntity)item.Entity).UpdatedBy = userName;
+					}
+				}
+			}
+
+			return entries;
+		}
 	}
 }
