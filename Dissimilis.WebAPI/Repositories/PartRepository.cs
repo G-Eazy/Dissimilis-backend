@@ -23,10 +23,15 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="NewPartObject"></param>
         /// <returns>SuperDTO</returns>
 
-        public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject)
+        public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject, int userId)
         {
+            //if dto is empty, return null
+            if (NewPartObject is null) return null;
             var SongId = NewPartObject.SongId;
+            
             var ExistsSong = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == SongId);
+            if (!ValidateUser(userId, ExistsSong)) return null;
+
             var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title);
             // This will trigger BadRequest from controller, Will remove when we have exception handler
             if (ExistsInstrument == null)
@@ -69,5 +74,24 @@ namespace Dissimilis.WebAPI.Repositories
                 return ExistsInstrument;
         }
 
+        /// <summary>
+        /// Check if the user belongs to the bar it is trying to access/edit
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="song"></param>
+        /// <returns></returns>
+        public bool ValidateUser(int userId, Song song)
+        {
+            try
+            {
+                if (userId == song.CreatedById)
+                    return true;
+                return false;
+            }
+            catch
+            {
+                throw new ArgumentException("The user is not allowed to edit on this song");
+            }
+        }
     }
 }

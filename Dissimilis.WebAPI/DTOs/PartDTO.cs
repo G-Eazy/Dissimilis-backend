@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class BarDTO
+    public class PartDTO
     {
         public int Id { get; set; }
-        public byte BarNumber { get; set; }
-        public int PartId { get; set; }
-
-        public BarDTO() { }
+        public byte PartNumber { set; get; }
+        public int SongId { get; set; }
+        public int InstrumentId { get; set; }
     }
 }

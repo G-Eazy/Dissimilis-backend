@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// Entity class for organisation
     /// Contains Id and Name
     /// </summary>
-    public class Organisation
+    public class Organisation : BaseEntity
     {
         /// <summary>
         /// ID of the organisation

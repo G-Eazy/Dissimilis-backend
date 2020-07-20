@@ -29,11 +29,6 @@ namespace Dissimilis.WebAPI.Database.Models
         public int PartId { get; set; }
 
         /// <summary>
-        /// the actual ABC notation for this bar
-        /// </summary>
-        public string Notation { get; set; }
-
-        /// <summary>
         /// Priority of the bar in a spesific part
         /// </summary>
         public byte BarNumber { get; set; }
@@ -42,5 +37,11 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Empty constructor for Bar
         /// </summary>
         public Bar () { }
+
+        public Bar(byte barNumber, int partId)
+        {
+            this.BarNumber = barNumber;
+            this.PartId = partId;
+        }
     }
 }

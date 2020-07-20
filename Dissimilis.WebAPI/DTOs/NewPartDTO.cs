@@ -11,7 +11,6 @@ namespace Dissimilis.WebAPI.DTOs
         public int SongId { get; set; }
         public string Title { get; set; }
         public byte Priority { get; set; }
-        public BarDTO[] Bars { get; set; }
-
+        public NewBarDTO[] Bars { get; set; }
     }
 }
