@@ -17,13 +17,13 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Who created this attribute
         /// </summary>
         public User CreatedBy { get; set; }
-        public int CreatedById { get; set; }
+        public int? CreatedById { get; set; }
 
         /// <summary>
         /// Who updated this attribute last
         /// </summary>
         public User UpdatedBy { get; set; }
-        public int UpdatedById { get; set; }
+        public int? UpdatedById { get; set; }
 
         /// <summary>
         /// When was this attribute created
