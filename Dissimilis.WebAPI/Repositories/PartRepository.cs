@@ -17,13 +17,15 @@ namespace Dissimilis.WebAPI.Repositories
         {
             this.context = context;
         }
+
         /// <summary>
         /// Create a new Part to a Song
         /// </summary>
         /// <param name="NewPartObject"></param>
+        /// <param name="userId"></param>
         /// <returns>SuperDTO</returns>
 
-        public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject, int userId)
+        public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject, uint userId)
         {
             //if dto is empty, return null
             if (NewPartObject is null) return null;
@@ -32,7 +34,7 @@ namespace Dissimilis.WebAPI.Repositories
             var ExistsSong = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == SongId);
             if (!ValidateUser(userId, ExistsSong)) return null;
 
-            var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title);
+            var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title, userId);
             // This will trigger BadRequest from controller, Will remove when we have exception handler
             if (ExistsInstrument == null)
                 return null;
@@ -48,6 +50,7 @@ namespace Dissimilis.WebAPI.Repositories
                     PartNumber = NewPartObject.Priority
                 };
                 await this.context.Parts.AddAsync(PartModelObject);
+                this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
                 PartObject = new SuperDTO(NewPartObject.Priority);
             }
@@ -57,8 +60,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// Looks for an instrument with title InstrumentName, and creates if non-existant
         /// </summary>
         /// <param name="InstrumentName"></param>
+        /// <param name="userId"></param>
         /// <returns>(Model) Instrument</returns>
-        public async Task<Instrument> CreateOrFindInstrument(string InstrumentName)
+        public async Task<Instrument> CreateOrFindInstrument(string InstrumentName, uint userId)
         {
             if (String.IsNullOrWhiteSpace(InstrumentName))
                 //throw new ArgumentNullException(nameof(InstrumentName)); // Commenting out until we have exception handler
@@ -69,6 +73,7 @@ namespace Dissimilis.WebAPI.Repositories
                 ExistsInstrument = new Instrument(InstrumentName);
                 await this.context.Instruments
                     .AddAsync(ExistsInstrument);
+                this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
             }
                 return ExistsInstrument;
@@ -80,7 +85,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         /// <param name="song"></param>
         /// <returns></returns>
-        public bool ValidateUser(int userId, Song song)
+        public bool ValidateUser(uint userId, Song song)
         {
             try
             {

@@ -23,42 +23,71 @@ namespace Dissimilis.WebAPI.Repositories
         /// Create a new note with the NewNoteDTO
         /// </summary>
         /// <param name="note"></param>
-        /// <param name="barId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<NoteDTO> CreateNote(NewNoteDTO note, int barId, uint userId)
+        public async Task<NoteDTO> CreateNote(NewNoteDTO note, uint userId)
         {
-            Note BarModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
+            Note NoteModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
             this.context.UserId = userId;
-            await this.context.SaveChangesAsync();
+            await this.context.Notes.AddAsync(NoteModel);
+            await this.context.TrySaveChangesAsync();
+
+            if (!ValidateUser(userId, NoteModel.Bar.Part.Song)) return null;
 
             NoteDTO noteDTO = new NoteDTO() 
             { 
-                Id = BarModel.Id, 
-                BarId = BarModel.BarId, 
-                Length = BarModel.Length, 
-                NoteNumber = BarModel.NoteNumber, 
-                NoteValues = BarModel.NoteValues 
+                Id = NoteModel.Id, 
+                BarId = NoteModel.BarId, 
+                Length = NoteModel.Length, 
+                NoteNumber = NoteModel.NoteNumber, 
+                NoteValues = NoteModel.NoteValues 
             };
 
             return noteDTO;
         }
 
+        
+
         /// <summary>
         /// Delete a note, using the ID that is in NoteDTO
         /// </summary>
         /// <param name="noteObject"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteNote(NoteDTO noteObject)
+        public async Task<bool> DeleteNote(NoteDTO noteObject, uint userId)
         {
             bool Deleted = false;
             Note deleteNote = await FindNoteById(noteObject.Id);
+
+            if (!ValidateUser(userId, deleteNote.Bar.Part.Song)) return false;
             this.context.Remove(deleteNote);
             
             //Check if any entries was changed, if yes it should have been deleted
             var entries = await this.context.SaveChangesAsync();
             if (entries > 0) Deleted = true;
             
+            return Deleted;
+        }
+
+        /// <summary>
+        /// Delete a note, using the ID that is in NoteDTO
+        /// </summary>
+        /// <param name="note_id"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteNoteById(int note_id, uint userId)
+        {
+            bool Deleted = false;
+            Note deleteNote = await FindNoteById(note_id);
+
+            //Check if the user is allowed to delete this notepart
+            if (!ValidateUser(userId, deleteNote.Bar.Part.Song)) return false;
+
+            this.context.Remove(deleteNote);
+
+            //Check if any entries was changed, if yes it should have been deleted
+            Deleted = await this.context.TrySaveChangesAsync();
+
             return Deleted;
         }
 
@@ -76,10 +105,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// Update the notes with the new values in NoteDTO
         /// </summary>
         /// <param name="noteObject"></param>
-        /// <param name="barId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateNote(NoteDTO noteObject, int barId, uint userId)
+        public async Task<bool> UpdateNote(NoteDTO noteObject, uint userId)
         {
             bool Updated = false;
 
@@ -87,7 +115,7 @@ namespace Dissimilis.WebAPI.Repositories
             Note nodeModel = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteObject.Id);
 
             //Validate user if they are allowed to edit here
-            if (!ValidateUser((int)userId, nodeModel.Bar.Part.Song)) return false;
+            if (!ValidateUser(userId, nodeModel.Bar.Part.Song)) return false;
 
             if (nodeModel is null) throw new Exception("The note with Id: " + noteObject.Id + " does not exist");
 
@@ -114,7 +142,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         /// <param name="song"></param>
         /// <returns></returns>
-        public bool ValidateUser(int userId, Song song)
+        public bool ValidateUser(uint userId, Song song)
         {
             try
             {

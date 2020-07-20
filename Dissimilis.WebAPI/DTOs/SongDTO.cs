@@ -16,6 +16,8 @@ namespace Dissimilis.WebAPI.DTOs
     
         public DateTime? UpdatedOn { get; set; }
 
+        public Part[] Parts { get; set; }
+
         public SongDTO(Song song)
         {
             this.Id = song.Id;

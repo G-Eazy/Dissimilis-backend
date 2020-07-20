@@ -18,6 +18,16 @@ namespace Dissimilis.WebAPI.Repositories
             this.context = context;
         }
 
+        public async Task<BarDTO> GetBar(int bar_id, uint userId)
+        {
+            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == bar_id);
+            if (BarModel is null) return null;
+            if (!ValidateUser(userId, BarModel.Part.Song)) return null;
+
+            BarDTO BarModelObject = new BarDTO(BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            return BarModelObject;
+        }
+
         /// <summary>
         /// Create new Bar using NewBarDTO
         /// </summary>
@@ -29,7 +39,9 @@ namespace Dissimilis.WebAPI.Repositories
             if (bar is null) return null;
 
             Bar BarModel = new Bar(bar.BarNumber, bar.PartId);
-            if (!ValidateUser(userId, BarModel.Part.Song)) return null;
+            this.context.UserId = userId;
+            await this.context.AddAsync(BarModel);
+            await this.context.TrySaveChangesAsync();
 
             await this.context.Bars.AddAsync(BarModel);
             this.context.UserId = userId;
@@ -49,22 +61,24 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Delete a bar by Id provided in BarDTO
         /// </summary>
-        /// <param name="bar"></param>
+        /// <param name="bar_id"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteBarById(BarDTO bar, uint userId)
+        public async Task<bool> DeleteBarById(int bar_id, uint userId)
         {
-            bool Deleted = false;
-            Bar barModel = await FindBarById(bar.Id);
-
-            //check if they are allowed to delete
-            if (ValidateUser(userId, barModel.Part.Song))
-            {
-                this.context.Remove(barModel);
-                Deleted = await this.context.TrySaveChangesAsync();
-            }
+            Bar barModel = await FindBarById(bar_id);
+            if (!ValidateUser(userId, barModel.Part.Song)) return false;
+               
+            this.context.Remove(barModel);
+            bool Deleted = await context.TrySaveChangesAsync();
 
             return Deleted;
+        }
+
+        public Note[] FindAllNotesForBar(int barId)
+        {
+            Note[] allNotes = this.context.Notes.Where(x => x.BarId == barId).ToArray();
+            return allNotes;
         }
 
         /// <summary>
@@ -86,7 +100,6 @@ namespace Dissimilis.WebAPI.Repositories
         /// TODO fix it if this is not working
         /// </summary>
         /// <param name="bar"></param>
-        /// <param name="partId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<BarDTO> FindOrCreateBar(BarDTO bar, uint userId)
@@ -106,7 +119,8 @@ namespace Dissimilis.WebAPI.Repositories
                 BarModel = await FindBarById(bar.Id);
             }
 
-            BarDTO NewBarDTO = new BarDTO() { BarNumber = BarModel.BarNumber, Id = bar.Id, PartId = bar.PartId };
+            BarDTO NewBarDTO = new BarDTO(BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            NewBarDTO.Notes = FindAllNotesForBar(NewBarDTO.Id); 
 
             return NewBarDTO;
         }
@@ -114,16 +128,20 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Update a bar by using its Id and BarDTO
         /// </summary>
-        /// <param name="bar"></param>
+        /// <param name="barObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateBarById(BarDTO bar, uint userId)
+        public async Task<bool> UpdateBar(UpdateBarDTO barObject, uint userId)
         {
-            if (bar is null) return false;
-            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == bar.Id);
+            if (barObject is null) return false;
+
+            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == barObject.Id);
             if(!ValidateUser(userId, BarModel.Part.Song))
-            if(bar.BarNumber != BarModel.BarNumber)
-                BarModel.BarNumber = bar.BarNumber;
+            
+            if(barObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = barObject.BarNumber;
+            if (barObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = barObject.RepAfter;
+            if (barObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = barObject.RepBefore;
+            if (barObject.House != BarModel.House) BarModel.House = barObject.House;
 
             this.context.UserId = userId;
             bool Updated = await this.context.TrySaveChangesAsync();
@@ -132,10 +150,10 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Check if the user belongs to the bar it is trying to access/edit
+        /// Check if the user belongs to the song it is trying to access/edit
         /// </summary>
         /// <param name="userId"></param>
-        /// <param name="part"></param>
+        /// <param name="song"></param>
         /// <returns></returns>
         public bool ValidateUser(uint userId, Song song)
         {

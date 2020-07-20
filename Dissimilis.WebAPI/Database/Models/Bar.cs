@@ -32,6 +32,21 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Priority of the bar in a spesific part
         /// </summary>
         public byte BarNumber { get; set; }
+        
+        /// <summary>
+        /// Is there a repetion sign before the bar 
+        /// </summary>
+        public bool RepBefore { get; set; }
+
+        /// <summary>
+        /// Is there a repetion sign after the bar
+        /// </summary>
+        public bool RepAfter { get; set; }
+
+        /// <summary>
+        /// if 0, there is no house. otherwise it should follow an order
+        /// </summary>
+        public byte House { get; set; }
 
         /// <summary>
         /// Empty constructor for Bar

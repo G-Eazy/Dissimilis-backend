@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers
             if (song_id != NewPartObject.SongId)
                 return base.BadRequest("Url Id must match SongId");
 
-            var result = await repository.CreatePartCommand(NewPartObject, (int)base.UserID);
+            var result = await repository.CreatePartCommand(NewPartObject, base.UserID);
             if (result != null)
                 return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
             else

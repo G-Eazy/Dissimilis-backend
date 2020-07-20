@@ -31,6 +31,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .SingleOrDefaultAsync(s => s.Id == SongId);
             
             SongDTO SongObject = new SongDTO(SongModelObject);
+            SongObject.Parts = GetAllPartsForSong(SongModelObject.Id);
 
             return SongObject;
         }
@@ -158,6 +159,16 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 throw new ArgumentException("The user is not allowed to edit on this song");
             }
+        }
+
+        public Part[] GetAllPartsForSong(int songId)
+        {
+            //get all parts belonging to this songid, decending by partnumber
+            Part[] AllParts = this.context.Parts.Where(x => x.SongId == songId)
+                .OrderByDescending(x => x.PartNumber).ToArray();
+            
+            return AllParts;
+                
         }
     }
 }
