@@ -27,10 +27,9 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<BarDTO> CreateBar(NewBarDTO bar, uint userId)
         {
             if (bar is null) return null;
-
+            Part checkpart = await this.context.Parts.Include(x => x.Song).SingleOrDefaultAsync(x => x.Id == bar.PartId);
+            if (!ValidateUser(userId, checkpart.Song)) return null;
             Bar BarModel = new Bar(bar.BarNumber, bar.PartId);
-            if (!ValidateUser(userId, BarModel.Part.Song)) return null;
-
             await this.context.Bars.AddAsync(BarModel);
             this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
@@ -78,7 +77,7 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 throw new ArgumentException("The Id is not provided");
             }
-            return await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
+            return await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(x => x.Id == id);
         }
 
         /// <summary>
@@ -120,7 +119,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateBarById(BarDTO bar, uint userId)
         {
             if (bar is null) return false;
-            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == bar.Id);
+            Bar BarModel = await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(b => b.Id == bar.Id);
             if(!ValidateUser(userId, BarModel.Part.Song))
             if(bar.BarNumber != BarModel.BarNumber)
                 BarModel.BarNumber = bar.BarNumber;
