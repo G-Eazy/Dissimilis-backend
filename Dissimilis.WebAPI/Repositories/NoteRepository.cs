@@ -27,12 +27,15 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<NoteDTO> CreateNote(NewNoteDTO note, uint userId)
         {
+            Bar usingBar = await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(x => x.Id == note.BarId);
+            if (!ValidateUser(userId, usingBar.Part.Song)) return null;
+
             Note NoteModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
             this.context.UserId = userId;
             await this.context.Notes.AddAsync(NoteModel);
             await this.context.TrySaveChangesAsync();
 
-            if (!ValidateUser(userId, NoteModel.Bar.Part.Song)) return null;
+           
 
             NoteDTO noteDTO = new NoteDTO() 
             { 

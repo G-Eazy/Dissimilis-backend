@@ -52,9 +52,9 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.GetBar(bar_id, base.UserID);
             if (result is null)
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("No bar by that id");
             else
-                return base.Created($"api/bars/{result.Id}", "");
+                return base.Ok(result);
         }
 
         /// <summary>

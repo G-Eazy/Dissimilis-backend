@@ -14,12 +14,13 @@ namespace Dissimilis.WebAPI.DTOs
         public bool RepBefore { get; set; }
         public bool RepAfter { get; set; }
         public byte House { get; set; }
-        public Note[] Notes { get; set; }
+        public NoteDTO[] Notes { get; set; }
 
         public BarDTO() { }
 
-        public BarDTO(byte barnumber, bool repAfter, bool repBefore, byte house)
+        public BarDTO(int id,  byte barnumber, bool repAfter, bool repBefore, byte house)
         {
+            this.Id = id;
             this.BarNumber = barnumber;
             this.RepAfter = repAfter;
             this.RepBefore = repBefore;

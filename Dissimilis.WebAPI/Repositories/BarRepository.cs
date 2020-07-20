@@ -20,11 +20,12 @@ namespace Dissimilis.WebAPI.Repositories
 
         public async Task<BarDTO> GetBar(int bar_id, uint userId)
         {
-            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == bar_id);
+            Bar BarModel = await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(x => x.Id == bar_id);
             if (BarModel is null) return null;
             if (!ValidateUser(userId, BarModel.Part.Song)) return null;
 
-            BarDTO BarModelObject = new BarDTO(BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            BarDTO BarModelObject = new BarDTO(BarModel.Id, BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            BarModelObject.Notes = FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
 
@@ -75,10 +76,17 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
-        public Note[] FindAllNotesForBar(int barId)
+        public NoteDTO[] FindAllNotesForBar(int barId)
         {
             Note[] allNotes = this.context.Notes.Where(x => x.BarId == barId).ToArray();
-            return allNotes;
+            NoteDTO[] NoteDTOArray = new NoteDTO[allNotes.Length];
+
+            for (int i = 0; i < allNotes.Length; i++)
+            {
+                NoteDTOArray[i] = new NoteDTO(allNotes[i].Id, allNotes[i].BarId, allNotes[i].NoteNumber, allNotes[i].Length, allNotes[i].NoteValues);
+            }
+
+            return NoteDTOArray;
         }
 
         /// <summary>
@@ -119,7 +127,7 @@ namespace Dissimilis.WebAPI.Repositories
                 BarModel = await FindBarById(bar.Id);
             }
 
-            BarDTO NewBarDTO = new BarDTO(BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            BarDTO NewBarDTO = new BarDTO(BarModel.Id, BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
             NewBarDTO.Notes = FindAllNotesForBar(NewBarDTO.Id); 
 
             return NewBarDTO;
@@ -135,7 +143,7 @@ namespace Dissimilis.WebAPI.Repositories
         {
             if (barObject is null) return false;
 
-            Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(b => b.Id == barObject.Id);
+            Bar BarModel = await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(b => b.Id == barObject.Id);
             if(!ValidateUser(userId, BarModel.Part.Song))
             
             if(barObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = barObject.BarNumber;

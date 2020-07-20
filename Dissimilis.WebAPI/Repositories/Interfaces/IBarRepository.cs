@@ -17,6 +17,6 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<bool> DeleteBarById(int barId, uint userId);
         bool ValidateUser(uint userId, Song bar);
 
-        Note[] FindAllNotesForBar(int barId);
+        NoteDTO[] FindAllNotesForBar(int barId);
     }
 }
