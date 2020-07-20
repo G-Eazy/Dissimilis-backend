@@ -16,7 +16,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<SongDTO> GetSongById(SuperDTO SuperObject);
         bool ValidateUser(int userId, Song bar);
 
-        Part[] GetAllPartsForSong(int songId);
+        PartDTO[] GetAllPartsForSong(int songId);
 
     }   
 }

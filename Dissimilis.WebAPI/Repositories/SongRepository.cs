@@ -161,13 +161,20 @@ namespace Dissimilis.WebAPI.Repositories
             }
         }
 
-        public Part[] GetAllPartsForSong(int songId)
+        public PartDTO[] GetAllPartsForSong(int songId)
         {
             //get all parts belonging to this songid, decending by partnumber
             Part[] AllParts = this.context.Parts.Where(x => x.SongId == songId)
-                .OrderByDescending(x => x.PartNumber).ToArray();
+                .OrderBy(x => x.PartNumber).ToArray();
+
+            PartDTO[] AllPartsDTO = new PartDTO[AllParts.Length];
+
+            for(int i = 0; i < AllParts.Length; i++)
+            {
+                AllPartsDTO[i] = new PartDTO(AllParts[i].Id, AllParts[i].PartNumber, AllParts[i].SongId, AllParts[i].InstrumentId);
+            }
             
-            return AllParts;
+            return AllPartsDTO;
                 
         }
     }
