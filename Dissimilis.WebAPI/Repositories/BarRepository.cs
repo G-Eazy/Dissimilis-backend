@@ -41,38 +41,35 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Create new Bar using NewBarDTO
         /// </summary>
-        /// <param name="bar"></param>
+        /// <param name="NewBarObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<int> CreateBar(NewBarDTO bar, uint userId)
+        public async Task<int> CreateBar(NewBarDTO NewBarObject, uint userId)
         {
-            if (!CheckProperties(bar)) return 0;
+            if (!CheckProperties(NewBarObject)) return 0;
 
-            Bar CheckBarNumber = await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == bar.BarNumber && b.PartId == bar.PartId);
+            Bar CheckBarNumber = await this.context.Bars
+                .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
+                                        && b.PartId == NewBarObject.PartId);
             if (CheckBarNumber != null)
-            {
                 UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
-            }
 
-            Part part = await this.context.Parts
-                .Include(x => x.Song).SingleOrDefaultAsync(x => x.Id == bar.PartId);
-            
-            if (!ValidateUser(userId, part.Song)) 
-                return 0;
+            Bar BarModel = new Bar(NewBarObject.BarNumber, NewBarObject.PartId);
 
-            Bar BarModel = new Bar(bar.BarNumber, bar.PartId);
-            this.context.UserId = userId;
             await this.context.AddAsync(BarModel);
-            await this.context.TrySaveChangesAsync();
-
-            await this.context.Bars.AddAsync(BarModel);
             this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
 
             return BarModel.Id;
         }
 
-        public async void UpdateBarNumbers(int barNumber, int partId, uint userId)
+        /// <summary>
+        /// Update Bar numbers
+        /// </summary>
+        /// <param name="barNumber"></param>
+        /// <param name="partId"></param>
+        /// <param name="userId"></param>
+        private async void UpdateBarNumbers(int barNumber, int partId, uint userId)
         {
             Bar[] allbars = this.context.Bars.Where(b => b.PartId == partId)
                 .OrderBy(x => x.BarNumber)
@@ -93,120 +90,66 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="bar_id"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteBarById(int bar_id, uint userId)
+        public async Task<bool> DeleteBar(int bar_id, uint userId)
         {
-            Bar barModel = await FindBarById(bar_id);
-            if (!ValidateUser(userId, barModel.Part.Song)) 
-                return false;
-               
-            this.context.Remove(barModel);
-            bool Deleted = await context.TrySaveChangesAsync();
+            bool Deleted = false;
+            Bar barModel = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == bar_id);
+            if (barModel != null) 
+                if (ValidateUser(userId, barModel.Part.Song))
+                {
+                    this.context.Remove(barModel);
+                    Deleted = await context.TrySaveChangesAsync();
+                }
 
             return Deleted;
         }
 
-        public async Task<NoteDTO[]> FindAllNotesForBar(int barId)
-        {
-            Note[] allNotes = this.context.Notes.Where(x => x.BarId == barId).ToArray();
-            NoteDTO[] NoteDTOArray = new NoteDTO[allNotes.Length];
 
-            for (int i = 0; i < allNotes.Length; i++)
+        private async Task<NoteDTO[]> FindAllNotesForBar(int barId)
+        {
+            int[] allNotes = this.context.Notes
+                .Where(x => x.BarId == barId)
+                .OrderBy(x => x.NoteNumber)
+                .Select(x => x.Id)
+                .ToArray();
+
+            NoteDTO[] NoteDTOArray = new NoteDTO[allNotes.Count()];
+
+            for (int i = 0; i < allNotes.Count(); i++)
             {
-                NoteDTOArray[i] = await this.noteRepository.GetNote(allNotes[i].Id);
+                NoteDTOArray[i] = await this.noteRepository.GetNote(allNotes[i]);
             }
 
             return NoteDTOArray;
         }
 
         /// <summary>
-        /// Find bar by Id
+        /// Update a bar using UpdateBarDTO
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<Bar> FindBarById(int id)
-        {
-            if(id == 0)
-            {
-                throw new ArgumentException("The Id is not provided");
-            }
-            return await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
-        }
-
-        /// <summary>
-        /// Find or create a bar using BarDTO(if id empty, create new?)
-        /// TODO fix it if this is not working
-        /// </summary>
-        /// <param name="bar"></param>
+        /// <param name="UpdateBarObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<BarDTO> FindOrCreateBar(BarDTO bar, uint userId)
+        public async Task<bool> UpdateBar(UpdateBarDTO UpdateBarObject, uint userId)
         {
-            Bar BarModel;
-            if (bar is null) return null;
-            
-            if(bar.Id <= 0)
-            {
-                BarModel = new Bar(bar.BarNumber, bar.PartId);
-                await this.context.Bars.AddAsync(BarModel);
-                this.context.UserId = userId;
-                await this.context.TrySaveChangesAsync();
-            }
-            else
-            {
-                BarModel = await FindBarById(bar.Id);
-            }
-
-            BarDTO NewBarDTO = new BarDTO(BarModel.Id, BarModel.PartId, BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
-            NewBarDTO.Notes = await FindAllNotesForBar(NewBarDTO.Id); 
-
-            return NewBarDTO;
-        }
-
-        /// <summary>
-        /// Update a bar by using its Id and BarDTO
-        /// </summary>
-        /// <param name="barObject"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<bool> UpdateBar(UpdateBarDTO barObject, uint userId)
-        {
-            if (barObject is null) return false;
-
+            if (!CheckProperties(UpdateBarObject)) return false;
+            bool Updated = false;
             Bar BarModel = await this.context.Bars
                 .Include(x => x.Part)
                 .ThenInclude(x => x.Song)
-                .SingleOrDefaultAsync(b => b.Id == barObject.Id);
-            if(!ValidateUser(userId, BarModel.Part.Song))
-            
-            if(barObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = barObject.BarNumber;
-            if (barObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = barObject.RepAfter;
-            if (barObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = barObject.RepBefore;
-            if (barObject.House != BarModel.House) BarModel.House = barObject.House;
+                .SingleOrDefaultAsync(b => b.Id == UpdateBarObject.Id);
+            if (BarModel != null)
+                if (ValidateUser(userId, BarModel.Part.Song))
+                {
+                    if (UpdateBarObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = UpdateBarObject.BarNumber;
+                    if (UpdateBarObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = UpdateBarObject.RepAfter;
+                    if (UpdateBarObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = UpdateBarObject.RepBefore;
+                    if (UpdateBarObject.House != BarModel.House) BarModel.House = UpdateBarObject.House;
 
-            this.context.UserId = userId;
-            bool Updated = await this.context.TrySaveChangesAsync();
-            
+                    this.context.UserId = userId;
+                    Updated = await this.context.TrySaveChangesAsync();
+                }
+
             return Updated;
-        }
-
-        /// <summary>
-        /// Check if the user belongs to the song it is trying to access/edit
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="song"></param>
-        /// <returns></returns>
-        public bool ValidateUser(uint userId, Song song)
-        {
-            try
-            {
-                if(userId == song.CreatedById)
-                    return true;
-                return false;
-            }
-            catch
-            {
-                throw new ArgumentException("The user is not allowed to edit on this song");
-            }
         }
     }
 }

@@ -23,11 +23,11 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Get part by id provided in DTO
+        /// Get part by id 
         /// </summary>
         /// <param name="partId"></param>
         /// <returns>PartDTO</returns>
-        public async Task<PartDTO> GetPartById(int partId)
+        public async Task<PartDTO> GetPart(int partId)
         {
             Part ExistsPart = await this.context.Parts
                 .Include(p => p.Instrument)
@@ -54,9 +54,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<int> CreatePart(NewPartDTO NewPartObject, uint userId)
         {
             //Check if values are present in DTO, return 0 if one is missing
-            if (NewPartObject.PartNumber is 0
-                || NewPartObject.SongId is 0
-                || NewPartObject.Title is "") return 0;
+            if (!CheckProperties(NewPartObject)) return 0;
 
             var ExistsSong = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
@@ -89,7 +87,13 @@ namespace Dissimilis.WebAPI.Repositories
             return result;
         }
 
-        public async void UpdatePartNumbers(int partNumber, int songId, uint userId)
+        /// <summary>
+        /// Update the Part Numbers
+        /// </summary>
+        /// <param name="partNumber"></param>
+        /// <param name="songId"></param>
+        /// <param name="userId"></param>
+        private async void UpdatePartNumbers(int partNumber, int songId, uint userId)
         {
             Part[] AllParts = this.context.Parts.Where(b => b.SongId == songId)
                 .OrderBy(x => x.PartNumber)
@@ -134,7 +138,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="partId"></param>
         /// <returns>BarDTOArray</returns>
-        public async Task<BarDTO[]> GetAllBarsForParts(int partId)
+        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
         {
             int[] AllBars = this.context.Bars
                 .Where(x => x.PartId == partId)

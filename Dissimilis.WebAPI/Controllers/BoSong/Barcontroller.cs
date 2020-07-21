@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="BarObject"></param>
         /// <returns>201</returns>
-        [HttpPost("{part_id:int:min(1)}")]
+        [HttpPost]
         public async Task<IActionResult> CreateBar([FromBody] NewBarDTO BarObject)
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
@@ -43,49 +43,49 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Create new Bar.
+        /// Get Bar by Id.
         /// </summary>
-        /// <param name="bar_id"></param>
+        /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpGet("{bar_id}")]
-        public async Task<IActionResult> GetBar(int bar_id)
+        [HttpGet("{barId}")]
+        public async Task<IActionResult> GetBar(int barId)
         {
-            var result = await repository.GetBar(bar_id);
-            if (result is null)
-                return base.BadRequest("No bar by that id");
-            else
+            var result = await repository.GetBar(barId);
+            if (result != null)
                 return base.Ok(result);
+
+            return base.BadRequest("No bar by that id");
         }
 
         /// <summary>
         /// Update the bar, taking in only the bar params
         /// </summary>
         /// <param name="BarObject"></param>
-        /// <param name="bar_id"></param>
+        /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpPatch("{bar_id}")]
-        public async Task<IActionResult> UpdateBar(int bar_id, [FromBody] UpdateBarDTO BarObject)
+        [HttpPatch("{barId}")]
+        public async Task<IActionResult> UpdateBar(int barId, [FromBody] UpdateBarDTO BarObject)
         {
             var result = await repository.UpdateBar(BarObject, base.UserID);
-            if (result is false)
-                return base.BadRequest("Something went wrong updating the bar");
+            if (result)
+                return base.Created($"api/bars/{barId}", $"{barId}");
 
-            return base.Created($"api/bars/{bar_id}", "Was created");
+            return base.BadRequest("Something went wrong updating the bar");
         }
 
         /// <summary>
         /// Delete a bar
         /// </summary>
-        /// <param name="bar_id"></param>
+        /// <param name="barId"></param>
         /// <returns>201</returns>
         [HttpDelete("{bar_id}")]
-        public async Task<IActionResult> DeleteBar(int bar_id)
+        public async Task<IActionResult> DeleteBar(int barId)
         {
-            var result = await repository.DeleteBarById(bar_id, base.UserID);
-            if (result is false)
-                return base.BadRequest("Something went wrong updating the bar");
+            var result = await repository.DeleteBar(barId, base.UserID);
+            if (result)
+                return base.NoContent();
 
-            return base.Created($"api/bars/{bar_id}", "Was created");
+            return base.BadRequest("Something went wrong deleting the bar");
         }
 
 

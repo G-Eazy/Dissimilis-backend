@@ -33,13 +33,13 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <returns>200</returns> 
         [HttpGet("{partId:int:min(1)}")]
-        public async Task<IActionResult> GetPartById([FromQuery] int partId)
+        public async Task<IActionResult> GetPart([FromQuery] int partId)
         {
-            var PartObject = await repository.GetPartById(partId);
+            var PartObject = await repository.GetPart(partId);
             if (PartObject != null)
                 return base.Ok(PartObject);
             else
-                return base.BadRequest("No song (or part) by that Id"); // TODO: tell if song or part missing
+                return base.BadRequest("No song (or part) by that Id"); 
         }
 
 
@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="NewPartObject"></param>
         /// <returns>201</returns>
-        [HttpPost("{partId:int:min(1)}")]
+        [HttpPost]
         public async Task<IActionResult> CreatePart([FromBody] NewPartDTO NewPartObject)
         {
             var result = await repository.CreatePart(NewPartObject, base.UserID);
@@ -60,7 +60,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Update part by Id 
+        /// Update part by using UpdatePartDTO 
         /// </summary>
         /// <param name="UpdatePartObject"></param>
         /// <returns>204</returns>

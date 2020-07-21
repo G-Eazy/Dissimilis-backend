@@ -22,52 +22,66 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         #region CRUD Part
+
         /// <summary>
-        /// Create new Note. The Bar Id must also be provided for the associated Bar
+        /// Get Note by Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        [HttpGet("{noteId:int:min(1)}")]
+        public async Task<IActionResult> GetNote([FromQuery] int noteId)
+        {
+            var NoteObject = await repository.GetNote(noteId);
+            if (NoteObject != null)
+                return base.Ok(NoteObject);
+            else
+                return base.BadRequest("There was no note with this ID");
+        }
+
+        /// <summary>
+        /// Create new Note using NewNoteDTO
         /// </summary>
         /// <param name="NewNoteObject"></param>
-        /// <param name="bar_id"></param>
         /// <returns>201</returns>
-        [HttpPost("{bar_id}")]
+        [HttpPost]
         public async Task<IActionResult> CreateNote([FromBody] NewNoteDTO NewNoteObject)
         {
             var result = await repository.CreateNote(NewNoteObject, base.UserID);
-            if (result != null)
-                return base.Created($"api/note/{result.Id}", "");
+            if (result != 0)
+                return base.Created($"api/note/{result}", $"{result}");
             else
                 return base.BadRequest("No song by that Id");
         }
 
-
-        [HttpPatch("{note_id}")]
-        public async Task<IActionResult> UpdateNote(int note_id, [FromBody] NoteDTO NoteObject)
+        /// <summary>
+        /// Update note by using NoteDTO
+        /// </summary>
+        /// <param name="NoteObject"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteDTO NoteObject)
         {
-            if (note_id != NoteObject.Id)
-                return base.BadRequest("Url Id must match SongId");
-
             var result = await repository.UpdateNote(NoteObject, base.UserID);
-            if (result is false)
-                return base.BadRequest("No song by that Id");
+            if (result)
+                return base.NoContent();
 
-            return base.Ok($"Note with id: " + note_id + "was updated");
+            return base.BadRequest("No song by that Id");
         }
 
 
         /// <summary>
-        /// Delete a note using it's unique id
+        /// Delete a note by Id
         /// </summary>
-        /// <param name="note_id"></param>
+        /// <param name="noteId"></param>
         /// <returns></returns>
-        [HttpDelete("{note_id}")]
-        public async Task<IActionResult> DeleteNote(int note_id)
+        [HttpDelete("{note_id:int:min(1)}")]
+        public async Task<IActionResult> DeleteNote(int noteId)
         {
-            var respone = await repository.DeleteNoteById(note_id, base.UserID);
-            if(respone is false)
-            {
-                return base.BadRequest("No note was deleted");
-            }
+            var respone = await repository.DeleteNote(noteId, base.UserID);
+            if(respone != false)
+                return base.NoContent();
 
-            return base.Ok("note with id: " + note_id + " was deleted");
+            return base.BadRequest("No note was deleted");
         }
 
         #endregion

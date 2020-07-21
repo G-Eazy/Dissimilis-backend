@@ -23,7 +23,7 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Get song by id provided in DTO
+        /// Get song by id
         /// </summary>
         /// <param name="songId"></param>
         /// <returns></returns>
@@ -85,7 +85,8 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
-            Console.WriteLine(NewSongObject.Title);
+            if (!CheckProperties(NewSongObject)) return 0;
+
             var SongModelObject = new Song()
             {
                 Title = NewSongObject.Title,
@@ -109,22 +110,19 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             bool Updated = false;
-            var UpdateSongObjectId = UpdateSongObject.Id;
-            var NewTitle = UpdateSongObject.Title;
-            var NewTimeSignature = UpdateSongObject.TimeSignature;
+           
+            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObject.Id);
 
-            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObjectId);
-
-            if (SongModelObject != null) 
-            {
+            if (SongModelObject != null)
                 if (ValidateUser(userId, SongModelObject))
                 {
-                    SongModelObject.Title = NewTitle;
-                    SongModelObject.TimeSignature = NewTimeSignature;
+                    if (UpdateSongObject.Title != SongModelObject.Title) SongModelObject.Title = UpdateSongObject.Title;
+                    if (UpdateSongObject.TimeSignature != SongModelObject.TimeSignature) SongModelObject.TimeSignature = UpdateSongObject.TimeSignature;
+
                     this.context.UserId = userId;
                     Updated = await this.context.TrySaveChangesAsync();
                 }
-            }
+
             return Updated;
         }
 
@@ -152,14 +150,17 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
             //get all parts belonging to this songid, decending by partnumber
-            Part[] AllParts = this.context.Parts.Where(x => x.SongId == songId)
-                .OrderBy(x => x.PartNumber).ToArray();
+            int[] AllParts = this.context.Parts
+                .Where(x => x.SongId == songId)
+                .OrderBy(x => x.PartNumber)
+                .Select(x => x.Id)
+                .ToArray();
 
             PartDTO[] AllPartsDTO = new PartDTO[AllParts.Length];
 
             for(int i = 0; i < AllParts.Length; i++)
             {
-                AllPartsDTO[i] = await this.partRepository.GetPartById(AllParts[i].Id);
+                AllPartsDTO[i] = await this.partRepository.GetPart(AllParts[i]);
             }
             
             return AllPartsDTO;
