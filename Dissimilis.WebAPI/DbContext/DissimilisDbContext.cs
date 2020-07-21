@@ -139,6 +139,7 @@ namespace Dissimilis.WebAPI.Database
 			
 			entity.HasOne(x => x.CreatedBy).WithMany()
 				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
 			entity.HasOne(x => x.UpdatedBy).WithMany()
 				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 
@@ -184,6 +185,7 @@ namespace Dissimilis.WebAPI.Database
 			//Set foregin key for PartId linked to the Id of Part
 			entity.HasOne(x => x.Bar).WithMany()
 				.HasForeignKey(x => x.BarId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Cascade);
+			
 			entity
 			.Property(e => e.NoteValues)
 			.HasConversion(
@@ -338,8 +340,7 @@ namespace Dissimilis.WebAPI.Database
 
 			return await base.SaveChangesAsync();
 		}
-
-		
+			
 
 		/// <summary>
 		/// Ocerrideing the savechanges to add modified and added date

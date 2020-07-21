@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/songs")]
+    [Route("api/parts")]
     [ApiController]
     public class PartController : UserControllerBase
     {
@@ -32,50 +32,42 @@ namespace Dissimilis.WebAPI.Controllers
         /// Get part by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet("{song_id:int:min(1)}/parts/{Id:int:min(1)}")]
-        public async Task<IActionResult> GetPartById(int Id)
+        [HttpGet("{partId:int:min(1)}")]
+        public async Task<IActionResult> GetPart([FromQuery] int partId)
         {
-            var SuperObject = new SuperDTO(Id);
-            var PartObject = await repository.GetPartById(SuperObject);
+            var PartObject = await repository.GetPart(partId);
             if (PartObject != null)
                 return base.Ok(PartObject);
             else
-                return base.BadRequest("No song (or part) by that Id"); // TODO: tell if song or part missing
+                return base.BadRequest("No song (or part) by that Id"); 
         }
 
 
         /// <summary>
-        /// Create new part. Song must be id of some entity in DB.
+        /// Create new part
         /// </summary>
         /// <param name="NewPartObject"></param>
-        /// <param name="song_id"></param>
         /// <returns>201</returns>
-        [HttpPost("{song_id:int:min(1)}/parts")]
-        public async Task<IActionResult> CreatePart(int song_id, [FromBody] NewPartDTO NewPartObject)
+        [HttpPost]
+        public async Task<IActionResult> CreatePart([FromBody] NewPartDTO NewPartObject)
         {
-            if (song_id != NewPartObject.SongId)
-                return base.BadRequest("Url Id must match SongId");
+            var result = await repository.CreatePart(NewPartObject, base.UserID);
 
-            var result = await repository.CreatePartCommand(NewPartObject, base.UserID);
-            if (result != null)
-                return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
+            if (result != 0)
+                return base.Created($"api/parts/{result}", $"{result}"); 
             else
                 return base.BadRequest("No song by that Id");
         }
 
         /// <summary>
-        /// Update part. 
+        /// Update part by using UpdatePartDTO 
         /// </summary>
         /// <param name="UpdatePartObject"></param>
-        /// <param name="song_id"></param>
         /// <returns>204</returns>
-        [HttpPatch("{song_id:int:min(1)}/parts/{Id:int:min(1)}")]
-        public async Task<IActionResult> UpdatePart(int song_id, [FromBody] UpdatePartDTO UpdatePartObject)
+        [HttpPatch("{partId:int:min(1)}")]
+        public async Task<IActionResult> UpdatePart([FromBody] UpdatePartDTO UpdatePartObject)
         {
-            if (song_id != UpdatePartObject.SongId)
-                return base.BadRequest("Url Id must match SongId");
-
-            var result = await repository.UpdatePartCommand(UpdatePartObject, base.UserID);
+            var result = await repository.UpdatePart(UpdatePartObject, base.UserID);
             if (result)
                 return base.NoContent();
             else
@@ -87,11 +79,10 @@ namespace Dissimilis.WebAPI.Controllers
         /// Delete Part by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete("{song_id:int:min(1)}/parts/{Id:int:min(1)}")]
-        public async Task<IActionResult> DeletePart(int Id)
+        [HttpDelete("{partId:int:min(1)}")]
+        public async Task<IActionResult> DeletePart([FromQuery] int partId)
         {
-            var DeletePartObject = new SuperDTO(Id);
-            bool result = await repository.DeletePart(DeletePartObject, base.UserID);
+            bool result = await repository.DeletePart(partId, base.UserID);
             if (result)
                 return base.NoContent();
             else

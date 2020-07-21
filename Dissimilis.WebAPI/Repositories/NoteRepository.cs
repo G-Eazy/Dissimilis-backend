@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    class NoteRepository : INoteRepository
+    public class NoteRepository : BaseRepository, INoteRepository
     {
         private readonly DissimilisDbContext context;
         
@@ -20,112 +20,128 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
+        /// Get Note by Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        public async Task<NoteDTO> GetNote (int noteId)
+        {
+            if (noteId is 0) return null;
+
+            Note NoteModel = await this.context.Notes
+                .SingleOrDefaultAsync(x => x.Id == noteId);
+            if (NoteModel is null) return null;
+
+            NoteDTO NoteModelObject = new NoteDTO(NoteModel.Id, NoteModel.BarId, 
+                                                    NoteModel.NoteNumber, NoteModel.Length, 
+                                                    NoteModel.NoteValues);
+            return NoteModelObject;
+        }
+
+        /// <summary>
         /// Create a new note with the NewNoteDTO
         /// </summary>
-        /// <param name="note"></param>
-        /// <param name="barId"></param>
+        /// <param name="NewNoteObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<NoteDTO> CreateNote(NewNoteDTO note, int barId, uint userId)
+        public async Task<int> CreateNote(NewNoteDTO NewNoteObject, uint userId)
         {
-            Note BarModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
-            this.context.UserId = userId;
-            await this.context.SaveChangesAsync();
+            if (!CheckProperties(NewNoteObject)) return 0;
 
-            NoteDTO noteDTO = new NoteDTO() 
-            { 
-                Id = BarModel.Id, 
-                BarId = BarModel.BarId, 
-                Length = BarModel.Length, 
-                NoteNumber = BarModel.NoteNumber, 
-                NoteValues = BarModel.NoteValues 
+            Note CheckNoteNumber = await this.context.Notes
+                .SingleOrDefaultAsync(b => b.NoteNumber == NewNoteObject.NoteNumber 
+                                        && b.BarId == NewNoteObject.BarId);
+            if (CheckNoteNumber != null)
+                UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
+
+            Note NoteModel = new Note()
+            {
+                NoteNumber = NewNoteObject.NoteNumber,
+                BarId = NewNoteObject.BarId,
+                Length = NewNoteObject.Length,
+                NoteValues = NewNoteObject.NoteValues
             };
 
-            return noteDTO;
+            this.context.UserId = userId;
+            await this.context.Notes.AddAsync(NoteModel);
+            await this.context.TrySaveChangesAsync();
+
+            return NoteModel.Id;
         }
 
         /// <summary>
-        /// Delete a note, using the ID that is in NoteDTO
+        /// Update note numbers
         /// </summary>
-        /// <param name="noteObject"></param>
+        /// <param name="noteNumber"></param>
+        /// <param name="barId"></param>
+        /// <param name="userId"></param>
+        private async void UpdateNoteNumbers(int noteNumber, int barId, uint userId)
+        {
+            Note[] AllNotes = this.context.Notes.Where(b => b.BarId == barId)
+                .OrderBy(x => x.NoteNumber)
+                .ToArray();
+
+            for (int i = noteNumber - 1; i < AllNotes.Count(); i++)
+            {
+                AllNotes[i].NoteNumber += 1;
+            }
+
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+        }
+
+
+        /// <summary>
+        /// Delete a note, using the ID 
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteNote(NoteDTO noteObject)
+        public async Task<bool> DeleteNote(int noteId, uint userId)
         {
             bool Deleted = false;
-            Note deleteNote = await FindNoteById(noteObject.Id);
-            this.context.Remove(deleteNote);
-            
-            //Check if any entries was changed, if yes it should have been deleted
-            var entries = await this.context.SaveChangesAsync();
-            if (entries > 0) Deleted = true;
-            
-            return Deleted;
-        }
+            Note DeletedNote = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteId);
 
-        /// <summary>
-        /// Find a Note by Id
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <returns></returns>
-        public async Task<Note> FindNoteById(int Id)
-        {
-            return await this.context.Notes.SingleOrDefaultAsync(n => n.Id == Id);
+            if(DeletedNote != null)
+                if (ValidateUser(userId, DeletedNote.Bar.Part.Song))
+                {
+                    this.context.Remove(DeletedNote);
+                    Deleted = await this.context.TrySaveChangesAsync();
+
+                }
+
+            return Deleted;
         }
 
         /// <summary>
         /// Update the notes with the new values in NoteDTO
         /// </summary>
         /// <param name="noteObject"></param>
-        /// <param name="barId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateNote(NoteDTO noteObject, int barId, uint userId)
+        public async Task<bool> UpdateNote(UpdateNoteDTO noteObject, uint userId)
         {
             bool Updated = false;
 
             if (noteObject is null) return false;
-            Note nodeModel = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteObject.Id);
+            Note nodeModel = await this.context.Notes.Include(x => x.Bar)
+                .ThenInclude(x => x.Part)
+                .ThenInclude(x => x.Song)
+                .SingleOrDefaultAsync(n => n.Id == noteObject.Id);
 
             //Validate user if they are allowed to edit here
-            if (!ValidateUser((int)userId, nodeModel.Bar.Part.Song)) return false;
+            if (nodeModel != null)
+                if (ValidateUser(userId, nodeModel.Bar.Part.Song))
+                {
+                    if (nodeModel.Length != noteObject.Length) nodeModel.Length = noteObject.Length;
+                    if (nodeModel.NoteValues != noteObject.NoteValues) nodeModel.NoteValues = noteObject.NoteValues;
+                    if (nodeModel.NoteNumber != noteObject.NoteNumber) nodeModel.NoteNumber = noteObject.NoteNumber;
 
-            if (nodeModel is null) throw new Exception("The note with Id: " + noteObject.Id + " does not exist");
-
-            if(nodeModel.Length != noteObject.Length)
-                nodeModel.Length = noteObject.Length;
-
-            if(nodeModel.NoteValues != noteObject.NoteValues)
-                nodeModel.NoteValues = noteObject.NoteValues;
-
-            if (nodeModel.NoteNumber != noteObject.NoteNumber)
-                nodeModel.NoteNumber = noteObject.NoteNumber;
-
-            this.context.UserId = userId;
-            var entries = await this.context.SaveChangesAsync();
-            //If more than 0 entires was saved/updated set Updated to true
-            if(entries > 0) Updated = true;
+                    this.context.UserId = userId;
+                    Updated = await this.context.TrySaveChangesAsync();
+                }
 
             return Updated;
-        }
-
-        /// <summary>
-        /// Check if the user belongs to the bar it is trying to access/edit
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="song"></param>
-        /// <returns></returns>
-        public bool ValidateUser(int userId, Song song)
-        {
-            try
-            {
-                if (userId == song.CreatedById)
-                    return true;
-                return false;
-            }
-            catch
-            {
-                throw new ArgumentException("The user is not allowed to edit on this song");
-            }
         }
     }
 }

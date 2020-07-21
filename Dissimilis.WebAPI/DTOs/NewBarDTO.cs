@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class NewBarDTO
+    public class NewBarDTO : SuperDTO
     {
         public byte BarNumber { get; set; }
         public int PartId { get; set; }
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
-        public NoteDTO[] Notes { get; set; }
+        public byte House { get; set; }
     }
 }

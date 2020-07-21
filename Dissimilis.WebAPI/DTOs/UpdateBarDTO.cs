@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public abstract class SuperDTO
+    public class UpdateBarDTO : NewBarDTO
     {
+        public int Id { get; set; }
+
     }
 }

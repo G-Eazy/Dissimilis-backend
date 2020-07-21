@@ -11,26 +11,31 @@ using Dissimilis.WebAPI.Repositories.Interfaces;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class SongRepository : ISongRepository
+    public class SongRepository : BaseRepository, ISongRepository
     {
         private DissimilisDbContext context;
+        private PartRepository partRepository;
+
         public SongRepository(DissimilisDbContext context)
         {
             this.context = context;
+            this.partRepository = new PartRepository(context);
         }
 
         /// <summary>
-        /// Get song by id provided in DTO
+        /// Get song by id
         /// </summary>
-        /// <param name="SuperObject"></param>
+        /// <param name="songId"></param>
         /// <returns></returns>
-        public async Task<SongDTO> GetSongById(SuperDTO SuperObject)
+        public async Task<SongDTO> GetSongById(int songId)
         {
-            var SongId = SuperObject.Id;
             var SongModelObject = await this.context.Songs
-                .SingleOrDefaultAsync(s => s.Id == SongId);
-            
+                .Include(x => x.Arranger)
+                .SingleOrDefaultAsync(s => s.Id == songId);
+            if (SongModelObject is null) return null;
+
             SongDTO SongObject = new SongDTO(SongModelObject);
+            SongObject.Parts = await GetAllPartsForSong(SongModelObject.Id);
 
             return SongObject;
         }
@@ -40,7 +45,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="SongQueryObject"></param>
         /// <returns></returns>
-        public async Task<SongDTO[]> SearchSongs(SongQueryDTO SongQueryObject) {
+        public async Task<UpdateSongDTO[]> SearchSongs(SongQueryDTO SongQueryObject) {
 
             var Title = SongQueryObject.Title;
             var ArrangerId = SongQueryObject.ArrangerId;
@@ -67,7 +72,7 @@ namespace Dissimilis.WebAPI.Repositories
             var SongModelArray = await SongQuery
                 .ToArrayAsync();
 
-            var SongDTOArray = SongModelArray.Select(u => new SongDTO(u)).ToArray();
+            var SongDTOArray = SongModelArray.Select(u => new UpdateSongDTO(u)).ToArray();
             return SongDTOArray;
         
         }
@@ -78,26 +83,22 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="NewSongObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<SongDTO> CreateSong(NewSongDTO NewSongObject, uint userId)
+        public async Task<int> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
-            //TODO CHECK IF DTO IS EMPTY!
-            var ArrangerId = NewSongObject.ArrangerId;
-            var ExistsArranger = await this.context.Users.SingleOrDefaultAsync(u => u.Id == ArrangerId);
-            SongDTO SongObject = null;
-            if (ExistsArranger != null)
+            if (!CheckProperties(NewSongObject)) return 0;
+
+            var SongModelObject = new Song()
             {
-                var SongModelObject = new Song()
-                {
-                    Title = NewSongObject.Title,
-                    ArrangerId = NewSongObject.ArrangerId,
-                    TimeSignature = NewSongObject.TimeSignature
-                };
-                await this.context.Songs.AddAsync(SongModelObject);
-                this.context.UserId = userId;
-                await this.context.SaveChangesAsync();
-                SongObject = new SongDTO(SongModelObject);
-            }
-            return SongObject;
+                Title = NewSongObject.Title,
+                ArrangerId = (int)userId,
+                TimeSignature = NewSongObject.TimeSignature
+            };
+            await this.context.Songs.AddAsync(SongModelObject);
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+            var result = SongModelObject.Id;
+
+            return result;
         }
 
         /// <summary>
@@ -109,55 +110,61 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             bool Updated = false;
-            //TODO VALIDATE USER; CHECK IF DTO IS EMPTY!
-            var UpdateSongObjectId = UpdateSongObject.Id;
-            var NewTitle = UpdateSongObject.Title;
-            var NewTimeSignature = UpdateSongObject.TimeSignature;
+           
+            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObject.Id);
 
-            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObjectId);
-            
-            if (SongModelObject != null) 
-            {
-                SongModelObject.Title = NewTitle;
-                SongModelObject.TimeSignature = NewTimeSignature;
-                this.context.UserId = userId;
-                Updated = await this.context.TrySaveChangesAsync();
-            }
+            if (SongModelObject != null)
+                if (ValidateUser(userId, SongModelObject))
+                {
+                    if (UpdateSongObject.Title != SongModelObject.Title) SongModelObject.Title = UpdateSongObject.Title;
+                    if (UpdateSongObject.TimeSignature != SongModelObject.TimeSignature) SongModelObject.TimeSignature = UpdateSongObject.TimeSignature;
+
+                    this.context.UserId = userId;
+                    Updated = await this.context.TrySaveChangesAsync();
+                }
+
             return Updated;
         }
 
         /// <summary>
-        /// Delete song using deletesong DTO
+        /// Delete song by songId
         /// </summary>
-        /// <param name="DeleteSongObject"></param>
+        /// <param name="songId"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<bool> DeleteSong(SuperDTO DeleteSongObject, int userId)
+        /// <returns>boolean</returns>
+        public async Task<bool> DeleteSong(int songId, uint userId)
         {
             bool Deleted = false;
-            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == DeleteSongObject.Id);
-            if (ValidateUser(userId, SongModelObject))
-                if (SongModelObject != null) 
-            { 
-                this.context.Songs.Remove(SongModelObject);
-                Deleted = await this.context.TrySaveChangesAsync();
-            }
+            var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
+
+            if (SongModelObject != null)
+                if (ValidateUser(userId, SongModelObject))
+                {
+                    this.context.Songs.Remove(SongModelObject);
+                    Deleted = await this.context.TrySaveChangesAsync();
+                }
 
             return Deleted;
         }
 
-        public bool ValidateUser(int userId, Song song)
+        public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
-            try
+            //get all parts belonging to this songid, decending by partnumber
+            int[] AllParts = this.context.Parts
+                .Where(x => x.SongId == songId)
+                .OrderBy(x => x.PartNumber)
+                .Select(x => x.Id)
+                .ToArray();
+
+            PartDTO[] AllPartsDTO = new PartDTO[AllParts.Length];
+
+            for(int i = 0; i < AllParts.Length; i++)
             {
-                if (userId == song.CreatedById)
-                    return true;
-                return false;
+                AllPartsDTO[i] = await this.partRepository.GetPart(AllParts[i]);
             }
-            catch
-            {
-                throw new ArgumentException("The user is not allowed to edit on this song");
-            }
+            
+            return AllPartsDTO;
+                
         }
     }
 }
