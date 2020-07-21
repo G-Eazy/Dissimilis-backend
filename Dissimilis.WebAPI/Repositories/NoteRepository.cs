@@ -41,6 +41,12 @@ namespace Dissimilis.WebAPI.Repositories
                 .ThenInclude(x => x.Song).SingleOrDefaultAsync(x => x.Id == note.BarId);
             if (!ValidateUser(userId, UsingBar.Part.Song)) return null;
 
+            Note CheckNoteNumber = await this.context.Notes.SingleOrDefaultAsync(b => b.NoteNumber == note.NoteNumber && b.BarId == note.BarId);
+            if (CheckNoteNumber != null)
+            {
+                UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
+            }
+
             Note NoteModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
             this.context.UserId = userId;
             await this.context.Notes.AddAsync(NoteModel);
@@ -60,7 +66,21 @@ namespace Dissimilis.WebAPI.Repositories
             return noteDTO;
         }
 
-        
+        public async void UpdateNoteNumbers(int noteNumber, int barId, uint userId)
+        {
+            Note[] AllNotes = this.context.Notes.Where(b => b.BarId == barId)
+                .OrderBy(x => x.NoteNumber)
+                .ToArray();
+
+            for (int i = noteNumber - 1; i < AllNotes.Count(); i++)
+            {
+                AllNotes[i].NoteNumber += 1;
+            }
+
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+        }
+
 
         /// <summary>
         /// Delete a note, using the ID that is in NoteDTO

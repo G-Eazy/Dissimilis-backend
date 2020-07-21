@@ -59,6 +59,12 @@ namespace Dissimilis.WebAPI.Repositories
             var ExistsSong = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == SongId);
             if (!ValidateUser(userId, ExistsSong)) return null;
 
+            Part CheckPartNumber = await this.context.Parts.SingleOrDefaultAsync(b => b.PartNumber == NewPartObject.Priority && b.SongId == NewPartObject.SongId);
+            if (CheckPartNumber != null)
+            {
+                UpdatePartNumbers(CheckPartNumber.PartNumber, CheckPartNumber.SongId, userId);
+            }
+
             var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title, userId);
             // This will trigger BadRequest from controller, Will remove when we have exception handler
             if (ExistsInstrument == null)
@@ -80,6 +86,21 @@ namespace Dissimilis.WebAPI.Repositories
                 PartObject = new SuperDTO(NewPartObject.Priority);
             }
             return PartObject;
+        }
+
+        public async void UpdatePartNumbers(int partNumber, int songId, uint userId)
+        {
+            Part[] AllParts = this.context.Parts.Where(b => b.SongId == songId)
+                .OrderBy(x => x.PartNumber)
+                .ToArray();
+
+            for (int i = partNumber - 1; i < AllParts.Count(); i++)
+            {
+                AllParts[i].PartNumber += 1;
+            }
+
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
         }
 
         /// <summary>
