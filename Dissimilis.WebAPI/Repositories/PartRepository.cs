@@ -93,7 +93,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="partNumber"></param>
         /// <param name="songId"></param>
         /// <param name="userId"></param>
-        private async void UpdatePartNumbers(int partNumber, int songId, uint userId)
+        private async Task<bool> UpdatePartNumbers(int partNumber, int songId, uint userId)
         {
             Part[] AllParts = this.context.Parts.Where(b => b.SongId == songId)
                 .OrderBy(x => x.PartNumber)
@@ -106,6 +106,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
+            return true;
         }
 
         /// <summary>
@@ -175,6 +176,11 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 if (ValidateUser(userId, PartModelObject.Song))
                 {
+                    Part CheckPartNumber = await this.context.Parts.SingleOrDefaultAsync(p => p.PartNumber == UpdatePartObject.PartNumber && p.SongId == UpdatePartObject.SongId);
+                    if (CheckPartNumber != null)
+                    {
+                        await UpdatePartNumbers(UpdatePartObject.PartNumber, UpdatePartObject.SongId, userId);
+                    }
                     // Checking for differences between Model and DTO 
                     if (PartModelObject.Instrument.Name != UpdatePartObject.Title)
                     {

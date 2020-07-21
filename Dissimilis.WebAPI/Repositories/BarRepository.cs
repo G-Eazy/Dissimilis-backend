@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="barNumber"></param>
         /// <param name="partId"></param>
         /// <param name="userId"></param>
-        private async void UpdateBarNumbers(int barNumber, int partId, uint userId)
+        private async Task<bool> UpdateBarNumbers(int barNumber, int partId, uint userId)
         {
             Bar[] allbars = this.context.Bars.Where(b => b.PartId == partId)
                 .OrderBy(x => x.BarNumber)
@@ -82,6 +82,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
+            return true;
         }
 
         /// <summary>
@@ -93,7 +94,10 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> DeleteBar(int bar_id, uint userId)
         {
             bool Deleted = false;
-            Bar barModel = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == bar_id);
+            Bar barModel = await this.context.Bars
+                .Include(b => b.Part)
+                .ThenInclude(b => b.Song)
+                .SingleOrDefaultAsync(x => x.Id == bar_id);
             if (barModel != null) 
                 if (ValidateUser(userId, barModel.Part.Song))
                 {
@@ -103,7 +107,6 @@ namespace Dissimilis.WebAPI.Repositories
 
             return Deleted;
         }
-
 
         private async Task<NoteDTO[]> FindAllNotesForBar(int barId)
         {
@@ -132,14 +135,23 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateBar(UpdateBarDTO UpdateBarObject, uint userId)
         {
             if (!CheckProperties(UpdateBarObject)) return false;
+
             bool Updated = false;
+            
             Bar BarModel = await this.context.Bars
                 .Include(x => x.Part)
                 .ThenInclude(x => x.Song)
                 .SingleOrDefaultAsync(b => b.Id == UpdateBarObject.Id);
+
             if (BarModel != null)
                 if (ValidateUser(userId, BarModel.Part.Song))
                 {
+                    Bar CheckBarNumber = await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == UpdateBarObject.BarNumber && b.PartId == UpdateBarObject.PartId);
+                    if (CheckBarNumber != null)
+                    {
+                        await UpdateBarNumbers(UpdateBarObject.BarNumber, UpdateBarObject.PartId, userId);
+                    }
+
                     if (UpdateBarObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = UpdateBarObject.BarNumber;
                     if (UpdateBarObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = UpdateBarObject.RepAfter;
                     if (UpdateBarObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = UpdateBarObject.RepBefore;

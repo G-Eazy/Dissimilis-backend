@@ -31,7 +31,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Get song by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet("{songId:int:min(1)}")]
+        [HttpGet]
         public async Task<IActionResult> GetSongById([FromQuery] int songId)
         {
             var SongObject = await repository.GetSongById(songId);
@@ -49,10 +49,10 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<ActionResult<UpdateSongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
         {
             var SongDTOArray = await repository.SearchSongs(SongQueryObject);
-            if (SongDTOArray.Length == 0)
-                return base.BadRequest("No arranger by that Id");
-            else
+            if (SongDTOArray.Count() != 0)
                 return base.Ok(SongDTOArray);
+
+            return base.BadRequest("No arranger by that Id");
         }
 
 
@@ -75,7 +75,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Update song by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpPatch("{songId:int:min(1)}")]
+        [HttpPatch]
         public async Task<IActionResult> UpdateSong([FromBody] UpdateSongDTO UpdateSongObject)
         {
             bool result = await repository.UpdateSong(UpdateSongObject, base.UserID);
@@ -89,7 +89,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Delete song by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete("{songId:int:min(1)}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteSong([FromQuery] int songId)
         {
             bool result = await repository.DeleteSong(songId, base.UserID);

@@ -52,7 +52,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .SingleOrDefaultAsync(b => b.NoteNumber == NewNoteObject.NoteNumber 
                                         && b.BarId == NewNoteObject.BarId);
             if (CheckNoteNumber != null)
-                UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
+                await UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
 
             Note NoteModel = new Note()
             {
@@ -75,7 +75,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="noteNumber"></param>
         /// <param name="barId"></param>
         /// <param name="userId"></param>
-        private async void UpdateNoteNumbers(int noteNumber, int barId, uint userId)
+        private async Task<bool> UpdateNoteNumbers(int noteNumber, int barId, uint userId)
         {
             Note[] AllNotes = this.context.Notes.Where(b => b.BarId == barId)
                 .OrderBy(x => x.NoteNumber)
@@ -88,6 +88,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
+            return true;
         }
 
 
@@ -100,7 +101,11 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> DeleteNote(int noteId, uint userId)
         {
             bool Deleted = false;
-            Note DeletedNote = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteId);
+            Note DeletedNote = await this.context.Notes
+                .Include(n => n.Bar)
+                .ThenInclude(n => n.Part)
+                .ThenInclude(n => n.Song)
+                .SingleOrDefaultAsync(n => n.Id == noteId);
 
             if(DeletedNote != null)
                 if (ValidateUser(userId, DeletedNote.Bar.Part.Song))
@@ -116,26 +121,31 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Update the notes with the new values in NoteDTO
         /// </summary>
-        /// <param name="noteObject"></param>
+        /// <param name="UpdateNoteObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateNote(UpdateNoteDTO noteObject, uint userId)
+        public async Task<bool> UpdateNote(UpdateNoteDTO UpdateNoteObject, uint userId)
         {
             bool Updated = false;
 
-            if (noteObject is null) return false;
+            if (UpdateNoteObject is null) return false;
             Note nodeModel = await this.context.Notes.Include(x => x.Bar)
                 .ThenInclude(x => x.Part)
                 .ThenInclude(x => x.Song)
-                .SingleOrDefaultAsync(n => n.Id == noteObject.Id);
+                .SingleOrDefaultAsync(n => n.Id == UpdateNoteObject.Id);
 
             //Validate user if they are allowed to edit here
             if (nodeModel != null)
                 if (ValidateUser(userId, nodeModel.Bar.Part.Song))
                 {
-                    if (nodeModel.Length != noteObject.Length) nodeModel.Length = noteObject.Length;
-                    if (nodeModel.NoteValues != noteObject.NoteValues) nodeModel.NoteValues = noteObject.NoteValues;
-                    if (nodeModel.NoteNumber != noteObject.NoteNumber) nodeModel.NoteNumber = noteObject.NoteNumber;
+                    Note CheckNoteNumber = await this.context.Notes.SingleOrDefaultAsync(b => b.NoteNumber == UpdateNoteObject.NoteNumber && b.BarId == UpdateNoteObject.BarId);
+                    if (CheckNoteNumber != null)
+                    {
+                        UpdateNoteNumbers(UpdateNoteObject.NoteNumber, UpdateNoteObject.BarId, userId);
+                    }
+                    if (nodeModel.Length != UpdateNoteObject.Length) nodeModel.Length = UpdateNoteObject.Length;
+                    if (nodeModel.NoteValues != UpdateNoteObject.NoteValues) nodeModel.NoteValues = UpdateNoteObject.NoteValues;
+                    if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
 
                     this.context.UserId = userId;
                     Updated = await this.context.TrySaveChangesAsync();

@@ -36,10 +36,10 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> CreateBar([FromBody] NewBarDTO BarObject)
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
-            if (result is 0)
-                return base.BadRequest("No song by that Id");
-            else
-                return base.Created($"api/bars/{result}", $"{result}");
+            if (result != 0)
+                return base.Created($"api/bars?barsId={result}", $"{result}");
+
+            return base.BadRequest("Couldn't create the bar");
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpGet("{barId}")]
-        public async Task<IActionResult> GetBar(int barId)
+        [HttpGet]
+        public async Task<IActionResult> GetBar([FromQuery]int barId)
         {
             var result = await repository.GetBar(barId);
             if (result != null)
@@ -61,14 +61,13 @@ namespace Dissimilis.WebAPI.Controllers
         /// Update the bar, taking in only the bar params
         /// </summary>
         /// <param name="BarObject"></param>
-        /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpPatch("{barId}")]
-        public async Task<IActionResult> UpdateBar(int barId, [FromBody] UpdateBarDTO BarObject)
+        [HttpPatch]
+        public async Task<IActionResult> UpdateBar([FromBody] UpdateBarDTO BarObject)
         {
             var result = await repository.UpdateBar(BarObject, base.UserID);
             if (result)
-                return base.Created($"api/bars/{barId}", $"{barId}");
+                return base.NoContent();
 
             return base.BadRequest("Something went wrong updating the bar");
         }
@@ -78,8 +77,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpDelete("{bar_id}")]
-        public async Task<IActionResult> DeleteBar(int barId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteBar([FromQuery] int barId)
         {
             var result = await repository.DeleteBar(barId, base.UserID);
             if (result)

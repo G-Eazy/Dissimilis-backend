@@ -50,12 +50,12 @@ namespace Dissimilis.WebAPI.Repositories
                 }
                 else if(p.PropertyType == typeof(byte))
                 {
-                    if ((byte)p.GetValue(obj) <= 0)
+                    if ((byte)p.GetValue(obj) <= 0 && p.Name.ToLower() != "house")
                         return false;
                 }
                 else if (p.PropertyType.IsArray)
                 {
-                    if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
+                    if (string.IsNullOrWhiteSpace(p.GetValue(obj).ToString()))
                         return false;
                 }
             }

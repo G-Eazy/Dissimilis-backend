@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Get part by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet("{partId:int:min(1)}")]
+        [HttpGet]
         public async Task<IActionResult> GetPart([FromQuery] int partId)
         {
             var PartObject = await repository.GetPart(partId);
@@ -64,7 +64,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="UpdatePartObject"></param>
         /// <returns>204</returns>
-        [HttpPatch("{partId:int:min(1)}")]
+        [HttpPatch]
         public async Task<IActionResult> UpdatePart([FromBody] UpdatePartDTO UpdatePartObject)
         {
             var result = await repository.UpdatePart(UpdatePartObject, base.UserID);
@@ -79,7 +79,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// Delete Part by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete("{partId:int:min(1)}")]
+        [HttpDelete]
         public async Task<IActionResult> DeletePart([FromQuery] int partId)
         {
             bool result = await repository.DeletePart(partId, base.UserID);
