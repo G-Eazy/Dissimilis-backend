@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Database.Models
         public int SongId { get; set; }
 
         /// <summary>
-        /// The instrument object linked to the foregin key id
+        /// The instrument entity of this Part
         /// </summary>
         public Instrument Instrument { get; set; }
 

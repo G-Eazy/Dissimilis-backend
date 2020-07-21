@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class BarDTO
+    public class BarDTO : NewBarDTO
     {
         public int Id { get; set; }
-        public byte BarNumber { get; set; }
-        public int PartId { get; set; }
-        public bool RepBefore { get; set; }
-        public bool RepAfter { get; set; }
-        public byte House { get; set; }
         public NoteDTO[] Notes { get; set; }
 
         public BarDTO() { }
@@ -21,11 +16,11 @@ namespace Dissimilis.WebAPI.DTOs
         public BarDTO(int id, int partId, byte barnumber, bool repAfter, bool repBefore, byte house)
         {
             this.Id = id;
-            this.PartId = partId;
-            this.BarNumber = barnumber;
-            this.RepAfter = repAfter;
-            this.RepBefore = repBefore;
-            this.House = house;
+            base.PartId = partId;
+            base.BarNumber = barnumber;
+            base.RepAfter = repAfter;
+            base.RepBefore = repBefore;
+            base.House = house;
         }
     }
 }

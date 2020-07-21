@@ -127,7 +127,7 @@ namespace Dissimilis.WebAPI.Database
 			{
 				x.SongId,
 				x.PartNumber
-			});
+			}).IsUnique();
 
 			//set foregin key for creator id
 			entity.HasOne(x => x.Song).WithMany()

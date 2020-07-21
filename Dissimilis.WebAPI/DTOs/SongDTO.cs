@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class SongDTO 
+    public class SongDTO : NewSongDTO
     {
-        public int Id { get; set; }
-        
-        public string Title { get; set; }
+        public int Id { get; set; } 
         
         public string ArrangerName { get; set; }
     
@@ -21,9 +19,10 @@ namespace Dissimilis.WebAPI.DTOs
         public SongDTO(Song song)
         {
             this.Id = song.Id;
-            this.Title = song.Title;
+            base.Title = song.Title;
             this.ArrangerName = song.Arranger.Name;
             this.UpdatedOn = song.UpdatedOn;
+            base.TimeSignature = song.TimeSignature;
         }
     }
 }

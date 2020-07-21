@@ -116,7 +116,7 @@ namespace Dissimilis.WebAPI
             });
 
             //Comment out if you are not using authentication
-             app.UseWebUserAuthentication();
+            app.UseWebUserAuthentication();
             
             app.UseRouting();
 

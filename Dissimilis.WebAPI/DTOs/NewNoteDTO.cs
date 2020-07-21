@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class NewNoteDTO
+    public class NewNoteDTO : SuperDTO
     {
         public int BarId { get; set; }
         public byte NoteNumber { get; set; }
