@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Database.Models
         public int SongId { get; set; }
 
         /// <summary>
-        /// A string containing name of instrument(should be it's own entity)
+        /// The instrument entity of this Part
         /// </summary>
         public Instrument Instrument { get; set; }
 
