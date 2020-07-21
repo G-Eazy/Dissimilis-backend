@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
             if (result != 0)
-                return base.Created($"api/bars?barsId={result}", $"{result}");
+                return base.Created($"api/bars?barId={result}", $"{result}");
 
             return base.BadRequest("Couldn't create the bar");
         }

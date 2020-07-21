@@ -66,7 +66,7 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.CreateSong(NewSongObject, base.UserID);
             if (result != 0)
-                return base.Created($"api/songs/{result}", $"{result}"); 
+                return base.Created($"api/songs?songId={result}", $"{result}"); 
             else
                 return base.BadRequest("Error");
         }

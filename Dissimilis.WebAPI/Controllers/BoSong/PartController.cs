@@ -54,7 +54,7 @@ namespace Dissimilis.WebAPI.Controllers
             var result = await repository.CreatePart(NewPartObject, base.UserID);
 
             if (result != 0)
-                return base.Created($"api/parts/{result}", $"{result}"); 
+                return base.Created($"api/parts?partId={result}", $"{result}"); 
             else
                 return base.BadRequest("No song by that Id");
         }

@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var result = await repository.CreateNote(NewNoteObject, base.UserID);
             if (result != 0)
-                return base.Created($"api/note/{result}", $"{result}");
+                return base.Created($"api/notes?noteId={result}", $"{result}");
             else
                 return base.BadRequest("No song by that Id");
         }
