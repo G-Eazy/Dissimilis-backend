@@ -10,6 +10,7 @@
                         barNumber: 1,
                         repBefore: false,
                         repAfter: false,
+			house: false,
                         chordsAndTones: [
                             {
 				order: 1,
@@ -23,15 +24,17 @@
                             },
                             {
                                 length: 1,
-				order: 3, // Fill inn order param below
+				order: 3, 
                                 notes: ["H", "A", "C"]
                             }
                         ],
                     },
+			// Order and House continues below, but is not filled
                     {
                         barNumber: 2,
                         repBefore: true,
                         repAfter: false,
+			house: false,
                         chordsAndTones: [
                             {
                                 length: 6,
@@ -43,7 +46,8 @@
                         barNumber: 3,
                         repBefore: true,
                         repAfter: false,
-                        chordsAndTones: [
+                        house: false,
+			chordsAndTones: [
                             {
                                 length: 2,
                                 notes: ["A", "H", "C"]
@@ -62,7 +66,8 @@
                         barNumber: 4,
                         repBefore: true,
                         repAfter: false,
-                        chordsAndTones: [
+                        house: false,
+			chordsAndTones: [
                             {
                                 length: 1,
                                 notes: ["A", "H", "C"]
