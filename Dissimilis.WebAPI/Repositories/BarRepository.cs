@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class BarRepository : IBarRepository
+    public class BarRepository : BaseRepository, IBarRepository
     {
         private readonly DissimilisDbContext context;
         private readonly NoteRepository noteRepository;
@@ -25,7 +25,6 @@ namespace Dissimilis.WebAPI.Repositories
         /// Get a bar with all notes associated with it
         /// </summary>
         /// <param name="bar_id"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<BarDTO> GetBar(int bar_id)
         {
@@ -45,10 +44,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="bar"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<BarDTO> CreateBar(NewBarDTO bar, uint userId)
+        public async Task<int> CreateBar(NewBarDTO bar, uint userId)
         {
-            if (bar is null) 
-                return null;
+            if (!CheckProperties(bar)) return 0;
 
             Bar CheckBarNumber = await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == bar.BarNumber && b.PartId == bar.PartId);
             if (CheckBarNumber != null)
@@ -60,7 +58,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .Include(x => x.Song).SingleOrDefaultAsync(x => x.Id == bar.PartId);
             
             if (!ValidateUser(userId, part.Song)) 
-                return null;
+                return 0;
 
             Bar BarModel = new Bar(bar.BarNumber, bar.PartId);
             this.context.UserId = userId;
@@ -71,15 +69,7 @@ namespace Dissimilis.WebAPI.Repositories
             this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
 
-            //Create a DTO object of the newly created Bar
-            BarDTO BarModelDTO = new BarDTO() 
-            { 
-                Id = BarModel.Id, 
-                PartId = BarModel.PartId, 
-                BarNumber = BarModel.BarNumber 
-            };
-
-            return BarModelDTO;
+            return BarModel.Id;
         }
 
         public async void UpdateBarNumbers(int barNumber, int partId, uint userId)

@@ -11,11 +11,10 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
     {
         Task<BarDTO> GetBar(int bar_it);
         Task<BarDTO> FindOrCreateBar(BarDTO bar, uint userId);
-        Task<BarDTO> CreateBar(NewBarDTO bar, uint userId);
+        Task<int> CreateBar(NewBarDTO bar, uint userId);
         Task<Bar> FindBarById(int id);
         Task<bool> UpdateBar(UpdateBarDTO bar, uint userId);
         Task<bool> DeleteBarById(int barId, uint userId);
-        bool ValidateUser(uint userId, Song bar);
         void UpdateBarNumbers(int barNumber, int partId, uint userId);
 
         Task<NoteDTO[]> FindAllNotesForBar(int barId);

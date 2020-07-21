@@ -29,11 +29,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <param name="bar_id"></param>
         /// <returns>201</returns>
         [HttpPost("{bar_id}")]
-        public async Task<IActionResult> CreateNote(int bar_id, [FromBody] NewNoteDTO NewNoteObject)
+        public async Task<IActionResult> CreateNote([FromBody] NewNoteDTO NewNoteObject)
         {
-            if (bar_id != NewNoteObject.BarId)
-                return base.BadRequest("Url Id must match SongId");
-
             var result = await repository.CreateNote(NewNoteObject, base.UserID);
             if (result != null)
                 return base.Created($"api/note/{result.Id}", "");

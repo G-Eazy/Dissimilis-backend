@@ -32,14 +32,14 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="BarObject"></param>
         /// <returns>201</returns>
-        [HttpPost("{part_id}")]
+        [HttpPost("{part_id:int:min(1)}")]
         public async Task<IActionResult> CreateBar([FromBody] NewBarDTO BarObject)
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
-            if (result is null)
+            if (result is 0)
                 return base.BadRequest("No song by that Id");
             else
-                return base.Created($"api/bars/{result.Id}", "");
+                return base.Created($"api/bars/{result}", $"{result}");
         }
 
         /// <summary>
