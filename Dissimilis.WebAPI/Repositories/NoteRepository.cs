@@ -10,13 +10,23 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    class NoteRepository : INoteRepository
+    public class NoteRepository : INoteRepository
     {
         private readonly DissimilisDbContext context;
         
         public NoteRepository(DissimilisDbContext context)
         {
             this.context = context;
+        }
+
+        public async Task<NoteDTO> GetNote (int noteId)
+        {
+            if (noteId is 0) return null;
+            Note NoteModel = await this.context.Notes.SingleOrDefaultAsync(x => x.Id == noteId);
+            if (NoteModel is null) return null;
+
+            NoteDTO NoteModelObject = new NoteDTO(NoteModel.Id, NoteModel.BarId, NoteModel.NoteNumber, NoteModel.Length, NoteModel.NoteValues);
+            return NoteModelObject;
         }
 
         /// <summary>
@@ -27,8 +37,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<NoteDTO> CreateNote(NewNoteDTO note, uint userId)
         {
-            Bar usingBar = await this.context.Bars.Include(x => x.Part.Song).SingleOrDefaultAsync(x => x.Id == note.BarId);
-            if (!ValidateUser(userId, usingBar.Part.Song)) return null;
+            Bar UsingBar = await this.context.Bars.Include(x => x.Part)
+                .ThenInclude(x => x.Song).SingleOrDefaultAsync(x => x.Id == note.BarId);
+            if (!ValidateUser(userId, UsingBar.Part.Song)) return null;
 
             Note NoteModel = new Note() { NoteNumber = note.NoteNumber, BarId = note.BarId, Length = note.Length, NoteValues = note.NoteValues };
             this.context.UserId = userId;
@@ -115,7 +126,10 @@ namespace Dissimilis.WebAPI.Repositories
             bool Updated = false;
 
             if (noteObject is null) return false;
-            Note nodeModel = await this.context.Notes.SingleOrDefaultAsync(n => n.Id == noteObject.Id);
+            Note nodeModel = await this.context.Notes.Include(x => x.Bar)
+                .ThenInclude(x => x.Part)
+                .ThenInclude(x => x.Song)
+                .SingleOrDefaultAsync(n => n.Id == noteObject.Id);
 
             //Validate user if they are allowed to edit here
             if (!ValidateUser(userId, nodeModel.Bar.Part.Song)) return false;

@@ -13,17 +13,42 @@ namespace Dissimilis.WebAPI.Repositories
     public class PartRepository 
     {
         private DissimilisDbContext context;
+        private BarRepository barRepository;
+
         public PartRepository(DissimilisDbContext context)
         {
+            this.barRepository = new BarRepository(context);
             this.context = context;
         }
 
         /// <summary>
-        /// Create a new Part to a Song
+        /// Get part by id provided in DTO
         /// </summary>
-        /// <param name="NewPartObject"></param>
-        /// <param name="userId"></param>
-        /// <returns>SuperDTO</returns>
+        /// <param name="partId"></param>
+        /// <returns>PartDTO</returns>
+        public async Task<PartDTO> GetPartById(int partId)
+        {
+            Part ExistsPart = await this.context.Parts
+                .Include(p => p.Instrument)
+                .SingleOrDefaultAsync(p => p.Id == partId);
+
+            PartDTO PartObject = null;
+
+            if (ExistsPart != null)
+            {
+                PartObject = new PartDTO(ExistsPart);
+                PartObject.Bars = await GetAllBars(ExistsPart.Id);
+            }
+
+            return PartObject;
+        }
+
+            /// <summary>
+            /// Create a new Part to a Song
+            /// </summary>
+            /// <param name="NewPartObject"></param>
+            /// <param name="userId"></param>
+            /// <returns>SuperDTO</returns>
 
         public async Task<SuperDTO> CreatePartCommand(NewPartDTO NewPartObject, uint userId)
         {
@@ -56,6 +81,7 @@ namespace Dissimilis.WebAPI.Repositories
             }
             return PartObject;
         }
+
         /// <summary>
         /// Looks for an instrument with title InstrumentName, and creates if non-existant
         /// </summary>
@@ -77,6 +103,21 @@ namespace Dissimilis.WebAPI.Repositories
                 await this.context.SaveChangesAsync();
             }
                 return ExistsInstrument;
+        }
+
+        public async Task<BarDTO[]> GetAllBars(int partId)
+        {
+            Bar[] AllBars = this.context.Bars.Where(x => x.PartId == partId)
+                .OrderBy(x => x.BarNumber).ToArray();
+
+            BarDTO[] AllBarsDTO = new BarDTO[AllBars.Count()];
+
+            for(int i = 0; i < AllBars.Count(); i++)
+            {
+                AllBarsDTO[i] = await this.barRepository.GetBar(AllBars[i].Id);
+            }
+
+            return AllBarsDTO;
         }
 
         /// <summary>

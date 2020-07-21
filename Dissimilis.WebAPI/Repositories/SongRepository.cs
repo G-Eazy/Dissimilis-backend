@@ -14,9 +14,11 @@ namespace Dissimilis.WebAPI.Repositories
     public class SongRepository : ISongRepository
     {
         private DissimilisDbContext context;
+        private PartRepository partRepository;
         public SongRepository(DissimilisDbContext context)
         {
             this.context = context;
+            this.partRepository = new PartRepository(context);
         }
 
         /// <summary>
@@ -31,7 +33,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .SingleOrDefaultAsync(s => s.Id == SongId);
             
             SongDTO SongObject = new SongDTO(SongModelObject);
-            SongObject.Parts = GetAllPartsForSong(SongModelObject.Id);
+            SongObject.Parts = await GetAllPartsForSong(SongModelObject.Id);
 
             return SongObject;
         }
@@ -97,6 +99,7 @@ namespace Dissimilis.WebAPI.Repositories
                 this.context.UserId = userId;
                 await this.context.SaveChangesAsync();
                 SongObject = new SongDTO(SongModelObject);
+                SongObject.Parts = await this.GetAllPartsForSong(SongObject.Id);
             }
             return SongObject;
         }
@@ -161,7 +164,7 @@ namespace Dissimilis.WebAPI.Repositories
             }
         }
 
-        public PartDTO[] GetAllPartsForSong(int songId)
+        public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
             //get all parts belonging to this songid, decending by partnumber
             Part[] AllParts = this.context.Parts.Where(x => x.SongId == songId)
@@ -171,7 +174,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             for(int i = 0; i < AllParts.Length; i++)
             {
-                AllPartsDTO[i] = new PartDTO(AllParts[i].Id, AllParts[i].PartNumber, AllParts[i].SongId, AllParts[i].InstrumentId);
+                AllPartsDTO[i] = await this.partRepository.GetPartById(AllParts[i].Id);
             }
             
             return AllPartsDTO;

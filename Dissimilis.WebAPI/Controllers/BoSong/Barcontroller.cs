@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="BarObject"></param>
         /// <returns>201</returns>
-        [HttpPost("{bar_id}")]
+        [HttpPost("{part_id}")]
         public async Task<IActionResult> CreateBar([FromBody] NewBarDTO BarObject)
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpGet("{bar_id}")]
         public async Task<IActionResult> GetBar(int bar_id)
         {
-            var result = await repository.GetBar(bar_id, base.UserID);
+            var result = await repository.GetBar(bar_id);
             if (result is null)
                 return base.BadRequest("No bar by that id");
             else

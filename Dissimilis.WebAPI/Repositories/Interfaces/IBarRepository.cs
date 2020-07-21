@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
 {
     interface IBarRepository
     {
-        Task<BarDTO> GetBar(int bar_it, uint userId);
+        Task<BarDTO> GetBar(int bar_it);
         Task<BarDTO> FindOrCreateBar(BarDTO bar, uint userId);
         Task<BarDTO> CreateBar(NewBarDTO bar, uint userId);
         Task<Bar> FindBarById(int id);
@@ -17,6 +17,6 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
         Task<bool> DeleteBarById(int barId, uint userId);
         bool ValidateUser(uint userId, Song bar);
 
-        NoteDTO[] FindAllNotesForBar(int barId);
+        Task<NoteDTO[]> FindAllNotesForBar(int barId);
     }
 }

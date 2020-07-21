@@ -19,11 +19,11 @@ namespace Dissimilis.WebAPI.Controllers
     [ApiController]
     public class PartController : UserControllerBase
     {
-        private PartRepository repository;
+        private PartRepository BarRepository;
         
         public PartController(DissimilisDbContext context)
         {
-            this.repository = new PartRepository(context);
+            this.BarRepository = new PartRepository(context);
         }
 
         #region CRUD Part
@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers
             if (song_id != NewPartObject.SongId)
                 return base.BadRequest("Url Id must match SongId");
 
-            var result = await repository.CreatePartCommand(NewPartObject, base.UserID);
+            var result = await BarRepository.CreatePartCommand(NewPartObject, base.UserID);
             if (result != null)
                 return base.Created($"api/songs/{song_id}/parts/{result.Id}", ""); 
             else
