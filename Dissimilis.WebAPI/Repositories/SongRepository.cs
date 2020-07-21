@@ -30,6 +30,7 @@ namespace Dissimilis.WebAPI.Repositories
         {
             var SongId = SuperObject.Id;
             var SongModelObject = await this.context.Songs
+                .Include(x => x.Arranger)
                 .SingleOrDefaultAsync(s => s.Id == SongId);
             
             SongDTO SongObject = new SongDTO(SongModelObject);

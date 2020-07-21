@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.DTOs
         public int Id { get; set; }
         public byte PartNumber { set; get; }
         public int SongId { get; set; }
-        public int InstrumentId { get; set; }
+        public string Title { get; set; }
         public BarDTO[] Bars { get; set; }
 
         public PartDTO() { }
@@ -21,15 +21,15 @@ namespace Dissimilis.WebAPI.DTOs
             this.Id = existingPart.Id;
             this.PartNumber = existingPart.PartNumber;
             this.SongId = existingPart.SongId;
-            this.InstrumentId = existingPart.InstrumentId;
+            this.Title = existingPart.Instrument.Name;
         }
 
-        public PartDTO(int id, byte partnumber, int songid, int instrumentid)
+        public PartDTO(int id, byte partnumber, int songid, string InstrumentName)
         {
             this.Id = id;
             this.PartNumber = partnumber;
             this.SongId = songid;
-            this.InstrumentId = instrumentid;
+            this.Title = InstrumentName;
         }
     }
 }

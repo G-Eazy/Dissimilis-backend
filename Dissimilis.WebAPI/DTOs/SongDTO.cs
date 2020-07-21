@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.DTOs
         
         public string Title { get; set; }
         
-        public int ArrangerId { get; set; }
+        public string ArrangerName { get; set; }
     
         public DateTime? UpdatedOn { get; set; }
 
@@ -22,7 +22,7 @@ namespace Dissimilis.WebAPI.DTOs
         {
             this.Id = song.Id;
             this.Title = song.Title;
-            this.ArrangerId = song.ArrangerId;
+            this.ArrangerName = song.Arranger.Name;
             this.UpdatedOn = song.UpdatedOn;
         }
     }
