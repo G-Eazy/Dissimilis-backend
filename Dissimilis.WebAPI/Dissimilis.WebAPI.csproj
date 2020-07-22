@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>be3811c2-9b19-4a15-a73e-d34183bfe62c</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>obj\Dissimilis.WebAPI.xml</DocumentationFile>
+    <DocumentationFile>Dissimilis.WebAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,5 +27,11 @@
     <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj" />
     <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj" />
   </ItemGroup>
-	
+
+	<ItemGroup>
+		<None Update="Dissimilis.WebAPI.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 </Project>

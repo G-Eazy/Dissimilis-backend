@@ -1,0 +1,672 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Dissimilis.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="M:Dissimilis.WebAPI.Controllers.PartController.CreatePart(System.Int32,Dissimilis.WebAPI.DTOs.NewPartDTO)">
+            <summary>
+            Create new part. Song must be id of some entity in DB.
+            </summary>
+            <param name="NewPartDTO"></param>
+            <returns>201</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.GetSongById(System.Int32)">
+            <summary>
+            Get song by Id
+            </summary>
+            <returns>200</returns> 
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.Search(Dissimilis.WebAPI.DTOs.SongQueryDTO)">
+            <summary>
+            Fetch songs that contain {Title} and/or from Arranger {ArrangerId} in the database. Limit output to {Num} songs. Set {OrderByDateTime} to true for ordering.
+            </summary>
+            <returns>200</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.CreateSong(Dissimilis.WebAPI.DTOs.NewSongDTO)">
+            <summary>
+            Create new song. Arranger must be id of somebody in DB, see all users below.
+            </summary>
+            <param name="NewSongObject"></param>
+            <returns>201</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.UpdateSong(System.Int32,Dissimilis.WebAPI.DTOs.UpdateSongDTO)">
+            <summary>
+            Update song by Id
+            </summary>
+            <returns>200</returns> 
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.DeleteSong(System.Int32)">
+            <summary>
+            Delete song by Id
+            </summary>
+            <returns>200</returns> 
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.UserController.GetAllUsers">
+            <summary>
+            Fetch all users in the database
+            </summary>
+            <returns>AllUsers</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.TestController.MyTestMethod">
+            <summary>
+            Test method to get userId
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.TestController.GetAllUsers">
+            <summary>
+            A test fucntion to fetch all users that are in the database
+            </summary>
+            <returns>AllUsers</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Controllers.TestController.MyMethod(System.String,System.Int32)">
+            <summary>
+            This is a test method to fetch the api using a name and a number
+            </summary>
+            <param name="name"></param>
+            <param name="bob"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Bar">
+            <summary>
+            This is the bar, which is associated with a Part (norsk: Stemme)
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Bar.Id">
+            <summary>
+            The id of this bar
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Bar.Part">
+            <summary>
+            The part it is linked to
+            and the corresponding PartId
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Bar.PartId">
+            <summary>
+            THe ID for the corresponding Part 
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Bar.Notation">
+            <summary>
+            the actual ABC notation for this bar
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Bar.BarNumber">
+            <summary>
+            Priority of the bar in a spesific part
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Bar.#ctor">
+            <summary>
+            Empty constructor for Bar
+            </summary>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.BaseEntity">
+            <summary>
+            This entity class will be used when there are updates 
+            or additions to other entities, by updated the time created/updated
+            and who created/updated
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.CreatedBy">
+            <summary>
+            Who created this attribute
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.UpdatedBy">
+            <summary>
+            Who updated this attribute last
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.CreatedOn">
+            <summary>
+            When was this attribute created
+            </summary>  
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.BaseEntity.UpdatedOn">
+            <summary>
+            What time was this attribute updated
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Country.Name">
+            <summary>
+            The name of the country
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Country.#ctor">
+            <summary>
+            Empty constructor for Country
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Country.#ctor(System.String)">
+            <summary>
+            Constructor for Country with parameteres
+            </summary>
+            <param name="country"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Instrument">
+            <summary>
+            Entity class for Instruemtn
+            Contains Id, Name
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Instrument.Name">
+            <summary>
+            String containing the InstrumentType
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Instrument.#ctor">
+            <summary>
+            Empty constructor for Instrument
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Instrument.#ctor(System.String)">
+            <summary>
+            Instrument constructor
+            </summary>
+            <param name="instrument"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Note">
+            <summary>
+            This is the Note, which is associated with a Bar (norsk: Takt)
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Note.Id">
+            <summary>
+            The id of this Note
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Note.Bar">
+            <summary>
+            The bar it is linked to
+            and the corresponding BarId
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Note.BarId">
+            <summary>
+            THe ID for the corresponding Part 
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Note.NoteNumber">
+            <summary>
+            Priority of the Note in a spesific Bar
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Note.#ctor">
+            <summary>
+            Empty constructor for Note
+            </summary>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Organisation">
+            <summary>
+            Entity class for organisation
+            Contains Id and Name
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Organisation.Id">
+            <summary>
+            ID of the organisation
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Organisation.Name">
+            <summary>
+            The name of the organisation
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Organisation.#ctor">
+            <summary>
+            Empty constructor 
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Organisation.#ctor(System.String)">
+            <summary>
+            Constructor that takes a name of the organisation
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Part">
+            <summary>
+            This is a part, which is associated with a Song and contains bars
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Part.Song">
+            <summary>
+            The Song that this Part belongs too
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Part.SongId">
+            <summary>
+            The foregin key of the Song it belongs too
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Part.Instrument">
+            <summary>
+            A string containing name of instrument(should be it's own entity)
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Part.InstrumentId">
+            <summary>
+            The id of the corresponding instrument
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Part.PartNumber">
+            <summary>
+            The priority the voice has over other voices
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Part.#ctor">
+            <summary>
+            Empty constructor for Part.cs
+            </summary>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Resource">
+            <summary>
+            Entity class for the resources users can access
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Resource.Id">
+            <summary>
+            The Id of this Resource
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Resource.Name">
+            <summary>
+            the type of resource a user has, eg. printing, deleting etc
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Resource.#ctor">
+            <summary>
+            Empty constructor for Resource
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Resource.#ctor(System.String)">
+            <summary>
+            Contructor for Resource
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.Song">
+            <summary>
+            This is the whole songs, which contains one or more parts 
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Song.Title">
+            <summary>
+            The song title of the music scheet (NO: Partitur)
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Song.Arranger">
+            <summary>
+            ID of the creator, eg. instructor
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Song.ArrangerId">
+            <summary>
+            The id of the corresponding creator aka. User.Id
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Song.Composer">
+            <summary>
+            The composer of the song
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.Song.TimeSignature">
+            <summary>
+            The time signature of the song (NO: Taktart)
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Song.#ctor">
+            <summary>
+            Empty constructor for Song
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.Song.#ctor(System.String,Dissimilis.WebAPI.Database.Models.User,System.String,System.String,System.DateTime)">
+            <summary>
+            COnstructor for Song
+            </summary>
+            <param name="title"></param>
+            <param name="creator"></param>
+            <param name="composer"></param>
+            <param name="time_signature"></param>
+            <param name="creation_time"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.User">
+            <summary>
+            User entity that contains: 
+            Id, email, name, DOB, org and country
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Id">
+            <summary>
+            The Id of the user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.MsId">
+            <summary>
+            The microsoft Id of this user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Email">
+            <summary>
+            Email address of user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Name">
+            <summary>
+            Name of the user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Country">
+            <summary>
+            Country the user is from or belongs to
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.CountryId">
+            <summary>
+            Foreign key for Country.ID
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.Organisation">
+            <summary>
+            The Organisation object associated with this user
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.User.OrganisationId">
+            <summary>
+            The Id of the organisation this user belongs to
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.User.#ctor">
+            <summary>
+            Empty constructor for User
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.User.#ctor(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Constructor for User
+            </summary>
+            <param name="username"></param>
+            <param name="name"></param>
+            <param name="email"></param>
+            <param name="organisationId"></param>
+            <param name="countryId"></param>
+            <param name="date_of_birth"></param>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroup.Name">
+            <summary>
+            Name of the grouptype for users
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroup.#ctor">
+            <summary>
+            Empty constructor for UserGroup
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroup.#ctor(System.String)">
+            <summary>
+            Constructor for UserGroup
+            </summary>
+            <param name="groupname"></param>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupMembers.UserId">
+            <summary>
+            the user id
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupMembers.User">
+            <summary>
+            The user that is associated with the id
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupMembers.UserGroupId">
+            <summary>
+            The user group id
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupMembers.UserGroup">
+            <summary>
+            the user group associated with the id
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroupMembers.#ctor">
+            <summary>
+            Empty constructor for usergroup members
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroupMembers.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Constructor for usergroup members with params
+            </summary>
+            <param name="userId"></param>
+            <param name="userGroupId"></param>
+        </member>
+        <member name="T:Dissimilis.WebAPI.Database.Models.UserGroupResources">
+            <summary>
+            A many-to-many relationship table
+            between usergroups and resources
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupResources.UserGroupId">
+            <summary>
+            The UserGroupId 
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupResources.UserGroup">
+            <summary>
+            The usergroup associated with the userGroupId
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupResources.ResourceId">
+            <summary>
+            The id of the Resource 
+            </summary>
+        </member>
+        <member name="P:Dissimilis.WebAPI.Database.Models.UserGroupResources.Resource">
+            <summary>
+            The resource associated with the ResourceId
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroupResources.#ctor">
+            <summary>
+            empty constructor for group resources
+            </summary>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.Models.UserGroupResources.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Construcotr for usergroup taking in id of resource and group
+            </summary>
+            <param name="resourceId"></param>
+            <param name="userGroupId"></param>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.DissimilisDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Created the models and configure them
+            </summary>
+            <param name="modelBuilder"></param>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Database.DissimilisDbContext.SaveChanges">
+            <summary>
+            Ocerrideing the savechanges to add modified and added date
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            This function created the HostBuilder from Startup.cs
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.CountryRepository.CreateCountryAsync(System.String,System.UInt32)">
+            <summary>
+            Create a new country entry based on the name
+            </summary>
+            <param name="name"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.CountryRepository.CreateOrFindCountryAsync(Experis.Ciber.Authentication.Microsoft.APIObjects.OrganizationMetadata,System.UInt32)">
+            <summary>
+            Create or find country based on metadata
+            if metadata is null, use default country "Norway"
+            </summary>
+            <param name="metaData"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.CountryRepository.GetCountryByIdAsync(System.Int32)">
+            <summary>
+            Get country by the id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.CountryRepository.GetCountryByNameAsync(System.String)">
+            <summary>
+            Get country based on country Name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.OrganisationRepository.CreateOrFindOrganisationAsync(Experis.Ciber.Authentication.Microsoft.APIObjects.OrganizationMetadata,System.UInt32)">
+            <summary>
+            Find or create an organisation depending on the organisaion metadata
+            </summary>
+            <param name="metadata"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.OrganisationRepository.CreateOrganisationAsync(Experis.Ciber.Authentication.Microsoft.APIObjects.OrganizationMetadata,System.UInt32)">
+            <summary>
+            Create an organisation using the metadata. If its null, use default
+            </summary>
+            <param name="metadata"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.OrganisationRepository.GetOrganisationByMsIdAsync(Experis.Ciber.Authentication.Microsoft.APIObjects.OrganizationMetadata)">
+            <summary>
+            Find the organisation by the ms id
+            </summary>
+            <param name="metadata"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.OrganisationRepository.GetOrganisationByIdAsync(System.Int32)">
+            <summary>
+            Fidn the organisation by ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.OrganisationRepository.GetOrganisationByNameAsync(System.String)">
+            <summary>
+            Find the organisation based on the name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.PartRepository.CreatePartCommand(Dissimilis.WebAPI.DTOs.NewPartDTO)">
+            <summary>
+            Create a new Part to a Song
+            </summary>
+            <param name="NewPartObject"></param>
+            <returns>SuperDTO</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.PartRepository.CreateOrFindInstrument(System.String)">
+            <summary>
+            Looks for an instrument with title InstrumentName, and creates if non-existant
+            </summary>
+            <param name="InstrumentName"></param>
+            <returns>(Model) Instrument</returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.GetSongById(Dissimilis.WebAPI.DTOs.SuperDTO)">
+            <summary>
+            Get song by id provided in DTO
+            </summary>
+            <param name="SuperObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.SearchSongs(Dissimilis.WebAPI.DTOs.SongQueryDTO)">
+            <summary>
+            Search songs with parameters in SongSearchDTO
+            </summary>
+            <param name="SongSearchObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.CreateSong(Dissimilis.WebAPI.DTOs.NewSongDTO,System.UInt32)">
+            <summary>
+            Create song using NewSongDTO
+            </summary>
+            <param name="NewSongObject"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.UpdateSong(Dissimilis.WebAPI.DTOs.UpdateSongDTO,System.UInt32)">
+            <summary>
+            UpdateSong using UpdateSongDTO
+            </summary>
+            <param name="UpdateSongObject"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.DeleteSong(Dissimilis.WebAPI.DTOs.SuperDTO,System.UInt32)">
+            <summary>
+            Delete song using deletesong DTO
+            </summary>
+            <param name="DeleteSongObject"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.GetAllUsersAsync">
+            <summary>
+            Get all users in a list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.GetUserByEmailAsync(System.String)">
+            <summary>
+            Get user by give email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.GetUserByIdAsync(System.Int32)">
+            <summary>
+            Get user by ID
+            </summary>
+            <param name="UserId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.GetUserByMsIdAsync(System.Guid)">
+            <summary>
+            Get user by the microsoft ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.UpdateUserCountryAsync(Dissimilis.WebAPI.Database.Models.User,Dissimilis.WebAPI.Database.Models.Country)">
+            <summary>
+            Update the user country fk
+            </summary>
+            <param name="user"></param>
+            <param name="country"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Repositories.UserRepository.UpdateUserOrganisationAsync(Dissimilis.WebAPI.Database.Models.User,Dissimilis.WebAPI.Database.Models.Organisation)">
+            <summary>
+            Update the user organisation fk
+            </summary>
+            <param name="user"></param>
+            <param name="organisation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dissimilis.WebAPI.Startup.ConfigureDbOptions(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder@)">
+            <summary>
+            Configure the DbOptions. We get the connectionstring 
+            that is placed in appsettings.Development.json
+            </summary>
+            <param name="dbCob"></param>
+        </member>
+    </members>
+</doc>
