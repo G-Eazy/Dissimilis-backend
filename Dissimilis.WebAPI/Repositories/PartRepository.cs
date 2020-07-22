@@ -29,6 +29,8 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns>PartDTO</returns>
         public async Task<PartDTO> GetPart(int partId)
         {
+            if (partId <= 0) return null;
+
             Part ExistsPart = await this.context.Parts
                 .Include(p => p.Instrument)
                 .SingleOrDefaultAsync(p => p.Id == partId);
@@ -58,6 +60,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             var ExistsSong = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
+
             if (!ValidateUser(userId, ExistsSong)) return 0;
 
             Part CheckPartNumber = await this.context.Parts
@@ -65,7 +68,7 @@ namespace Dissimilis.WebAPI.Repositories
                                         && b.SongId == NewPartObject.SongId);
             if (CheckPartNumber != null)
             {
-                UpdatePartNumbers(CheckPartNumber.PartNumber, CheckPartNumber.SongId, userId);
+                await UpdatePartNumbers(CheckPartNumber.PartNumber, CheckPartNumber.SongId, userId);
             }
 
             var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title, userId);
@@ -101,7 +104,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             for (int i = partNumber - 1; i < AllParts.Count(); i++)
             {
-                AllParts[i].PartNumber += 1;
+                AllParts[i].PartNumber++;
             }
 
             this.context.UserId = userId;
@@ -166,35 +169,33 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdatePart(UpdatePartDTO UpdatePartObject, uint userId)
         {
             bool Updated = false;
+            if (!CheckProperties(UpdatePartObject)) return Updated;
 
             var PartModelObject = await this.context.Parts
                 .Include(p => p.Song)
                 .Include(p => p.Instrument)
                 .SingleOrDefaultAsync(s => s.Id == UpdatePartObject.Id);
 
-            if (PartModelObject != null)
+            if (PartModelObject != null && ValidateUser(userId, PartModelObject.Song))
             {
-                if (ValidateUser(userId, PartModelObject.Song))
+                Part CheckPartNumber = await this.context.Parts.SingleOrDefaultAsync(p => p.PartNumber == UpdatePartObject.PartNumber && p.SongId == UpdatePartObject.SongId);
+                if (CheckPartNumber != null)
                 {
-                    Part CheckPartNumber = await this.context.Parts.SingleOrDefaultAsync(p => p.PartNumber == UpdatePartObject.PartNumber && p.SongId == UpdatePartObject.SongId);
-                    if (CheckPartNumber != null)
-                    {
-                        await UpdatePartNumbers(UpdatePartObject.PartNumber, UpdatePartObject.SongId, userId);
-                    }
-                    // Checking for differences between Model and DTO 
-                    if (PartModelObject.Instrument.Name != UpdatePartObject.Title)
-                    {
-                        var NewInstrument = await CreateOrFindInstrument(UpdatePartObject.Title, userId);
-                        PartModelObject.InstrumentId = NewInstrument.Id;
-                    }
-                    if (PartModelObject.PartNumber != UpdatePartObject.PartNumber)
-                    {
-                        PartModelObject.PartNumber = UpdatePartObject.PartNumber;
-                    }
-
-                    this.context.UserId = userId;
-                    Updated = await this.context.TrySaveChangesAsync();
+                    await UpdatePartNumbers(UpdatePartObject.PartNumber, UpdatePartObject.SongId, userId);
                 }
+                // Checking for differences between Model and DTO 
+                if (PartModelObject.Instrument.Name != UpdatePartObject.Title)
+                {
+                    var NewInstrument = await CreateOrFindInstrument(UpdatePartObject.Title, userId);
+                    PartModelObject.InstrumentId = NewInstrument.Id;
+                }
+                if (PartModelObject.PartNumber != UpdatePartObject.PartNumber)
+                {
+                    PartModelObject.PartNumber = UpdatePartObject.PartNumber;
+                }
+
+                this.context.UserId = userId;
+                Updated = await this.context.TrySaveChangesAsync();
             }
             return Updated;
         }
@@ -210,17 +211,17 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> DeletePart(int partId, uint userId)
         {
             bool Deleted = false;
+            if (partId <= 0) return Deleted;
 
             var PartModelObject = await this.context.Parts
                 .Include(p => p.Song)
                 .SingleOrDefaultAsync(p => p.Id == partId);
 
-            if (PartModelObject != null)
-                if (ValidateUser(userId, PartModelObject.Song))
-                {
-                    this.context.Parts.Remove(PartModelObject);
-                    Deleted = await this.context.TrySaveChangesAsync();
-                }
+            if (PartModelObject != null && ValidateUser(userId, PartModelObject.Song))
+            {
+                this.context.Parts.Remove(PartModelObject);
+                Deleted = await this.context.TrySaveChangesAsync();
+            }
             
             return Deleted;
         }

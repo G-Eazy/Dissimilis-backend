@@ -29,6 +29,8 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<SongDTO> GetSongById(int songId)
         {
+            if (songId <= 0) return null;
+
             var SongModelObject = await this.context.Songs
                 .Include(x => x.Arranger)
                 .SingleOrDefaultAsync(s => s.Id == songId);
@@ -96,9 +98,8 @@ namespace Dissimilis.WebAPI.Repositories
             await this.context.Songs.AddAsync(SongModelObject);
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
-            var result = SongModelObject.Id;
 
-            return result;
+            return SongModelObject.Id;
         }
 
         /// <summary>
@@ -110,18 +111,19 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             bool Updated = false;
+            
+            if (!CheckProperties(UpdateSongObject)) return Updated;
            
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObject.Id);
 
-            if (SongModelObject != null)
-                if (ValidateUser(userId, SongModelObject))
-                {
-                    if (UpdateSongObject.Title != SongModelObject.Title) SongModelObject.Title = UpdateSongObject.Title;
-                    if (UpdateSongObject.TimeSignature != SongModelObject.TimeSignature) SongModelObject.TimeSignature = UpdateSongObject.TimeSignature;
+            if (SongModelObject != null && ValidateUser(userId, SongModelObject))
+            {
+                if (UpdateSongObject.Title != SongModelObject.Title) SongModelObject.Title = UpdateSongObject.Title;
+                if (UpdateSongObject.TimeSignature != SongModelObject.TimeSignature) SongModelObject.TimeSignature = UpdateSongObject.TimeSignature;
 
-                    this.context.UserId = userId;
-                    Updated = await this.context.TrySaveChangesAsync();
-                }
+                this.context.UserId = userId;
+                Updated = await this.context.TrySaveChangesAsync();
+            }
 
             return Updated;
         }
@@ -135,14 +137,14 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> DeleteSong(int songId, uint userId)
         {
             bool Deleted = false;
+            if (songId <= 0) return Deleted;
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
 
-            if (SongModelObject != null)
-                if (ValidateUser(userId, SongModelObject))
-                {
-                    this.context.Songs.Remove(SongModelObject);
-                    Deleted = await this.context.TrySaveChangesAsync();
-                }
+            if (SongModelObject != null && ValidateUser(userId, SongModelObject))
+            {
+                this.context.Songs.Remove(SongModelObject);
+                Deleted = await this.context.TrySaveChangesAsync();
+            }
 
             return Deleted;
         }

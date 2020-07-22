@@ -26,15 +26,13 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<NoteDTO> GetNote (int noteId)
         {
-            if (noteId is 0) return null;
+            if (noteId <= 0) return null;
 
             Note NoteModel = await this.context.Notes
                 .SingleOrDefaultAsync(x => x.Id == noteId);
             if (NoteModel is null) return null;
 
-            NoteDTO NoteModelObject = new NoteDTO(NoteModel.Id, NoteModel.BarId, 
-                                                    NoteModel.NoteNumber, NoteModel.Length, 
-                                                    NoteModel.NoteValues);
+            NoteDTO NoteModelObject = new NoteDTO(NoteModel);
             return NoteModelObject;
         }
 
@@ -83,39 +81,12 @@ namespace Dissimilis.WebAPI.Repositories
 
             for (int i = noteNumber - 1; i < AllNotes.Count(); i++)
             {
-                AllNotes[i].NoteNumber += 1;
+                AllNotes[i].NoteNumber++;
             }
 
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
             return true;
-        }
-
-
-        /// <summary>
-        /// Delete a note, using the ID 
-        /// </summary>
-        /// <param name="noteId"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<bool> DeleteNote(int noteId, uint userId)
-        {
-            bool Deleted = false;
-            Note DeletedNote = await this.context.Notes
-                .Include(n => n.Bar)
-                .ThenInclude(n => n.Part)
-                .ThenInclude(n => n.Song)
-                .SingleOrDefaultAsync(n => n.Id == noteId);
-
-            if(DeletedNote != null)
-                if (ValidateUser(userId, DeletedNote.Bar.Part.Song))
-                {
-                    this.context.Remove(DeletedNote);
-                    Deleted = await this.context.TrySaveChangesAsync();
-
-                }
-
-            return Deleted;
         }
 
         /// <summary>
@@ -127,31 +98,58 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateNote(UpdateNoteDTO UpdateNoteObject, uint userId)
         {
             bool Updated = false;
+            if (!CheckProperties(UpdateNoteObject)) return Updated;
 
-            if (UpdateNoteObject is null) return false;
             Note nodeModel = await this.context.Notes.Include(x => x.Bar)
                 .ThenInclude(x => x.Part)
                 .ThenInclude(x => x.Song)
                 .SingleOrDefaultAsync(n => n.Id == UpdateNoteObject.Id);
 
             //Validate user if they are allowed to edit here
-            if (nodeModel != null)
-                if (ValidateUser(userId, nodeModel.Bar.Part.Song))
+            if (nodeModel != null && ValidateUser(userId, nodeModel.Bar.Part.Song))
+            {
+                Note CheckNoteNumber = await this.context.Notes.SingleOrDefaultAsync(b => b.NoteNumber == UpdateNoteObject.NoteNumber && b.BarId == UpdateNoteObject.BarId);
+                if (CheckNoteNumber != null)
                 {
-                    Note CheckNoteNumber = await this.context.Notes.SingleOrDefaultAsync(b => b.NoteNumber == UpdateNoteObject.NoteNumber && b.BarId == UpdateNoteObject.BarId);
-                    if (CheckNoteNumber != null)
-                    {
-                        UpdateNoteNumbers(UpdateNoteObject.NoteNumber, UpdateNoteObject.BarId, userId);
-                    }
-                    if (nodeModel.Length != UpdateNoteObject.Length) nodeModel.Length = UpdateNoteObject.Length;
-                    if (nodeModel.NoteValues != UpdateNoteObject.NoteValues) nodeModel.NoteValues = UpdateNoteObject.NoteValues;
-                    if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
-
-                    this.context.UserId = userId;
-                    Updated = await this.context.TrySaveChangesAsync();
+                    await UpdateNoteNumbers(UpdateNoteObject.NoteNumber, UpdateNoteObject.BarId, userId);
                 }
+                if (nodeModel.Length != UpdateNoteObject.Length) nodeModel.Length = UpdateNoteObject.Length;
+                if (nodeModel.NoteValues != UpdateNoteObject.NoteValues) nodeModel.NoteValues = UpdateNoteObject.NoteValues;
+                if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
+
+                this.context.UserId = userId;
+                Updated = await this.context.TrySaveChangesAsync();
+            }
 
             return Updated;
         }
+        
+        /// <summary>
+        /// Delete a note, using the ID 
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteNote(int noteId, uint userId)
+        {
+            bool Deleted = false;
+            if (noteId <= 0) return Deleted;
+
+            Note DeletedNote = await this.context.Notes
+                .Include(n => n.Bar)
+                .ThenInclude(n => n.Part)
+                .ThenInclude(n => n.Song)
+                .SingleOrDefaultAsync(n => n.Id == noteId);
+
+            if (DeletedNote != null && ValidateUser(userId, DeletedNote.Bar.Part.Song))
+            {
+                this.context.Remove(DeletedNote);
+                Deleted = await this.context.TrySaveChangesAsync();
+
+            }
+
+            return Deleted;
+        }
+
     }
 }

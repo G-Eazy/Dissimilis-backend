@@ -28,12 +28,13 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<BarDTO> GetBar(int bar_id)
         {
-            if (bar_id is 0) return null;
+            if (bar_id <= 0) return null;
+
             Bar BarModel = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == bar_id);
             if (BarModel is null) 
                 return null;
 
-            BarDTO BarModelObject = new BarDTO(BarModel.Id, BarModel.PartId, BarModel.BarNumber, BarModel.RepAfter, BarModel.RepBefore, BarModel.House);
+            BarDTO BarModelObject = new BarDTO(BarModel);
             BarModelObject.Notes = await FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
@@ -52,7 +53,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
                                         && b.PartId == NewBarObject.PartId);
             if (CheckBarNumber != null)
-                UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
+                await UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
 
             Bar BarModel = new Bar(NewBarObject.BarNumber, NewBarObject.PartId);
 
@@ -77,7 +78,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             for(int i = barNumber-1; i < allbars.Count(); i++)
             {
-                allbars[i].BarNumber += 1;
+                allbars[i].BarNumber++;
             }
 
             this.context.UserId = userId;
@@ -88,22 +89,23 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Delete a bar by Id provided in BarDTO
         /// </summary>
-        /// <param name="bar_id"></param>
+        /// <param name="barId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteBar(int bar_id, uint userId)
+        public async Task<bool> DeleteBar(int barId, uint userId)
         {
             bool Deleted = false;
+            if (barId <= 0) return Deleted;
+
             Bar barModel = await this.context.Bars
                 .Include(b => b.Part)
                 .ThenInclude(b => b.Song)
-                .SingleOrDefaultAsync(x => x.Id == bar_id);
-            if (barModel != null) 
-                if (ValidateUser(userId, barModel.Part.Song))
-                {
-                    this.context.Remove(barModel);
-                    Deleted = await context.TrySaveChangesAsync();
-                }
+                .SingleOrDefaultAsync(x => x.Id == barId);
+            if (barModel != null &&  ValidateUser(userId, barModel.Part.Song))
+            {
+                this.context.Remove(barModel);
+                Deleted = await context.TrySaveChangesAsync();
+            }
 
             return Deleted;
         }
@@ -143,23 +145,22 @@ namespace Dissimilis.WebAPI.Repositories
                 .ThenInclude(x => x.Song)
                 .SingleOrDefaultAsync(b => b.Id == UpdateBarObject.Id);
 
-            if (BarModel != null)
-                if (ValidateUser(userId, BarModel.Part.Song))
+            if (BarModel != null && ValidateUser(userId, BarModel.Part.Song))
+            {
+                Bar CheckBarNumber = await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == UpdateBarObject.BarNumber && b.PartId == UpdateBarObject.PartId);
+                if (CheckBarNumber != null)
                 {
-                    Bar CheckBarNumber = await this.context.Bars.SingleOrDefaultAsync(b => b.BarNumber == UpdateBarObject.BarNumber && b.PartId == UpdateBarObject.PartId);
-                    if (CheckBarNumber != null)
-                    {
-                        await UpdateBarNumbers(UpdateBarObject.BarNumber, UpdateBarObject.PartId, userId);
-                    }
-
-                    if (UpdateBarObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = UpdateBarObject.BarNumber;
-                    if (UpdateBarObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = UpdateBarObject.RepAfter;
-                    if (UpdateBarObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = UpdateBarObject.RepBefore;
-                    if (UpdateBarObject.House != BarModel.House) BarModel.House = UpdateBarObject.House;
-
-                    this.context.UserId = userId;
-                    Updated = await this.context.TrySaveChangesAsync();
+                    await UpdateBarNumbers(UpdateBarObject.BarNumber, UpdateBarObject.PartId, userId);
                 }
+
+                if (UpdateBarObject.BarNumber != BarModel.BarNumber) BarModel.BarNumber = UpdateBarObject.BarNumber;
+                if (UpdateBarObject.RepAfter != BarModel.RepAfter) BarModel.RepAfter = UpdateBarObject.RepAfter;
+                if (UpdateBarObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = UpdateBarObject.RepBefore;
+                if (UpdateBarObject.House != BarModel.House) BarModel.House = UpdateBarObject.House;
+
+                this.context.UserId = userId;
+                Updated = await this.context.TrySaveChangesAsync();
+            }
 
             return Updated;
         }
