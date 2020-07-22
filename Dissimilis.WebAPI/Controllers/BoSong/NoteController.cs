@@ -23,7 +23,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         #region CRUD Part
         /// <summary>
-        /// Create new Note using NewNoteDTO
+        /// Create note
         /// </summary>
         /// <param name="NewNoteObject"></param>
         /// <returns>201</returns>
@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
         
         /// <summary>
-        /// Get Note by Id
+        /// Get note
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Update note by using NoteDTO
+        /// Update note
         /// </summary>
         /// <param name="NoteObject"></param>
         /// <returns></returns>
@@ -68,7 +68,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Delete a note by Id
+        /// Delete note
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>

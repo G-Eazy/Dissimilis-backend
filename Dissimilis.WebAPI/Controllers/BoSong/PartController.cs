@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD Part
         /// <summary>
-        /// Create new part
+        /// Create part
         /// </summary>
         /// <param name="NewPartObject"></param>
         /// <returns>201</returns>
@@ -44,7 +44,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get part by Id
+        /// Get part
         /// </summary>
         /// <returns>200</returns> 
         [HttpGet("{partId:int:min(1)}")]
@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Update part by using UpdatePartDTO 
+        /// Update part
         /// </summary>
         /// <param name="UpdatePartObject"></param>
         /// <returns>204</returns>
@@ -73,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
         
         /// <summary>
-        /// Delete Part by Id
+        /// Delete part
         /// </summary>
         /// <returns>204</returns> 
         [HttpDelete("{partId:int:min(1)}")]

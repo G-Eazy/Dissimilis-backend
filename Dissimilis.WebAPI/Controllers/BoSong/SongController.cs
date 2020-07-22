@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD Song
         /// <summary>
-        /// Create new song
+        /// Create song
         /// </summary>
         /// <param name="NewSongObject"></param>
         /// <returns>201</returns>
@@ -71,7 +71,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
         
         /// <summary>
-        /// Update song by Id
+        /// Update song
         /// </summary>
         /// <returns>204</returns> 
         [HttpPatch]
@@ -85,7 +85,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Delete song by Id
+        /// Delete song
         /// </summary>
         /// <returns>204</returns> 
         [HttpDelete("{songId:int:min(1)}")]

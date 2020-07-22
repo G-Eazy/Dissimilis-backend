@@ -15,18 +15,21 @@ namespace Dissimilis.WebAPI.DTOs
     
         public DateTime? UpdatedOn { get; set; }
 
-        public PartDTO[] Parts { get; set; }
+        public PartDTO[] Voices { get; set; }
 
         public SongDTO(ISong song)
         {
-            if (song is null)
+            if (song != null && song.Arranger != null)
+            { 
+                this.Id = song.Id;
+                base.Title = song.Title;
+                this.ArrangerName = song.Arranger.Name;
+                this.UpdatedOn = song.UpdatedOn;
+                base.TimeSignature = song.TimeSignature;
+            }
+            else
                 throw new ArgumentNullException(nameof(song));
 
-            this.Id = song.Id;
-            base.Title = song.Title;
-            this.ArrangerName = song.Arranger.Name;
-            this.UpdatedOn = song.UpdatedOn;
-            base.TimeSignature = song.TimeSignature;
         }
     }
 }

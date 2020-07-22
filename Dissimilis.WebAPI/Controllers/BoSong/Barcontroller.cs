@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD bar
         /// <summary>
-        /// Create new Bar.
+        /// Create bar
         /// </summary>
         /// <param name="BarObject"></param>
         /// <returns>201</returns>
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get Bar by Id.
+        /// Get bar
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Update the bar, taking in only the bar params
+        /// Update bar
         /// </summary>
         /// <param name="BarObject"></param>
         /// <returns>201</returns>
@@ -73,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Delete a bar
+        /// Delete bar
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
