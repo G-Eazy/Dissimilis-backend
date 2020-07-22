@@ -149,24 +149,48 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Get all the parts belonging to this song
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <returns></returns>
         public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
             //get all parts belonging to this songid, decending by partnumber
-            int[] AllParts = this.context.Parts
+            var AllParts = this.context.Parts
                 .Where(x => x.SongId == songId)
                 .OrderBy(x => x.PartNumber)
-                .Select(x => x.Id)
+                .Include(p => p.Instrument)
+                .Select(p => new PartDTO(p))
                 .ToArray();
 
-            PartDTO[] AllPartsDTO = new PartDTO[AllParts.Length];
+            var PartIds = AllParts.Select(x => x.Id);
 
-            for(int i = 0; i < AllParts.Length; i++)
+            BarDTO[] AllBars = this.context.Bars
+                .Where(b => PartIds.Contains(b.PartId))
+                .OrderBy(b => b.BarNumber)
+                .Select(b => new BarDTO(b))
+                .ToArray();
+
+            var BarIds = AllBars.Select(x => x.Id);
+
+            var AllNotes = this.context.Notes
+                .Where(n => BarIds.Contains(n.BarId))
+                .OrderBy(n => n.NoteNumber)
+                .Select(n => new NoteDTO(n))
+                .ToArray();
+
+            foreach (var bar in AllBars)
             {
-                AllPartsDTO[i] = await this.partRepository.GetPart(AllParts[i]);
+                bar.Notes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
             }
-            
-            return AllPartsDTO;
-                
+
+            foreach (var part in AllParts)
+            {
+                part.Bars = AllBars.Where(x => x.PartId == part.Id).ToArray();
+            }
+
+            return AllParts;
         }
     }
 }
