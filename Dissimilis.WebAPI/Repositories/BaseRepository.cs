@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Web.Http.Validation;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -66,6 +67,13 @@ namespace Dissimilis.WebAPI.Repositories
             }
             
             return true;
-        } 
+        }
+
+        public static bool IsValidDTO<T, TValidator>(T dto)
+            where TValidator : class, IValidator<T>, new()
+        {
+            return new TValidator().IsValid(dto);
+        }
     }
+
 }
