@@ -98,15 +98,10 @@ namespace Dissimilis.WebAPI
                 c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHttpsRedirection();
-            }
+            app.UseDeveloperExceptionPage();
 
+            app.UseHttpsRedirection();
+            
             app.UseSwagger();
 
             app.UseSwaggerUI(c => 
