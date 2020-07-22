@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public abstract class SuperDTO
+    public interface IDTO
     {
     }
 }
