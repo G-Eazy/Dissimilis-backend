@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/bars")]
+    [Route("api/bar")]
     [ApiController]
     public class BarController : UserControllerBase
     {
@@ -37,9 +37,9 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.CreateBar(BarObject, base.UserID);
             if (result != 0)
-                return base.Created($"api/bars?barId={result}", $"{result}");
+                return base.Created($"api/bar/{result}", $"{result}");
 
-            return base.BadRequest("Couldn't create the bar");
+            return base.BadRequest("Unable to create Bar");
         }
 
         /// <summary>
@@ -47,14 +47,14 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpGet]
-        public async Task<IActionResult> GetBar([FromQuery]int barId)
+        [HttpGet("{barId:int:min(1)}")]
+        public async Task<IActionResult> GetBar(int barId)
         {
             var result = await repository.GetBar(barId);
             if (result != null)
                 return base.Ok(result);
 
-            return base.BadRequest("No bar by that id");
+            return base.NotFound();
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Controllers
             if (result)
                 return base.NoContent();
 
-            return base.BadRequest("Something went wrong updating the bar");
+            return base.BadRequest("Unable to update bar");
         }
 
         /// <summary>

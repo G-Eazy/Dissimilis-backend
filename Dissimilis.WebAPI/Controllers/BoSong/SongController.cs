@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/songs")]
+    [Route("api/song")]
     [ApiController]
     public class SongController : UserControllerBase
     {
@@ -28,17 +28,32 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD Song
         /// <summary>
+        /// Create new song
+        /// </summary>
+        /// <param name="NewSongObject"></param>
+        /// <returns>201</returns>
+        [HttpPost]
+        public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
+        {
+            var result = await repository.CreateSong(NewSongObject, base.UserID);
+            if (result != 0)
+                return base.Created($"api/song/{result}", $"{result}");
+            else
+                return base.BadRequest("Unable to create Song");
+        }
+
+        /// <summary>
         /// Get song by Id
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet]
-        public async Task<IActionResult> GetSongById([FromQuery] int songId)
+        [HttpGet("{songId:int:min(1)}")]
+        public async Task<IActionResult> GetSongById(int songId)
         {
             var SongObject = await repository.GetSongById(songId);
             if (SongObject != null)
                 return base.Ok(SongObject);
             else
-                return base.BadRequest("No song by that Id");
+                return base.NotFound();
         }
 
         /// <summary>
@@ -52,23 +67,7 @@ namespace Dissimilis.WebAPI.Controllers
             if (SongDTOArray.Count() != 0)
                 return base.Ok(SongDTOArray);
 
-            return base.BadRequest("No arranger by that Id");
-        }
-
-
-        /// <summary>
-        /// Create new song
-        /// </summary>
-        /// <param name="NewSongObject"></param>
-        /// <returns>201</returns>
-        [HttpPost]
-        public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
-        {
-            var result = await repository.CreateSong(NewSongObject, base.UserID);
-            if (result != 0)
-                return base.Created($"api/songs?songId={result}", $"{result}"); 
-            else
-                return base.BadRequest("Error");
+            return base.NoContent();
         }
         
         /// <summary>
@@ -82,21 +81,21 @@ namespace Dissimilis.WebAPI.Controllers
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to update Song");
         }
 
         /// <summary>
         /// Delete song by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteSong([FromQuery] int songId)
+        [HttpDelete("{songId:int:min(1)}")]
+        public async Task<IActionResult> DeleteSong(int songId)
         {
             bool result = await repository.DeleteSong(songId, base.UserID);
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to delete Song");
         }
         #endregion
 

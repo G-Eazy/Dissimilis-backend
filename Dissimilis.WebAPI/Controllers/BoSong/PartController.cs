@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/parts")]
+    [Route("api/part")]
     [ApiController]
     public class PartController : UserControllerBase
     {
@@ -27,22 +27,6 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         #region CRUD Part
-
-        /// <summary>
-        /// Get part by Id
-        /// </summary>
-        /// <returns>200</returns> 
-        [HttpGet]
-        public async Task<IActionResult> GetPart([FromQuery] int partId)
-        {
-            var PartObject = await repository.GetPart(partId);
-            if (PartObject != null)
-                return base.Ok(PartObject);
-            else
-                return base.BadRequest("No song (or part) by that Id"); 
-        }
-
-
         /// <summary>
         /// Create new part
         /// </summary>
@@ -54,9 +38,23 @@ namespace Dissimilis.WebAPI.Controllers
             var result = await repository.CreatePart(NewPartObject, base.UserID);
 
             if (result != 0)
-                return base.Created($"api/parts?partId={result}", $"{result}"); 
+                return base.Created($"api/part/{result}", $"{result}"); 
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to create Part");
+        }
+
+        /// <summary>
+        /// Get part by Id
+        /// </summary>
+        /// <returns>200</returns> 
+        [HttpGet("{partId:int:min(1)}")]
+        public async Task<IActionResult> GetPart(int partId)
+        {
+            var PartObject = await repository.GetPart(partId);
+            if (PartObject != null)
+                return base.Ok(PartObject);
+            else
+                return base.NotFound();
         }
 
         /// <summary>
@@ -71,22 +69,21 @@ namespace Dissimilis.WebAPI.Controllers
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song (or part) by that Id");
+                return base.BadRequest("Unable to update Part");
         }
-
         
         /// <summary>
         /// Delete Part by Id
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete]
-        public async Task<IActionResult> DeletePart([FromQuery] int partId)
+        [HttpDelete("{partId:int:min(1)}")]
+        public async Task<IActionResult> DeletePart(int partId)
         {
             bool result = await repository.DeletePart(partId, base.UserID);
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song (or part) by that Id");
+                return base.BadRequest("Unable to delete Part");
         }
 
         

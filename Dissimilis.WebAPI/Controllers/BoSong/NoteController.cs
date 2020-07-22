@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-    [Route("api/notes")]
+    [Route("api/note")]
     [ApiController]
     public class NoteController : UserControllerBase
     {
@@ -22,22 +22,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         #region CRUD Part
-
-        /// <summary>
-        /// Get Note by Id
-        /// </summary>
-        /// <param name="noteId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<IActionResult> GetNote([FromQuery] int noteId)
-        {
-            var NoteObject = await repository.GetNote(noteId);
-            if (NoteObject != null)
-                return base.Ok(NoteObject);
-            else
-                return base.BadRequest("There was no note with this ID");
-        }
-
         /// <summary>
         /// Create new Note using NewNoteDTO
         /// </summary>
@@ -48,9 +32,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var result = await repository.CreateNote(NewNoteObject, base.UserID);
             if (result != 0)
-                return base.Created($"api/notes?noteId={result}", $"{result}");
+                return base.Created($"api/note/{result}", $"{result}");
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to create Note");
+        }
+        
+        /// <summary>
+        /// Get Note by Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        [HttpGet("{noteId:int:min(1)}")]
+        public async Task<IActionResult> GetNote(int noteId)
+        {
+            var NoteObject = await repository.GetNote(noteId);
+            if (NoteObject != null)
+                return base.Ok(NoteObject);
+            else
+                return base.NotFound();
         }
 
         /// <summary>
@@ -65,23 +64,22 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             if (result)
                 return base.NoContent();
 
-            return base.BadRequest("No song by that Id");
+            return base.BadRequest("Unable to update Note");
         }
-
 
         /// <summary>
         /// Delete a note by Id
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>
-        [HttpDelete]
-        public async Task<IActionResult> DeleteNote([FromQuery]int noteId)
+        [HttpDelete("{noteId:int:min(1)}")]
+        public async Task<IActionResult> DeleteNote(int noteId)
         {
-            var respone = await repository.DeleteNote(noteId, base.UserID);
-            if(respone != false)
+            var result = await repository.DeleteNote(noteId, base.UserID);
+            if(result)
                 return base.NoContent();
 
-            return base.BadRequest("No note was deleted");
+            return base.BadRequest("Unable to delete Note");
         }
 
         #endregion
