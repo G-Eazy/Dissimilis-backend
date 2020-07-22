@@ -21,8 +21,9 @@ namespace Dissimilis.WebAPI.Repositories.Validators
 
             foreach(PropertyInfo p in properties)
             {
-                if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
-                    return false;
+                if (p.PropertyType == typeof(string))
+                    if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
+                        return false;
             }
             
             return true;
