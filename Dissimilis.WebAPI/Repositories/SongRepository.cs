@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (SongModelObject is null) return null;
 
             SongDTO SongObject = new SongDTO(SongModelObject);
-            SongObject.Parts = await GetAllPartsForSong(SongModelObject.Id);
+            SongObject.Voices = await GetAllPartsForSong(SongModelObject.Id);
 
             return SongObject;
         }
