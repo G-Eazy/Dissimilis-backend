@@ -13,14 +13,17 @@ namespace Dissimilis.WebAPI.DTOs
 
         public BarDTO() { }
 
-        public BarDTO(int id, int partId, byte barnumber, bool repAfter, bool repBefore, byte house)
+        public BarDTO(IBar bar)
         {
-            this.Id = id;
-            base.PartId = partId;
-            base.BarNumber = barnumber;
-            base.RepAfter = repAfter;
-            base.RepBefore = repBefore;
-            base.House = house;
+            if (bar is null)
+                throw new ArgumentNullException(nameof(bar));
+
+            this.Id = bar.Id;
+            base.PartId = bar.PartId;
+            base.BarNumber = bar.BarNumber;
+            base.RepBefore = bar.RepBefore;
+            base.RepAfter = bar.RepAfter;
+            base.House = bar.House;
         }
     }
 }

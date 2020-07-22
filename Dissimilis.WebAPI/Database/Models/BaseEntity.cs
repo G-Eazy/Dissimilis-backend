@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// or additions to other entities, by updated the time created/updated
     /// and who created/updated
     /// </summary>
-    public abstract class BaseEntity
+    public abstract class BaseEntity : IBaseEntity
     {
 
         /// <summary>

@@ -12,13 +12,16 @@ namespace Dissimilis.WebAPI.DTOs
         
         public NoteDTO() { }
 
-        public NoteDTO(int id, int barid, byte notenumber, byte length, string[] values)
+        public NoteDTO(INote note)
         {
-            this.Id = id;
-            base.BarId = barid;
-            base.NoteNumber = notenumber;
-            base.Length = length;
-            base.NoteValues = values;
+            if (note is null)
+                throw new ArgumentNullException(nameof(note));
+
+            this.Id = note.Id;
+            base.BarId = note.BarId;
+            base.NoteNumber = note.NoteNumber;
+            base.Length = note.Length;
+            base.NoteValues = note.NoteValues;
         }
     }
 }

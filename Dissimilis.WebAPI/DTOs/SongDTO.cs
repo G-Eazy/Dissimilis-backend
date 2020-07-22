@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Database.Models;
+﻿using Dissimilis.WebAPI.Database.Interfaces;
+using Dissimilis.WebAPI.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,11 @@ namespace Dissimilis.WebAPI.DTOs
 
         public PartDTO[] Parts { get; set; }
 
-        public SongDTO(Song song)
+        public SongDTO(ISong song)
         {
+            if (song is null)
+                throw new ArgumentNullException(nameof(song));
+
             this.Id = song.Id;
             base.Title = song.Title;
             this.ArrangerName = song.Arranger.Name;

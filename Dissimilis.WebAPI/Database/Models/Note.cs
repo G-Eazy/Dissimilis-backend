@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// <summary>
     /// This is the Note, which is associated with a Bar (norsk: Takt)
     /// </summary>
-    public class Note : BaseEntity
+    public class Note : BaseEntity, INote
     {
         /// <summary>
         /// The id of this Note
@@ -46,6 +46,6 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// Empty constructor for Note
         /// </summary>
-        public Note () { }
+        public Note() { }
     }
 }

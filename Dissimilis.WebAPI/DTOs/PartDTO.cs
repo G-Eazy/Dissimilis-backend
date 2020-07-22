@@ -13,20 +13,15 @@ namespace Dissimilis.WebAPI.DTOs
 
         public PartDTO() { }
 
-        public PartDTO(Part existingPart)
+        public PartDTO(IPart part)
         {
-            this.Id = existingPart.Id;
-            this.PartNumber = existingPart.PartNumber;
-            this.SongId = existingPart.SongId;
-            this.Title = existingPart.Instrument.Name;
-        }
+            if (part is null)
+                throw new ArgumentNullException(nameof(part));
 
-        public PartDTO(int id, byte partnumber, int songid, string InstrumentName)
-        {
-            this.Id = id;
-            this.PartNumber = partnumber;
-            this.SongId = songid;
-            this.Title = InstrumentName;
+            this.Id = part.Id;
+            this.PartNumber = part.PartNumber;
+            this.SongId = part.SongId;
+            this.Title = part.Instrument.Name;
         }
     }
 }
