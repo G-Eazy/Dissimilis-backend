@@ -4,13 +4,14 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dissimilis.WebAPI.Database.Interfaces;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
     /// <summary>
     /// This is the whole songs, which contains one or more parts 
     /// </summary>
-    public class Song : BaseEntity
+    public class Song : BaseEntity, ISong
     {
         [Key]
         public int Id { get; set; }

@@ -22,6 +22,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// Find or create an organisation depending on the organisaion metadata
         /// </summary>
         /// <param name="metadata"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<Organisation> CreateOrFindOrganisationAsync(OrganizationMetadata metadata, uint userId)
         {
@@ -51,6 +52,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// Create an organisation using the metadata. If its null, use default
         /// </summary>
         /// <param name="metadata"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<Organisation> CreateOrganisationAsync(OrganizationMetadata metadata, uint userId)
         {

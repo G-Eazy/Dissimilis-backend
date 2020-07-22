@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
+    [Route("api/note")]
+    [ApiController]
     public class NoteController : UserControllerBase
     {
         private NoteRepository repository;
@@ -21,22 +23,63 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         #region CRUD Part
         /// <summary>
-        /// Create new Note. The Bar Id must also be provided for the associated Bar
+        /// Create new Note using NewNoteDTO
         /// </summary>
         /// <param name="NewNoteObject"></param>
-        /// <param name="bar_id"></param>
         /// <returns>201</returns>
-        [HttpPost("{song_id:int:min(1)}/parts/{part_id:int:min(1)}/bars/{bar_id:int:min(1)}/notes")]
-        public async Task<IActionResult> CreateNote(int bar_id, [FromBody] NewNoteDTO NewNoteObject)
+        [HttpPost]
+        public async Task<IActionResult> CreateNote([FromBody] NewNoteDTO NewNoteObject)
         {
-            if (bar_id != NewNoteObject.BarId)
-                return base.BadRequest("Url Id must match SongId");
-
-            var result = await repository.CreateNote(NewNoteObject, bar_id, base.UserID);
-            if (result != null)
-                return base.Created($"api/songs/parts/{bar_id}/notes/{result.Id}", "");
+            var result = await repository.CreateNote(NewNoteObject, base.UserID);
+            if (result != 0)
+                return base.Created($"api/note/{result}", $"{result}");
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to create Note");
+        }
+        
+        /// <summary>
+        /// Get Note by Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        [HttpGet("{noteId:int:min(1)}")]
+        public async Task<IActionResult> GetNote(int noteId)
+        {
+            var NoteObject = await repository.GetNote(noteId);
+            if (NoteObject != null)
+                return base.Ok(NoteObject);
+            else
+                return base.NotFound();
+        }
+
+        /// <summary>
+        /// Update note by using NoteDTO
+        /// </summary>
+        /// <param name="NoteObject"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteDTO NoteObject)
+        {
+            var result = await repository.UpdateNote(NoteObject, base.UserID);
+            if (result)
+                return base.NoContent();
+
+            return base.BadRequest("Unable to update Note");
+        }
+
+        /// <summary>
+        /// Delete a note by Id
+        /// </summary>
+        /// <param name="noteId"></param>
+        /// <returns></returns>
+        [HttpDelete("{noteId:int:min(1)}")]
+        public async Task<IActionResult> DeleteNote(int noteId)
+        {
+            var result = await repository.DeleteNote(noteId, base.UserID);
+            if(result)
+                return base.NoContent();
+
+            return base.BadRequest("Unable to delete Note");
         }
 
         #endregion

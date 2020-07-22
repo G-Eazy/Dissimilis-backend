@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/songs")]
+    [Route("api/song")]
     [ApiController]
     public class SongController : UserControllerBase
     {
@@ -28,37 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD Song
         /// <summary>
-        /// Get song by Id
-        /// </summary>
-        /// <returns>200</returns> 
-        [HttpGet("{Id:int:min(1)}")]
-        public async Task<IActionResult> GetSongById(int Id)
-        {
-            var SuperObject = new SuperDTO(Id);
-            var SongObject = await repository.GetSongById(SuperObject);
-            if (SongObject != null)
-                return base.Ok(SongObject);
-            else
-                return base.BadRequest("No song by that Id");
-        }
-
-        /// <summary>
-        /// Fetch songs that contain {Title} and/or from Arranger {ArrangerId} in the database. Limit output to {Num} songs. Set {OrderByDateTime} to true for ordering.
-        /// </summary>
-        /// <returns>200</returns>
-        [HttpGet("search")]
-        public async Task<ActionResult<SongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
-        {
-            var SongDTOArray = await repository.SearchSongs(SongQueryObject);
-            if (SongDTOArray.Length == 0)
-                return base.BadRequest("No arranger by that Id");
-            else
-                return base.Ok(SongDTOArray);
-        }
-
-
-        /// <summary>
-        /// Create new song. Arranger must be id of somebody in DB, see all users below.
+        /// Create new song
         /// </summary>
         /// <param name="NewSongObject"></param>
         /// <returns>201</returns>
@@ -66,42 +36,66 @@ namespace Dissimilis.WebAPI.Controllers
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
             var result = await repository.CreateSong(NewSongObject, base.UserID);
-            if (result != null)
-                return base.Created($"api/songs/{result.Id}", ""); // Add result.Id as second param if frontend wants it in body
+            if (result != 0)
+                return base.Created($"api/song/{result}", $"{result}");
             else
-                return base.BadRequest("No arranger by that Id");
+                return base.BadRequest("Unable to create Song");
+        }
+
+        /// <summary>
+        /// Get song by Id
+        /// </summary>
+        /// <returns>200</returns> 
+        [HttpGet("{songId:int:min(1)}")]
+        public async Task<IActionResult> GetSongById(int songId)
+        {
+            var SongObject = await repository.GetSongById(songId);
+            if (SongObject != null)
+                return base.Ok(SongObject);
+            else
+                return base.NotFound();
+        }
+
+        /// <summary>
+        /// Search songs with optional filters
+        /// </summary>
+        /// <returns>200</returns>
+        [HttpGet("search")]
+        public async Task<ActionResult<UpdateSongDTO[]>> Search([FromQuery] SongQueryDTO SongQueryObject)
+        {
+            var SongDTOArray = await repository.SearchSongs(SongQueryObject);
+            if (SongDTOArray.Count() != 0)
+                return base.Ok(SongDTOArray);
+
+            return base.NoContent();
         }
         
         /// <summary>
         /// Update song by Id
         /// </summary>
-        /// <returns>200</returns> 
-        [HttpPatch("{Id:int:min(1)}")]
-        public async Task<IActionResult> UpdateSong(int Id, [FromBody] UpdateSongDTO UpdateSongObject)
+        /// <returns>204</returns> 
+        [HttpPatch]
+        public async Task<IActionResult> UpdateSong([FromBody] UpdateSongDTO UpdateSongObject)
         {
-            if (Id != UpdateSongObject.Id)
-                return base.BadRequest("Url Id must match SongId");
-
             bool result = await repository.UpdateSong(UpdateSongObject, base.UserID);
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to update Song");
         }
 
         /// <summary>
         /// Delete song by Id
         /// </summary>
-        /// <returns>200</returns> 
-        [HttpDelete("{Id:int:min(1)}")]
-        public async Task<IActionResult> DeleteSong(int Id)
+        /// <returns>204</returns> 
+        [HttpDelete("{songId:int:min(1)}")]
+        public async Task<IActionResult> DeleteSong(int songId)
         {
-            var DeleteSongObject = new SuperDTO(Id);
-            bool result = await repository.DeleteSong(DeleteSongObject, (int)base.UserID);
+            bool result = await repository.DeleteSong(songId, base.UserID);
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("No song by that Id");
+                return base.BadRequest("Unable to delete Song");
         }
         #endregion
 

@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// <summary>
     /// This is a part, which is associated with a Song and contains bars
     /// </summary>
-    public class Part : BaseEntity
+    public class Part : BaseEntity, IPart
     {
         [Key]
         public int Id { get; set; }
@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Database.Models
         public int SongId { get; set; }
 
         /// <summary>
-        /// A string containing name of instrument(should be it's own entity)
+        /// The instrument entity of this Part
         /// </summary>
         public Instrument Instrument { get; set; }
 

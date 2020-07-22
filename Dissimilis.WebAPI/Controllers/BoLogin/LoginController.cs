@@ -29,7 +29,6 @@ namespace Dissimilis.WebAPI.Controllers
         {
             //Find the webuser in the db
             User webUser = Task.Run(() => this._repository.CreateOrFindUser(user, graph_api)).Result;
-
             //handle error if webuser is null
             if (webUser is null)
             {

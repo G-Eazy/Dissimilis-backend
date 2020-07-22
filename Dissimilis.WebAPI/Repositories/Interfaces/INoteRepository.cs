@@ -9,11 +9,10 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
 {
     interface INoteRepository
     {
-        Task<NoteDTO> CreateNote(NewNoteDTO note, int barId, uint userId);
-        Task<Note> FindNoteById(int Id);
-        Task<bool> UpdateNote(NoteDTO noteObject, int BarId, uint userId);
-        Task<bool> DeleteNote(NoteDTO noteObject);
-        bool ValidateUser(int userId, Song bar);
+        Task<int> CreateNote(NewNoteDTO note, uint userId);
+        Task<NoteDTO> GetNote(int Id);
+        Task<bool> UpdateNote(UpdateNoteDTO noteObject, uint userId);
+        Task<bool> DeleteNote(int note_id, uint userId);
 
     }
 }

@@ -6,12 +6,22 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class NoteDTO
+    public class NoteDTO : NewNoteDTO
     {
         public int Id { get; set; }
-        public int BarId { get; set; }
-        public byte NoteNumber { get; set; }
-        public byte Length { get; set; }
-        public string[] NoteValues { get; set; }
+        
+        public NoteDTO() { }
+
+        public NoteDTO(INote note)
+        {
+            if (note is null)
+                throw new ArgumentNullException(nameof(note));
+
+            this.Id = note.Id;
+            base.BarId = note.BarId;
+            base.NoteNumber = note.NoteNumber;
+            base.Length = note.Length;
+            base.NoteValues = note.NoteValues;
+        }
     }
 }

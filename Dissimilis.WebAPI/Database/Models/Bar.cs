@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Database.Models
     /// <summary>
     /// This is the bar, which is associated with a Part (norsk: Stemme)
     /// </summary>
-    public class Bar : BaseEntity
+    public class Bar : BaseEntity, IBar
     {
         /// <summary>
         /// The id of this bar
@@ -34,9 +34,24 @@ namespace Dissimilis.WebAPI.Database.Models
         public byte BarNumber { get; set; }
 
         /// <summary>
+        /// Is there a repetion sign before the bar 
+        /// </summary>
+        public bool RepBefore { get; set; }
+
+        /// <summary>
+        /// Is there a repetion sign after the bar
+        /// </summary>
+        public bool RepAfter { get; set; }
+
+        /// <summary>
+        /// if 0, there is no house. otherwise it should follow an order
+        /// </summary>
+        public byte House { get; set; }
+
+        /// <summary>
         /// Empty constructor for Bar
         /// </summary>
-        public Bar () { }
+        public Bar() { }
 
         public Bar(byte barNumber, int partId)
         {
