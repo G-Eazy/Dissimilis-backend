@@ -15,7 +15,7 @@ using Experis.Ciber.Web.API.Controllers;
 
 namespace Dissimilis.WebAPI.Controllers
 {
-    [Route("api/part")]
+    [Route("api/voice")]
     [ApiController]
     public class PartController : UserControllerBase
     {
@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers
 
         #region CRUD Part
         /// <summary>
-        /// Create part
+        /// Create voice
         /// </summary>
         /// <param name="NewPartObject"></param>
         /// <returns>201</returns>
@@ -38,19 +38,19 @@ namespace Dissimilis.WebAPI.Controllers
             var result = await repository.CreatePart(NewPartObject, base.UserID);
 
             if (result != 0)
-                return base.Created($"api/part/{result}", $"{result}"); 
+                return base.Created($"api/voice/{result}", $"{result}"); 
             else
-                return base.BadRequest("Unable to create Part");
+                return base.BadRequest("Unable to create voice");
         }
 
         /// <summary>
-        /// Get part
+        /// Get voice
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet("{partId:int:min(1)}")]
-        public async Task<IActionResult> GetPart(int partId)
+        [HttpGet("{voiceId:int:min(1)}")]
+        public async Task<IActionResult> GetPart(int voiceId)
         {
-            var PartObject = await repository.GetPart(partId);
+            var PartObject = await repository.GetPart(voiceId);
             if (PartObject != null)
                 return base.Ok(PartObject);
             else
@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Update part
+        /// Update voice
         /// </summary>
         /// <param name="UpdatePartObject"></param>
         /// <returns>204</returns>
@@ -69,21 +69,21 @@ namespace Dissimilis.WebAPI.Controllers
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("Unable to update Part");
+                return base.BadRequest("Unable to update Voice");
         }
         
         /// <summary>
         /// Delete part
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete("{partId:int:min(1)}")]
-        public async Task<IActionResult> DeletePart(int partId)
+        [HttpDelete("{voiceId:int:min(1)}")]
+        public async Task<IActionResult> DeletePart(int voiceId)
         {
-            bool result = await repository.DeletePart(partId, base.UserID);
+            bool result = await repository.DeletePart(voiceId, base.UserID);
             if (result)
                 return base.NoContent();
             else
-                return base.BadRequest("Unable to delete Part");
+                return base.BadRequest("Unable to delete Voice");
         }
 
         

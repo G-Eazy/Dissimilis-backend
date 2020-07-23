@@ -9,7 +9,6 @@ namespace Dissimilis.WebAPI.DTOs
     public class PartDTO : NewPartDTO
     {
         public int Id { get; set; }
-        public BarDTO[] Bars { get; set; }
 
         public PartDTO() { }
 

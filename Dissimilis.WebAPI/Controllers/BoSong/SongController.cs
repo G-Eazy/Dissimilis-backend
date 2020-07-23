@@ -20,7 +20,7 @@ namespace Dissimilis.WebAPI.Controllers
     public class SongController : UserControllerBase
     {
         private SongRepository repository;
-        
+
         public SongController(DissimilisDbContext context)
         {
             this.repository = new SongRepository(context);
@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Controllers
 
             return base.NoContent();
         }
-        
+
         /// <summary>
         /// Update song
         /// </summary>
@@ -82,6 +82,21 @@ namespace Dissimilis.WebAPI.Controllers
                 return base.NoContent();
             else
                 return base.BadRequest("Unable to update Song");
+        }
+
+        /// <summary>
+        /// Create a song from scratch, with all associated parts etc
+        /// </summary>
+        /// <param name="songObject"></param>
+        /// <returns></returns>
+        [HttpPost("{songId:int:min(0)}")]
+        public async Task<IActionResult> CreateWholeSong ([FromBody] NewSongDTO songObject, int songId)
+        {
+            int result = await this.repository.CreateFullSong(songObject, base.UserID, songId);
+            if(result != 0)
+                return base.Created($"api/song/{result}", $"{result}");
+
+            return base.BadRequest("Unable to create Song");
         }
 
         /// <summary>

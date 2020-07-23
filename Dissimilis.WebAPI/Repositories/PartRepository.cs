@@ -92,6 +92,28 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
+        /// Create all parts in a NewPartDTO array
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <param name="PartObjects"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAllParts (int songId, NewPartDTO[] PartObjects, uint userId)
+        {
+            if (PartObjects.Count() == 0) return false;
+            if (songId <= 0) return false;
+
+            foreach(NewPartDTO part in PartObjects)
+            {
+                part.SongId = songId;
+                int partId = await CreatePart(part, userId);
+                if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId)) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Update the Part Numbers
         /// </summary>
         /// <param name="partNumber"></param>

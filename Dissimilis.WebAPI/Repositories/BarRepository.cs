@@ -66,6 +66,29 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="partId"></param>
+        /// <param name="barObjects"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAllBars(int partId, NewBarDTO[] barObjects, uint userId)
+        {
+            if (partId is 0) return false;
+            if (barObjects.Count() == 0) return false;
+
+            foreach (NewBarDTO bar in barObjects)
+            {
+                bar.PartId = partId;
+                int barId = await CreateBar(bar, userId);
+                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.Notes, userId);
+                if (!notesCreated) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Update Bar numbers
         /// </summary>
         /// <param name="barNumber"></param>

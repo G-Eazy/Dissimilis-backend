@@ -11,5 +11,8 @@ namespace Dissimilis.WebAPI.DTOs
         public byte NoteNumber { get; set; }
         public byte Length { get; set; }
         public string[] NoteValues { get; set; }
+
+        public NewNoteDTO() { }
+
     }
 }

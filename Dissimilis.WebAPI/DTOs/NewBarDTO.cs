@@ -13,5 +13,9 @@ namespace Dissimilis.WebAPI.DTOs
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
         public byte House { get; set; }
+        public NewNoteDTO[] Notes { get; set; }
+
+        public NewBarDTO() { }
+
     }
 }
