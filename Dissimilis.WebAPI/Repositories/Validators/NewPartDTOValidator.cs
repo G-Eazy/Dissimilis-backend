@@ -13,9 +13,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
 
         public bool IsValid(NewPartDTO obj)
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
+            if (obj is null) return false;
             if (obj.SongId <= 0) return false;
             if (string.IsNullOrWhiteSpace(obj.Title)) return false;
             if (obj.PartNumber <= 0) return false;

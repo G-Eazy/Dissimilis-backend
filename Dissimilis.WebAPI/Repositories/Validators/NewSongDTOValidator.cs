@@ -13,9 +13,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
 
         public bool IsValid(NewSongDTO obj)
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
+            if (obj is null) return false;
             if (string.IsNullOrWhiteSpace(obj.Title)) return false;
             if (string.IsNullOrWhiteSpace(obj.TimeSignature)) return false;
             

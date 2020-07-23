@@ -13,9 +13,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
 
         public bool IsValid(NewNoteDTO obj)
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
+            if (obj is null) return false;
             if (obj.BarId <= 0) return false;
             if (obj.NoteNumber <= 0) return false;
             if (obj.Length < 0) return false;

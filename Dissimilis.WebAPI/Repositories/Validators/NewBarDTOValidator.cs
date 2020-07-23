@@ -13,9 +13,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
 
         public bool IsValid(NewBarDTO obj)
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
+            if (obj is null) return false;
             if (obj.BarNumber <= 0) return false;
             if (obj.PartId <= 0) return false;
             if (obj.House < 0) return false;
