@@ -107,8 +107,8 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 part.SongId = songId;
                 int partId = await CreatePart(part, userId);
-                if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId)) 
-                    throw new ArgumentException("There was a problem creating a Bar in this part");
+                if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
+                    return false;
             }
 
             return true;

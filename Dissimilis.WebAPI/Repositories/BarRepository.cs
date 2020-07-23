@@ -82,7 +82,7 @@ namespace Dissimilis.WebAPI.Repositories
                 bar.PartId = partId;
                 int barId = await CreateBar(bar, userId);
                 bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.Notes, userId);
-                if (!notesCreated) throw new ArgumentException("there was a problem creating notes for this bar: " + barId);
+                if (!notesCreated) return false;
             }
 
             return true;

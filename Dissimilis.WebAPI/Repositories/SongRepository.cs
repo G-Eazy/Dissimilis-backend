@@ -111,7 +111,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         /// <param name="songId"></param>
         /// <returns></returns>
-        public async Task<int> CreateFullSong(UpdateSongDTO songObject, uint userId, int songId)
+        public async Task<int> CreateOrUpdateSong(UpdateSongDTO songObject, uint userId, int songId)
         {
             //Check if song already exists
             if (songId > 0)
@@ -129,13 +129,20 @@ namespace Dissimilis.WebAPI.Repositories
                 foreach (int partId in AllParts)
                 {
                     bool WasDeleted = await this.partRepository.DeletePart(partId, userId);
-                    if (!WasDeleted) throw new ArgumentException("There was a problem deleting a part");
+                    if (!WasDeleted) return 0;
                 }
             }
 
             bool partCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
-                        
-            return songId;
+            
+            if (partCreated) return songId;
+            else
+            {
+                var AllParts = this.context.Parts.Where(p => p.SongId == songId).Select(p => p.Id).ToArray();
+                foreach (int partId in AllParts)
+                    await this.partRepository.DeletePart(partId, userId);
+                    return 0;
+            }
         }
 
 
