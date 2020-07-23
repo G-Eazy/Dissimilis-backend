@@ -30,45 +30,13 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Check if properties in DTOs are not default values
+        /// Generic function that has multiple implementations
+        /// Checks for default and invalid incoming DTO property values
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool CheckProperties(IDTO obj)
-        {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
-            Type t = obj.GetType();
-            var properties = t.GetProperties();
-
-            foreach(PropertyInfo p in properties)
-            {
-                if (p.PropertyType == typeof(string))
-                {
-                    if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
-                        return false;
-                }
-                else if(p.PropertyType == typeof(int))
-                {
-                    if ((int)p.GetValue(obj) <= 0)
-                        return false;
-                }
-                else if(p.PropertyType == typeof(byte))
-                {
-                    if ((byte)p.GetValue(obj) <= 0 && p.Name.ToLower() != "house")
-                        return false;
-                }
-                else if (p.PropertyType.IsArray)
-                {
-                    if (string.IsNullOrWhiteSpace(p.GetValue(obj).ToString()))
-                        return false;
-                }
-            }
-            
-            return true;
-        }
-
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TValidator"></typeparam>
+        /// <param name="dto"></param>
+        /// <returns>bool</returns>
         public static bool IsValidDTO<T, TValidator>(T dto)
             where TValidator : class, IValidator<T>, new()
         {
