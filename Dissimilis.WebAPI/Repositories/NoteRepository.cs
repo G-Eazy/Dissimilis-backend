@@ -77,7 +77,7 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 note.BarId = barId;
                 int NoteCreated = await CreateNote(note, userId);
-                if (NoteCreated == 0) return false;
+                if (NoteCreated == 0) throw new ArgumentException("There was a problem creating the note");
             }
 
             return true;

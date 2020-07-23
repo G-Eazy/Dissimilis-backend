@@ -90,7 +90,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// <param name="songObject"></param>
         /// <returns></returns>
         [HttpPost("{songId:int:min(0)}")]
-        public async Task<IActionResult> CreateWholeSong ([FromBody] NewSongDTO songObject, int songId)
+        public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject, int songId)
         {
             int result = await this.repository.CreateFullSong(songObject, base.UserID, songId);
             if(result != 0)

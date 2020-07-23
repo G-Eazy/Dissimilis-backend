@@ -111,25 +111,30 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         /// <param name="songId"></param>
         /// <returns></returns>
-        public async Task<int> CreateFullSong(NewSongDTO songObject, uint userId, int songId)
+        public async Task<int> CreateFullSong(UpdateSongDTO songObject, uint userId, int songId)
         {
             //Check if song already exists
-            if (songId != 0)
+            if (songId > 0)
             {
-                Song songModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
-                if (songModel != null && !await DeleteSong(songModel.Id, userId))
-                    return 0;
+                bool WasUpdated = await UpdateSong(songObject, userId);
+                if (!WasUpdated) return 0;
+                songId = songObject.Id;
+            }
+            else
+                songId = await CreateSong(songObject, userId);
+
+            //Delete all parts for this song
+            {
+                var AllParts = this.context.Parts.Where(p => p.SongId == songId).Select(p => p.Id).ToArray();
+                foreach (int partId in AllParts)
+                {
+                    bool WasDeleted = await this.partRepository.DeletePart(partId, userId);
+                    if (!WasDeleted) throw new ArgumentException("There was a problem deleting a part");
+                }
             }
 
-            //CreateNewSong and get it's new Id
-            songId = await CreateSong(songObject, userId);
             bool partCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
-
-            if (!partCreated) {
-                await DeleteSong(songId, userId);
-                return 0;
-            }
-            
+                        
             return songId;
         }
 
