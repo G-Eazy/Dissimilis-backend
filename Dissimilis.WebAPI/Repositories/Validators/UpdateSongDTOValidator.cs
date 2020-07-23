@@ -15,15 +15,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
         {
             if (! base.IsValid(obj)) return false;
 
-            Type t = obj.GetType();
-            var properties = t.GetProperties();
-
-            foreach (PropertyInfo p in properties)
-            {
-                if (p.PropertyType == typeof(int))
-                    if ((int)p.GetValue(obj) <= 0)
-                        return false;
-            } 
+            if (obj.Id <= 0) return false;
 
             return true;
         }

@@ -16,15 +16,8 @@ namespace Dissimilis.WebAPI.Repositories.Validators
             if (obj is null)
                 throw new ArgumentNullException(nameof(obj));
 
-            Type t = obj.GetType();
-            var properties = t.GetProperties();
-
-            foreach(PropertyInfo p in properties)
-            {
-                if (p.PropertyType == typeof(string))
-                    if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
-                        return false;
-            }
+            if (string.IsNullOrWhiteSpace(obj.Title)) return false;
+            if (string.IsNullOrWhiteSpace(obj.TimeSignature)) return false;
             
             return true;
         }
