@@ -95,12 +95,37 @@ namespace Dissimilis.WebAPI.Repositories
                 ArrangerId = (int)userId,
                 TimeSignature = NewSongObject.TimeSignature
             };
+
             await this.context.Songs.AddAsync(SongModelObject);
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
 
             return SongModelObject.Id;
         }
+
+        public async Task<int> CreateFullSong(NewSongDTO songObject, uint userId, int songId)
+        {
+            //Check if song already exists
+            if (songId != 0)
+            {
+                Song songModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
+                if (songModel != null)
+                    if (!await DeleteSong(songModel.Id, userId))
+                        return 0;
+            }
+
+            //CreateNewSong and get it's new Id
+            songId = await CreateSong(songObject, userId);
+            bool partId = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
+
+            if (partId is false) {
+                await DeleteSong(songId, userId);
+                return 0;
+            }
+            
+            return songId;
+        }
+
 
         /// <summary>
         /// UpdateSong using UpdateSongDTO

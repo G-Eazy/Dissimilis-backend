@@ -56,11 +56,10 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="time_signature"></param>
         /// <param name="creation_time"></param>
 
-        public Song(string title, User creator,
-                    string composer, string time_signature, DateTime creation_time)
+        public Song(string title, int arrangerId, string time_signature)
         {
             this.Title = title;
-            this.Composer = composer;
+            this.ArrangerId = arrangerId;
             this.TimeSignature = time_signature;
         }
     }

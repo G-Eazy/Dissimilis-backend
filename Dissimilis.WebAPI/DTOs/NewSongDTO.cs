@@ -10,6 +10,15 @@ namespace Dissimilis.WebAPI.DTOs
     {
         public string Title { get; set; }
         public string TimeSignature { get; set; }
+        public NewPartDTO[] Voices { get; set; }
 
+
+        public NewSongDTO() { }
+
+        public NewSongDTO(string title, string timesignature)
+        {
+            this.Title = title;
+            this.TimeSignature = timesignature;
+        }
     }
 }

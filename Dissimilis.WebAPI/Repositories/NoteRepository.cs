@@ -67,6 +67,21 @@ namespace Dissimilis.WebAPI.Repositories
             return NoteModel.Id;
         }
 
+        public async Task<bool> CreateAllNotes(int barId, NewNoteDTO[] noteObjects, uint userId)
+        {
+            if (barId is 0) return false;
+            if (noteObjects.Count() == 0) return false;
+
+            foreach(NewNoteDTO note in noteObjects)
+            {
+                note.BarId = barId;
+                int NoteCreated = await CreateNote(note, userId);
+                if (NoteCreated == 0) return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Update note numbers
         /// </summary>

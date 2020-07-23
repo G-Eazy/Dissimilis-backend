@@ -9,7 +9,6 @@ namespace Dissimilis.WebAPI.DTOs
     public class BarDTO : NewBarDTO
     {
         public int Id { get; set; }
-        public NoteDTO[] Notes { get; set; }
 
         public BarDTO() { }
 
