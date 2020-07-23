@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class UserDTO : IDTO
+    public class UserDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

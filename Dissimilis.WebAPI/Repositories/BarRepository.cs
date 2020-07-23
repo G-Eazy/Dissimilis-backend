@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateBar(NewBarDTO NewBarObject, uint userId)
         {
-            if (!CheckProperties(NewBarObject)) return 0;
+            if (! IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return 0;
 
             Bar CheckBarNumber = await this.context.Bars
                 .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
@@ -157,9 +158,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<bool> UpdateBar(UpdateBarDTO UpdateBarObject, uint userId)
         {
-            if (!CheckProperties(UpdateBarObject)) return false;
-
             bool Updated = false;
+
+            if (! IsValidDTO<UpdateBarDTO, UpdateBarDTOValidator>(UpdateBarObject)) return Updated;
             
             Bar BarModel = await this.context.Bars
                 .Include(x => x.Part)

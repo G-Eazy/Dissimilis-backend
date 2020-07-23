@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateNote(NewNoteDTO NewNoteObject, uint userId)
         {
-            if (!CheckProperties(NewNoteObject)) return 0;
+            if (! IsValidDTO<NewNoteDTO, NewNoteDTOValidator>(NewNoteObject)) return 0;
 
             Note CheckNoteNumber = await this.context.Notes
                 .SingleOrDefaultAsync(b => b.NoteNumber == NewNoteObject.NoteNumber 
@@ -113,7 +114,8 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateNote(UpdateNoteDTO UpdateNoteObject, uint userId)
         {
             bool Updated = false;
-            if (!CheckProperties(UpdateNoteObject)) return Updated;
+
+            if (! IsValidDTO<UpdateNoteDTO, UpdateNoteDTOValidator>(UpdateNoteObject)) return Updated;
 
             Note nodeModel = await this.context.Notes.Include(x => x.Bar)
                 .ThenInclude(x => x.Part)
