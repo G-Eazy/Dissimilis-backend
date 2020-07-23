@@ -114,6 +114,17 @@ namespace Dissimilis.WebAPI.Repositories
             return true;
         }
 
+        public async Task<bool> DeleteParts(int songId, uint userId)
+        {
+            var AllParts = this.context.Parts.Where(p => p.SongId == songId);
+            foreach (Part part in AllParts)
+            {
+                this.context.Parts.Remove(part);
+            }
+
+            return await this.context.TrySaveChangesAsync();
+        }
+
         /// <summary>
         /// Update the Part Numbers
         /// </summary>

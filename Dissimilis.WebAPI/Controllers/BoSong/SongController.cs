@@ -92,8 +92,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost("0")]
         public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject)
         {
-            var songId = 0;
-            int result = await this.repository.CreateOrUpdateSong(songObject, base.UserID, songId);
+            int result = await this.repository.CreateFullSong(songObject, base.UserID);
             if(result != 0)
                 return base.Created($"api/song/{result}", $"{result}");
 
@@ -109,7 +108,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPut("{songId:int:min(1)}")]
         public async Task<IActionResult> UpdateWholeSong([FromBody] UpdateSongDTO songObject, int songId)
         {
-            int result = await this.repository.CreateOrUpdateSong(songObject, base.UserID, songId);
+            int result = await this.repository.UpdateSong(songObject, base.UserID, songId);
             if (result != 0)
                 return base.Created($"api/song/{result}", $"{result}");
 
