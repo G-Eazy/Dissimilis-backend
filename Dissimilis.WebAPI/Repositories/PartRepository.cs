@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -56,7 +57,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<int> CreatePart(NewPartDTO NewPartObject, uint userId)
         {
             //Check if values are present in DTO, return 0 if one is missing
-            if (!CheckProperties(NewPartObject)) return 0;
+            if (! IsValidDTO<NewPartDTO, NewPartDTOValidator>(NewPartObject)) return 0;
 
             var ExistsSong = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
@@ -146,7 +147,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdatePart(UpdatePartDTO UpdatePartObject, uint userId)
         {
             bool Updated = false;
-            if (!CheckProperties(UpdatePartObject)) return Updated;
+            if (! IsValidDTO<UpdatePartDTO, UpdatePartDTOValidator>(UpdatePartObject)) return Updated;
 
             var PartModelObject = await this.context.Parts
                 .Include(p => p.Song)

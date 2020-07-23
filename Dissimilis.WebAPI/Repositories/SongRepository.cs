@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -87,7 +88,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
-            if (!CheckProperties(NewSongObject)) return 0;
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return 0;
 
             var SongModelObject = new Song()
             {
@@ -111,8 +112,8 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             bool Updated = false;
-            
-            if (!CheckProperties(UpdateSongObject)) return Updated;
+
+            if (! IsValidDTO<UpdateSongDTO, UpdateSongDTOValidator>(UpdateSongObject)) return Updated;
            
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObject.Id);
 
