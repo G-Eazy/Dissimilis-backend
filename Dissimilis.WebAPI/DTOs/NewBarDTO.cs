@@ -17,13 +17,5 @@ namespace Dissimilis.WebAPI.DTOs
 
         public NewBarDTO() { }
 
-        public NewBarDTO(int partId, byte barNumber, bool repAfter, bool repBefore, byte house)
-        {
-            this.PartId = partId;
-            this.RepBefore = repBefore;
-            this.RepAfter = repAfter;
-            this.BarNumber = barNumber;
-            this.House = house;
-        }
     }
 }

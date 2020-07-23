@@ -104,22 +104,28 @@ namespace Dissimilis.WebAPI.Repositories
             return SongModelObject.Id;
         }
 
+        /// <summary>
+        /// Create a full song with all it's objects
+        /// </summary>
+        /// <param name="songObject"></param>
+        /// <param name="userId"></param>
+        /// <param name="songId"></param>
+        /// <returns></returns>
         public async Task<int> CreateFullSong(NewSongDTO songObject, uint userId, int songId)
         {
             //Check if song already exists
             if (songId != 0)
             {
                 Song songModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
-                if (songModel != null)
-                    if (!await DeleteSong(songModel.Id, userId))
-                        return 0;
+                if (songModel != null && !await DeleteSong(songModel.Id, userId))
+                    return 0;
             }
 
             //CreateNewSong and get it's new Id
             songId = await CreateSong(songObject, userId);
-            bool partId = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
+            bool partCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
 
-            if (partId is false) {
+            if (!partCreated) {
                 await DeleteSong(songId, userId);
                 return 0;
             }

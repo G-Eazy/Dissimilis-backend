@@ -14,12 +14,5 @@ namespace Dissimilis.WebAPI.DTOs
         public NewBarDTO[] Bars { get; set; }
 
         public NewPartDTO() { }
-
-        public NewPartDTO(int songId, string title, byte partNumber) 
-        {
-            this.SongId = songId;
-            this.Title = title;
-            this.PartNumber = partNumber;
-        }
     } 
 }

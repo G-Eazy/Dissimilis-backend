@@ -14,12 +14,5 @@ namespace Dissimilis.WebAPI.DTOs
 
         public NewNoteDTO() { }
 
-        public NewNoteDTO(int barId, byte noteNumber, byte length, string[] noteValues)
-        {
-            this.BarId = barId;
-            this.NoteNumber = NoteNumber;
-            this.Length = length;
-            this.NoteValues = noteValues;
-        } 
     }
 }

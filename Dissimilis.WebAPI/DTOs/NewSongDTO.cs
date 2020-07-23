@@ -15,10 +15,5 @@ namespace Dissimilis.WebAPI.DTOs
 
         public NewSongDTO() { }
 
-        public NewSongDTO(string title, string timesignature)
-        {
-            this.Title = title;
-            this.TimeSignature = timesignature;
-        }
     }
 }
