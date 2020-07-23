@@ -110,22 +110,20 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Get all the notes associated with this bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         private async Task<NoteDTO[]> FindAllNotesForBar(int barId)
         {
-            int[] allNotes = this.context.Notes
-                .Where(x => x.BarId == barId)
-                .OrderBy(x => x.NoteNumber)
-                .Select(x => x.Id)
-                .ToArray();
+            var AllNotes = this.context.Notes
+                           .Where(n => n.BarId == barId)
+                           .OrderBy(n => n.NoteNumber)
+                           .Select(n => new NoteDTO(n))
+                           .ToArray();
 
-            NoteDTO[] NoteDTOArray = new NoteDTO[allNotes.Count()];
-
-            for (int i = 0; i < allNotes.Count(); i++)
-            {
-                NoteDTOArray[i] = await this.noteRepository.GetNote(allNotes[i]);
-            }
-
-            return NoteDTOArray;
+            return AllNotes;
         }
 
         /// <summary>

@@ -138,29 +138,6 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Get all associated bars to partId
-        /// </summary>
-        /// <param name="partId"></param>
-        /// <returns>BarDTOArray</returns>
-        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
-        {
-            int[] AllBars = this.context.Bars
-                .Where(x => x.PartId == partId)
-                .OrderBy(x => x.BarNumber)
-                .Select(x => x.Id)
-                .ToArray();
-
-            BarDTO[] AllBarsDTO = new BarDTO[AllBars.Count()];
-
-            for (int i = 0; i < AllBars.Count(); i++)
-            {
-                AllBarsDTO[i] = await this.barRepository.GetBar(AllBars[i]);
-            }
-
-            return AllBarsDTO;
-        }
-
-        /// <summary>
         /// UpdatePart using UpdatePartDTO
         /// </summary>
         /// <param name="UpdatePartObject"></param>
@@ -201,7 +178,6 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
 
-
         /// <summary>
         /// Delete Part by partId
         /// </summary>
@@ -224,6 +200,36 @@ namespace Dissimilis.WebAPI.Repositories
             }
             
             return Deleted;
+        }
+
+
+        /// <summary>
+        /// Get all associated bars with this part
+        /// </summary>
+        /// <param name="partId"></param>
+        /// <returns>BarDTOArray</returns>
+        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
+        {
+            BarDTO[] AllBars = this.context.Bars
+                .Where(b => b.PartId == partId)
+                .OrderBy(b => b.BarNumber)
+                .Select(b => new BarDTO(b))
+                .ToArray();
+
+            var BarIds = AllBars.Select(x => x.Id);
+
+            var AllNotes = this.context.Notes
+                .Where(n => BarIds.Contains(n.BarId))
+                .OrderBy(n => n.NoteNumber)
+                .Select(n => new NoteDTO(n))
+                .ToArray();
+
+            foreach (var bar in AllBars)
+            {
+                bar.Notes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
+            }
+
+            return AllBars;
         }
     }
 }
