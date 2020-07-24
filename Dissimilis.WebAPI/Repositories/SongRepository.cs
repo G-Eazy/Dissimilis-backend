@@ -110,7 +110,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="NewSongObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<int>> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
+        public async Task<SongDTO> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
         {
             if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
 
@@ -120,6 +120,9 @@ namespace Dissimilis.WebAPI.Repositories
                 ArrangerId = (int)userId,
                 TimeSignature = NewSongObject.TimeSignature
             };
+            await this.context.Songs.AddAsync(SongModelObject);
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
 
             // Creating partiture and linking to Song
             NewPartDTO NewPartObject = new NewPartDTO()
@@ -130,11 +133,8 @@ namespace Dissimilis.WebAPI.Repositories
             };
             var partId = await this.partRepository.CreatePart(NewPartObject, userId);
 
-            await this.context.Songs.AddAsync(SongModelObject);
-            this.context.UserId = userId;
-            await this.context.SaveChangesAsync();
-
-            return new List<int> { SongModelObject.Id, partId };
+            // Sending Song with first Part back as request body
+            return await GetSongById(SongModelObject.Id);
         }
 
         /// <summary>

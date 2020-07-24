@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.CreateSongWithPart(NewSongObject, base.UserID);
             if (result != null)
-                return base.Created($"api/song/{result.First() }", $"{string.Join(",", result)}");
+                return base.Created($"api/song/{result.Id}?voice={result.Voices.First().PartNumber}", result);
             else
                 return base.BadRequest("Unable to create Song");
         }
