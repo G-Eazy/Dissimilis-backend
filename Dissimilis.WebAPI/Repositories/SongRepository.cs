@@ -79,7 +79,7 @@ namespace Dissimilis.WebAPI.Repositories
             return SongDTOArray;
         
         }
-
+        
         /// <summary>
         /// Create song using NewSongDTO
         /// </summary>
@@ -105,6 +105,39 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
+        /// Create song using NewSongDTO with an empty first part
+        /// </summary>
+        /// <param name="NewSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<List<int>> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
+        {
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
+
+            var SongModelObject = new Song()
+            {
+                Title = NewSongObject.Title,
+                ArrangerId = (int)userId,
+                TimeSignature = NewSongObject.TimeSignature
+            };
+
+            // Creating partiture and linking to Song
+            NewPartDTO NewPartObject = new NewPartDTO()
+            {
+                SongId = SongModelObject.Id,
+                Title = "Partitur", // Hardcoded for now, will be in NewSongDTO when frontend is ready
+                PartNumber = 1
+            };
+            var partId = await this.partRepository.CreatePart(NewPartObject, userId);
+
+            await this.context.Songs.AddAsync(SongModelObject);
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+
+            return new List<int> { SongModelObject.Id, partId };
+        }
+
+        /// <summary>
         /// Create a full song with all it's objects
         /// </summary>
         /// <param name="songObject"></param>
@@ -121,7 +154,7 @@ namespace Dissimilis.WebAPI.Repositories
                     return 0;
             }
 
-            //CreateNewSong and get it's new Id
+            //CreateNewSong and get its new Id
             songId = await CreateSong(songObject, userId);
             bool partCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
 

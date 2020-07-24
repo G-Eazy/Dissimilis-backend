@@ -35,9 +35,9 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
-            var result = await repository.CreateSong(NewSongObject, base.UserID);
-            if (result != 0)
-                return base.Created($"api/song/{result}", $"{result}");
+            var result = await repository.CreateSongWithPart(NewSongObject, base.UserID);
+            if (result != null)
+                return base.Created($"api/song/{result.First() }", $"{string.Join(",", result)}");
             else
                 return base.BadRequest("Unable to create Song");
         }
