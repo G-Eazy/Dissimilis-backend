@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Repositories
                 return null;
 
             BarDTO BarModelObject = new BarDTO(BarModel);
-            BarModelObject.Notes = await FindAllNotesForBar(BarModel.Id);
+            BarModelObject.ChordsAndNotes = await FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
 
@@ -81,7 +81,7 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 bar.PartId = partId;
                 int barId = await CreateBar(bar, userId);
-                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.Notes, userId);
+                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
                 if (!notesCreated) return false;
             }
 

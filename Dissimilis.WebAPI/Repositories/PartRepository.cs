@@ -249,7 +249,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             foreach (var bar in AllBars)
             {
-                bar.Notes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
+                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
             }
 
             return AllBars;
