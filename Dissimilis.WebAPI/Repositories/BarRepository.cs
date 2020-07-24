@@ -61,8 +61,49 @@ namespace Dissimilis.WebAPI.Repositories
             await this.context.AddAsync(BarModel);
             this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
-
             return BarModel.Id;
+        }
+        /// <summary>
+        /// Creates new [empty] bars for all parts of a song, at the same position.
+        /// </summary>
+        /// <param name="NewBarObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<List<int>> CreateBarHelper(NewBarDTO NewBarObject, uint userId)
+        {
+            // Saving all created bars' Id  
+            List<Bar> bars = new List<Bar>();
+
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return null;
+            
+            // Get all parts of this song
+            Part[] parts = await this.context.Parts
+                .Include(p => p.Song)
+                .Where(p => p.SongId == p.Song.Id)
+                .OrderBy(p => p.PartNumber)
+                .ToArrayAsync();
+            
+           
+            // Creating bars for all parts in this song
+            foreach (Part part in parts)
+            { 
+                Bar CheckBarNumber = await this.context.Bars
+                    .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
+                                            && b.PartId == part.Id);
+                if (CheckBarNumber != null)
+                    await UpdateBarNumbers(CheckBarNumber.BarNumber, part.Id, userId);
+
+                Bar BarModel = new Bar(NewBarObject.BarNumber, part.Id);
+                await this.context.AddAsync(BarModel);
+                bars.Add(BarModel);
+            
+            }
+            
+            this.context.UserId = userId;
+            await this.context.TrySaveChangesAsync();
+
+            return bars.Select(b => b.Id).ToList();
+
         }
 
         /// <summary>
