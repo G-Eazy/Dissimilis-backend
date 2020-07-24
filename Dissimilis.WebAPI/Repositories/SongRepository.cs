@@ -79,7 +79,7 @@ namespace Dissimilis.WebAPI.Repositories
             return SongDTOArray;
         
         }
-
+        
         /// <summary>
         /// Create song using NewSongDTO
         /// </summary>
@@ -105,6 +105,39 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
+        /// Create song using NewSongDTO with an empty first part
+        /// </summary>
+        /// <param name="NewSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<SongDTO> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
+        {
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
+
+            var SongModelObject = new Song()
+            {
+                Title = NewSongObject.Title,
+                ArrangerId = (int)userId,
+                TimeSignature = NewSongObject.TimeSignature
+            };
+            await this.context.Songs.AddAsync(SongModelObject);
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+
+            // Creating partiture and linking to Song
+            NewPartDTO NewPartObject = new NewPartDTO()
+            {
+                SongId = SongModelObject.Id,
+                Title = "Partitur", // Hardcoded for now, will be in NewSongDTO when frontend is ready
+                PartNumber = 1
+            };
+            var partId = await this.partRepository.CreatePart(NewPartObject, userId);
+
+            // Sending Song with first Part back as request body
+            return await GetSongById(SongModelObject.Id);
+        }
+
+        /// <summary>
         /// Create a full song with all its parts
         /// </summary>
         /// <param name="songObject"></param>
@@ -125,7 +158,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (PartsCreated) return NewSongId;
             else
             {
-                bool WasDeleted = await this.partRepository.DeleteParts(NewSongId, userId);
+                await this.partRepository.DeleteParts(NewSongId, userId);
                 return 0;
             }
 
