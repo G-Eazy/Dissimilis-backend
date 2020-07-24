@@ -40,7 +40,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// The time signature of the song (NO: Taktart)
         /// </summary>
-        public string TimeSignature { get; set; }
+        public string[] TimeSignature { get; set; }
 
         /// <summary>
         /// Empty constructor for Song

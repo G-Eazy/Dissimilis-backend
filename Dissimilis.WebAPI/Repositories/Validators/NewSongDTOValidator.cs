@@ -15,7 +15,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
         {
             if (obj is null) return false;
             if (string.IsNullOrWhiteSpace(obj.Title)) return false;
-            if (string.IsNullOrWhiteSpace(obj.TimeSignature)) return false;
+            if (obj.TimeSignature.Count() < 0 && obj.TimeSignature.Count() > 2) return false;
             
             return true;
         }

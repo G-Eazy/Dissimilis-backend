@@ -117,6 +117,12 @@ namespace Dissimilis.WebAPI.Database
 				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 			entity.HasOne(x => x.UpdatedBy).WithMany()
 				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+
+			entity
+			.Property(e => e.TimeSignature)
+			.HasConversion(
+				v => string.Join(',', v),
+				v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 		}
 	
 		static void BuildPart (ModelBuilder builder)

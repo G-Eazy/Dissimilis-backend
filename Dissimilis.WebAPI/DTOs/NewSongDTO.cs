@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.DTOs
     public class NewSongDTO
     {
         public string Title { get; set; }
-        public string TimeSignature { get; set; }
+        public string[] TimeSignature { get; set; }
 
         public NewSongDTO() { }
 

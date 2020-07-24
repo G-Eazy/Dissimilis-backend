@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Database.Interfaces
         int ArrangerId { get; }
         string Composer { get; }
         int Id { get; }
-        string TimeSignature { get; }
+        string[] TimeSignature { get; }
         string Title { get; }
     }
 }
