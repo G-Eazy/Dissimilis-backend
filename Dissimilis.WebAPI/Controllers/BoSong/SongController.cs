@@ -85,18 +85,36 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Create a song from scratch, with all associated parts etc
+        /// Create a full song-part-bar-note object
         /// </summary>
         /// <param name="songObject"></param>
         /// <returns></returns>
-        [HttpPost("{songId:int:min(0)}")]
-        public async Task<IActionResult> CreateWholeSong ([FromBody] NewSongDTO songObject, int songId)
+        [HttpPost("0")]
+        public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject)
         {
-            int result = await this.repository.CreateFullSong(songObject, base.UserID, songId);
+            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
+            int result = await this.repository.CreateFullSong(songObject, base.UserID);
             if(result != 0)
                 return base.Created($"api/song/{result}", $"{result}");
 
             return base.BadRequest("Unable to create Song");
+        }
+
+        /// <summary>
+        /// Update an already existing song and replace everything inside it
+        /// </summary>
+        /// <param name="songObject"></param>
+        /// <param name="songId"></param>
+        /// <returns></returns>
+        [HttpPut("{songId:int:min(1)}")]
+        public async Task<IActionResult> UpdateWholeSong([FromBody] UpdateSongDTO songObject, int songId)
+        {
+            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
+            int result = await this.repository.UpdateSong(songObject, base.UserID, songId);
+            if (result != 0)
+                return base.Created($"api/song/{result}", $"{result}");
+
+            return base.BadRequest("Unable to update Song");
         }
 
         /// <summary>

@@ -15,6 +15,8 @@ namespace Dissimilis.WebAPI.DTOs
     
         public DateTime? UpdatedOn { get; set; }
 
+        public PartDTO[] Voices { get; set; }
+
         public SongDTO(ISong song)
         {
             if (song != null && song.Arranger != null)
