@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.DTOs
         public int PartId { get; set; }
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
-        public byte House { get; set; }
+        public byte? House { get; set; }
         public NewNoteDTO[] ChordsAndNotes { get; set; }
 
         public NewBarDTO() { }
