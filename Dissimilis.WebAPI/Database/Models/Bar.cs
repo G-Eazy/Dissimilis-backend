@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dissimilis.WebAPI.DTOs;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
@@ -46,17 +47,20 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// if 0, there is no house. otherwise it should follow an order
         /// </summary>
-        public byte House { get; set; }
+        public byte? House { get; set; }
 
         /// <summary>
         /// Empty constructor for Bar
         /// </summary>
         public Bar() { }
 
-        public Bar(byte barNumber, int partId)
+        public Bar(NewBarDTO bar)
         {
-            this.BarNumber = barNumber;
-            this.PartId = partId;
+            this.BarNumber = bar.BarNumber;
+            this.PartId = bar.PartId;
+            this.RepAfter = bar.RepAfter;
+            this.RepBefore = bar.RepBefore;
+            this.House = bar.House;
         }
     }
 }

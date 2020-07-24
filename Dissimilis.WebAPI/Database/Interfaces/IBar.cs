@@ -3,7 +3,7 @@
     public interface IBar : IBaseEntity
     {
         byte BarNumber { get; }
-        byte House { get; }
+        byte? House { get; }
         int Id { get; }
         Part Part { get; }
         int PartId { get; }
