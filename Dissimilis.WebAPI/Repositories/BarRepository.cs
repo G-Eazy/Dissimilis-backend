@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Repositories
                 return null;
 
             BarDTO BarModelObject = new BarDTO(BarModel);
-            BarModelObject.ChordsAndNotes = await FindAllNotesForBar(BarModel.Id);
+            BarModelObject.Notes = await FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
 
@@ -56,12 +56,53 @@ namespace Dissimilis.WebAPI.Repositories
             if (CheckBarNumber != null)
                 await UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
 
-            var BarModel = new Bar(NewBarObject);
+            Bar BarModel = new Bar(NewBarObject.BarNumber, NewBarObject.PartId);
 
             await this.context.AddAsync(BarModel);
             this.context.UserId = userId;
-            if (await this.context.TrySaveChangesAsync()) return BarModel.Id;
-            else return 0;
+            await this.context.TrySaveChangesAsync();
+            return BarModel.Id;
+        }
+        /// <summary>
+        /// Creates new [empty] bars for all parts of a song, at the same position.
+        /// </summary>
+        /// <param name="NewBarObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<List<int>> CreateBarHelper(NewBarDTO NewBarObject, uint userId)
+        {
+            // Saving all created bars' Id  
+            List<Bar> bars = new List<Bar>();
+
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return null;
+            
+            // Get all parts of this song
+            Part[] parts = await this.context.Parts
+                .Include(p => p.Song)
+                .Where(p => p.SongId == p.Song.Id)
+                .OrderBy(p => p.PartNumber)
+                .ToArrayAsync();
+            
+           
+            // Creating bars for all parts in this song
+            foreach (Part part in parts)
+            { 
+                Bar CheckBarNumber = await this.context.Bars
+                    .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
+                                            && b.PartId == part.Id);
+                if (CheckBarNumber != null)
+                    await UpdateBarNumbers(CheckBarNumber.BarNumber, part.Id, userId);
+
+                Bar BarModel = new Bar(NewBarObject.BarNumber, part.Id);
+                await this.context.AddAsync(BarModel);
+                bars.Add(BarModel);
+            
+            }
+            
+            this.context.UserId = userId;
+            await this.context.TrySaveChangesAsync();
+
+            return bars.Select(b => b.Id).ToList();
 
         }
 
@@ -81,7 +122,7 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 bar.PartId = partId;
                 int barId = await CreateBar(bar, userId);
-                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
+                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.Notes, userId);
                 if (!notesCreated) return false;
             }
 
