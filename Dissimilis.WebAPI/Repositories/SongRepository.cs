@@ -159,7 +159,7 @@ namespace Dissimilis.WebAPI.Repositories
                 return songId;
             else
             {
-                WasDeleted = await this.partRepository.DeleteParts(songId, userId);
+                await this.partRepository.DeleteParts(songId, userId);
                 return 0;
             }
         }

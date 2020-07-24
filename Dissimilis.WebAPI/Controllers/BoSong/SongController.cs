@@ -92,7 +92,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost("0")]
         public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject)
         {
-            if (songObject is null) return base.BadRequest("The object is null");
+            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
             int result = await this.repository.CreateFullSong(songObject, base.UserID);
             if(result != 0)
                 return base.Created($"api/song/{result}", $"{result}");
@@ -109,7 +109,7 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPut("{songId:int:min(1)}")]
         public async Task<IActionResult> UpdateWholeSong([FromBody] UpdateSongDTO songObject, int songId)
         {
-            if (songObject is null) return base.BadRequest("The object is null");
+            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
             int result = await this.repository.UpdateSong(songObject, base.UserID, songId);
             if (result != 0)
                 return base.Created($"api/song/{result}", $"{result}");
