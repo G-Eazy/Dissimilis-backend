@@ -42,8 +42,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>
-        [HttpGet("{noteId:int:min(1)}")]
-        public async Task<IActionResult> GetNote(int noteId)
+        [HttpGet]
+        public async Task<IActionResult> GetNote([FromQuery] int noteId)
         {
             var NoteObject = await repository.GetNote(noteId);
             if (NoteObject != null)
@@ -72,8 +72,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>
-        [HttpDelete("{noteId:int:min(1)}")]
-        public async Task<IActionResult> DeleteNote(int noteId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteNote([FromQuery] int noteId)
         {
             var result = await repository.DeleteNote(noteId, base.UserID);
             if(result)
