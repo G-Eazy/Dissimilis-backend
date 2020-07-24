@@ -46,8 +46,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// Get song
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet]
-        public async Task<IActionResult> GetSongById([FromQuery] int songId)
+        [HttpGet("{songId:int:min(1)}")]
+        public async Task<IActionResult> GetSongById(int songId)
         {
             var SongObject = await repository.GetSongById(songId);
             if (SongObject != null)
@@ -121,8 +121,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// Delete song
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteSong([FromQuery] int songId)
+        [HttpDelete("{songId:int:min(1)}")]
+        public async Task<IActionResult> DeleteSong(int songId)
         {
             bool result = await repository.DeleteSong(songId, base.UserID);
             if (result)

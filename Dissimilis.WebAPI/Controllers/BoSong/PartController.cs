@@ -47,8 +47,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// Get voice
         /// </summary>
         /// <returns>200</returns> 
-        [HttpGet]
-        public async Task<IActionResult> GetPart([FromQuery] int voiceId)
+        [HttpGet("{voiceId:int:min(1)}")]
+        public async Task<IActionResult> GetPart(int voiceId)
         {
             var PartObject = await repository.GetPart(voiceId);
             if (PartObject != null)
@@ -73,11 +73,11 @@ namespace Dissimilis.WebAPI.Controllers
         }
         
         /// <summary>
-        /// Delete voice
+        /// Delete part
         /// </summary>
         /// <returns>204</returns> 
-        [HttpDelete]
-        public async Task<IActionResult> DeletePart([FromQuery] int voiceId)
+        [HttpDelete("{voiceId:int:min(1)}")]
+        public async Task<IActionResult> DeletePart(int voiceId)
         {
             bool result = await repository.DeletePart(voiceId, base.UserID);
             if (result)

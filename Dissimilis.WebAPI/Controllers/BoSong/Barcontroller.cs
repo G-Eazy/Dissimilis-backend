@@ -47,8 +47,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpGet]
-        public async Task<IActionResult> GetBar([FromQuery] int barId)
+        [HttpGet("{barId:int:min(1)}")]
+        public async Task<IActionResult> GetBar(int barId)
         {
             var result = await repository.GetBar(barId);
             if (result != null)
