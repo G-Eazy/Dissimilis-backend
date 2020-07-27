@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateNote(NewNoteDTO NewNoteObject, uint userId)
         {
-            if (!CheckProperties(NewNoteObject)) return 0;
+            if (! IsValidDTO<NewNoteDTO, NewNoteDTOValidator>(NewNoteObject)) return 0;
 
             Note CheckNoteNumber = await this.context.Notes
                 .SingleOrDefaultAsync(b => b.NoteNumber == NewNoteObject.NoteNumber 
@@ -57,7 +58,7 @@ namespace Dissimilis.WebAPI.Repositories
                 NoteNumber = NewNoteObject.NoteNumber,
                 BarId = NewNoteObject.BarId,
                 Length = NewNoteObject.Length,
-                NoteValues = NewNoteObject.NoteValues
+                NoteValues = NewNoteObject.Notes
             };
 
             this.context.UserId = userId;
@@ -65,6 +66,25 @@ namespace Dissimilis.WebAPI.Repositories
             await this.context.TrySaveChangesAsync();
 
             return NoteModel.Id;
+        }
+
+        public async Task<bool> CreateAllNotes(int barId, NewNoteDTO[] noteObjects, uint userId)
+        {
+            if (noteObjects == null || noteObjects.Count() == 0) return false;
+            if (barId is 0) return false;
+
+            byte noteNumber = 1;
+
+            foreach(NewNoteDTO note in noteObjects)
+            {
+                note.BarId = barId;
+                note.NoteNumber = noteNumber++;
+                if (note.Notes.Count() == 0) continue;
+                int NoteCreated = await CreateNote(note, userId);
+                if (NoteCreated == 0) return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -98,7 +118,8 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateNote(UpdateNoteDTO UpdateNoteObject, uint userId)
         {
             bool Updated = false;
-            if (!CheckProperties(UpdateNoteObject)) return Updated;
+
+            if (! IsValidDTO<UpdateNoteDTO, UpdateNoteDTOValidator>(UpdateNoteObject)) return Updated;
 
             Note nodeModel = await this.context.Notes.Include(x => x.Bar)
                 .ThenInclude(x => x.Part)
@@ -114,7 +135,7 @@ namespace Dissimilis.WebAPI.Repositories
                     await UpdateNoteNumbers(UpdateNoteObject.NoteNumber, UpdateNoteObject.BarId, userId);
                 }
                 if (nodeModel.Length != UpdateNoteObject.Length) nodeModel.Length = UpdateNoteObject.Length;
-                if (nodeModel.NoteValues != UpdateNoteObject.NoteValues) nodeModel.NoteValues = UpdateNoteObject.NoteValues;
+                if (nodeModel.NoteValues != UpdateNoteObject.Notes) nodeModel.NoteValues = UpdateNoteObject.Notes;
                 if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
 
                 this.context.UserId = userId;

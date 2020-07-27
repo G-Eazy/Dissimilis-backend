@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Reposities.Interfaces
     public interface IUserRepository
     {
         Task<User> GetUserByIdAsync(int id);
-        Task<User> GetUserByMsIdAsync(Guid id);
+        Task<User> GetUserByMsIdAsync(string id);
         Task<UserDTO> GetUserDTOByIdAsync(int id);
         Task<User> GetUserByEmailAsync(string email);
         Task<User[]> GetAllUsersAsync();

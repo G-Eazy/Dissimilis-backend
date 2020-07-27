@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Database.Models;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace Dissimilis.WebAPI.Repositories
                 return null;
 
             BarDTO BarModelObject = new BarDTO(BarModel);
-            BarModelObject.Notes = await FindAllNotesForBar(BarModel.Id);
+            BarModelObject.ChordsAndNotes = await FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
 
@@ -47,7 +48,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateBar(NewBarDTO NewBarObject, uint userId)
         {
-            if (!CheckProperties(NewBarObject)) return 0;
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return 0;
 
             Bar CheckBarNumber = await this.context.Bars
                 .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
@@ -55,13 +56,81 @@ namespace Dissimilis.WebAPI.Repositories
             if (CheckBarNumber != null)
                 await UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
 
-            Bar BarModel = new Bar(NewBarObject.BarNumber, NewBarObject.PartId);
+            Bar BarModel = new Bar(NewBarObject);
 
             await this.context.AddAsync(BarModel);
             this.context.UserId = userId;
+            if(await this.context.TrySaveChangesAsync()) return BarModel.Id;
+            else return 0;
+        }
+        /// <summary>
+        /// Creates new [empty] bars for all parts of a song, at the same position.
+        /// </summary>
+        /// <param name="NewBarObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<BarDTO[]> CreateBarHelper(NewBarDTO NewBarObject, uint userId)
+        {
+            // Saving all created bars' Id  
+            List<Bar> bars = new List<Bar>();
+
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return null;
+            
+            // Get all parts of this song
+            Part[] parts = await this.context.Parts
+                .Include(p => p.Song)
+                .Where(p => p.SongId == p.Song.Id)
+                .OrderBy(p => p.PartNumber)
+                .ToArrayAsync();
+            
+           
+            // Creating bars for all parts in this song
+            foreach (Part part in parts)
+            { 
+                Bar CheckBarNumber = await this.context.Bars
+                    .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
+                                            && b.PartId == part.Id);
+                if (CheckBarNumber != null)
+                    await UpdateBarNumbers(CheckBarNumber.BarNumber, part.Id, userId);
+
+                Bar BarModel = new Bar(NewBarObject);
+                await this.context.AddAsync(BarModel);
+                bars.Add(BarModel);
+            
+            }
+            
+            this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
 
-            return BarModel.Id;
+            return bars.Select(b => new BarDTO(b)).ToArray();
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="partId"></param>
+        /// <param name="barObjects"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAllBars(int partId, NewBarDTO[] barObjects, uint userId)
+        {
+            if (barObjects == null || barObjects.Count() == 0) return false;
+            if (partId is 0) return false;
+
+            ushort barNumber = 1;
+
+            foreach (NewBarDTO bar in barObjects)
+            {
+                bar.PartId = partId;
+                bar.BarNumber = barNumber++;
+                int barId = await CreateBar(bar, userId);
+                if(bar.ChordsAndNotes.Count() == 0) continue;
+                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
+                if (!notesCreated) return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -110,22 +179,20 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Get all the notes associated with this bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         private async Task<NoteDTO[]> FindAllNotesForBar(int barId)
         {
-            int[] allNotes = this.context.Notes
-                .Where(x => x.BarId == barId)
-                .OrderBy(x => x.NoteNumber)
-                .Select(x => x.Id)
-                .ToArray();
+            var AllNotes = this.context.Notes
+                           .Where(n => n.BarId == barId)
+                           .OrderBy(n => n.NoteNumber)
+                           .Select(n => new NoteDTO(n))
+                           .ToArray();
 
-            NoteDTO[] NoteDTOArray = new NoteDTO[allNotes.Count()];
-
-            for (int i = 0; i < allNotes.Count(); i++)
-            {
-                NoteDTOArray[i] = await this.noteRepository.GetNote(allNotes[i]);
-            }
-
-            return NoteDTOArray;
+            return AllNotes;
         }
 
         /// <summary>
@@ -136,9 +203,9 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<bool> UpdateBar(UpdateBarDTO UpdateBarObject, uint userId)
         {
-            if (!CheckProperties(UpdateBarObject)) return false;
-
             bool Updated = false;
+
+            if (! IsValidDTO<UpdateBarDTO, UpdateBarDTOValidator>(UpdateBarObject)) return Updated;
             
             Bar BarModel = await this.context.Bars
                 .Include(x => x.Part)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class UserDTO : IDTO
+    public class UserDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -20,7 +20,5 @@ namespace Dissimilis.WebAPI.DTOs
             this.Email = u.Email;
             this.Country = u.Country;
         }
-
-
     }
 }

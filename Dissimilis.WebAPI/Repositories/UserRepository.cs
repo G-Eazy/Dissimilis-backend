@@ -95,7 +95,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<User> GetUserByMsIdAsync(Guid id)
+        public async Task<User> GetUserByMsIdAsync(string id)
         {
             return await context.Users.SingleOrDefaultAsync(x => x.MsId == id);
         }

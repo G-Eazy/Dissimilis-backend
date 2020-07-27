@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.DTOs
             base.BarId = note.BarId;
             base.NoteNumber = note.NoteNumber;
             base.Length = note.Length;
-            base.NoteValues = note.NoteValues;
+            base.Notes = note.NoteValues;
         }
     }
 }

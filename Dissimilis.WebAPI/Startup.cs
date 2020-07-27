@@ -97,16 +97,12 @@ namespace Dissimilis.WebAPI
             {
                 c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             });
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
+            // Only for week 31
+            app.UseDeveloperExceptionPage();
+            
+            if (!env.IsDevelopment())
                 app.UseHttpsRedirection();
-            }
-
+            
             app.UseSwagger();
 
             app.UseSwaggerUI(c => 
@@ -115,7 +111,6 @@ namespace Dissimilis.WebAPI
                 
             });
 
-            //Comment out if you are not using authentication
             app.UseWebUserAuthentication();
             
             app.UseRouting();

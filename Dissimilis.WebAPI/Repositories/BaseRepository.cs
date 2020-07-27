@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Web.Http.Validation;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -25,47 +26,29 @@ namespace Dissimilis.WebAPI.Repositories
 
             if (userId == entity.CreatedById)
                 return true;
-            return false;
+
+            //THIS NEEDS TO BE SET TO FALSE IN LATER VERSION
+            /*
+             At the moment all users can edit, delete and create new songs. This is
+            because we want there to technically be "one" user, but for future use, this needs 
+            to be changed to reflect some sort of authorisation
+             */
+            return true;
         }
 
         /// <summary>
-        /// Check if properties in DTOs are not default values
+        /// Generic function that has multiple implementations
+        /// Checks for default and invalid incoming DTO property values
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool CheckProperties(IDTO obj)
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TValidator"></typeparam>
+        /// <param name="dto"></param>
+        /// <returns>bool</returns>
+        public static bool IsValidDTO<T, TValidator>(T dto)
+            where TValidator : class, IValidator<T>, new()
         {
-            if (obj is null)
-                throw new ArgumentNullException(nameof(obj));
-
-            Type t = obj.GetType();
-            var properties = t.GetProperties();
-
-            foreach(PropertyInfo p in properties)
-            {
-                if (p.PropertyType == typeof(string))
-                {
-                    if (string.IsNullOrWhiteSpace((string)p.GetValue(obj)))
-                        return false;
-                }
-                else if(p.PropertyType == typeof(int))
-                {
-                    if ((int)p.GetValue(obj) <= 0)
-                        return false;
-                }
-                else if(p.PropertyType == typeof(byte))
-                {
-                    if ((byte)p.GetValue(obj) <= 0 && p.Name.ToLower() != "house")
-                        return false;
-                }
-                else if (p.PropertyType.IsArray)
-                {
-                    if (string.IsNullOrWhiteSpace(p.GetValue(obj).ToString()))
-                        return false;
-                }
-            }
-            
-            return true;
-        } 
+            return new TValidator().IsValid(dto);
+        }
     }
+
 }

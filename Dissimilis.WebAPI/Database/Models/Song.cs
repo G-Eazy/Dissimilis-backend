@@ -47,21 +47,5 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         public Song() { }
 
-        /// <summary>
-        /// COnstructor for Song
-        /// </summary>
-        /// <param name="title"></param>
-        /// <param name="creator"></param>
-        /// <param name="composer"></param>
-        /// <param name="time_signature"></param>
-        /// <param name="creation_time"></param>
-
-        public Song(string title, User creator,
-                    string composer, string time_signature, DateTime creation_time)
-        {
-            this.Title = title;
-            this.Composer = composer;
-            this.TimeSignature = time_signature;
-        }
     }
 }

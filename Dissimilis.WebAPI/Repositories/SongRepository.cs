@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -78,16 +80,40 @@ namespace Dissimilis.WebAPI.Repositories
             return SongDTOArray;
         
         }
-
+        
         /// <summary>
         /// Create song using NewSongDTO
         /// </summary>
         /// <param name="NewSongObject"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<int> CreateSong(NewSongDTO NewSongObject, uint userId)
+        /// <returns>SongDTO</returns>
+        public async Task<SongDTO> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
-            if (!CheckProperties(NewSongObject)) return 0;
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
+
+            var SongModelObject = new Song()
+            {
+                Title = NewSongObject.Title,
+                ArrangerId = (int)userId,
+                TimeSignature = NewSongObject.TimeSignature
+            };
+
+            await this.context.Songs.AddAsync(SongModelObject);
+            this.context.UserId = userId;
+            await this.context.SaveChangesAsync();
+
+            return new SongDTO(SongModelObject);
+        }
+
+        /// <summary>
+        /// Create song using NewSongDTO with an empty first part
+        /// </summary>
+        /// <param name="NewSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns>SongDTO</returns>
+        public async Task<SongDTO> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
+        {
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
 
             var SongModelObject = new Song()
             {
@@ -99,7 +125,73 @@ namespace Dissimilis.WebAPI.Repositories
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
 
-            return SongModelObject.Id;
+            // Creating partiture and linking to Song
+            NewPartDTO NewPartObject = new NewPartDTO()
+            {
+                SongId = SongModelObject.Id,
+                Title = "Partitur", // Hardcoded for now, will be in NewSongDTO when frontend is ready
+                PartNumber = 1
+            };
+            var partId = await this.partRepository.CreatePart(NewPartObject, userId);
+
+            // Sending Song with first Part back as request body
+            return await GetSongById(SongModelObject.Id);
+        }
+
+        /// <summary>
+        /// Create a full song with all its parts
+        /// </summary>
+        /// <param name="UpdateSongObject"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<SongDTO> CreateFullSong(UpdateSongDTO UpdateSongObject, uint userId)
+        {
+            var SongObject = await CreateSong(UpdateSongObject, userId);
+
+            // Create all the associated parts for this song
+            bool PartsCreated = await this.partRepository.CreateAllParts(SongObject.Id, UpdateSongObject.Voices, userId);
+
+            // If all parts are created return songId, if there was an error, delete them all and return 0
+            if (PartsCreated) return SongObject;
+            else
+            {
+                await this.partRepository.DeleteParts(UpdateSongObject.Id, userId);
+                return null;
+            }
+
+        }
+
+        /// <summary>
+        /// Put/update a full song with all it's parts
+        /// </summary>
+        /// <param name="songObject"></param>
+        /// <param name="userId"></param>
+        /// <param name="songId"></param>
+        /// <returns></returns>
+        public async Task<SongDTO> UpdateSong(UpdateSongDTO songObject, uint userId, int songId)
+        {
+            //Get song and check if you are allowed to change it
+            Song SongModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
+            if (!ValidateUser(userId, SongModel)) return null;
+
+            //Update song, if it wasn't updated return 0
+            bool WasUpdated = await UpdateSong(songObject, userId);
+            if (!WasUpdated) return null;
+            
+            //Delete all the parts under this song
+            bool WasDeleted = await this.partRepository.DeleteParts(songId, userId);
+            if (!WasDeleted) return null;
+
+            bool PartsCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
+
+            //If all parts are created return songId, if there was an error, delete them all and return 0
+            if (PartsCreated)
+                return new SongDTO(SongModel);
+            else
+            {
+                await this.partRepository.DeleteParts(songId, userId);
+                return null;
+            }
         }
 
         /// <summary>
@@ -111,8 +203,8 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdateSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
             bool Updated = false;
-            
-            if (!CheckProperties(UpdateSongObject)) return Updated;
+
+            if (! IsValidDTO<UpdateSongDTO, UpdateSongDTOValidator>(UpdateSongObject)) return Updated;
            
             var SongModelObject = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == UpdateSongObject.Id);
 
@@ -149,24 +241,48 @@ namespace Dissimilis.WebAPI.Repositories
             return Deleted;
         }
 
+        /// <summary>
+        /// Get all the parts belonging to this song
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <returns></returns>
         public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
             //get all parts belonging to this songid, decending by partnumber
-            int[] AllParts = this.context.Parts
+            var AllParts = this.context.Parts
                 .Where(x => x.SongId == songId)
                 .OrderBy(x => x.PartNumber)
-                .Select(x => x.Id)
+                .Include(p => p.Instrument)
+                .Select(p => new PartDTO(p))
                 .ToArray();
 
-            PartDTO[] AllPartsDTO = new PartDTO[AllParts.Length];
+            var PartIds = AllParts.Select(x => x.Id);
 
-            for(int i = 0; i < AllParts.Length; i++)
+            BarDTO[] AllBars = this.context.Bars
+                .Where(b => PartIds.Contains(b.PartId))
+                .OrderBy(b => b.BarNumber)
+                .Select(b => new BarDTO(b))
+                .ToArray();
+
+            var BarIds = AllBars.Select(x => x.Id);
+
+            var AllNotes = this.context.Notes
+                .Where(n => BarIds.Contains(n.BarId))
+                .OrderBy(n => n.NoteNumber)
+                .Select(n => new NoteDTO(n))
+                .ToArray();
+
+            foreach (var bar in AllBars)
             {
-                AllPartsDTO[i] = await this.partRepository.GetPart(AllParts[i]);
+                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
             }
-            
-            return AllPartsDTO;
-                
+
+            foreach (var part in AllParts)
+            {
+                part.Bars = AllBars.Where(x => x.PartId == part.Id).ToArray();
+            }
+
+            return AllParts;
         }
     }
 }

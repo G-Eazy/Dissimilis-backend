@@ -11,6 +11,7 @@ namespace Dissimilis.WebAPI.DTOs
     public class UpdateSongDTO : NewSongDTO
     {
         public int Id { get; set; }
+        public NewPartDTO[] Voices { get; set; }
         
         public UpdateSongDTO() { }
 

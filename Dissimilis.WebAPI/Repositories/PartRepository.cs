@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Repositories.Interfaces;
+using Dissimilis.WebAPI.Repositories.Validators;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -56,7 +57,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<int> CreatePart(NewPartDTO NewPartObject, uint userId)
         {
             //Check if values are present in DTO, return 0 if one is missing
-            if (!CheckProperties(NewPartObject)) return 0;
+            if (!IsValidDTO<NewPartDTO, NewPartDTOValidator>(NewPartObject)) return 0;
 
             var ExistsSong = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
@@ -88,6 +89,44 @@ namespace Dissimilis.WebAPI.Repositories
                 result = PartModelObject.Id;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Create all parts in a NewPartDTO array
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <param name="PartObjects"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAllParts(int songId, NewPartDTO[] PartObjects, uint userId)
+        {
+            if (PartObjects == null || PartObjects.Count() == 0) return false;
+            if (songId <= 0) return false;
+
+            byte partNumber = 1;
+
+            foreach(NewPartDTO part in PartObjects)
+            {
+                part.SongId = songId;
+                part.PartNumber = partNumber++;
+                int partId = await CreatePart(part, userId);
+                if (part.Bars.Count() == 0) continue;
+                if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> DeleteParts(int songId, uint userId)
+        {
+            var AllParts = this.context.Parts.Where(p => p.SongId == songId);
+            foreach (Part part in AllParts)
+            {
+                this.context.Parts.Remove(part);
+            }
+
+            return await this.context.TrySaveChangesAsync();
         }
 
         /// <summary>
@@ -138,29 +177,6 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
         /// <summary>
-        /// Get all associated bars to partId
-        /// </summary>
-        /// <param name="partId"></param>
-        /// <returns>BarDTOArray</returns>
-        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
-        {
-            int[] AllBars = this.context.Bars
-                .Where(x => x.PartId == partId)
-                .OrderBy(x => x.BarNumber)
-                .Select(x => x.Id)
-                .ToArray();
-
-            BarDTO[] AllBarsDTO = new BarDTO[AllBars.Count()];
-
-            for (int i = 0; i < AllBars.Count(); i++)
-            {
-                AllBarsDTO[i] = await this.barRepository.GetBar(AllBars[i]);
-            }
-
-            return AllBarsDTO;
-        }
-
-        /// <summary>
         /// UpdatePart using UpdatePartDTO
         /// </summary>
         /// <param name="UpdatePartObject"></param>
@@ -169,7 +185,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> UpdatePart(UpdatePartDTO UpdatePartObject, uint userId)
         {
             bool Updated = false;
-            if (!CheckProperties(UpdatePartObject)) return Updated;
+            if (! IsValidDTO<UpdatePartDTO, UpdatePartDTOValidator>(UpdatePartObject)) return Updated;
 
             var PartModelObject = await this.context.Parts
                 .Include(p => p.Song)
@@ -201,7 +217,6 @@ namespace Dissimilis.WebAPI.Repositories
         }
 
 
-
         /// <summary>
         /// Delete Part by partId
         /// </summary>
@@ -224,6 +239,36 @@ namespace Dissimilis.WebAPI.Repositories
             }
             
             return Deleted;
+        }
+
+
+        /// <summary>
+        /// Get all associated bars with this part
+        /// </summary>
+        /// <param name="partId"></param>
+        /// <returns>BarDTOArray</returns>
+        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
+        {
+            BarDTO[] AllBars = this.context.Bars
+                .Where(b => b.PartId == partId)
+                .OrderBy(b => b.BarNumber)
+                .Select(b => new BarDTO(b))
+                .ToArray();
+
+            var BarIds = AllBars.Select(x => x.Id);
+
+            var AllNotes = this.context.Notes
+                .Where(n => BarIds.Contains(n.BarId))
+                .OrderBy(n => n.NoteNumber)
+                .Select(n => new NoteDTO(n))
+                .ToArray();
+
+            foreach (var bar in AllBars)
+            {
+                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
+            }
+
+            return AllBars;
         }
     }
 }
