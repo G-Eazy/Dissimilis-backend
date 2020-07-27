@@ -4,6 +4,7 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Dissimilis.WebAPI.DTOs;
+using Dissimilis.WebAPI.Database.Interfaces;
 
 namespace Dissimilis.WebAPI.Database.Models
 {
@@ -54,7 +55,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// </summary>
         public Bar() { }
 
-        public Bar(NewBarDTO bar)
+        public Bar(INewBar bar)
         {
             this.BarNumber = bar.BarNumber;
             this.PartId = bar.PartId;
