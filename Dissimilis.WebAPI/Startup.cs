@@ -97,10 +97,11 @@ namespace Dissimilis.WebAPI
             {
                 c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             });
-
+            // Only for week 31
             app.UseDeveloperExceptionPage();
-
-            app.UseHttpsRedirection();
+            
+            if (!env.IsDevelopment())
+                app.UseHttpsRedirection();
             
             app.UseSwagger();
 
@@ -110,7 +111,6 @@ namespace Dissimilis.WebAPI
                 
             });
 
-            //Comment out if you are not using authentication
             app.UseWebUserAuthentication();
             
             app.UseRouting();
