@@ -125,6 +125,7 @@ namespace Dissimilis.WebAPI.Repositories
                 bar.PartId = partId;
                 bar.BarNumber = barNumber++;
                 int barId = await CreateBar(bar, userId);
+                if(bar.ChordsAndNotes.Count() == 0) continue;
                 bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
                 if (!notesCreated) return false;
             }

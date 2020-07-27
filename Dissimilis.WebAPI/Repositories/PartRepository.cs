@@ -57,7 +57,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<int> CreatePart(NewPartDTO NewPartObject, uint userId)
         {
             //Check if values are present in DTO, return 0 if one is missing
-            if (! IsValidDTO<NewPartDTO, NewPartDTOValidator>(NewPartObject)) return 0;
+            if (!IsValidDTO<NewPartDTO, NewPartDTOValidator>(NewPartObject)) return 0;
 
             var ExistsSong = await this.context.Songs
                 .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
@@ -110,6 +110,7 @@ namespace Dissimilis.WebAPI.Repositories
                 part.SongId = songId;
                 part.PartNumber = partNumber++;
                 int partId = await CreatePart(part, userId);
+                if (part.Bars.Count() == 0) continue;
                 if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
                     return false;
             }
