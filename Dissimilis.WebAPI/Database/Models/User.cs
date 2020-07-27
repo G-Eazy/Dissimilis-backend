@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// <summary>
 		/// The microsoft Id of this user
 		/// </summary>
-		public Guid MsId { get; set; }
+		public string MsId { get; set; }
 		
 		//Commented out as we are using MS login
 /*		/// <summary>

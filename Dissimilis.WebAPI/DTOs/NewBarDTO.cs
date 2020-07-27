@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Database.Models;
+﻿using Dissimilis.WebAPI.Database.Interfaces;
+using Dissimilis.WebAPI.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.DTOs
 {
-    public class NewBarDTO
+    public class NewBarDTO : INewBar
     {
-        public byte BarNumber { get; set; }
+        public ushort BarNumber { get; set; }
         public int PartId { get; set; }
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
-        public byte House { get; set; }
-        public NewNoteDTO[] Notes { get; set; }
-
-        public NewBarDTO() { }
+        public byte? House { get; set; }
+        public NewNoteDTO[] ChordsAndNotes { get; set; }
 
     }
 }

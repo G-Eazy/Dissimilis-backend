@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Repositories
                 return null;
 
             BarDTO BarModelObject = new BarDTO(BarModel);
-            BarModelObject.Notes = await FindAllNotesForBar(BarModel.Id);
+            BarModelObject.ChordsAndNotes = await FindAllNotesForBar(BarModel.Id);
             return BarModelObject;
         }
 
@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<int> CreateBar(NewBarDTO NewBarObject, uint userId)
         {
-            if (! IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return 0;
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return 0;
 
             Bar CheckBarNumber = await this.context.Bars
                 .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
@@ -56,12 +56,12 @@ namespace Dissimilis.WebAPI.Repositories
             if (CheckBarNumber != null)
                 await UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
 
-            Bar BarModel = new Bar(NewBarObject.BarNumber, NewBarObject.PartId);
+            Bar BarModel = new Bar(NewBarObject);
 
             await this.context.AddAsync(BarModel);
             this.context.UserId = userId;
-            await this.context.TrySaveChangesAsync();
-            return BarModel.Id;
+            if(await this.context.TrySaveChangesAsync()) return BarModel.Id;
+            else return 0;
         }
         /// <summary>
         /// Creates new [empty] bars for all parts of a song, at the same position.
@@ -93,7 +93,7 @@ namespace Dissimilis.WebAPI.Repositories
                 if (CheckBarNumber != null)
                     await UpdateBarNumbers(CheckBarNumber.BarNumber, part.Id, userId);
 
-                Bar BarModel = new Bar(NewBarObject.BarNumber, part.Id);
+                Bar BarModel = new Bar(NewBarObject);
                 await this.context.AddAsync(BarModel);
                 bars.Add(BarModel);
             
@@ -118,11 +118,15 @@ namespace Dissimilis.WebAPI.Repositories
             if (partId is 0) return false;
             if (barObjects.Count() == 0) return false;
 
+            ushort barNumber = 1;
+
             foreach (NewBarDTO bar in barObjects)
             {
                 bar.PartId = partId;
+                bar.BarNumber = barNumber++;
                 int barId = await CreateBar(bar, userId);
-                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.Notes, userId);
+                if(bar.ChordsAndNotes.Count() == 0) continue;
+                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
                 if (!notesCreated) return false;
             }
 

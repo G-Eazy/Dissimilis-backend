@@ -16,7 +16,7 @@ namespace Dissimilis.WebAPI.Repositories.Validators
             if (obj is null) return false;
             if (obj.BarNumber <= 0) return false;
             if (obj.PartId <= 0) return false;
-            if (obj.House < 0) return false;
+            //if (obj.House < 0 && obj.House != null) return false;
             
             return true;
         }

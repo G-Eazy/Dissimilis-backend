@@ -20,7 +20,5 @@ namespace Dissimilis.WebAPI.DTOs
             this.Email = u.Email;
             this.Country = u.Country;
         }
-
-
     }
 }

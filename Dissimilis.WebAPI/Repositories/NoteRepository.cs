@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Repositories
                 NoteNumber = NewNoteObject.NoteNumber,
                 BarId = NewNoteObject.BarId,
                 Length = NewNoteObject.Length,
-                NoteValues = NewNoteObject.NoteValues
+                NoteValues = NewNoteObject.Notes
             };
 
             this.context.UserId = userId;
@@ -73,9 +73,13 @@ namespace Dissimilis.WebAPI.Repositories
             if (barId is 0) return false;
             if (noteObjects.Count() == 0) return false;
 
+            byte noteNumber = 1;
+
             foreach(NewNoteDTO note in noteObjects)
             {
                 note.BarId = barId;
+                note.NoteNumber = noteNumber++;
+                if (note.Notes.Count() == 0) continue;
                 int NoteCreated = await CreateNote(note, userId);
                 if (NoteCreated == 0) return false;
             }
@@ -131,7 +135,7 @@ namespace Dissimilis.WebAPI.Repositories
                     await UpdateNoteNumbers(UpdateNoteObject.NoteNumber, UpdateNoteObject.BarId, userId);
                 }
                 if (nodeModel.Length != UpdateNoteObject.Length) nodeModel.Length = UpdateNoteObject.Length;
-                if (nodeModel.NoteValues != UpdateNoteObject.NoteValues) nodeModel.NoteValues = UpdateNoteObject.NoteValues;
+                if (nodeModel.NoteValues != UpdateNoteObject.Notes) nodeModel.NoteValues = UpdateNoteObject.Notes;
                 if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
 
                 this.context.UserId = userId;
