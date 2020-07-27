@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="NewBarObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<int>> CreateBarHelper(NewBarDTO NewBarObject, uint userId)
+        public async Task<BarDTO[]> CreateBarHelper(NewBarDTO NewBarObject, uint userId)
         {
             // Saving all created bars' Id  
             List<Bar> bars = new List<Bar>();
@@ -102,7 +102,7 @@ namespace Dissimilis.WebAPI.Repositories
             this.context.UserId = userId;
             await this.context.TrySaveChangesAsync();
 
-            return bars.Select(b => b.Id).ToList();
+            return bars.Select(b => new BarDTO(b)).ToArray();
 
         }
 

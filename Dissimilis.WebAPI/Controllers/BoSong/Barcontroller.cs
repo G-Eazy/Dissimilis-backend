@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers
         {
             var result = await repository.CreateBarHelper(BarObject, base.UserID);
             if (result != null && result.Count() != 0)
-                return base.Created($"api/bar/{result.First()}", $"{string.Join(",", result)}");
+                return base.Created($"api/bar/{result.First()}", result);
 
             return base.BadRequest("Unable to create Bar");
         }
@@ -77,8 +77,8 @@ namespace Dissimilis.WebAPI.Controllers
         /// </summary>
         /// <param name="barId"></param>
         /// <returns>201</returns>
-        [HttpDelete]
-        public async Task<IActionResult> DeleteBar([FromQuery] int barId)
+        [HttpDelete("{barId:int:min(1)}")]
+        public async Task<IActionResult> DeleteBar(int barId)
         {
             var result = await repository.DeleteBar(barId, base.UserID);
             if (result)
