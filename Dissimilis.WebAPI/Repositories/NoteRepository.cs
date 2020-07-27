@@ -70,8 +70,8 @@ namespace Dissimilis.WebAPI.Repositories
 
         public async Task<bool> CreateAllNotes(int barId, NewNoteDTO[] noteObjects, uint userId)
         {
+            if (noteObjects == null || noteObjects.Count() == 0) return false;
             if (barId is 0) return false;
-            if (noteObjects.Count() == 0) return false;
 
             byte noteNumber = 1;
 

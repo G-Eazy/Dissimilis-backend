@@ -100,7 +100,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<bool> CreateAllParts(int songId, NewPartDTO[] PartObjects, uint userId)
         {
-            if (PartObjects.Count() == 0) return false;
+            if (PartObjects == null || PartObjects.Count() == 0) return false;
             if (songId <= 0) return false;
 
             byte partNumber = 1;
