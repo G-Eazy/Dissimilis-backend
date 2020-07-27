@@ -110,7 +110,6 @@ namespace Dissimilis.WebAPI.Repositories
                 part.SongId = songId;
                 part.PartNumber = partNumber++;
                 int partId = await CreatePart(part, userId);
-                if (part.Bars.Count() == 0) continue;
                 if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
                     return false;
             }

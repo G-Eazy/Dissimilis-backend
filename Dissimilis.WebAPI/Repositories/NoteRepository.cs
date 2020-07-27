@@ -53,12 +53,15 @@ namespace Dissimilis.WebAPI.Repositories
             if (CheckNoteNumber != null)
                 await UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
 
+            string[] notes = NewNoteObject.Notes;
+            if (NewNoteObject.Notes.Count() == 0) notes = new string[1] { " " };
+
             Note NoteModel = new Note()
             {
                 NoteNumber = NewNoteObject.NoteNumber,
                 BarId = NewNoteObject.BarId,
                 Length = NewNoteObject.Length,
-                NoteValues = NewNoteObject.Notes
+                NoteValues = notes
             };
 
             this.context.UserId = userId;
@@ -79,7 +82,6 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 note.BarId = barId;
                 note.NoteNumber = noteNumber++;
-                if (note.Notes.Count() == 0) continue;
                 int NoteCreated = await CreateNote(note, userId);
                 if (NoteCreated == 0) return false;
             }
