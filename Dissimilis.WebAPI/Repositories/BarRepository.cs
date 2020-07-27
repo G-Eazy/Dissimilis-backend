@@ -118,9 +118,12 @@ namespace Dissimilis.WebAPI.Repositories
             if (partId is 0) return false;
             if (barObjects.Count() == 0) return false;
 
+            byte priority = 1;
+
             foreach (NewBarDTO bar in barObjects)
             {
                 bar.PartId = partId;
+                bar.BarNumber = priority++;
                 int barId = await CreateBar(bar, userId);
                 bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
                 if (!notesCreated) return false;
