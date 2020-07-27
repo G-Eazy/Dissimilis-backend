@@ -5,7 +5,7 @@
         int Id { get; }
         Instrument Instrument { get; }
         int InstrumentId { get; }
-        ushort PartNumber { get; }
+        byte PartNumber { get; }
         Song Song { get; }
         int SongId { get; }
     }

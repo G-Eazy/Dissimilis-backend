@@ -6,7 +6,7 @@
         int BarId { get; }
         int Id { get; }
         byte Length { get; }
-        ushort NoteNumber { get; }
+        byte NoteNumber { get; }
         string[] NoteValues { get; }
     }
 }

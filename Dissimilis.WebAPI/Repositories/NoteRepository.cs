@@ -73,7 +73,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (barId is 0) return false;
             if (noteObjects.Count() == 0) return false;
 
-            ushort noteNumber = 1;
+            byte noteNumber = 1;
 
             foreach(NewNoteDTO note in noteObjects)
             {

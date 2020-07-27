@@ -103,7 +103,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (PartObjects.Count() == 0) return false;
             if (songId <= 0) return false;
 
-            ushort partNumber = 1;
+            byte partNumber = 1;
 
             foreach(NewPartDTO part in PartObjects)
             {
