@@ -103,12 +103,12 @@ namespace Dissimilis.WebAPI.Repositories
             if (PartObjects.Count() == 0) return false;
             if (songId <= 0) return false;
 
-            byte priority = 1;
+            ushort partNumber = 1;
 
             foreach(NewPartDTO part in PartObjects)
             {
                 part.SongId = songId;
-                part.PartNumber = priority++;
+                part.PartNumber = partNumber++;
                 int partId = await CreatePart(part, userId);
                 if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
                     return false;

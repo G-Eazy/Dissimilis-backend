@@ -31,7 +31,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// Priority of the Note in a spesific Bar
         /// </summary>
-        public byte NoteNumber { get; set; }
+        public ushort NoteNumber { get; set; }
 
         /// <summary>
         /// The lenght of this note/chord

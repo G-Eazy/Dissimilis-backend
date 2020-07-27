@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// Priority of the bar in a spesific part
         /// </summary>
-        public byte BarNumber { get; set; }
+        public ushort BarNumber { get; set; }
 
         /// <summary>
         /// Is there a repetion sign before the bar 

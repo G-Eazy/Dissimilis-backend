@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// The priority the voice has over other voices
         /// </summary>
-        public byte PartNumber { get; set; }
+        public ushort PartNumber { get; set; }
 
         /// <summary>
         /// Empty constructor for Part.cs
@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
         /// <param name="partNumber"></param>
-        public Part(int songId, int instrumentId, byte partNumber)
+        public Part(int songId, int instrumentId, ushort partNumber)
         {
             this.SongId = songId;
             this.InstrumentId = instrumentId;

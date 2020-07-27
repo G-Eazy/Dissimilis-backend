@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.DTOs
 {
     public class NewBarDTO
     {
-        public byte BarNumber { get; set; }
+        public ushort BarNumber { get; set; }
         public int PartId { get; set; }
         public bool RepBefore { get; set; } 
         public bool RepAfter { get; set; } 
