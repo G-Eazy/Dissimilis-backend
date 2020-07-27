@@ -73,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers
         }
         
         /// <summary>
-        /// Delete part
+        /// Delete voice
         /// </summary>
         /// <returns>204</returns> 
         [HttpDelete("{voiceId:int:min(1)}")]

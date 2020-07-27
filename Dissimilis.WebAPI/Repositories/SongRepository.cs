@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Repositories.Interfaces;
 using Dissimilis.WebAPI.Repositories.Validators;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -85,10 +86,10 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="NewSongObject"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<int> CreateSong(NewSongDTO NewSongObject, uint userId)
+        /// <returns>SongDTO</returns>
+        public async Task<SongDTO> CreateSong(NewSongDTO NewSongObject, uint userId)
         {
-            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return 0;
+            if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
 
             var SongModelObject = new Song()
             {
@@ -101,7 +102,7 @@ namespace Dissimilis.WebAPI.Repositories
             this.context.UserId = userId;
             await this.context.SaveChangesAsync();
 
-            return SongModelObject.Id;
+            return new SongDTO(SongModelObject);
         }
 
         /// <summary>
@@ -109,7 +110,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="NewSongObject"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <returns>SongDTO</returns>
         public async Task<SongDTO> CreateSongWithPart(NewSongDTO NewSongObject, uint userId)
         {
             if (! IsValidDTO<NewSongDTO, NewSongDTOValidator>(NewSongObject)) return null;
@@ -140,26 +141,22 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Create a full song with all its parts
         /// </summary>
-        /// <param name="songObject"></param>
+        /// <param name="UpdateSongObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<int> CreateFullSong(UpdateSongDTO songObject, uint userId)
+        public async Task<SongDTO> CreateFullSong(UpdateSongDTO UpdateSongObject, uint userId)
         {
-            //Get song and check if you are allowed to change it
-            if (songObject is null)
-                return 0;
+            var SongObject = await CreateSong(UpdateSongObject, userId);
 
-            int NewSongId = await CreateSong(songObject, userId);
+            // Create all the associated parts for this song
+            bool PartsCreated = await this.partRepository.CreateAllParts(SongObject.Id, UpdateSongObject.Voices, userId);
 
-            //Create all the associated parts for this song
-            bool PartsCreated = await this.partRepository.CreateAllParts(NewSongId, songObject.Voices, userId);
-
-            //If all parts are created return songId, if there was an error, delete them all and return 0
-            if (PartsCreated) return NewSongId;
+            // If all parts are created return songId, if there was an error, delete them all and return 0
+            if (PartsCreated) return SongObject;
             else
             {
-                await this.partRepository.DeleteParts(NewSongId, userId);
-                return 0;
+                await this.partRepository.DeleteParts(UpdateSongObject.Id, userId);
+                return null;
             }
 
         }
@@ -171,29 +168,29 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         /// <param name="songId"></param>
         /// <returns></returns>
-        public async Task<int> UpdateSong(UpdateSongDTO songObject, uint userId, int songId)
+        public async Task<SongDTO> UpdateSong(UpdateSongDTO songObject, uint userId, int songId)
         {
             //Get song and check if you are allowed to change it
             Song SongModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
-            if (!ValidateUser(userId, SongModel)) return 0;
+            if (!ValidateUser(userId, SongModel)) return null;
 
             //Update song, if it wasn't updated return 0
             bool WasUpdated = await UpdateSong(songObject, userId);
-            if (!WasUpdated) return 0;
+            if (!WasUpdated) return null;
             
             //Delete all the parts under this song
             bool WasDeleted = await this.partRepository.DeleteParts(songId, userId);
-            if (!WasDeleted) return 0;
+            if (!WasDeleted) return null;
 
             bool PartsCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
-            
+
             //If all parts are created return songId, if there was an error, delete them all and return 0
             if (PartsCreated)
-                return songId;
+                return new SongDTO(SongModel);
             else
             {
                 await this.partRepository.DeleteParts(songId, userId);
-                return 0;
+                return null;
             }
         }
 

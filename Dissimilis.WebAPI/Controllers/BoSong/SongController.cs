@@ -35,9 +35,9 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] NewSongDTO NewSongObject)
         {
-            var result = await repository.CreateSongWithPart(NewSongObject, base.UserID);
-            if (result != null)
-                return base.Created($"api/song/{result.Id}?voice={result.Voices.First().PartNumber}", result);
+            var SongObject = await repository.CreateSongWithPart(NewSongObject, base.UserID);
+            if (SongObject != null)
+                return base.Created($"api/song/{SongObject.Id}", SongObject);
             else
                 return base.BadRequest("Unable to create Song");
         }
@@ -92,10 +92,9 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPost("0")]
         public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject)
         {
-            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
-            int result = await this.repository.CreateFullSong(songObject, base.UserID);
-            if(result != 0)
-                return base.Created($"api/song/{result}", $"{result}");
+            var SongObject = await this.repository.CreateFullSong(songObject, base.UserID);
+            if(SongObject != null)
+                return base.Created($"api/song/{SongObject.Id}", SongObject);
 
             return base.BadRequest("Unable to create Song");
         }
@@ -109,10 +108,9 @@ namespace Dissimilis.WebAPI.Controllers
         [HttpPut("{songId:int:min(1)}")]
         public async Task<IActionResult> UpdateWholeSong([FromBody] UpdateSongDTO songObject, int songId)
         {
-            if (songObject is null) return base.BadRequest("Please provide the UpdateSongDTO in the body of the request!");
-            int result = await this.repository.UpdateSong(songObject, base.UserID, songId);
-            if (result != 0)
-                return base.Created($"api/song/{result}", $"{result}");
+            var SongObject = await this.repository.UpdateSong(songObject, base.UserID, songId);
+            if(SongObject != null)
+                return base.Created($"api/song/{SongObject.Id}", SongObject);
 
             return base.BadRequest("Unable to update Song");
         }
