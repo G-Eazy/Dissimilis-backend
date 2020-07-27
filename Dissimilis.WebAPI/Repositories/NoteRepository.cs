@@ -79,7 +79,6 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 note.BarId = barId;
                 note.NoteNumber = noteNumber++;
-                if (note.Notes.Count() == 0) continue;
                 int NoteCreated = await CreateNote(note, userId);
                 if (NoteCreated == 0) return false;
             }
