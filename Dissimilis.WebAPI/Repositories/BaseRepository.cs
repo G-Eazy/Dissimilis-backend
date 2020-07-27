@@ -26,7 +26,14 @@ namespace Dissimilis.WebAPI.Repositories
 
             if (userId == entity.CreatedById)
                 return true;
-            return false;
+
+            //THIS NEEDS TO BE SET TO FALSE IN LATER VERSION
+            /*
+             At the moment all users can edit, delete and create new songs. This is
+            because we want there to technically be "one" user, but for future use, this needs 
+            to be changed to reflect some sort of authorisation
+             */
+            return true;
         }
 
         /// <summary>

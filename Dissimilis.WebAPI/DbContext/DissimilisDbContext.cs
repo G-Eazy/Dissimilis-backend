@@ -116,7 +116,7 @@ namespace Dissimilis.WebAPI.Database
 			entity.HasOne(x => x.CreatedBy).WithMany()
 				.HasForeignKey(x => x.CreatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
 			entity.HasOne(x => x.UpdatedBy).WithMany()
-				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
+				.HasForeignKey(x => x.UpdatedById).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);	
 		}
 	
 		static void BuildPart (ModelBuilder builder)
