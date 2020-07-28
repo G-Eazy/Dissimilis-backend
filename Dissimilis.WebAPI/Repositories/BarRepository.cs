@@ -115,7 +115,8 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<bool> CreateAllBars(int partId, NewBarDTO[] barObjects, uint userId)
         {
-            if (barObjects == null || barObjects.Count() == 0) return false;
+            //return true if the barobject is empty because that just means parts dont have any bars
+            if (barObjects == null || barObjects.Count() == 0) return true;
             if (partId is 0) return false;
 
             ushort barNumber = 1;

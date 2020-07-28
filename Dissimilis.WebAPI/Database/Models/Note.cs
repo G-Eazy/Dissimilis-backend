@@ -41,6 +41,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// Either a single note, two notes or chords ["C", "F", "A"]
         /// </summary>
+        [MaxLength(100)]
         public string[] NoteValues { get; set; }
 
         /// <summary>
