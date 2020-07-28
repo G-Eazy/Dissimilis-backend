@@ -35,13 +35,14 @@ namespace Dissimilis.WebAPI.Database.Models
 		/// Email address of user
 		/// </summary>
 		[Required]
+		[MaxLength(100)]
 		public string Email { get; set; }
 
 		/// <summary>
 		/// Name of the user
 		/// </summary>
 		[Required]
-		[MaxLength(100)]
+		[MaxLength(150)]
 		public string Name { get; set; }
 
 		/// <summary>
