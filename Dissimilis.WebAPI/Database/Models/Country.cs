@@ -13,6 +13,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// The name of the country
         /// </summary>
+        [MaxLength(100)]
         public string Name { get; set; }
 
         /// <summary>

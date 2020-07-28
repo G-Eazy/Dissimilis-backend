@@ -19,10 +19,11 @@ namespace Dissimilis.WebAPI.Database.Models
         public int Id { get; set; }
 
         public Guid? MsId { get; set; }
-        
+
         /// <summary>
         /// The name of the organisation
         /// </summary>
+        [MaxLength(100)]
         public string Name { get; set; }
 
         /// <summary>

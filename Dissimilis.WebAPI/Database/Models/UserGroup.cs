@@ -14,6 +14,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// Name of the grouptype for users
         /// </summary>
         [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
 
 
