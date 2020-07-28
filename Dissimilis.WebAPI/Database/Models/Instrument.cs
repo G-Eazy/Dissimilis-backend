@@ -17,7 +17,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// String containing the InstrumentType
         /// </summary>
-        [MaxLength(50)]
+        [MaxLength(250)]
         public string Name { get; set; }
 
         /// <summary>
