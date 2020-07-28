@@ -35,11 +35,13 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// The composer of the song
         /// </summary>
+        [MaxLength(100)]
         public string Composer { get; set; }
 
         /// <summary>
         /// The time signature of the song (NO: Taktart)
         /// </summary>
+        [MaxLength(10)]
         public string TimeSignature { get; set; }
 
         /// <summary>
