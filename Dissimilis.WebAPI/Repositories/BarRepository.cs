@@ -93,7 +93,14 @@ namespace Dissimilis.WebAPI.Repositories
                 if (CheckBarNumber != null)
                     await UpdateBarNumbers(CheckBarNumber.BarNumber, part.Id, userId);
 
-                Bar BarModel = new Bar(NewBarObject);
+                Bar BarModel = new Bar()
+                {
+                    PartId = part.Id,
+                    BarNumber = NewBarObject.BarNumber,
+                    RepAfter = NewBarObject.RepAfter,
+                    RepBefore = NewBarObject.RepBefore,
+                    House = NewBarObject.House
+                };
                 await this.context.AddAsync(BarModel);
                 bars.Add(BarModel);
             
