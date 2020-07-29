@@ -23,7 +23,6 @@ namespace Dissimilis.WebAPI.DTOs
             { 
                 this.Id = song.Id;
                 base.Title = song.Title;
-                this.ArrangerName = song.Arranger.Name;
                 this.UpdatedOn = song.UpdatedOn;
                 base.TimeSignature = song.TimeSignature;
             }
