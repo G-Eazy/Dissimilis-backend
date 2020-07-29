@@ -19,11 +19,15 @@ namespace Dissimilis.WebAPI.DTOs
 
         public SongDTO(ISong song)
         {
+
             if (song != null)
             { 
                 this.Id = song.Id;
                 base.Title = song.Title;
-                this.ArrangerName = song.Arranger.Name;
+                if (song.Arranger != null)
+                    this.ArrangerName = song.Arranger.Name;
+                else
+                    this.ArrangerName = "Unknown";
                 this.UpdatedOn = song.UpdatedOn;
                 base.TimeSignature = song.TimeSignature;
             }

@@ -150,7 +150,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<SongDTO> UpdateSong(UpdateSongDTO songObject, uint userId, int songId)
         {
             //Get song and check if you are allowed to change it
-            Song SongModel = await this.context.Songs.SingleOrDefaultAsync(s => s.Id == songId);
+            Song SongModel = await this.context.Songs.Include(x => x.Arranger).SingleOrDefaultAsync(s => s.Id == songId);
             if (!ValidateUser(userId, SongModel)) return null;
 
             //Update song, if it wasn't updated return 0
