@@ -19,6 +19,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// <summary>
         /// the type of resource a user has, eg. printing, deleting etc
         /// </summary>
+        [MaxLength(100)]
         public string Name { get; set; }
 
         /// <summary>
