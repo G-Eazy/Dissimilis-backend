@@ -47,23 +47,20 @@ namespace Dissimilis.WebAPI.Repositories
         {
             if (! IsValidDTO<NewNoteDTO, NewNoteDTOValidator>(NewNoteObject)) return 0;
 
-            Note CheckNoteNumber = await this.context.Notes
-                .SingleOrDefaultAsync(b => b.NoteNumber == NewNoteObject.NoteNumber 
-                                        && b.BarId == NewNoteObject.BarId);
-            if (CheckNoteNumber != null)
-                await UpdateNoteNumbers(CheckNoteNumber.NoteNumber, CheckNoteNumber.BarId, userId);
+            string[] newNote = NewNoteObject.Notes;
+            if (newNote.Count() == 0) {
+                 newNote = new string[1] { " " };
+            }
 
             Note NoteModel = new Note()
             {
                 NoteNumber = NewNoteObject.NoteNumber,
                 BarId = NewNoteObject.BarId,
                 Length = NewNoteObject.Length,
-                NoteValues = NewNoteObject.Notes
+                NoteValues = newNote
             };
 
-            this.context.UserId = userId;
             await this.context.Notes.AddAsync(NoteModel);
-            await this.context.TrySaveChangesAsync();
 
             return NoteModel.Id;
         }
@@ -71,7 +68,6 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<bool> CreateAllNotes(int barId, NewNoteDTO[] noteObjects, uint userId)
         {
             if (noteObjects == null || noteObjects.Count() == 0) return false;
-            if (barId is 0) return false;
 
             byte noteNumber = 1;
 
@@ -80,8 +76,7 @@ namespace Dissimilis.WebAPI.Repositories
                 note.BarId = barId;
                 note.NoteNumber = noteNumber++;
                 if (note.Notes.Count() == 0) continue;
-                int NoteCreated = await CreateNote(note, userId);
-                if (NoteCreated == 0) return false;
+                await CreateNote(note, userId);
             }
 
             return true;

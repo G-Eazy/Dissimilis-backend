@@ -10,7 +10,7 @@ namespace Dissimilis.WebAPI.Repositories.Interfaces
     interface IBarRepository
     {
         Task<BarDTO> GetBar(int bar_it);
-        Task<int> CreateBar(NewBarDTO bar, uint userId);
+        Task<Bar> CreateBar(NewBarDTO bar, uint userId);
         Task<bool> UpdateBar(UpdateBarDTO bar, uint userId);
         Task<bool> DeleteBar(int barId, uint userId);
 

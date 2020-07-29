@@ -46,22 +46,16 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="NewBarObject"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<int> CreateBar(NewBarDTO NewBarObject, uint userId)
+        public async Task<Bar> CreateBar(NewBarDTO NewBarObject, uint userId)
         {
-            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return 0;
+            if (!IsValidDTO<NewBarDTO, NewBarDTOValidator>(NewBarObject)) return null;
 
-            Bar CheckBarNumber = await this.context.Bars
-                .SingleOrDefaultAsync(b => b.BarNumber == NewBarObject.BarNumber 
-                                        && b.PartId == NewBarObject.PartId);
-            if (CheckBarNumber != null)
-                await UpdateBarNumbers(CheckBarNumber.BarNumber, CheckBarNumber.PartId, userId);
-
+          
             Bar BarModel = new Bar(NewBarObject);
 
             await this.context.AddAsync(BarModel);
             this.context.UserId = userId;
-            if(await this.context.TrySaveChangesAsync()) return BarModel.Id;
-            else return 0;
+            return BarModel;
         }
         /// <summary>
         /// Creates new [empty] bars for all parts of a song, at the same position.
@@ -124,10 +118,10 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 bar.PartId = partId;
                 bar.BarNumber = barNumber++;
-                int barId = await CreateBar(bar, userId);
+                Bar newBar = await CreateBar(bar, userId);
                 if(bar.ChordsAndNotes.Count() == 0) continue;
-                bool notesCreated = await this.noteRepository.CreateAllNotes(barId, bar.ChordsAndNotes, userId);
-                if (!notesCreated) return false;
+                //bool notesCreated = await this.noteRepository.CreateAllNotes(newBar.Id, bar.ChordsAndNotes, userId);
+                //if (!notesCreated) return false;
             }
 
             return true;
