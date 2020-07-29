@@ -132,34 +132,13 @@ namespace Dissimilis.WebAPI.Repositories
                 Title = "Partitur", // Hardcoded for now, will be in NewSongDTO when frontend is ready
                 PartNumber = 1
             };
-            var partId = await this.partRepository.CreatePart(NewPartObject, userId);
+            await this.partRepository.CreatePart(NewPartObject, userId);
+            await this.context.TrySaveChangesAsync();
 
             // Sending Song with first Part back as request body
             return await GetSongById(SongModelObject.Id);
         }
 
-        /// <summary>
-        /// Create a full song with all its parts
-        /// </summary>
-        /// <param name="UpdateSongObject"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<SongDTO> CreateFullSong(UpdateSongDTO UpdateSongObject, uint userId)
-        {
-            var SongObject = await CreateSong(UpdateSongObject, userId);
-
-            // Create all the associated parts for this song
-            bool PartsCreated = await this.partRepository.CreateAllParts(SongObject.Id, UpdateSongObject.Voices, userId);
-
-            // If all parts are created return songId, if there was an error, delete them all and return 0
-            if (PartsCreated) return SongObject;
-            else
-            {
-                await this.partRepository.DeleteParts(UpdateSongObject.Id, userId);
-                return null;
-            }
-
-        }
 
         /// <summary>
         /// Put/update a full song with all it's parts
@@ -177,7 +156,7 @@ namespace Dissimilis.WebAPI.Repositories
             //Update song, if it wasn't updated return 0
             bool WasUpdated = await UpdateSong(songObject, userId);
             if (!WasUpdated) return null;
-            
+
             //Delete all the parts under this song
             bool WasDeleted = await this.partRepository.DeleteParts(songId, userId);
             if (!WasDeleted) return null;
@@ -186,7 +165,11 @@ namespace Dissimilis.WebAPI.Repositories
 
             //If all parts are created return songId, if there was an error, delete them all and return 0
             if (PartsCreated)
+            {
+                this.context.UserId = userId;
+                await this.context.TrySaveChangesAsync();
                 return new SongDTO(SongModel);
+            }
             else
             {
                 await this.partRepository.DeleteParts(songId, userId);

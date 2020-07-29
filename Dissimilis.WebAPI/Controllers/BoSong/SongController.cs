@@ -85,21 +85,6 @@ namespace Dissimilis.WebAPI.Controllers
         }
 
         /// <summary>
-        /// Create a full song-part-bar-note object
-        /// </summary>
-        /// <param name="songObject"></param>
-        /// <returns></returns>
-        [HttpPost("0")]
-        public async Task<IActionResult> CreateWholeSong ([FromBody] UpdateSongDTO songObject)
-        {
-            var SongObject = await this.repository.CreateFullSong(songObject, base.UserID);
-            if(SongObject != null)
-                return base.Created($"api/song/{SongObject.Id}", SongObject);
-
-            return base.BadRequest("Unable to create Song");
-        }
-
-        /// <summary>
         /// Update an already existing song and replace everything inside it
         /// </summary>
         /// <param name="songObject"></param>
@@ -107,7 +92,7 @@ namespace Dissimilis.WebAPI.Controllers
         /// <returns></returns>
         [HttpPut("{songId:int:min(1)}")]
         public async Task<IActionResult> UpdateWholeSong([FromBody] UpdateSongDTO songObject, int songId)
-        {
+         {
             var SongObject = await this.repository.UpdateSong(songObject, base.UserID, songId);
             if(SongObject != null)
                 return base.Created($"api/song/{SongObject.Id}", SongObject);

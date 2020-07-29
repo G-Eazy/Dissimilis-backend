@@ -16,11 +16,13 @@ namespace Dissimilis.WebAPI.Repositories
     {
         private DissimilisDbContext context;
         private BarRepository barRepository;
+        private NoteRepository noteRepository;
 
         public PartRepository(DissimilisDbContext context)
         {
             this.context = context;
             this.barRepository = new BarRepository(context);
+            this.noteRepository = new NoteRepository(context);
         }
 
         /// <summary>
@@ -64,14 +66,6 @@ namespace Dissimilis.WebAPI.Repositories
 
             if (!ValidateUser(userId, ExistsSong)) return 0;
 
-            Part CheckPartNumber = await this.context.Parts
-                .SingleOrDefaultAsync(b => b.PartNumber == NewPartObject.PartNumber
-                                        && b.SongId == NewPartObject.SongId);
-            if (CheckPartNumber != null)
-            {
-                await UpdatePartNumbers(CheckPartNumber.PartNumber, CheckPartNumber.SongId, userId);
-            }
-
             var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title, userId);
             // This will trigger BadRequest from controller, Will remove when we have exception handler
             if (ExistsInstrument == null)
@@ -82,10 +76,8 @@ namespace Dissimilis.WebAPI.Repositories
             if (ExistsSong != null)
             {
                 var PartModelObject = new Part(ExistsSong.Id, ExistsInstrument.Id, NewPartObject.PartNumber);
-
-                await this.context.Parts.AddAsync(PartModelObject);
                 this.context.UserId = userId;
-                await this.context.SaveChangesAsync();
+                await this.context.Parts.AddAsync(PartModelObject);
                 result = PartModelObject.Id;
             }
             return result;
@@ -109,11 +101,40 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 part.SongId = songId;
                 part.PartNumber = partNumber++;
-                int partId = await CreatePart(part, userId);
-                if (!await this.barRepository.CreateAllBars(partId, part.Bars, userId))
-                    return false;
+                await CreatePart(part, userId);
             }
 
+            await this.context.TrySaveChangesAsync();
+
+            int[] allParts = await this.context.Parts
+                .Where(b => b.SongId== songId)
+                .OrderBy(b => b.PartNumber)
+                .Select(b => b.Id)
+                .ToArrayAsync();
+
+            for (int i = 0; i < allParts.Count(); i++)
+            {
+                await this.barRepository.CreateAllBars(allParts[i], PartObjects[i].Bars, userId);
+            }
+
+            await this.context.TrySaveChangesAsync();
+
+
+            for (int i = 0; i < allParts.Count(); i++)
+            {
+                int[] allBars = await this.context.Bars
+                   .Where(b => b.PartId == allParts[i])
+                   .OrderBy(b => b.BarNumber)
+                   .Select(b => b.Id)
+                   .ToArrayAsync();
+
+                for (int j = 0; j < allBars.Count(); j++)
+                {
+                    await this.noteRepository.CreateAllNotes(allBars[j], PartObjects[i].Bars[j].ChordsAndNotes, userId);
+                }
+            }
+
+            await this.context.TrySaveChangesAsync();
             return true;
         }
 
@@ -248,19 +269,19 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns>BarDTOArray</returns>
         private async Task<BarDTO[]> GetAllBarsForParts(int partId)
         {
-            BarDTO[] AllBars = this.context.Bars
+            BarDTO[] AllBars = await this.context.Bars
                 .Where(b => b.PartId == partId)
                 .OrderBy(b => b.BarNumber)
                 .Select(b => new BarDTO(b))
-                .ToArray();
+                .ToArrayAsync();
 
             var BarIds = AllBars.Select(x => x.Id);
 
-            var AllNotes = this.context.Notes
+            var AllNotes =  await this.context.Notes
                 .Where(n => BarIds.Contains(n.BarId))
                 .OrderBy(n => n.NoteNumber)
                 .Select(n => new NoteDTO(n))
-                .ToArray();
+                .ToArrayAsync();
 
             foreach (var bar in AllBars)
             {

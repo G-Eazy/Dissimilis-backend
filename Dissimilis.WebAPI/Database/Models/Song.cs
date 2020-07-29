@@ -20,6 +20,7 @@ namespace Dissimilis.WebAPI.Database.Models
         /// The song title of the music scheet (NO: Partitur)
         /// </summary>
         [Required]
+        [MaxLength(500)]
         public string Title { get; set; }
 
         /// <summary>
