@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.DTOs
 
         public SongDTO(ISong song)
         {
-            if (song != null && song.Arranger != null)
+            if (song != null)
             { 
                 this.Id = song.Id;
                 base.Title = song.Title;
