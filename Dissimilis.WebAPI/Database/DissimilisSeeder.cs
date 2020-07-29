@@ -64,6 +64,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Instruments.Add(new Instrument("Piano"));
 				context.Instruments.Add(new Instrument("Gitar"));
 				context.Instruments.Add(new Instrument("Bass"));
+				context.Instruments.Add(new Instrument("Partitur"));
 			}
 
 			context.UserId = 1;
@@ -112,6 +113,14 @@ namespace Dissimilis.WebAPI.Database
 				context.Songs.Add(new Song() { Title = "Lisa Gikk Til Skolen", Composer = "Unknown", ArrangerId = 1, TimeSignature = "4/4"});
 				context.Songs.Add(new Song() { Title = "Fade To Black", Composer = "Metallica", ArrangerId = 1, TimeSignature = "4/4" });
 				context.Songs.Add(new Song() { Title = "Be Yourself", Composer = "Audioslave", ArrangerId = 1, TimeSignature = "4/4" });
+			}
+
+			context.UserId = 1;
+			context.SaveChanges();
+            {
+				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 1, PartNumber = 1 });
+				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 2, PartNumber = 1 });
+				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 3, PartNumber = 1 });
 			}
 
 			context.UserId = 1;
