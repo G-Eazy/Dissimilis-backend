@@ -231,32 +231,33 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<PartDTO[]> GetAllPartsForSong(int songId)
         {
-            //get all parts belonging to this songid, decending by partnumber
-            var AllParts = this.context.Parts
+            var AllParts = await this.context.Parts
                 .Where(x => x.SongId == songId)
                 .OrderBy(x => x.PartNumber)
                 .Include(p => p.Instrument)
                 .Select(p => new PartDTO(p))
-                .ToArray();
+                .ToArrayAsync();
 
             var PartIds = AllParts.Select(x => x.Id);
 
-            BarDTO[] AllBars = this.context.Bars
+            var AllBars = await this.context.Bars
                 .Where(b => PartIds.Contains(b.PartId))
                 .OrderBy(b => b.BarNumber)
                 .Select(b => new BarDTO(b))
-                .ToArray();
+                .ToArrayAsync();
 
             var BarIds = AllBars.Select(x => x.Id);
 
-            var AllNotes = this.context.Notes
+            var AllNotes = await this.context.Notes
                 .Where(n => BarIds.Contains(n.BarId))
                 .OrderBy(n => n.NoteNumber)
                 .Select(n => new NoteDTO(n))
-                .ToArray();
+                .ToArrayAsync();
+
 
             foreach (var bar in AllBars)
             {
+           
                 bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
             }
 
