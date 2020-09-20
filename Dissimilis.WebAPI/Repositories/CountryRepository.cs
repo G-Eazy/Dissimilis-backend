@@ -33,7 +33,7 @@ namespace Dissimilis.WebAPI.Repositories
             {
                 country = new Country(name);
                 await this.context.Countries.AddAsync(country);
-                this.context.UserId = userId;
+                
                 await this.context.SaveChangesAsync();
             }
             

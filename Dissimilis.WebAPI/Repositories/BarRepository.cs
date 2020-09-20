@@ -54,7 +54,7 @@ namespace Dissimilis.WebAPI.Repositories
             Bar BarModel = new Bar(NewBarObject);
 
             await this.context.AddAsync(BarModel);
-            this.context.UserId = userId;
+            
             return BarModel;
         }
         /// <summary>
@@ -92,9 +92,9 @@ namespace Dissimilis.WebAPI.Repositories
                 bars.Add(BarModel);
             
             }
-            
-            this.context.UserId = userId;
-            await this.context.TrySaveChangesAsync();
+
+
+            await this.context.SaveChangesAsync();
 
             return bars.Select(b => new BarDTO(b)).ToArray();
 
@@ -144,7 +144,7 @@ namespace Dissimilis.WebAPI.Repositories
                 allbars[i].BarNumber++;
             }
 
-            this.context.UserId = userId;
+            
             await this.context.SaveChangesAsync();
             return true;
         }
@@ -167,7 +167,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (barModel != null &&  ValidateUser(userId, barModel.Part.Song))
             {
                 this.context.Remove(barModel);
-                Deleted = await context.TrySaveChangesAsync();
+                await context.SaveChangesAsync();
             }
 
             return Deleted;
@@ -219,8 +219,8 @@ namespace Dissimilis.WebAPI.Repositories
                 if (UpdateBarObject.RepBefore != BarModel.RepBefore) BarModel.RepBefore = UpdateBarObject.RepBefore;
                 if (UpdateBarObject.House != BarModel.House) BarModel.House = UpdateBarObject.House;
 
-                this.context.UserId = userId;
-                Updated = await this.context.TrySaveChangesAsync();
+                
+                await this.context.SaveChangesAsync();
             }
 
             return Updated;

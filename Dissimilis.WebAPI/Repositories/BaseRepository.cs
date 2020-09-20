@@ -1,12 +1,5 @@
 ﻿using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.DTOs;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Web.Http.Validation;
 
 namespace Dissimilis.WebAPI.Repositories
 {

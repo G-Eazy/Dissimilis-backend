@@ -67,7 +67,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Instruments.Add(new Instrument("Partitur"));
 			}
 
-			context.UserId = 1;
+			
 			context.SaveChanges();
 
 			var Admin = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
@@ -115,7 +115,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Songs.Add(new Song() { Title = "Be Yourself", Composer = "Audioslave", ArrangerId = 1, TimeSignature = "4/4" });
 			}
 
-			context.UserId = 1;
+			
 			context.SaveChanges();
             {
 				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 1, PartNumber = 1 });
@@ -123,7 +123,7 @@ namespace Dissimilis.WebAPI.Database
 				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 3, PartNumber = 1 });
 			}
 
-			context.UserId = 1;
+			
 			context.SaveChanges();
 
 		}

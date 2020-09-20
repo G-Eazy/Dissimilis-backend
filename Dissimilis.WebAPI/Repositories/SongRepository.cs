@@ -99,7 +99,6 @@ namespace Dissimilis.WebAPI.Repositories
             };
 
             await this.context.Songs.AddAsync(SongModelObject);
-            this.context.UserId = userId;
             await this.context.SaveChangesAsync();
 
             return new SongDTO(SongModelObject);
@@ -122,7 +121,7 @@ namespace Dissimilis.WebAPI.Repositories
                 TimeSignature = NewSongObject.TimeSignature
             };
             await this.context.Songs.AddAsync(SongModelObject);
-            this.context.UserId = userId;
+            
             await this.context.SaveChangesAsync();
 
             // Creating partiture and linking to Song
@@ -133,7 +132,7 @@ namespace Dissimilis.WebAPI.Repositories
                 PartNumber = 1
             };
             await this.partRepository.CreatePart(NewPartObject, userId);
-            await this.context.TrySaveChangesAsync();
+            await this.context.SaveChangesAsync();
 
             // Sending Song with first Part back as request body
             return await GetSongById(SongModelObject.Id);
@@ -158,16 +157,15 @@ namespace Dissimilis.WebAPI.Repositories
             if (!WasUpdated) return null;
 
             //Delete all the parts under this song
-            bool WasDeleted = await this.partRepository.DeleteParts(songId, userId);
-            if (!WasDeleted) return null;
+            await this.partRepository.DeleteParts(songId, userId);
+           // if (!WasDeleted) return null;
 
             bool PartsCreated = await this.partRepository.CreateAllParts(songId, songObject.Voices, userId);
 
             //If all parts are created return songId, if there was an error, delete them all and return 0
             if (PartsCreated)
             {
-                this.context.UserId = userId;
-                await this.context.TrySaveChangesAsync();
+                await this.context.SaveChangesAsync();
                 return new SongDTO(SongModel);
             }
             else
@@ -196,8 +194,7 @@ namespace Dissimilis.WebAPI.Repositories
                 if (UpdateSongObject.Title != SongModelObject.Title) SongModelObject.Title = UpdateSongObject.Title;
                 if (UpdateSongObject.TimeSignature != SongModelObject.TimeSignature) SongModelObject.TimeSignature = UpdateSongObject.TimeSignature;
 
-                this.context.UserId = userId;
-                Updated = await this.context.TrySaveChangesAsync();
+                await this.context.SaveChangesAsync();
             }
 
             return Updated;
@@ -218,7 +215,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (SongModelObject != null && ValidateUser(userId, SongModelObject))
             {
                 this.context.Songs.Remove(SongModelObject);
-                Deleted = await this.context.TrySaveChangesAsync();
+                await this.context.SaveChangesAsync();
             }
 
             return Deleted;

@@ -99,7 +99,7 @@ namespace Dissimilis.WebAPI.Repositories
                 AllNotes[i].NoteNumber++;
             }
 
-            this.context.UserId = userId;
+            
             await this.context.SaveChangesAsync();
             return true;
         }
@@ -133,8 +133,8 @@ namespace Dissimilis.WebAPI.Repositories
                 if (nodeModel.NoteValues != UpdateNoteObject.Notes) nodeModel.NoteValues = UpdateNoteObject.Notes;
                 if (nodeModel.NoteNumber != UpdateNoteObject.NoteNumber) nodeModel.NoteNumber = UpdateNoteObject.NoteNumber;
 
-                this.context.UserId = userId;
-                Updated = await this.context.TrySaveChangesAsync();
+                
+                 await this.context.SaveChangesAsync();
             }
 
             return Updated;
@@ -160,7 +160,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (DeletedNote != null && ValidateUser(userId, DeletedNote.Bar.Part.Song))
             {
                 this.context.Remove(DeletedNote);
-                Deleted = await this.context.TrySaveChangesAsync();
+                await this.context.SaveChangesAsync();
 
             }
 

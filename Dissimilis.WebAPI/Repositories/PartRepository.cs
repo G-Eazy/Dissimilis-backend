@@ -76,7 +76,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (ExistsSong != null)
             {
                 var PartModelObject = new Part(ExistsSong.Id, ExistsInstrument.Id, NewPartObject.PartNumber);
-                this.context.UserId = userId;
+                
                 await this.context.Parts.AddAsync(PartModelObject);
                 result = PartModelObject.Id;
             }
@@ -104,7 +104,7 @@ namespace Dissimilis.WebAPI.Repositories
                 await CreatePart(part, userId);
             }
 
-            await this.context.TrySaveChangesAsync();
+            await this.context.SaveChangesAsync();
 
             int[] allParts = await this.context.Parts
                 .Where(b => b.SongId== songId)
@@ -117,7 +117,7 @@ namespace Dissimilis.WebAPI.Repositories
                 await this.barRepository.CreateAllBars(allParts[i], PartObjects[i].Bars, userId);
             }
 
-            await this.context.TrySaveChangesAsync();
+            await this.context.SaveChangesAsync();
 
 
             for (int i = 0; i < allParts.Count(); i++)
@@ -134,11 +134,11 @@ namespace Dissimilis.WebAPI.Repositories
                 }
             }
 
-            await this.context.TrySaveChangesAsync();
+            await this.context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> DeleteParts(int songId, uint userId)
+        public async Task DeleteParts(int songId, uint userId)
         {
             var AllParts = this.context.Parts.Where(p => p.SongId == songId);
             foreach (Part part in AllParts)
@@ -146,7 +146,7 @@ namespace Dissimilis.WebAPI.Repositories
                 this.context.Parts.Remove(part);
             }
 
-            return await this.context.TrySaveChangesAsync();
+            await this.context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -166,7 +166,6 @@ namespace Dissimilis.WebAPI.Repositories
                 AllParts[i].PartNumber++;
             }
 
-            this.context.UserId = userId;
             await this.context.SaveChangesAsync();
             return true;
         }
@@ -190,7 +189,7 @@ namespace Dissimilis.WebAPI.Repositories
                 ExistsInstrument = new Instrument(InstrumentName);
                 await this.context.Instruments
                     .AddAsync(ExistsInstrument);
-                this.context.UserId = userId;
+                
                 await this.context.SaveChangesAsync();
             }
             return ExistsInstrument;
@@ -230,8 +229,8 @@ namespace Dissimilis.WebAPI.Repositories
                     PartModelObject.PartNumber = UpdatePartObject.PartNumber;
                 }
 
-                this.context.UserId = userId;
-                Updated = await this.context.TrySaveChangesAsync();
+                
+                await this.context.SaveChangesAsync();
             }
             return Updated;
         }
@@ -255,7 +254,7 @@ namespace Dissimilis.WebAPI.Repositories
             if (PartModelObject != null && ValidateUser(userId, PartModelObject.Song))
             {
                 this.context.Parts.Remove(PartModelObject);
-                Deleted = await this.context.TrySaveChangesAsync();
+                 await this.context.SaveChangesAsync();
             }
             
             return Deleted;

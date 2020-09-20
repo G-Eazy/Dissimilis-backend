@@ -46,7 +46,7 @@ namespace Dissimilis.WebAPI.Repositories
             //add the user to the lowest usergroup
             var userGroup = await this.context.UserGroups.SingleOrDefaultAsync(ug => ug.Name == "User");
             await this.context.UserGroupMembers.AddAsync(new UserGroupMembers() { UserId = user.Id, UserGroupId = userGroup.Id });
-            this.context.UserId = (uint)user.Id;
+            
             await this.context.SaveChangesAsync();
             Console.WriteLine(user + " " + userGroup);
             return user;
@@ -110,7 +110,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<User> UpdateUserCountryAsync(User user, Country country)
         {
             user.CountryId = country.Id;
-            this.context.UserId = (uint)user.Id;
+            
             await this.context.SaveChangesAsync();
             return user;
         }
@@ -124,7 +124,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<User> UpdateUserOrganisationAsync(User user, Organisation organisation)
         {
             user.OrganisationId = organisation.Id;
-            this.context.UserId = (uint)user.Id;
+            
             await this.context.SaveChangesAsync();
             return user;
         }

@@ -10,7 +10,7 @@
 # Migration help
 ## Add another migration
     Add-Migration InitialCreate -context DissimilisDbContext
-    dotnet ef migrations add AddIptModels --project Dissimilis.WebAPI. --startup-project Dissimilis.WebAPI--context DissimlisDbContext
+    dotnet ef migrations add AddIptModels --project Dissimilis.WebAPI. --startup-project Dissimilis.WebAPI --context DissimilisDbContext
 
 
 ## Remove last migration

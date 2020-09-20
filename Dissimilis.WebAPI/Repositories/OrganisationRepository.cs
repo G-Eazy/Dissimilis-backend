@@ -67,7 +67,7 @@ namespace Dissimilis.WebAPI.Repositories
             }
 
             await this._context.AddAsync(newOrg);
-            this._context.UserId = userId;
+            
             await this._context.SaveChangesAsync();
             return newOrg;
         }
