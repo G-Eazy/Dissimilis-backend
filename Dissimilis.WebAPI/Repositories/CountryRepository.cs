@@ -1,10 +1,6 @@
-﻿using Dissimilis.WebAPI.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dissimilis.WebAPI.Repositories.Interfaces;
-using Dissimilis.WebAPI.Database.Models;
+﻿using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 using Microsoft.EntityFrameworkCore;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 

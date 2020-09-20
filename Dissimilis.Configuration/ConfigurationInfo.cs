@@ -20,6 +20,7 @@ namespace Dissimilis.Configuration
 
             SQL_CONNECTION_STRING,
             AzureWebJobsStorage, // AZURE_STORAGE_CONNECTION_STRING
+            AZURE_CLIENT_SECRET
         }
 
         /// <summary>
@@ -27,7 +28,8 @@ namespace Dissimilis.Configuration
         /// </summary>
         private enum OptionalValues
         {
-
+            AZURE_DIRECTORY_ID,
+            AZURE_APPLICATION_ID
         }
 
         internal static IConfiguration StaticConfig;
@@ -120,6 +122,12 @@ namespace Dissimilis.Configuration
 #endif
 
         }
+
+        public static string GetAzureClientSecret() => GetValue(RequiredValues.AZURE_CLIENT_SECRET);
+
+        public static Guid GetAzureDirectoryId() => new Guid(GetValue(OptionalValues.AZURE_DIRECTORY_ID, "774897da - 0c2c - 4c71 - 9897 - 873c4d659aee"));
+
+        public static Guid GetAzureApplicationId() => new Guid(GetValue(OptionalValues.AZURE_APPLICATION_ID, "5a41da85-fa69-4aa0-93f2-1ce65104a1b2"));
     }
 
 }

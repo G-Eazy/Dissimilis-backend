@@ -1,9 +1,4 @@
-﻿using Dissimilis.WebAPI.Database.Models;
-using Microsoft.AspNetCore.Server.IIS.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.DTOs
 {

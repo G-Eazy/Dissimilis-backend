@@ -1,18 +1,16 @@
 ﻿using Experis.Ciber.Authentication.Microsoft;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Dissimilis.Configuration;
 
 namespace Dissimilis.WebAPI.Authentication
 {
     public class DissimilisServicePrincipal : AzureServicePrincipalBase
     {
-        public override Guid ApplicationID => new Guid ("5a41da85-fa69-4aa0-93f2-1ce65104a1b2");
+        public override Guid ApplicationID => ConfigurationInfo.GetAzureApplicationId();
 
-        public override string ClientSecret => "86a8.sy8U75O-owRYNV9Ku9~5.DDb6e-SU";
+        public override string ClientSecret => ConfigurationInfo.GetAzureClientSecret();
 
-        public override Guid DirectoryID => new Guid("774897da-0c2c-4c71-9897-873c4d659aee");
+        public override Guid DirectoryID => ConfigurationInfo.GetAzureDirectoryId(); 
 
         //Set it in the constructor (needs to be passed through the constructor later)
         protected override Uri WebAppURL { get; }

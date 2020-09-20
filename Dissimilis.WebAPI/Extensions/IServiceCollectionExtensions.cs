@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Scrutor;
 
 namespace Dissimilis.WebAPI.DependencyInjection
 {

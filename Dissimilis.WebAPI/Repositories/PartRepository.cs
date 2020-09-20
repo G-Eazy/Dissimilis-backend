@@ -1,14 +1,11 @@
 ﻿using Dissimilis.WebAPI.DTOs;
-using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Repositories.Interfaces;
-using Dissimilis.WebAPI.Repositories.Validators;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -279,7 +276,7 @@ namespace Dissimilis.WebAPI.Repositories
             var AllNotes =  await this.context.Notes
                 .Where(n => BarIds.Contains(n.BarId))
                 .OrderBy(n => n.NoteNumber)
-                .Select(n => new NoteDTO(n))
+                .Select(n => new NoteDto(n))
                 .ToArrayAsync();
 
             foreach (var bar in AllBars)

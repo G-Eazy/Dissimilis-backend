@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Security.Cryp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.Configuration", "Dissimilis.Configuration\Dissimilis.Configuration.csproj", "{69735D7A-A13C-4584-B952-23B90644D443}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.DbContext", "Dissimilis.DbContext\Dissimilis.DbContext.csproj", "{DEE68417-688A-4642-8FD0-22BCD149D17B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{69735D7A-A13C-4584-B952-23B90644D443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69735D7A-A13C-4584-B952-23B90644D443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69735D7A-A13C-4584-B952-23B90644D443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

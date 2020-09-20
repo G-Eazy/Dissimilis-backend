@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.JsonPatch.Operations;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Dissimilis.WebAPI.Authentication

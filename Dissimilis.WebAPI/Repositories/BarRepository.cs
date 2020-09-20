@@ -1,13 +1,10 @@
-﻿using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.DTOs;
-using Dissimilis.WebAPI.Repositories.Interfaces;
-using Dissimilis.WebAPI.Repositories.Validators;
+﻿using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -178,12 +175,12 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
-        private async Task<NoteDTO[]> FindAllNotesForBar(int barId)
+        private async Task<NoteDto[]> FindAllNotesForBar(int barId)
         {
             var AllNotes = this.context.Notes
                            .Where(n => n.BarId == barId)
                            .OrderBy(n => n.NoteNumber)
-                           .Select(n => new NoteDTO(n))
+                           .Select(n => new NoteDto(n))
                            .ToArray();
 
             return AllNotes;

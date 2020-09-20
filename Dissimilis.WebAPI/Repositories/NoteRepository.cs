@@ -1,13 +1,9 @@
-﻿using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.DTOs;
-using Dissimilis.WebAPI.Repositories.Interfaces;
-using Dissimilis.WebAPI.Repositories.Validators;
+﻿using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -25,7 +21,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="noteId"></param>
         /// <returns></returns>
-        public async Task<NoteDTO> GetNote (int noteId)
+        public async Task<NoteDto> GetNote (int noteId)
         {
             if (noteId <= 0) return null;
 
@@ -33,7 +29,7 @@ namespace Dissimilis.WebAPI.Repositories
                 .SingleOrDefaultAsync(x => x.Id == noteId);
             if (NoteModel is null) return null;
 
-            NoteDTO NoteModelObject = new NoteDTO(NoteModel);
+            NoteDto NoteModelObject = new NoteDto(NoteModel);
             return NoteModelObject;
         }
 

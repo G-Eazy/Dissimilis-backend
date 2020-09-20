@@ -1,12 +1,8 @@
-﻿using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Reposities.Interfaces;
-using Experis.Ciber.Authentication.Microsoft.APIObjects;
+﻿using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Repositories
 {

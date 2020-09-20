@@ -1,9 +1,4 @@
-﻿using Dissimilis.WebAPI.Database.Interfaces;
-using Dissimilis.WebAPI.Database.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Dissimilis.DbContext.Interfaces;
 
 namespace Dissimilis.WebAPI.DTOs
 {

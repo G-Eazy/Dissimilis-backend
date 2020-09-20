@@ -1,5 +1,4 @@
-﻿using Dissimilis.WebAPI.Database.Models;
-using System;
+﻿using System;
 
 namespace Dissimilis.WebAPI.Repositories
 {

@@ -12,8 +12,10 @@
         "API_BASEURL": "http://localhost:5000/",
         "FRONTEND_BASE_URL": "http://localhost:4200/",
 
-        "SQL_CONNECTION_STRING": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DissimilisDev;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+        "SQL_CONNECTION_STRING": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DissimilisDev;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
 
+
+        "AZURE_CLIENT_SECRET": "86a8.sy8U75O-owRYNV9Ku9~5.DDb6e-SU"
       }
     }
   }
