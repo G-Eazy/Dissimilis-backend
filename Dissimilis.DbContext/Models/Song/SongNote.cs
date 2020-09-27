@@ -3,9 +3,9 @@
 namespace Dissimilis.DbContext.Models.Song
 {
     /// <summary>
-    /// This is the Note, which is associated with a Bar (norsk: Takt)
+    /// Note
     /// </summary>
-    public class Note 
+    public class SongNote 
     {
         /// <summary>
         /// The id of this Note
@@ -35,7 +35,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// The bar it is linked to
         /// and the corresponding BarId
         /// </summary>
-        public Bar Bar { get; set; }
+        public SongBar SongBar { get; set; }
         public int BarId { get; set; }
 
        

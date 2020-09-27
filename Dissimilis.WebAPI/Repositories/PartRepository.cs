@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -31,16 +32,16 @@ namespace Dissimilis.WebAPI.Repositories
         {
             if (partId <= 0) return null;
 
-            Part ExistsPart = await this.context.Parts
+            SongVoice existsSongVoice = await this.context.SongParts
                 .Include(p => p.Instrument)
                 .SingleOrDefaultAsync(p => p.Id == partId);
 
             PartDTO PartObject = null;
 
-            if (ExistsPart != null)
+            if (existsSongVoice != null)
             {
-                PartObject = new PartDTO(ExistsPart);
-                PartObject.Bars = await GetAllBarsForParts(ExistsPart.Id);
+                PartObject = new PartDTO(existsSongVoice);
+                PartObject.Bars = await GetAllBarsForParts(existsSongVoice.Id);
             }
 
             return PartObject;
@@ -50,20 +51,20 @@ namespace Dissimilis.WebAPI.Repositories
         /// <summary>
         /// Create a new Part to a Song
         /// </summary>
-        /// <param name="NewPartObject"></param>
+        /// <param name="createPartObject"></param>
         /// <param name="userId"></param>
         /// <returns>SuperDTO</returns>
-        public async Task<int> CreatePart(NewPartDTO NewPartObject, uint userId)
+        public async Task<int> CreatePart(CreatePartDto createPartObject, uint userId)
         {
             //Check if values are present in DTO, return 0 if one is missing
-            if (!IsValidDTO<NewPartDTO, NewPartDTOValidator>(NewPartObject)) return 0;
+            if (!IsValidDTO<CreatePartDto, NewPartDTOValidator>(createPartObject)) return 0;
 
             var ExistsSong = await this.context.Songs
-                .SingleOrDefaultAsync(s => s.Id == NewPartObject.SongId);
+                .SingleOrDefaultAsync(s => s.Id == createPartObject.SongId);
 
             if (!ValidateUser(userId, ExistsSong)) return 0;
 
-            var ExistsInstrument = await CreateOrFindInstrument(NewPartObject.Title, userId);
+            var ExistsInstrument = await CreateOrFindInstrument(createPartObject.Title, userId);
             // This will trigger BadRequest from controller, Will remove when we have exception handler
             if (ExistsInstrument == null)
                 return 0;
@@ -72,9 +73,9 @@ namespace Dissimilis.WebAPI.Repositories
 
             if (ExistsSong != null)
             {
-                var PartModelObject = new Part(ExistsSong.Id, ExistsInstrument.Id, NewPartObject.PartNumber);
+                var PartModelObject = new SongVoice(ExistsSong.Id, ExistsInstrument.Id, createPartObject.PartNumber);
                 
-                await this.context.Parts.AddAsync(PartModelObject);
+                await this.context.SongParts.AddAsync(PartModelObject);
                 result = PartModelObject.Id;
             }
             return result;
@@ -87,14 +88,14 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="PartObjects"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<bool> CreateAllParts(int songId, NewPartDTO[] PartObjects, uint userId)
+        public async Task<bool> CreateAllParts(int songId, CreatePartDto[] PartObjects, uint userId)
         {
             if (PartObjects == null || PartObjects.Count() == 0) return false;
             if (songId <= 0) return false;
 
             byte partNumber = 1;
 
-            foreach(NewPartDTO part in PartObjects)
+            foreach(CreatePartDto part in PartObjects)
             {
                 part.SongId = songId;
                 part.PartNumber = partNumber++;
@@ -103,7 +104,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             await this.context.SaveChangesAsync();
 
-            int[] allParts = await this.context.Parts
+            int[] allParts = await this.context.SongParts
                 .Where(b => b.SongId== songId)
                 .OrderBy(b => b.PartNumber)
                 .Select(b => b.Id)
@@ -119,7 +120,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             for (int i = 0; i < allParts.Count(); i++)
             {
-                int[] allBars = await this.context.Bars
+                int[] allBars = await this.context.SongBars
                    .Where(b => b.PartId == allParts[i])
                    .OrderBy(b => b.BarNumber)
                    .Select(b => b.Id)
@@ -137,10 +138,10 @@ namespace Dissimilis.WebAPI.Repositories
 
         public async Task DeleteParts(int songId, uint userId)
         {
-            var AllParts = this.context.Parts.Where(p => p.SongId == songId);
-            foreach (Part part in AllParts)
+            var AllParts = this.context.SongParts.Where(p => p.SongId == songId);
+            foreach (SongVoice part in AllParts)
             {
-                this.context.Parts.Remove(part);
+                this.context.SongParts.Remove(part);
             }
 
             await this.context.SaveChangesAsync();
@@ -154,7 +155,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="userId"></param>
         private async Task<bool> UpdatePartNumbers(int partNumber, int songId, uint userId)
         {
-            Part[] AllParts = this.context.Parts.Where(b => b.SongId == songId)
+            SongVoice[] AllParts = this.context.SongParts.Where(b => b.SongId == songId)
                 .OrderBy(x => x.PartNumber)
                 .ToArray();
 
@@ -203,15 +204,15 @@ namespace Dissimilis.WebAPI.Repositories
             bool Updated = false;
             if (! IsValidDTO<UpdatePartDTO, UpdatePartDTOValidator>(UpdatePartObject)) return Updated;
 
-            var PartModelObject = await this.context.Parts
+            var PartModelObject = await this.context.SongParts
                 .Include(p => p.Song)
                 .Include(p => p.Instrument)
                 .SingleOrDefaultAsync(s => s.Id == UpdatePartObject.Id);
 
             if (PartModelObject != null && ValidateUser(userId, PartModelObject.Song))
             {
-                Part CheckPartNumber = await this.context.Parts.SingleOrDefaultAsync(p => p.PartNumber == UpdatePartObject.PartNumber && p.SongId == UpdatePartObject.SongId);
-                if (CheckPartNumber != null)
+                SongVoice checkSongVoiceNumber = await this.context.SongParts.SingleOrDefaultAsync(p => p.PartNumber == UpdatePartObject.PartNumber && p.SongId == UpdatePartObject.SongId);
+                if (checkSongVoiceNumber != null)
                 {
                     await UpdatePartNumbers(UpdatePartObject.PartNumber, UpdatePartObject.SongId, userId);
                 }
@@ -244,13 +245,13 @@ namespace Dissimilis.WebAPI.Repositories
             bool Deleted = false;
             if (partId <= 0) return Deleted;
 
-            var PartModelObject = await this.context.Parts
+            var PartModelObject = await this.context.SongParts
                 .Include(p => p.Song)
                 .SingleOrDefaultAsync(p => p.Id == partId);
 
             if (PartModelObject != null && ValidateUser(userId, PartModelObject.Song))
             {
-                this.context.Parts.Remove(PartModelObject);
+                this.context.SongParts.Remove(PartModelObject);
                  await this.context.SaveChangesAsync();
             }
             
@@ -263,17 +264,17 @@ namespace Dissimilis.WebAPI.Repositories
         /// </summary>
         /// <param name="partId"></param>
         /// <returns>BarDTOArray</returns>
-        private async Task<BarDTO[]> GetAllBarsForParts(int partId)
+        private async Task<BarDto[]> GetAllBarsForParts(int partId)
         {
-            BarDTO[] AllBars = await this.context.Bars
+            BarDto[] AllBars = await this.context.SongBars
                 .Where(b => b.PartId == partId)
                 .OrderBy(b => b.BarNumber)
-                .Select(b => new BarDTO(b))
+                .Select(b => new BarDto(b))
                 .ToArrayAsync();
 
-            var BarIds = AllBars.Select(x => x.Id);
+            var BarIds = AllBars.Select(x => x.BarId);
 
-            var AllNotes =  await this.context.Notes
+            var AllNotes =  await this.context.SongNotes
                 .Where(n => BarIds.Contains(n.BarId))
                 .OrderBy(n => n.NoteNumber)
                 .Select(n => new NoteDto(n))
@@ -281,7 +282,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             foreach (var bar in AllBars)
             {
-                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
+                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.BarId).ToArray();
             }
 
             return AllBars;

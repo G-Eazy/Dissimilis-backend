@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <param name="NewNoteObject"></param>
         /// <returns>201</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateNote([FromBody] NewNoteDTO NewNoteObject)
+        public async Task<IActionResult> CreateNote([FromBody] NoteDto NewNoteObject)
         {
             int result = await repository.CreateNote(NewNoteObject, base.UserID);
             if (result != 0)

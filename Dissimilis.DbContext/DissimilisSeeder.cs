@@ -116,9 +116,9 @@ namespace Dissimilis.DbContext
 			
 			context.SaveChanges();
             {
-				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 1, PartNumber = 1 });
-				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 2, PartNumber = 1 });
-				context.Parts.Add(new Part() { InstrumentId = 4, SongId = 3, PartNumber = 1 });
+				context.SongParts.Add(new SongVoice() { InstrumentId = 4, SongId = 1, PartNumber = 1 });
+				context.SongParts.Add(new SongVoice() { InstrumentId = 4, SongId = 2, PartNumber = 1 });
+				context.SongParts.Add(new SongVoice() { InstrumentId = 4, SongId = 3, PartNumber = 1 });
 			}
 
 			

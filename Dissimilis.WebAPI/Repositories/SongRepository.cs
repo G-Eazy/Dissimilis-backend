@@ -7,6 +7,7 @@ using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using BarDto = Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut.BarDto;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -122,13 +123,13 @@ namespace Dissimilis.WebAPI.Repositories
             await this.context.SaveChangesAsync();
 
             // Creating partiture and linking to Song
-            NewPartDTO NewPartObject = new NewPartDTO()
+            CreatePartDto createPartObject = new CreatePartDto()
             {
                 SongId = SongModelObject.Id,
                 Title = "Partitur", // Hardcoded for now, will be in NewSongDTO when frontend is ready
                 PartNumber = 1
             };
-            await this.partRepository.CreatePart(NewPartObject, userId);
+            await this.partRepository.CreatePart(createPartObject, userId);
             await this.context.SaveChangesAsync();
 
             // Sending Song with first Part back as request body
@@ -225,7 +226,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<PartDto[]> GetAllPartsForSong(int songId)
         {
-            var AllParts = await this.context.Parts
+            var AllParts = await this.context.SongParts
                 .Where(x => x.SongId == songId)
                 .OrderBy(x => x.PartNumber)
                 .Include(p => p.Instrument)
@@ -234,15 +235,15 @@ namespace Dissimilis.WebAPI.Repositories
 
             var PartIds = AllParts.Select(x => x.PartId);
 
-            var AllBars = await this.context.Bars
+            var AllBars = await this.context.SongBars
                 .Where(b => PartIds.Contains(b.PartId))
                 .OrderBy(b => b.BarNumber)
-                .Select(b => new BarDTO(b))
+                .Select(b => new BarDto(b))
                 .ToArrayAsync();
 
-            var BarIds = AllBars.Select(x => x.Id);
+            var BarIds = AllBars.Select(x => x.BarId);
 
-            var AllNotes = await this.context.Notes
+            var AllNotes = await this.context.SongNotes
                 .Where(n => BarIds.Contains(n.BarId))
                 .OrderBy(n => n.NoteNumber)
                 .Select(n => new NoteDTO(n))
@@ -252,7 +253,7 @@ namespace Dissimilis.WebAPI.Repositories
             foreach (var bar in AllBars)
             {
            
-                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.Id).ToArray();
+                bar.ChordsAndNotes = AllNotes.Where(x => x.BarId == bar.BarId).ToArray();
             }
 
             foreach (var part in AllParts)

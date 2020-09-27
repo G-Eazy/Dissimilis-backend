@@ -12,15 +12,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int? House { get; set; }
         public NoteDto[] ChordsAndNotes { get; set; }
 
-        public BarDto(Bar bar)
+        public BarDto(SongBar songBar)
         {
 
-            BarId = bar.Id;
-            BarNumber = bar.BarNumber;
-            RepBefore = bar.RepBefore;
-            RepAfter = bar.RepAfter;
-            House = bar.House;
-            ChordsAndNotes = bar.Notes
+            BarId = songBar.Id;
+            BarNumber = songBar.BarNumber;
+            RepBefore = songBar.RepBefore;
+            RepAfter = songBar.RepAfter;
+            House = songBar.House;
+            ChordsAndNotes = songBar.Notes
                 .OrderBy(n => n.NoteNumber)
                 .Select(n => new NoteDto(n))
                 .ToArray();

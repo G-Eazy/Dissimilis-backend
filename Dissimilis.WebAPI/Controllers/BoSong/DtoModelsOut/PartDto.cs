@@ -15,15 +15,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public BarDto[] Bars { get; set; }
 
 
-        public PartDto(Part part)
+        public PartDto(SongVoice songVoice)
         {
-            if (part?.Instrument == null)
+            if (songVoice?.Instrument == null)
                 return;
 
-            PartId = part.Id;
-            PartNumber = part.PartNumber;
-            Title = part.Instrument.Name;
-            Bars = part.Bars
+            PartId = songVoice.Id;
+            PartNumber = songVoice.PartNumber;
+            Title = songVoice.Instrument.Name;
+            Bars = songVoice.Bars
                 .OrderBy(b => b.BarNumber)
                 .Select(b => new BarDto(b))
                 .ToArray();

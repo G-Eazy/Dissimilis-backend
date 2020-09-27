@@ -51,8 +51,8 @@ namespace Dissimilis.DbContext.Models
 
         public ICollection<Song.Song> SongsCreated { get; set; } = new List<Song.Song>();
         public ICollection<Song.Song> SongsUpdated { get; set; } = new List<Song.Song>();
-        public ICollection<Part> PartsCreated { get; set; } = new List<Part>();
-        public ICollection<Part> PartsUpdated { get; set; } = new List<Part>();
+        public ICollection<SongVoice> PartsCreated { get; set; } = new List<SongVoice>();
+        public ICollection<SongVoice> PartsUpdated { get; set; } = new List<SongVoice>();
 
 
         /// <summary>

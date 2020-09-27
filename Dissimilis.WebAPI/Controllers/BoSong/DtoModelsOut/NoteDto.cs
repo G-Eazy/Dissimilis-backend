@@ -14,12 +14,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         /// </summary>
         public string[] Notes { get; set; }
 
-        public NoteDto(Note note)
+        public NoteDto(SongNote songNote)
         {
-            NoteId = note.Id;
-            NoteNumber = note.NoteNumber;
-            Length = note.Length;
-            Notes = note.NoteValues;
+            NoteId = songNote.Id;
+            NoteNumber = songNote.NoteNumber;
+            Length = songNote.Length;
+            Notes = songNote.NoteValues;
         }
     }
 }

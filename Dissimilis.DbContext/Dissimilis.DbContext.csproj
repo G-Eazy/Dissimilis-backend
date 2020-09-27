@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\User\" />
-  </ItemGroup>
-
 </Project>

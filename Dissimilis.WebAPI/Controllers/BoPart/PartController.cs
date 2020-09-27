@@ -9,11 +9,11 @@ namespace Dissimilis.WebAPI.Controllers
 {
     [Route("api/voice")]
     [ApiController]
-    public class PartController : UserControllerBase
+    public class OldPartController : UserControllerBase
     {
         private PartRepository repository;
         
-        public PartController(DissimilisDbContext context)
+        public OldPartController(DissimilisDbContext context)
         {
             this.repository = new PartRepository(context);
         }

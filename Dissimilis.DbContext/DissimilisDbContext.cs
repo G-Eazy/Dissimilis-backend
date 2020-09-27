@@ -15,19 +15,13 @@ namespace Dissimilis.DbContext
         //Create Database set for all the models
         public DbSet<User> Users { get; set; }
         public DbSet<Song> Songs { get; set; }
-        public DbSet<Part> Parts { get; set; }
-        public DbSet<Resource> Resources { get; set; }
-        public DbSet<Bar> Bars { get; set; }
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<SongVoice> SongParts { get; set; }
+        public DbSet<SongBar> SongBars { get; set; }
+        public DbSet<SongNote> SongNotes { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Instrument> Instruments { get; set; }
-        public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
-        public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
-        public DbSet<UserGroupResources> UserGroupResources { get; set; }
-
-
-
+     
 
         /// <summary>
         /// Created the models and configure them
@@ -46,10 +40,7 @@ namespace Dissimilis.DbContext
             BuildNote(modelBuilder);
             BuildCountry(modelBuilder);
             BuildOrganisation(modelBuilder);
-            BuildUserGroup(modelBuilder);
-            BuildUserGroupMembers(modelBuilder);
-            BuildResources(modelBuilder);
-            BuildUserGroupResource(modelBuilder);
+            
         }
 
 
@@ -105,7 +96,7 @@ namespace Dissimilis.DbContext
 
         static void BuildPart(ModelBuilder builder)
         {
-            var entity = builder.Entity<Part>();
+            var entity = builder.Entity<SongVoice>();
 
             entity.HasIndex(x => new
             {
@@ -143,7 +134,7 @@ namespace Dissimilis.DbContext
 
         static void BuildBar(ModelBuilder builder)
         {
-            var entity = builder.Entity<Bar>();
+            var entity = builder.Entity<SongBar>();
 
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
@@ -151,7 +142,7 @@ namespace Dissimilis.DbContext
             entity.HasIndex(x => new { x.PartId, x.BarNumber }).IsUnique();
 
             //Set foregin key for PartId linked to the Id of Part
-            entity.HasOne(x => x.Part)
+            entity.HasOne(x => x.SongVoice)
                 .WithMany()
                 .HasForeignKey(x => x.PartId)
                 .HasPrincipalKey(x => x.Id)
@@ -161,7 +152,7 @@ namespace Dissimilis.DbContext
 
         static void BuildNote(ModelBuilder builder)
         {
-            var entity = builder.Entity<Note>();
+            var entity = builder.Entity<SongNote>();
 
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
@@ -169,7 +160,7 @@ namespace Dissimilis.DbContext
             entity.HasIndex(x => new { x.BarId, x.NoteNumber }).IsUnique();
 
             //Set foregin key for PartId linked to the Id of Part
-            entity.HasOne(x => x.Bar)
+            entity.HasOne(x => x.SongBar)
                 .WithMany()
                 .HasForeignKey(x => x.BarId)
                 .HasPrincipalKey(x => x.Id)
@@ -197,23 +188,7 @@ namespace Dissimilis.DbContext
 
         }
 
-        static void BuildUserGroup(ModelBuilder builder)
-        {
-            var entity = builder.Entity<UserGroup>();
-
-            entity.Property(x => x.Name).IsRequired();
-            entity.HasIndex(x => x.Name).IsUnique();
-
-        }
-
-        static void BuildResources(ModelBuilder builder)
-        {
-            var entity = builder.Entity<Resource>();
-
-            entity.HasIndex(x => x.Name).IsUnique();
-
-        }
-
+     
         static void BuildOrganisation(ModelBuilder builder)
         {
             var entity = builder.Entity<Organisation>();
@@ -222,46 +197,7 @@ namespace Dissimilis.DbContext
 
         }
 
-        static void BuildUserGroupMembers(ModelBuilder builder)
-        {
-            var entity = builder.Entity<UserGroupMembers>();
-            entity.HasKey(fk => new { fk.UserId, fk.UserGroupId });
-
-            entity
-                .HasOne(x => x.User)
-                .WithMany()
-                .HasForeignKey(x => x.UserId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-            entity
-                .HasOne(x => x.UserGroup)
-                .WithMany()
-                .HasForeignKey(x => x.UserGroupId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
-
-        static void BuildUserGroupResource(ModelBuilder builder)
-        {
-            var entity = builder.Entity<UserGroupResources>();
-
-            entity.HasKey(fk => new { fk.ResourceId, fk.UserGroupId });
-
-            entity
-                .HasOne(x => x.UserGroup)
-                .WithMany()
-                .HasForeignKey(x => x.UserGroupId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity
-                .HasOne(x => x.Resource)
-                .WithMany()
-                .HasForeignKey(x => x.ResourceId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
-
+     
         #endregion
 
 

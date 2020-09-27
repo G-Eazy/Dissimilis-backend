@@ -5,9 +5,9 @@ using Dissimilis.DbContext.Interfaces;
 namespace Dissimilis.DbContext.Models.Song
 {
     /// <summary>
-    /// This is the bar, which is associated with a Part (norsk: Stemme)
+    /// Norsk: Takt
     /// </summary>
-    public class Bar
+    public class SongBar
     {
         /// <summary>
         /// The id of this bar
@@ -41,25 +41,17 @@ namespace Dissimilis.DbContext.Models.Song
         /// The part it is linked to
         /// and the corresponding PartId
         /// </summary>
-        public Part Part { get; set; }
+        public SongVoice SongVoice { get; set; }
         public int PartId { get; set; }
 
-        public ICollection<Note> Notes { get; set; } = new List<Note>();
+        public ICollection<SongNote> Notes { get; set; } = new List<SongNote>();
 
         /// <summary>
         /// Empty constructor for Bar
         /// </summary>
-        public Bar() { }
+        public SongBar() { }
 
-        public Bar(INewBar bar)
-        {
-            this.BarNumber = bar.BarNumber;
-            this.PartId = bar.PartId;
-            this.RepAfter = bar.RepAfter;
-            this.RepBefore = bar.RepBefore;
-            this.House = bar.House;
-        }
-
+       
       
     }
 }

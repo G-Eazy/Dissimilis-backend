@@ -6,16 +6,13 @@ using Dissimilis.DbContext.Interfaces;
 namespace Dissimilis.DbContext.Models.Song
 {
     /// <summary>
-    /// This is a part, which is associated with a Song and contains bars
+    /// Norsk: Partitur / Stemme
     /// </summary>
-    public class Part : ICreatedAndUpdated
+    public class SongVoice : ICreatedAndUpdated
     {
         [Key]
         public int Id { get; set; }
 
-        /// <summary>
-        /// The priority the voice has over other voices
-        /// </summary>
         public int PartNumber { get; set; }
 
 
@@ -38,9 +35,9 @@ namespace Dissimilis.DbContext.Models.Song
         public Song Song { get; set; }
         public int SongId { get; set; }
 
-        public ICollection<Bar> Bars { get; set; } = new List<Bar>();
+        public ICollection<SongBar> Bars { get; set; } = new List<SongBar>();
 
-        public Part() { }
+        public SongVoice() { }
 
         /// <summary>
         /// Constructor to create a part
@@ -48,13 +45,12 @@ namespace Dissimilis.DbContext.Models.Song
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
         /// <param name="partNumber"></param>
-        public Part(int songId, int instrumentId, byte partNumber)
+        public SongVoice(int songId, int instrumentId, byte partNumber)
         {
             SongId = songId;
             InstrumentId = instrumentId;
             PartNumber = partNumber;
         }
-
-
+        
     }
 }

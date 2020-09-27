@@ -20,7 +20,7 @@ namespace Dissimilis.DbContext.Models
         public string Name { get; set; }
 
         
-        public ICollection<Part> Parts { get; set; } = new List<Part>();
+        public ICollection<SongVoice> Parts { get; set; } = new List<SongVoice>();
 
         public Instrument() { }
 

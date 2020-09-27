@@ -29,14 +29,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 throw new NotFoundException($"Song with Id {songId} not found");
             }
 
-            await _context.Parts
+            await _context.SongParts
                 .Include(p => p.Instrument)
                 .Where(p => p.SongId == songId)
                 .LoadAsync(cancellationToken);
 
-            await _context.Bars
+            await _context.SongBars
                 .Include(b => b.Notes)
-                .Where(b => b.Part.SongId == songId)
+                .Where(b => b.SongVoice.SongId == songId)
                 .LoadAsync(cancellationToken);
 
             return song;

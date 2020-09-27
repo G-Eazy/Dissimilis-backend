@@ -1,6 +1,6 @@
 ﻿namespace Dissimilis.WebAPI.DTOs
 {
-    public class UpdatePartDTO : NewPartDTO
+    public class UpdatePartDTO : CreatePartDto
     {
         public int Id { get; set; }
     }
