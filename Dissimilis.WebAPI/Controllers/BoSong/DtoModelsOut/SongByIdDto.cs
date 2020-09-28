@@ -16,7 +16,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public DateTimeOffset? UpdatedOn { get; set; }
 
-        public PartDto[] Voices { get; set; }
+        public SongVoiceDto[] Voices { get; set; }
 
         public SongByIdDto(Song song)
         {
@@ -27,8 +27,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             Numerator = song.Numerator;
             Denominator = song.Denominator;
 
-            Voices = song.Parts
-                .Select(p => new PartDto(p))
+            Voices = song.Voices
+                .Select(p => new SongVoiceDto(p))
                 .OrderBy(p => p.PartNumber)
                 .ToArray();
         }

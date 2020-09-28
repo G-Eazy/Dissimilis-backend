@@ -6,7 +6,7 @@ using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class UserHandlingRepository : IUserHandlingRepository
+    public class UserHandlingRepository 
     {
         private readonly DissimilisDbContext context;
         private readonly UserRepository userRepo;
@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Repositories
             if(user.CountryId == null)
             {
                 //The create or find method handles null values
-                Country country = await this.countryRepo.CreateOrFindCountryAsync(orgData, (uint)user.Id);
+                Country country = await this.countryRepo.CreateOrFindCountryAsync(orgData);
                 user = await this.userRepo.UpdateUserCountryAsync(user, country);
             }
          

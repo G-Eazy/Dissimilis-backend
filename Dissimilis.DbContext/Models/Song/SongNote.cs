@@ -29,7 +29,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// "G" | "E" | "C"​​ | "D#"​​ | "A#"​​ | "H" | "A"​​ | "D"​​ | "F"​​ | "F#"​​ | "G#"​​ | "C#" | " "
         /// </summary>
         [MaxLength(100)]
-        public string[] NoteValues { get; set; }
+        public string NoteValues { get; set; }
 
         /// <summary>
         /// The bar it is linked to
@@ -38,6 +38,7 @@ namespace Dissimilis.DbContext.Models.Song
         public SongBar SongBar { get; set; }
         public int BarId { get; set; }
 
-       
+
+      
     }
 }

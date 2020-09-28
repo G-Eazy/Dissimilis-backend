@@ -3,7 +3,7 @@ using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
-    public class PartDto
+    public class SongVoiceDto
     {
         public int PartId { get; set; }
 
@@ -15,15 +15,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public BarDto[] Bars { get; set; }
 
 
-        public PartDto(SongVoice songVoice)
+        public SongVoiceDto(SongVoice songVoice)
         {
-            if (songVoice?.Instrument == null)
-                return;
-
             PartId = songVoice.Id;
-            PartNumber = songVoice.PartNumber;
-            Title = songVoice.Instrument.Name;
-            Bars = songVoice.Bars
+            PartNumber = songVoice.VoiceNumber;
+            Title = songVoice.Instrument?.Name;
+            Bars = songVoice.SongBars
                 .OrderBy(b => b.BarNumber)
                 .Select(b => new BarDto(b))
                 .ToArray();

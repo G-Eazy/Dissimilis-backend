@@ -13,7 +13,7 @@ namespace Dissimilis.DbContext.Models.Song
         [Key]
         public int Id { get; set; }
 
-        public int PartNumber { get; set; }
+        public int VoiceNumber { get; set; }
 
 
         public User CreatedBy { get; set; }
@@ -35,7 +35,7 @@ namespace Dissimilis.DbContext.Models.Song
         public Song Song { get; set; }
         public int SongId { get; set; }
 
-        public ICollection<SongBar> Bars { get; set; } = new List<SongBar>();
+        public ICollection<SongBar> SongBars { get; set; } = new List<SongBar>();
 
         public SongVoice() { }
 
@@ -44,12 +44,12 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
-        /// <param name="partNumber"></param>
-        public SongVoice(int songId, int instrumentId, byte partNumber)
+        /// <param name="voiceNumber"></param>
+        public SongVoice(int songId, int instrumentId, byte voiceNumber)
         {
             SongId = songId;
             InstrumentId = instrumentId;
-            PartNumber = partNumber;
+            VoiceNumber = voiceNumber;
         }
         
     }

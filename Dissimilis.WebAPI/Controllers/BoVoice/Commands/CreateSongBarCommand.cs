@@ -8,32 +8,32 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
-    public class CreateBarCommand : IRequest<UpdatedBarCommandDto>
+    public class CreateSongBarCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
         public CreateBarDto Command { get; }
-        public int PartId { get; set; }
+        public int SongVoiceId { get; set; }
 
-        public CreateBarCommand(int songId, int partId, CreateBarDto command)
+        public CreateSongBarCommand(int songId, int songVoiceId, CreateBarDto command)
         {
             SongId = songId;
             Command = command;
-            PartId = partId;
+            SongVoiceId = songVoiceId;
         }
     }
 
-    public class CreateBarCommandHandler : IRequestHandler<CreateBarCommand, UpdatedBarCommandDto>
+    public class CreateSongBarCommandHandler : IRequestHandler<CreateSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
 
-        public CreateBarCommandHandler(Repository repository)
+        public CreateSongBarCommandHandler(Repository repository)
         {
             _repository = repository;
         }
 
-        public async Task<UpdatedBarCommandDto> Handle(CreateBarCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedCommandDto> Handle(CreateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetPartById(request.SongId, request.PartId, cancellationToken);
+            var part = await _repository.GetSongPartById(request.SongId, request.SongVoiceId, cancellationToken);
 
             var bar = new SongBar()
             {
@@ -44,19 +44,19 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             };
 
             // Add/update for all parts of the song. 
-
-            var barsToIncrease = part.Bars.Where(b => b.BarNumber >= bar.BarNumber);
+            // TODO Add last, count to ensure all songVoices of the song have the same amount of bars
+            var barsToIncrease = part.SongBars.Where(b => b.BarNumber >= bar.BarNumber);
             foreach (var songBar in barsToIncrease)
             {
                 songBar.BarNumber++;
             }
-            part.Bars.Add(bar);
-
+            part.SongBars.Add(bar);
             part.SortBars();
+
 
             await _repository.UpdateAsync(cancellationToken);
 
-            return new UpdatedBarCommandDto(bar);
+            return new UpdatedCommandDto(bar);
         }
     }
 }

@@ -6,7 +6,7 @@ using Experis.Ciber.Authentication.Microsoft.APIObjects;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class CountryRepository : ICountryRepositories
+    public class CountryRepository
     {
         private readonly DissimilisDbContext context;
 
@@ -21,18 +21,18 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="name"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Country> CreateCountryAsync(string name, uint userId)
+        public async Task<Country> CreateCountryAsync(string name)
         {
             //Double check in case the name already exists
             Country country = await GetCountryByNameAsync(name);
-            if(country is null)
+            if (country is null)
             {
                 country = new Country(name);
                 await this.context.Countries.AddAsync(country);
-                
+
                 await this.context.SaveChangesAsync();
             }
-            
+
             return country;
         }
 
@@ -43,10 +43,10 @@ namespace Dissimilis.WebAPI.Repositories
         /// <param name="metaData"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Country> CreateOrFindCountryAsync(OrganizationMetadata metaData, uint userId)
+        public async Task<Country> CreateOrFindCountryAsync(OrganizationMetadata metaData)
         {
             Country country;
-            if(metaData is null)
+            if (metaData is null)
             {
                 country = await GetCountryByNameAsync("Norge");
             }
@@ -56,22 +56,14 @@ namespace Dissimilis.WebAPI.Repositories
                 country = await GetCountryByNameAsync(metaData.country.ToString());
                 if (country is null)
                 {
-                    country = await CreateCountryAsync(metaData.country.ToString(), userId);
+                    country = await CreateCountryAsync(metaData.country.ToString());
                 }
             }
-                        
+
             return country;
         }
 
-        /// <summary>
-        /// Get country by the id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<Country> GetCountryByIdAsync(int id)
-        {
-            return await this.context.Countries.SingleOrDefaultAsync(c => c.Id == id);
-        }
+
 
         /// <summary>
         /// Get country based on country Name
@@ -80,7 +72,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<Country> GetCountryByNameAsync(string name)
         {
-            return await this.context.Countries.SingleOrDefaultAsync(c => c.Name == name);
+            return await context.Countries.SingleOrDefaultAsync(c => c.Name == name);
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using Dissimilis.WebAPI.DTOs;
+﻿using System;
+using Dissimilis.WebAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
@@ -22,11 +24,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
 
-        public async Task<SongBar> GetBarById(int songId, int partId, int barId, CancellationToken cancellationToken)
+        public async Task<SongBar> GetSongBarById(int songId, int partId, int barId, CancellationToken cancellationToken)
         {
             var bar = await context.SongBars
+                .Include(b => b.SongVoice)
                 .Include(b => b.Notes)
-                .Where(b => b.SongVoice.SongId == songId && b.PartId == partId)
+                .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
                 .FirstOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
             if (bar == null)
@@ -38,120 +41,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
 
-        /// <summary>
-        /// Update Bar numbers
-        /// </summary>
-        /// <param name="barNumber"></param>
-        /// <param name="partId"></param>
-        /// <param name="userId"></param>
-        private async Task<bool> UpdateBarNumbers(int barNumber, int partId, uint userId)
-        {
-            SongBar[] allbars = this.context.SongBars.Where(b => b.PartId == partId)
-                .OrderBy(x => x.BarNumber)
-                .ToArray();
-
-            for (int i = barNumber - 1; i < allbars.Count(); i++)
-            {
-                allbars[i].BarNumber++;
-            }
-
-
-            await this.context.SaveChangesAsync();
-            return true;
-        }
-
-        /// <summary>
-        /// Delete a bar by Id provided in BarDTO
-        /// </summary>
-        /// <param name="barId"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<bool> DeleteBar(int barId, uint userId)
-        {
-            bool Deleted = false;
-            if (barId <= 0) return Deleted;
-
-            SongBar songBarModel = await this.context.SongBars
-                .Include(b => b.SongVoice)
-                .ThenInclude(b => b.Song)
-                .SingleOrDefaultAsync(x => x.Id == barId);
-            if (songBarModel != null && ValidateUser(userId, songBarModel.SongVoice.Song))
-            {
-                this.context.Remove(songBarModel);
-                await context.SaveChangesAsync();
-            }
-
-            return Deleted;
-        }
-
-        /// <summary>
-        /// Get all the notes associated with this bar
-        /// </summary>
-        /// <param name="barId"></param>
-        /// <returns></returns>
-        private async Task<NoteDto[]> FindAllNotesForBar(int barId)
-        {
-            var AllNotes = this.context.SongNotes
-                           .Where(n => n.BarId == barId)
-                           .OrderBy(n => n.NoteNumber)
-                           .Select(n => new NoteDto(n))
-                           .ToArray();
-
-            return AllNotes;
-        }
-
-        /// <summary>
-        /// Update a bar using UpdateBarDTO
-        /// </summary>
-        /// <param name="UpdateBarObject"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<bool> UpdateBar(UpdateBarDTO UpdateBarObject, uint userId)
-        {
-            bool Updated = false;
-
-            if (!IsValidDTO<UpdateBarDTO, UpdateBarDTOValidator>(UpdateBarObject)) return Updated;
-
-            SongBar songBarModel = await this.context.SongBars
-                .Include(x => x.SongVoice)
-                .ThenInclude(x => x.Song)
-                .SingleOrDefaultAsync(b => b.Id == UpdateBarObject.Id);
-
-            if (songBarModel != null && ValidateUser(userId, songBarModel.SongVoice.Song))
-            {
-                SongBar checkSongBarNumber = await this.context.SongBars.SingleOrDefaultAsync(b => b.BarNumber == UpdateBarObject.BarNumber && b.PartId == UpdateBarObject.PartId);
-                if (checkSongBarNumber != null)
-                {
-                    await UpdateBarNumbers(UpdateBarObject.BarNumber, UpdateBarObject.PartId, userId);
-                }
-
-                if (UpdateBarObject.BarNumber != songBarModel.BarNumber) songBarModel.BarNumber = UpdateBarObject.BarNumber;
-                if (UpdateBarObject.RepAfter != songBarModel.RepAfter) songBarModel.RepAfter = UpdateBarObject.RepAfter;
-                if (UpdateBarObject.RepBefore != songBarModel.RepBefore) songBarModel.RepBefore = UpdateBarObject.RepBefore;
-                if (UpdateBarObject.House != songBarModel.House) songBarModel.House = UpdateBarObject.House;
-
-
-                await this.context.SaveChangesAsync();
-            }
-
-            return Updated;
-        }
-
-        public async Task SaveAsync(SongBar bar, CancellationToken cancellationToken)
-        {
-            await context.SongBars.AddAsync(bar, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<SongVoice> GetPartById(int songId, int partId, CancellationToken cancellationToken)
+        public async Task<SongVoice> GetSongPartById(int songId, int partId, CancellationToken cancellationToken)
         {
-            var part = await context.SongParts
-                .Include(p => p.Bars)
+            var part = await context.SongVoices
+                .Include(p => p.SongBars)
                 .Where(p => p.SongId == songId)
                 .FirstOrDefaultAsync(p => p.Id == partId, cancellationToken);
 
@@ -161,6 +59,68 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             }
 
             return part;
+        }
+
+        /// <summary>
+        /// Looks for an instrument with title InstrumentName, and creates if non-existant
+        /// </summary>
+        public async Task<Instrument> CreateOrFindInstrument(string InstrumentName, CancellationToken cancellationToken)
+        {
+
+            var instrument = await this.context.Instruments
+                .FirstOrDefaultAsync(i => i.Name == InstrumentName, cancellationToken: cancellationToken);
+
+            if (instrument != null)
+            {
+                return instrument;
+            }
+
+            instrument = new Instrument(InstrumentName);
+
+            await context.Instruments.AddAsync(instrument, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+            return instrument;
+        }
+
+        public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
+        {
+            var song = await context.Songs
+                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with Id {songId} not found");
+            }
+
+            await context.SongVoices
+                .Include(sv => sv.Instrument)
+                .Where(sv => sv.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            await context.SongBars
+                .Include(sb => sb.Notes)
+                .Where(sb => sb.SongVoice.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            return song;
+        }
+
+        public async Task<SongVoice> GetSongVoiceById(int songId, int songVoiceId, CancellationToken cancellationToken)
+        {
+            var songVoice = await context.SongVoices
+                .Include(sv => sv.SongBars)
+                .FirstOrDefaultAsync(sv => sv.SongId == songId && sv.Id == songVoiceId, cancellationToken);
+
+            if (songVoice == null)
+            {
+                throw new NotFoundException($"SongVoice with Id {songVoiceId} not found.");
+            }
+
+            await context.SongNotes
+                .Where(sn => sn.SongBar.SongVoiceId == songVoiceId)
+                .LoadAsync(cancellationToken);
+
+            return songVoice;
         }
     }
 }

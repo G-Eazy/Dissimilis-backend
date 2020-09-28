@@ -9,40 +9,40 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
-    public class DeleteBarCommand : IRequest<UpdatedBarCommandDto>
+    public class DeleteSongBarCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
-        public int PartId { get; set; }
+        public int SongVoiceId { get; set; }
         public int BarId { get; }
 
-        public DeleteBarCommand(int songId, int partId, int barId)
+        public DeleteSongBarCommand(int songId, int songVoiceId, int barId)
         {
             SongId = songId;
-            PartId = partId;
+            SongVoiceId = songVoiceId;
             BarId = barId;
         }
     }
 
-    public class DeleteBarCommandHandler : IRequestHandler<DeleteBarCommand, UpdatedBarCommandDto>
+    public class DeleteSongBarCommandHandler : IRequestHandler<DeleteSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
 
-        public DeleteBarCommandHandler(Repository repository)
+        public DeleteSongBarCommandHandler(Repository repository)
         {
             _repository = repository;
         }
 
-        public async Task<UpdatedBarCommandDto> Handle(DeleteBarCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedCommandDto> Handle(DeleteSongBarCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetPartById(request.SongId, request.PartId, cancellationToken);
+            var part = await _repository.GetSongPartById(request.SongId, request.SongVoiceId, cancellationToken);
 
-            var bar = part.Bars.FirstOrDefault(b => b.Id == request.BarId);
+            var bar = part.SongBars.FirstOrDefault(b => b.Id == request.BarId);
             if (bar == null)
             {
                 throw new NotFoundException($"Bar with Id {request.BarId} was not found");
             }
 
-            part.Bars.Remove(bar);
+            part.SongBars.Remove(bar);
             part.SortBars();
             await _repository.UpdateAsync(cancellationToken);
 

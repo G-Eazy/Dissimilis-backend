@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static void SortBars(this SongVoice songVoice)
         {
             var number = 1;
-            var orderedList = songVoice.Bars.OrderBy(b => b.BarNumber);
+            var orderedList = songVoice.SongBars.OrderBy(b => b.BarNumber);
             foreach (var songBar in orderedList)
             {
                 songBar.BarNumber = number++;

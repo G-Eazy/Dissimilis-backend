@@ -8,12 +8,12 @@ using Dissimilis.WebAPI.DTOs;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository 
     {
-        private DissimilisDbContext context;
+        private readonly DissimilisDbContext _context;
         public UserRepository(DissimilisDbContext context)
         {
-            this.context = context;
+            this._context = context;
         }
 
         public async Task<User> CreateOrFindUserAsync(UserEntityMetadata userMeta)
@@ -34,15 +34,9 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<User> CreateUserAsync(UserEntityMetadata meta)
         {
             var user = new User() { Name = meta.displayName, Email = meta.Email(), MsId = meta.id};
-            await this.context.Users.AddAsync(user);
-            await this.context.SaveChangesAsync();
+            await this._context.Users.AddAsync(user);
+            await this._context.SaveChangesAsync();
 
-            //add the user to the lowest usergroup
-            var userGroup = await this.context.UserGroups.SingleOrDefaultAsync(ug => ug.Name == "User");
-            await this.context.UserGroupMembers.AddAsync(new UserGroupMembers() { UserId = user.Id, UserGroupId = userGroup.Id });
-            
-            await this.context.SaveChangesAsync();
-            Console.WriteLine(user + " " + userGroup);
             return user;
         }
 
@@ -52,7 +46,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User[]> GetAllUsersAsync()
         {
-            return await this.context.Users.ToArrayAsync();
+            return await this._context.Users.ToArrayAsync();
         }
 
         /// <summary>
@@ -62,7 +56,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await this.context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            return await this._context.Users.SingleOrDefaultAsync(u => u.Email == email);
         }
 
         /// <summary>
@@ -72,17 +66,10 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> GetUserByIdAsync(int UserId)
         {
-            return await this.context.Users
+            return await this._context.Users
                 .FirstOrDefaultAsync(u => u.Id == UserId);
         }
 
-        public async Task<UserDTO> GetUserDTOByIdAsync(int id)
-        {
-            User user = await GetUserByIdAsync(id);
-            UserDTO userModel = new UserDTO(user);
-
-            return userModel;
-        }
 
         /// <summary>
         /// Get user by the microsoft ID
@@ -91,7 +78,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> GetUserByMsIdAsync(string id)
         {
-            return await context.Users.SingleOrDefaultAsync(x => x.MsId == id);
+            return await _context.Users.SingleOrDefaultAsync(x => x.MsId == id);
         }
 
 
@@ -105,7 +92,7 @@ namespace Dissimilis.WebAPI.Repositories
         {
             user.CountryId = country.Id;
             
-            await this.context.SaveChangesAsync();
+            await this._context.SaveChangesAsync();
             return user;
         }
 
@@ -119,7 +106,7 @@ namespace Dissimilis.WebAPI.Repositories
         {
             user.OrganisationId = organisation.Id;
             
-            await this.context.SaveChangesAsync();
+            await this._context.SaveChangesAsync();
             return user;
         }
     }

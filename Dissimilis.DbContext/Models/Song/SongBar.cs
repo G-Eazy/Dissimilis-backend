@@ -42,7 +42,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// and the corresponding PartId
         /// </summary>
         public SongVoice SongVoice { get; set; }
-        public int PartId { get; set; }
+        public int SongVoiceId { get; set; }
 
         public ICollection<SongNote> Notes { get; set; } = new List<SongNote>();
 

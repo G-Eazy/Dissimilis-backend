@@ -6,7 +6,7 @@ using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class OrganisationRepository : IOrganisationRepository
+    public class OrganisationRepository 
     {
         private DissimilisDbContext _context;
         public OrganisationRepository(DissimilisDbContext context)

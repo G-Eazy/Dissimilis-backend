@@ -68,7 +68,7 @@ namespace Dissimilis.WebAPI
             TelemetryDebugWriter.IsTracingDisabled = true;
 
             ConfigureDatabase(services);
-            
+
             services.AddServices<Startup>();
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
@@ -77,7 +77,7 @@ namespace Dissimilis.WebAPI
             services.AddControllers();
 
             services.AddSwaggerGen(SwaggerConfiguration.SetSwaggerGenOptions);
-            
+
             services.AddCors(options =>
             {
                 options.AddPolicy(CORSPOLICY,
@@ -142,20 +142,21 @@ namespace Dissimilis.WebAPI
             EnsureNorwegianCulture(app);
 
             dbContext.Database.Migrate();
-            
+            InitializeDb(dbContext);
+
             app.UseRouting();
             app.UseCors(CORSPOLICY);
 
             app.UseSwagger();
             app.UseSwaggerUI(SwaggerConfiguration.SetSwaggerUiOptions);
-            
+
             if (ConfigurationInfo.IsLocalDebugBuild())
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-            
+
             app.UseWebUserAuthentication();
 
             app.UseDefaultFiles();
@@ -163,13 +164,10 @@ namespace Dissimilis.WebAPI
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
-        public virtual void InitializeDb(
-            IWebHostEnvironment env,
-            IApplicationBuilder app,
-            DissimilisDbContext context)
+        public virtual void InitializeDb(DissimilisDbContext context)
         {
 
-            // TODO seed production master data
+            DissimilisSeeder.SeedBasicData(context);
 
             if (ConfigurationInfo.IsLocalDebugBuild())
             {

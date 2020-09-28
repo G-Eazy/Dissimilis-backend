@@ -5,34 +5,34 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
-    public class UpdateBarCommand : IRequest<UpdatedBarCommandDto>
+    public class UpdateSongBarCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
-        public int PartId { get; }
+        public int SongVoiceId { get; }
         public int BarId { get; }
         public UpdateBarDto Command { get; }
 
-        public UpdateBarCommand(int songId, int partId, int barId, UpdateBarDto command)
+        public UpdateSongBarCommand(int songId, int songVoiceId, int barId, UpdateBarDto command)
         {
             SongId = songId;
-            PartId = partId;
+            SongVoiceId = songVoiceId;
             BarId = barId;
             Command = command;
         }
     }
 
-    public class UpdateBarCommandHandler : IRequestHandler<UpdateBarCommand, UpdatedBarCommandDto>
+    public class UpdateSongBarCommandHandler : IRequestHandler<UpdateSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
 
-        public UpdateBarCommandHandler(Repository repository)
+        public UpdateSongBarCommandHandler(Repository repository)
         {
             _repository = repository;
         }
 
-        public async Task<UpdatedBarCommandDto> Handle(UpdateBarCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var bar = await _repository.GetBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
+            var bar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.BarId, cancellationToken);
 
             bar.RepAfter = request.Command.RepAfter;
             bar.RepBefore = request.Command.RepBefore;
@@ -40,7 +40,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             await _repository.UpdateAsync(cancellationToken);
 
-            return new UpdatedBarCommandDto(bar);
+            return new UpdatedCommandDto(bar);
         }
     }
 }

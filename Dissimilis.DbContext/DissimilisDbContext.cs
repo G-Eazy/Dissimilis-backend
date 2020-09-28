@@ -15,7 +15,7 @@ namespace Dissimilis.DbContext
         //Create Database set for all the models
         public DbSet<User> Users { get; set; }
         public DbSet<Song> Songs { get; set; }
-        public DbSet<SongVoice> SongParts { get; set; }
+        public DbSet<SongVoice> SongVoices { get; set; }
         public DbSet<SongBar> SongBars { get; set; }
         public DbSet<SongNote> SongNotes { get; set; }
         public DbSet<Country> Countries { get; set; }
@@ -101,12 +101,12 @@ namespace Dissimilis.DbContext
             entity.HasIndex(x => new
             {
                 x.SongId,
-                x.PartNumber
+                PartNumber = x.VoiceNumber
             }).IsUnique();
 
             //set foregin key for creator id
             entity.HasOne(x => x.Song)
-                .WithMany(s => s.Parts)
+                .WithMany(s => s.Voices)
                 .HasForeignKey(x => x.SongId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -139,12 +139,12 @@ namespace Dissimilis.DbContext
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
             //corresponding Part.
-            entity.HasIndex(x => new { x.PartId, x.BarNumber }).IsUnique();
+            entity.HasIndex(x => new { PartId = x.SongVoiceId, x.BarNumber }).IsUnique();
 
             //Set foregin key for PartId linked to the Id of Part
             entity.HasOne(x => x.SongVoice)
                 .WithMany()
-                .HasForeignKey(x => x.PartId)
+                .HasForeignKey(x => x.SongVoiceId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 

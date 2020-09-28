@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<BarDto> Handle(QueryBarById request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
+            var result = await _repository.GetSongBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
 
             return new BarDto(result);
         }
