@@ -49,10 +49,11 @@ namespace Dissimilis.DbContext.Models
         public Organisation Organisation { get; set; }
         public int? OrganisationId { get; set; }
 
+        public ICollection<Song.Song> SongsArranged { get; set; } = new List<Song.Song>();
         public ICollection<Song.Song> SongsCreated { get; set; } = new List<Song.Song>();
         public ICollection<Song.Song> SongsUpdated { get; set; } = new List<Song.Song>();
-        public ICollection<SongVoice> PartsCreated { get; set; } = new List<SongVoice>();
-        public ICollection<SongVoice> PartsUpdated { get; set; } = new List<SongVoice>();
+        public ICollection<SongVoice> SongVoiceCreated { get; set; } = new List<SongVoice>();
+        public ICollection<SongVoice> SongVoiceUpdated { get; set; } = new List<SongVoice>();
 
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Dissimilis.DbContext.Models
         /// <param name="email"></param>
         /// <param name="organisationId"></param>
         /// <param name="countryId"></param>
-        public User(string name, string email, int organisationId, int countryId)
+        public User(string name, string email, int? organisationId = null, int? countryId = null)
         {
             this.Email = email;
             this.OrganisationId = organisationId;

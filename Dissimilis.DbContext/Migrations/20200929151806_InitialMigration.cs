@@ -86,7 +86,7 @@ namespace Dissimilis.DbContext.Migrations
                     Composer = table.Column<string>(maxLength: 100, nullable: true),
                     Numerator = table.Column<int>(nullable: false),
                     Denominator = table.Column<int>(nullable: false),
-                    ArrangerId = table.Column<int>(nullable: false),
+                    ArrangerId = table.Column<int>(nullable: true),
                     CreatedById = table.Column<int>(nullable: true),
                     CreatedOn = table.Column<DateTimeOffset>(nullable: true),
                     UpdatedById = table.Column<int>(nullable: true),
@@ -122,11 +122,12 @@ namespace Dissimilis.DbContext.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VoiceNumber = table.Column<int>(nullable: false),
+                    IsMainVoice = table.Column<bool>(nullable: false),
                     CreatedById = table.Column<int>(nullable: true),
                     CreatedOn = table.Column<DateTimeOffset>(nullable: true),
                     UpdatedById = table.Column<int>(nullable: true),
                     UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    InstrumentId = table.Column<int>(nullable: false),
+                    InstrumentId = table.Column<int>(nullable: true),
                     SongId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -168,8 +169,7 @@ namespace Dissimilis.DbContext.Migrations
                     RepBefore = table.Column<bool>(nullable: false),
                     RepAfter = table.Column<bool>(nullable: false),
                     House = table.Column<int>(nullable: true),
-                    SongVoiceId = table.Column<int>(nullable: false),
-                    SongVoiceId1 = table.Column<int>(nullable: true)
+                    SongVoiceId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -180,12 +180,6 @@ namespace Dissimilis.DbContext.Migrations
                         principalTable: "SongVoices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SongBars_SongVoices_SongVoiceId1",
-                        column: x => x.SongVoiceId1,
-                        principalTable: "SongVoices",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -197,8 +191,7 @@ namespace Dissimilis.DbContext.Migrations
                     NoteNumber = table.Column<int>(nullable: false),
                     Length = table.Column<int>(nullable: false),
                     NoteValues = table.Column<string>(maxLength: 100, nullable: true),
-                    BarId = table.Column<int>(nullable: false),
-                    SongBarId1 = table.Column<int>(nullable: true)
+                    BarId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,12 +202,6 @@ namespace Dissimilis.DbContext.Migrations
                         principalTable: "SongBars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SongNotes_SongBars_SongBarId1",
-                        column: x => x.SongBarId1,
-                        principalTable: "SongBars",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -237,20 +224,10 @@ namespace Dissimilis.DbContext.Migrations
                 filter: "[Name] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SongBars_SongVoiceId1",
-                table: "SongBars",
-                column: "SongVoiceId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_SongBars_SongVoiceId_BarNumber",
                 table: "SongBars",
                 columns: new[] { "SongVoiceId", "BarNumber" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SongNotes_SongBarId1",
-                table: "SongNotes",
-                column: "SongBarId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SongNotes_BarId_NoteNumber",

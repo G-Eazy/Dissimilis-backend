@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
@@ -38,13 +39,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            // Todo clean Notes, ensure distinct, and of valid values
+            if (part.Notes.Any(n => n.NoteNumber == request.Command.NoteNumber))
+            {
+                throw new ValidationException("Note number already in use");
+            }
+
             var note = new SongNote()
             {
                 NoteNumber = request.Command.NoteNumber,
-                Length = request.Command.Length,
-                NoteValues =  request.Command.Notes.GetNoteValues()
+                Length = request.Command.Length
             };
+
+            note.SetNoteValues(request.Command.Notes);
 
             part.Notes.Add(note);
 

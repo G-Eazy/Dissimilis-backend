@@ -5,7 +5,9 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Services;
 using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
@@ -31,10 +33,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class UpdateSongNoteCommandHandler : IRequestHandler<UpdateSongNoteCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
+        private readonly AuthService _authService;
 
-        public UpdateSongNoteCommandHandler(Repository repository)
+        public UpdateSongNoteCommandHandler(Repository repository, AuthService authService)
         {
             _repository = repository;
+            _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
@@ -47,10 +51,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Note with Id {request.SongNoteId} not found");
             }
 
-            // TOOD clean notes, only valid and appearing ones
             note.Length = request.Command.Length;
             note.NoteNumber = request.Command.NoteNumber;
-            note.NoteValues = request.Command.Notes.GetNoteValues();
+            note.SetNoteValues(request.Command.Notes);
+
+            part.SongVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

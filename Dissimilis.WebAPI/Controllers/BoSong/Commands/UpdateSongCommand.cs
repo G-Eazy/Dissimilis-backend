@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             song.Numerator = request.Command.Numerator;
             song.Denominator = request.Command.Denominator;
 
-            song.SetUpdated(_authService.GetVerifiedCurrentUserId());
+            song.SetUpdated(_authService.GetVerifiedCurrentUser());
 
             await _repository.UpdateAsync(cancellationToken);
 

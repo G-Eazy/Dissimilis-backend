@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-    // TODO add authorization
+    [AllowAnonymous]
     [Route("api/song")]
     [ApiController]
     public class SongController : Controller
@@ -22,12 +23,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Search songs with optional filters
         /// </summary>
-        [HttpGet("search")]
+        [HttpPost("search")]
         [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<UpdateSongDto[]>> Search([FromQuery] SearchQueryDto command)
+        public async Task<IActionResult> Search([FromBody] SearchQueryDto command)
         {
-            var result = _mediator.Send(new QuerySongSearch(command));
+            var result = await _mediator.Send(new QuerySongSearch(command));
             return Ok(result);
         }
 

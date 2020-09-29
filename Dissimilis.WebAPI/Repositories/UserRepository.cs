@@ -8,46 +8,41 @@ using Dissimilis.WebAPI.DTOs;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class UserRepository 
+    public class UserRepository
     {
         private readonly DissimilisDbContext _context;
         public UserRepository(DissimilisDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public async Task<User> CreateOrFindUserAsync(UserEntityMetadata userMeta)
         {
-            var user = await this.GetUserByMsIdAsync(userMeta.id);
-            if(user is null)
+            var user = await GetUserByMsIdAsync(userMeta.id);
+            if (user != null)
             {
-                user = await this.GetUserByEmailAsync(userMeta.Email());
-                if(user is null)
-                {
-                    user = await CreateUserAsync(userMeta);
-                }
+                return user;
             }
+
+            user = await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
 
             return user;
         }
 
         public async Task<User> CreateUserAsync(UserEntityMetadata meta)
         {
-            var user = new User() { Name = meta.displayName, Email = meta.Email(), MsId = meta.id};
-            await this._context.Users.AddAsync(user);
-            await this._context.SaveChangesAsync();
+            var user = new User()
+            {
+                Name = meta.displayName,
+                Email = meta.Email(),
+                MsId = meta.id
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
             return user;
         }
 
-        /// <summary>
-        /// Get all users in a list
-        /// </summary>
-        /// <returns></returns>
-        public async Task<User[]> GetAllUsersAsync()
-        {
-            return await this._context.Users.ToArrayAsync();
-        }
 
         /// <summary>
         /// Get user by give email
@@ -56,19 +51,10 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await this._context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
         }
 
-        /// <summary>
-        /// Get user by ID
-        /// </summary>
-        /// <param name="UserId"></param>
-        /// <returns></returns>
-        public async Task<User> GetUserByIdAsync(int UserId)
-        {
-            return await this._context.Users
-                .FirstOrDefaultAsync(u => u.Id == UserId);
-        }
+
 
 
         /// <summary>

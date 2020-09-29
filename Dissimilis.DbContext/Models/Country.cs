@@ -12,6 +12,7 @@ namespace Dissimilis.DbContext.Models
         /// The name of the country
         /// </summary>
         [MaxLength(100)]
+        [Required]
         public string Name { get; set; }
 
         public ICollection<User> Users { get; set; } = new List<User>();

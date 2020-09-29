@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-    public class QuerySongSearch : IRequest<SongByIdDto[]>
+    public class QuerySongSearch : IRequest<SongIndexDto[]>
     {
         public SearchQueryDto Command { get; }
 
@@ -18,7 +18,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
     }
 
-    public class QuerySongSearchHandler : IRequestHandler<QuerySongSearch, SongByIdDto[]>
+    public class QuerySongSearchHandler : IRequestHandler<QuerySongSearch, SongIndexDto[]>
     {
         private readonly Repository _repository;
 
@@ -27,11 +27,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             _repository = repository;
         }
 
-        public async Task<SongByIdDto[]> Handle(QuerySongSearch request, CancellationToken cancellationToken)
+        public async Task<SongIndexDto[]> Handle(QuerySongSearch request, CancellationToken cancellationToken)
         {
             var result = await _repository.GetSongSearchList(request.Command, cancellationToken);
 
-            return result.Select(s => new SongByIdDto(s)).ToArray();
+            return result.Select(s => new SongIndexDto(s)).ToArray();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         public int? House { get; set; }
 
-    
+
         /// <summary>
         /// The part it is linked to
         /// and the corresponding PartId
@@ -51,7 +51,11 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         public SongBar() { }
 
-       
-      
+        public SongBar(int barNumber)
+        {
+            BarNumber = barNumber;
+        }
+
+
     }
 }

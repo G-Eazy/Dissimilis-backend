@@ -4,6 +4,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -18,6 +19,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public VoiceController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet("song/{songId:int}/voice/{voiceId:int}")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> GetSongVoice(int songId, int voiceId)
+        {
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            return Ok(result);
         }
 
         [HttpPost("song/{songId:int}/voice")]
@@ -55,11 +64,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<IActionResult> CreateBar(int songId, int voiceId, [FromBody] CreateBarDto command)
         {
             var item = await _mediator.Send(new CreateSongBarCommand(songId, voiceId, command));
-            var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
             return Created($"{item.SongBarId}", result);
         }
 
-      
+
         /// <summary>
         /// Update bar
         /// </summary>
@@ -68,7 +77,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<IActionResult> UpdateBar(int songId, int voiceId, int barId, [FromBody] UpdateBarDto command)
         {
             var item = await _mediator.Send(new UpdateSongBarCommand(songId, voiceId, barId, command));
-            var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
             return Ok(result);
         }
 
@@ -93,32 +102,32 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var item = await _mediator.Send(new CreateSongNoteCommand(songId, voiceId, barId, command));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
-            return NoContent();
-        }
-
-
-        /// <summary>
-        /// Update note
-        /// </summary>
-        [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
-        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int noteId, [FromBody] UpdateNoteDto command)
-        {
-            var item = await _mediator.Send(new UpdateSongNoteCommand(songId, voiceId, barId, noteId, command));
-            var result = await _mediator.Send(new QueryBarById(songId, voiceId, item.SongBarId));
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Delete note
-        /// </summary>
-        [HttpDelete("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
-        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.NoContent)]
-        public async Task<IActionResult> DeleteNote(int songId, int voiceId, int barId, int noteId)
-        {
-            await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, noteId));
-            var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
-            return Ok(result);
-        }
+            return Created($"{item.SongNoteId}", result);
     }
+
+
+    /// <summary>
+    /// Update note
+    /// </summary>
+    [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
+    [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
+    public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int noteId, [FromBody] UpdateNoteDto command)
+    {
+        var item = await _mediator.Send(new UpdateSongNoteCommand(songId, voiceId, barId, noteId, command));
+        var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Delete note
+    /// </summary>
+    [HttpDelete("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
+    [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.NoContent)]
+    public async Task<IActionResult> DeleteNote(int songId, int voiceId, int barId, int noteId)
+    {
+        await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, noteId));
+        var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
+        return Ok(result);
+    }
+}
 }

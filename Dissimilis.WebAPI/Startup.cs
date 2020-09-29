@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -73,6 +73,8 @@ namespace Dissimilis.WebAPI
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddHttpContextAccessor();
+
+            services.AddTransient<DissimilisDbContextFactory>();
 
             services.AddControllers();
 
@@ -154,10 +156,12 @@ namespace Dissimilis.WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseWebUserAuthentication();
+            }
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-
-            app.UseWebUserAuthentication();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();

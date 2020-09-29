@@ -16,7 +16,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
     public class Repository
     {
-        private readonly DissimilisDbContext context;
+        internal readonly DissimilisDbContext context;
 
         public Repository(DissimilisDbContext context)
         {
@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<SongBar> GetSongBarById(int songId, int partId, int barId, CancellationToken cancellationToken)
         {
             var bar = await context.SongBars
-                .Include(b => b.SongVoice)
+                .Include(b => b.SongVoice.Song)
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
                 .FirstOrDefaultAsync(x => x.Id == barId, cancellationToken);
@@ -46,17 +46,23 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<SongVoice> GetSongPartById(int songId, int partId, CancellationToken cancellationToken)
+        public async Task<SongVoice> GetSongVoiceById(int songId, int songVoiceId, CancellationToken cancellationToken)
         {
             var part = await context.SongVoices
-                .Include(p => p.SongBars)
+                .Include(sv => sv.Instrument)
+                .Include(sv => sv.Song)
                 .Where(p => p.SongId == songId)
-                .FirstOrDefaultAsync(p => p.Id == partId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == songVoiceId, cancellationToken);
 
             if (part == null)
             {
-                throw new NotFoundException($"Part with SongId {songId} and PartId {partId} not found.");
+                throw new NotFoundException($"Part with SongId {songId} and PartId {songVoiceId} not found.");
             }
+
+            await context.SongBars
+                .Include(sb => sb.Notes)
+                .Where(sb => sb.SongVoiceId == songVoiceId)
+                .LoadAsync(cancellationToken);
 
             return part;
         }
@@ -64,18 +70,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         /// <summary>
         /// Looks for an instrument with title InstrumentName, and creates if non-existant
         /// </summary>
-        public async Task<Instrument> CreateOrFindInstrument(string InstrumentName, CancellationToken cancellationToken)
+        public async Task<Instrument> CreateOrFindInstrument(string instrumentName, CancellationToken cancellationToken)
         {
 
             var instrument = await this.context.Instruments
-                .FirstOrDefaultAsync(i => i.Name == InstrumentName, cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(i => i.Name == instrumentName, cancellationToken: cancellationToken);
 
             if (instrument != null)
             {
                 return instrument;
             }
 
-            instrument = new Instrument(InstrumentName);
+            instrument = new Instrument(instrumentName);
 
             await context.Instruments.AddAsync(instrument, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
@@ -105,22 +111,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             return song;
         }
 
-        public async Task<SongVoice> GetSongVoiceById(int songId, int songVoiceId, CancellationToken cancellationToken)
-        {
-            var songVoice = await context.SongVoices
-                .Include(sv => sv.SongBars)
-                .FirstOrDefaultAsync(sv => sv.SongId == songId && sv.Id == songVoiceId, cancellationToken);
 
-            if (songVoice == null)
-            {
-                throw new NotFoundException($"SongVoice with Id {songVoiceId} not found.");
-            }
-
-            await context.SongNotes
-                .Where(sn => sn.SongBar.SongVoiceId == songVoiceId)
-                .LoadAsync(cancellationToken);
-
-            return songVoice;
-        }
     }
 }

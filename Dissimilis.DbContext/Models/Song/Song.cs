@@ -41,7 +41,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// ID of the creator, eg. instructor
         /// </summary>
         public User Arranger { get; set; }
-        public int ArrangerId { get; set; }
+        public int? ArrangerId { get; set; }
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }

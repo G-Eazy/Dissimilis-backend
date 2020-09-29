@@ -31,7 +31,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<UpdatedSongCommandDto> Handle(CreateSongCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUserId();
+            var currentUser = _authService.GetVerifiedCurrentUser();
 
             var song = new Song()
             {
@@ -42,8 +42,20 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             };
 
             song.SetCreated(currentUser);
-
             await _repository.SaveAsync(song, cancellationToken);
+
+            var mainVoice = new SongVoice()
+            {
+                SongId = song.Id,
+                VoiceNumber = 1,
+                IsMainVoice = true,
+                SongBars = new SongBar[] { new SongBar() { BarNumber = 1 } }
+            };
+
+            song.Voices.Add(mainVoice);
+            mainVoice.SetCreated(currentUser);
+
+            await _repository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(song);
         }

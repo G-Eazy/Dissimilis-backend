@@ -1,10 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using IsolationLevel = System.Data.IsolationLevel;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
@@ -25,38 +33,59 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class CreateSongBarCommandHandler : IRequestHandler<CreateSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
+        private readonly AuthService _authService;
 
-        public CreateSongBarCommandHandler(Repository repository)
+        public CreateSongBarCommandHandler(Repository repository, AuthService authService)
         {
             _repository = repository;
+            _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetSongPartById(request.SongId, request.SongVoiceId, cancellationToken);
-
-            var bar = new SongBar()
+            var currentUser = _authService.GetVerifiedCurrentUser();
+            SongBar songBar = null;
+            await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
-                BarNumber = request.Command.BarNumber,
-                RepAfter = request.Command.RepAfter,
-                RepBefore = request.Command.RepBefore,
-                House = request.Command.House
-            };
+                var song = await _repository.GetSongById(request.SongId, cancellationToken);
 
-            // Add/update for all parts of the song. 
-            // TODO Add last, count to ensure all songVoices of the song have the same amount of bars
-            var barsToIncrease = part.SongBars.Where(b => b.BarNumber >= bar.BarNumber);
-            foreach (var songBar in barsToIncrease)
-            {
-                songBar.BarNumber++;
+                var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+                if (voice == null)
+                {
+                    throw new NotFoundException($"Voice with Id {voice.Id} not fond");
+                }
+
+                if (voice.SongBars.Any(n => n.BarNumber == request.Command.BarNumber))
+                {
+                    throw new ValidationException("Bar number already in use");
+                }
+
+                songBar = new SongBar()
+                {
+                    BarNumber = request.Command.BarNumber,
+                    RepAfter = request.Command.RepAfter,
+                    RepBefore = request.Command.RepBefore,
+                    House = request.Command.House
+                };
+
+                voice.SongBars.Add(songBar);
+                song.SyncBarCountToMaxInAllVoices();
+
+                song.UpdateAllSongVoices(currentUser.Id);
+
+                try
+                {
+                    await _repository.UpdateAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
+                }
             }
-            part.SongBars.Add(bar);
-            part.SortBars();
 
-
-            await _repository.UpdateAsync(cancellationToken);
-
-            return new UpdatedCommandDto(bar);
+            return new UpdatedCommandDto(songBar);
         }
     }
 }

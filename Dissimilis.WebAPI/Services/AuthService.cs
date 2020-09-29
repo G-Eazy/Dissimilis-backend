@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using Dissimilis.Configuration;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Exceptions;
@@ -9,12 +10,12 @@ namespace Dissimilis.WebAPI.Services
 {
     public class AuthService
     {
-        private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContext;
         private readonly DissimilisDbContext _dbContext;
 
         internal const string USERID_HEADER_NAME = "X-User-ID";
 
-        public AuthService(HttpContext httpContext, DissimilisDbContext dbContext)
+        public AuthService(IHttpContextAccessor httpContext, DissimilisDbContext dbContext)
         {
             _httpContext = httpContext;
             _dbContext = dbContext;
@@ -23,14 +24,21 @@ namespace Dissimilis.WebAPI.Services
         public int? GetCurrentUserId()
         {
             var val = GetHeaderValue(USERID_HEADER_NAME);
-            if (Regex.IsMatch(val, @"^[\d]+$"))
+
+            if (val != null && Regex.IsMatch(val, @"^[\d]+$"))
             {
                 return int.Parse(val);
             }
+
+            if (ConfigurationInfo.IsLocalDebugBuild())
+            {
+                return 1;
+            }
+
             return null;
         }
 
-        public User GetVerifiedCurrentUserId()
+        public User GetVerifiedCurrentUser()
         {
             var currentUserId = GetCurrentUserId();
             if (!currentUserId.HasValue)
@@ -49,7 +57,7 @@ namespace Dissimilis.WebAPI.Services
 
         private string GetHeaderValue(string key)
         {
-            var headers = _httpContext?.Request.Headers;
+            var headers = _httpContext?.HttpContext?.Request.Headers;
 
             if (headers == null)
             {

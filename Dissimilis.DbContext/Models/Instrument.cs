@@ -17,10 +17,11 @@ namespace Dissimilis.DbContext.Models
         /// String containing the InstrumentType
         /// </summary>
         [MaxLength(250)]
+        [Required]
         public string Name { get; set; }
 
         
-        public ICollection<SongVoice> Parts { get; set; } = new List<SongVoice>();
+        public ICollection<SongVoice> SongVoices { get; set; } = new List<SongVoice>();
 
         public Instrument() { }
 

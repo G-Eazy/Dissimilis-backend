@@ -89,7 +89,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ArrangerId")
+                    b.Property<int?>("ArrangerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Composer")
@@ -152,12 +152,7 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<int>("SongVoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SongVoiceId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SongVoiceId1");
 
                     b.HasIndex("SongVoiceId", "BarNumber")
                         .IsUnique();
@@ -185,12 +180,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<int?>("SongBarId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SongBarId1");
 
                     b.HasIndex("BarId", "NoteNumber")
                         .IsUnique();
@@ -211,8 +201,11 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("InstrumentId")
+                    b.Property<int?>("InstrumentId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsMainVoice")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SongId")
                         .HasColumnType("int");
@@ -286,10 +279,9 @@ namespace Dissimilis.DbContext.Migrations
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.User", "Arranger")
-                        .WithMany()
+                        .WithMany("SongsArranged")
                         .HasForeignKey("ArrangerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
                         .WithMany("SongsCreated")
@@ -305,41 +297,32 @@ namespace Dissimilis.DbContext.Migrations
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongBar", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.Song.SongVoice", "SongVoice")
-                        .WithMany()
+                        .WithMany("SongBars")
                         .HasForeignKey("SongVoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Dissimilis.DbContext.Models.Song.SongVoice", null)
-                        .WithMany("SongBars")
-                        .HasForeignKey("SongVoiceId1");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongNote", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.Song.SongBar", "SongBar")
-                        .WithMany()
+                        .WithMany("Notes")
                         .HasForeignKey("BarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Dissimilis.DbContext.Models.Song.SongBar", null)
-                        .WithMany("Notes")
-                        .HasForeignKey("SongBarId1");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
-                        .WithMany("PartsCreated")
+                        .WithMany("SongVoiceCreated")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Dissimilis.DbContext.Models.Instrument", "Instrument")
-                        .WithMany("Parts")
+                        .WithMany("SongVoices")
                         .HasForeignKey("InstrumentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
                         .WithMany("Voices")
@@ -348,7 +331,7 @@ namespace Dissimilis.DbContext.Migrations
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "UpdatedBy")
-                        .WithMany("PartsUpdated")
+                        .WithMany("SongVoiceUpdated")
                         .HasForeignKey("UpdatedById")
                         .OnDelete(DeleteBehavior.Restrict);
                 });

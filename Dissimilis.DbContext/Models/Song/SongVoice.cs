@@ -14,7 +14,7 @@ namespace Dissimilis.DbContext.Models.Song
         public int Id { get; set; }
 
         public int VoiceNumber { get; set; }
-
+        public bool IsMainVoice { get; set; }
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
@@ -27,7 +27,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// The instrument entity of this Part
         /// </summary>
         public Instrument Instrument { get; set; }
-        public int InstrumentId { get; set; }
+        public int? InstrumentId { get; set; }
 
         /// <summary>
         /// The Song that this Part belongs too
@@ -45,12 +45,12 @@ namespace Dissimilis.DbContext.Models.Song
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
         /// <param name="voiceNumber"></param>
-        public SongVoice(int songId, int instrumentId, byte voiceNumber)
+        public SongVoice(int songId, int instrumentId, int voiceNumber)
         {
             SongId = songId;
             InstrumentId = instrumentId;
             VoiceNumber = voiceNumber;
         }
-        
+
     }
 }
