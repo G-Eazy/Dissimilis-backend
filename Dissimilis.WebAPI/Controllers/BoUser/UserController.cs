@@ -1,35 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Database;
-using Microsoft.AspNetCore.Http;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Repositories;
+using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers
+namespace Dissimilis.WebAPI.Controllers.BoUser
 {
-    [Route("api/[controller]")]
+    // TODO add authorization
+    [Route("api/User")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
-        //Private variable to get the DissimilisDbContext
-        private UserRepository repository;
-        public UserController(DissimilisDbContext context)
+        private readonly IMediator _mediator;
+
+        public UserController(IMediator mediator)
         {
-            this.repository = new UserRepository(context);
+            _mediator = mediator;
         }
+
 
         /// <summary>
         /// Fetch all users in the database
         /// </summary>
         /// <returns>AllUsers</returns>
         [HttpGet]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllUsers()
         {
-            var UserDTOArray = await repository.GetAllUsersAsync();
-            return Ok(UserDTOArray);
+            var result = await _mediator.Send(new QueryAll());
+            return Ok(result);
         }
     }
 }

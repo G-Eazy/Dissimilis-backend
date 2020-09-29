@@ -1,124 +1,183 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Dissimilis.WebAPI.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
+using Dissimilis.Configuration;
+using Dissimilis.DbContext;
+using Dissimilis.WebAPI.CustomFilters;
+using Dissimilis.WebAPI.DependencyInjection;
+using Dissimilis.WebAPI.Services;
 using Experis.Ciber.Web.API.Middleware;
-using Dissimilis.WebAPI.Authentication;
+using MediatR;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.Implementation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.AzureAppServices;
+using Newtonsoft.Json.Serialization;
 
 namespace Dissimilis.WebAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private const string CORSPOLICY = "CorsPolicy";
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<Startup> _logger;
 
         public IConfiguration Configuration { get; }
+        public static IConfiguration StaticConfig { get; private set; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env, ILogger<Startup> logger)
+        {
+            Configuration = configuration;
+            StaticConfig = configuration;
+            _environment = env;
+            _logger = logger;
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddLogging(config =>
+            {
+                var logconfig = Configuration.GetSection("Logging");
+                config.ClearProviders();
+                config.AddConfiguration(logconfig);
+                config.AddConsole();
+
+                config.AddFilter<FileLoggerProvider>("", Enum.Parse<LogLevel>(logconfig["LogLevel:Default"] ?? "Information"));
+                config.AddFilter<FileLoggerProvider>("Microsoft", Enum.Parse<LogLevel>(logconfig["LogLevel:Microsoft"] ?? "Warning"));
+                config.AddFilter<FileLoggerProvider>("System", Enum.Parse<LogLevel>(logconfig["LogLevel:System"] ?? "Warning"));
+
+                config.AddAzureWebAppDiagnostics();
+            });
+            services.AddSingleton(new ConfigurationInfo(Configuration, _logger));
+            ConfigurationInfo.IsConfigurationHealthOk();
+
+            services.AddSingleton<ITelemetryInitializer>(new LoggingInitializer(Configuration["Logging:ApplicationInsights:RoleName"]));
+            services.AddApplicationInsightsTelemetry();
+            TelemetryDebugWriter.IsTracingDisabled = true;
+
+            ConfigureDatabase(services);
+
+            services.AddServices<Startup>();
+
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddHttpContextAccessor();
+
+            services.AddTransient<DissimilisDbContextFactory>();
+
             services.AddControllers();
 
-            services.AddDbContext<DissimilisDbContext>(x => this.ConfigureDbOptions(ref x));
+            services.AddSwaggerGen(SwaggerConfiguration.SetSwaggerGenOptions);
 
-            services.AddSwaggerGen(c =>
+            services.AddCors(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo()
-                {
-                    Title = "DissAPI",
-                    Version = "v1"
-                });
-
-                //This can be commented out if you want to
-                c.OperationFilter<AddRequiredHeaderParameter>();
-
-                var XMLFile = Assembly.GetExecutingAssembly().GetName().Name + ".xml";
-                var XMLPath = Path.Combine(AppContext.BaseDirectory, XMLFile);
-                c.IncludeXmlComments(XMLPath);
+                options.AddPolicy(CORSPOLICY,
+                    builder => builder.WithOrigins(
+                           "http://localhost:4200",
+                           "http://localhost:5000",
+                           "https://localhost:5001",
+                           ConfigurationInfo.GetFrontendBaseUrl()
+                           )
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
 
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson();
+            services.AddMvcCore(options =>
+                {
+                    options.Filters.Add(typeof(ValidateModelStateAttribute));
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly)
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ContractResolver =
+                        new CamelCasePropertyNamesContractResolver());
         }
 
-        /// <summary>
-        /// Configure the DbOptions. We get the connectionstring 
-        /// that is placed in appsettings.Development.json
-        /// </summary>
-        /// <param name="dbCob"></param>
-        protected virtual void ConfigureDbOptions(ref DbContextOptionsBuilder dbCob)
+
+        public virtual void ConfigureDatabase(IServiceCollection services)
         {
-            var conn = this.Configuration.GetConnectionString("default");
-            if (conn is null)
+            var connectionString = ConfigurationInfo.GetSqlConnectionString();
+            services.AddDbContext<DissimilisDbContext>(options => options.UseSqlServer(connectionString));
+        }
+
+        private void EnsureNorwegianCulture(IApplicationBuilder app)
+        {
+            var requestOpt = new RequestLocalizationOptions();
+            requestOpt.SupportedCultures = new List<CultureInfo>
             {
-                throw new Exception("The provided connection string is not valid");
-            }
-
-            dbCob.UseSqlServer(conn);
+                new CultureInfo(ConfigurationInfo.NORWEGIAN_CUTURE)
+            };
+            requestOpt.SupportedUICultures = new List<CultureInfo>
+            {
+                new CultureInfo(ConfigurationInfo.NORWEGIAN_CUTURE)
+            };
+            requestOpt.RequestCultureProviders.Clear();
+            requestOpt.RequestCultureProviders.Add(new SingleCultureProvider());
+            app.UseRequestLocalization(requestOpt);
         }
 
-        protected virtual void AddContextData(DissimilisDbContext dbContext)
+        public class SingleCultureProvider : IRequestCultureProvider
         {
-            //dont run if there are any users in the database
-            //No points as it will already have run the seeder.
-            if(!dbContext.Users.Any()){
-                DissimilisSeeder.SeedData(dbContext);
+            public Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
+            {
+                return Task.Run(() => new ProviderCultureResult(ConfigurationInfo.NORWEGIAN_CUTURE, ConfigurationInfo.NORWEGIAN_CUTURE));
             }
-            //To do seeding of data
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DissimilisDbContext dbContext)
         {
-            
-            //create a service scope
-            using(var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                using var context = serviceScope.ServiceProvider.GetRequiredService<DissimilisDbContext>();
-                context.Database.EnsureCreated();
-                this.AddContextData(context);
-            }
-            app.UseCors(c =>
-            {
-                c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-            });
-            // Only for week 31
-            app.UseDeveloperExceptionPage();
-            
-            if (!env.IsDevelopment())
-                app.UseHttpsRedirection();
-            
-            app.UseSwagger();
+            EnsureNorwegianCulture(app);
 
-            app.UseSwaggerUI(c => 
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "DissAPI V1");
-                
-            });
+            dbContext.Database.Migrate();
+            InitializeDb(dbContext);
 
-            app.UseWebUserAuthentication();
-            
             app.UseRouting();
+            app.UseCors(CORSPOLICY);
 
-            app.UseEndpoints(endpoints =>
+            app.UseSwagger();
+            app.UseSwaggerUI(SwaggerConfiguration.SetSwaggerUiOptions);
+
+            if (ConfigurationInfo.IsLocalDebugBuild())
             {
-                endpoints.MapControllers();
-            });
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseWebUserAuthentication();
+            }
+
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        public virtual void InitializeDb(DissimilisDbContext context)
+        {
+
+            DissimilisSeeder.SeedBasicData(context);
+
+            if (ConfigurationInfo.IsLocalDebugBuild())
+            {
+                // local seeding
+            }
         }
     }
 }

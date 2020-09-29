@@ -1,57 +1,52 @@
-﻿using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Reposities;
-using Dissimilis.WebAPI.Reposities.Interfaces;
-using Experis.Ciber.Authentication.Microsoft;
+﻿using Experis.Ciber.Authentication.Microsoft;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
-using Experis.Ciber.Web.API.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class UserHandlingRepository : IUserHandlingRepository
+    public class UserHandlingRepository
     {
-        private readonly DissimilisDbContext context;
-        private readonly UserRepository userRepo;
-        private readonly OrganisationRepository orgRepo;
-        private readonly CountryRepository countryRepo;
+        private readonly DissimilisDbContext _context;
+        private readonly UserRepository _userRepo;
+        private readonly OrganisationRepository _orgRepo;
+        private readonly CountryRepository _countryRepo;
         public UserHandlingRepository(DissimilisDbContext context)
         {
-            this.context = context;
-            this.userRepo = new UserRepository(context);
-            this.orgRepo = new OrganisationRepository(context);
-            this.countryRepo = new CountryRepository(context);
+            _context = context;
+            _userRepo = new UserRepository(context);
+            _orgRepo = new OrganisationRepository(context);
+            _countryRepo = new CountryRepository(context);
         }
-        public async Task<User> CreateOrFindUser(UserEntityMetadata userMeta, MSGraphAPI graph_api)
+
+        public async Task<User> CreateOrFindUser(UserEntityMetadata userMeta, MSGraphAPI graphApi)
         {
-            User user = Task.Run(() => this.userRepo.CreateOrFindUserAsync(userMeta)).Result;
+            var user = Task.Run(() => _userRepo.CreateOrFindUserAsync(userMeta)).Result;
             OrganizationMetadata orgData;
             try
             {
-                orgData = await graph_api.GetOrganizationAsync();
+                orgData = await graphApi.GetOrganizationAsync();
             }
             catch
             {
                 orgData = null;
             }
-            
-            if(user.OrganisationId == null)
+
+            if (user.OrganisationId == null)
             {
                 //The create or find method handles null values
-                Organisation organisation = await this.orgRepo.CreateOrFindOrganisationAsync(orgData, (uint)user.Id);
-                user = await this.userRepo.UpdateUserOrganisationAsync(user, organisation);
+                var organisation = await this._orgRepo.CreateOrFindOrganisationAsync(orgData, (uint)user.Id);
+                user = await this._userRepo.UpdateUserOrganisationAsync(user, organisation);
             }
 
-            if(user.CountryId == null)
+            if (user.CountryId == null)
             {
                 //The create or find method handles null values
-                Country country = await this.countryRepo.CreateOrFindCountryAsync(orgData, (uint)user.Id);
-                user = await this.userRepo.UpdateUserCountryAsync(user, country);
+                var country = await this._countryRepo.CreateOrFindCountryAsync(orgData);
+                user = await this._userRepo.UpdateUserCountryAsync(user, country);
             }
-         
+
             return user;
         }
     }

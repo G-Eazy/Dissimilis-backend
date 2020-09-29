@@ -1,16 +1,12 @@
-﻿using Dissimilis.WebAPI.Database;
-using Dissimilis.WebAPI.Database.Models;
-using Dissimilis.WebAPI.Reposities.Interfaces;
-using Experis.Ciber.Authentication.Microsoft.APIObjects;
+﻿using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Repositories
 {
-    public class OrganisationRepository : IOrganisationRepository
+    public class OrganisationRepository 
     {
         private DissimilisDbContext _context;
         public OrganisationRepository(DissimilisDbContext context)
@@ -67,7 +63,7 @@ namespace Dissimilis.WebAPI.Repositories
             }
 
             await this._context.AddAsync(newOrg);
-            this._context.UserId = userId;
+            
             await this._context.SaveChangesAsync();
             return newOrg;
         }
