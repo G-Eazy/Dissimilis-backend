@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-    [AllowAnonymous]
     [Route("api/song")]
     [ApiController]
     public class SongController : Controller

@@ -28,11 +28,12 @@ namespace Dissimilis.WebAPI
             });
 
             options.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.RouteValues["controller"]}");
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
-            //Set the comments path for the Swagger JSON and UI.
-            options.IncludeXmlComments(xmlPath);
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+            if (File.Exists(xmlPath))
+            {
+                options.IncludeXmlComments(xmlPath);
+            }
 
             options.CustomSchemaIds(x => x.FullName);
 
@@ -52,7 +53,7 @@ namespace Dissimilis.WebAPI
                 Type = SecuritySchemeType.ApiKey,
 
             });
-           
+
         }
 
         public static void SetSwaggerUiOptions(SwaggerUIOptions c)
@@ -66,7 +67,7 @@ namespace Dissimilis.WebAPI
 
             c.SwaggerEndpoint("/swagger/v1/swagger.json", $"Dissimilis - v1");
             c.DisplayRequestDuration();
-            
+
             c.DefaultModelsExpandDepth(0);
         }
     }

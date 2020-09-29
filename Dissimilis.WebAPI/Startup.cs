@@ -1,4 +1,4 @@
-    using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -86,7 +86,8 @@ namespace Dissimilis.WebAPI
                     builder => builder.WithOrigins(
                            "http://localhost:4200",
                            "http://localhost:5000",
-                           "https://localhost:5001"
+                           "https://localhost:5001",
+                           ConfigurationInfo.GetFrontendBaseUrl()
                            )
                         .AllowAnyMethod()
                         .AllowAnyHeader()
