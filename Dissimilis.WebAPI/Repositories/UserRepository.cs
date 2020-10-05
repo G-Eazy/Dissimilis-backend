@@ -76,7 +76,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> UpdateUserCountryAsync(User user, Country country)
         {
-            user.CountryId = country.Id;
+            user.CountryId = country?.Id;
             
             await this._context.SaveChangesAsync();
             return user;
@@ -90,7 +90,7 @@ namespace Dissimilis.WebAPI.Repositories
         /// <returns></returns>
         public async Task<User> UpdateUserOrganisationAsync(User user, Organisation organisation)
         {
-            user.OrganisationId = organisation.Id;
+            user.OrganisationId = organisation?.Id;
             
             await this._context.SaveChangesAsync();
             return user;
