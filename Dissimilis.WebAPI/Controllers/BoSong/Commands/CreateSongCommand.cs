@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 SongId = song.Id,
                 VoiceNumber = 1,
                 IsMainVoice = true,
-                SongBars = new SongBar[] { new SongBar() { BarNumber = 1 } }
+                SongBars = new SongBar[] { new SongBar() { Position = 1 } }
             };
 
             song.Voices.Add(mainVoice);

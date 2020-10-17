@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
-using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -59,7 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                     throw new NotFoundException($"Bar with Id {request.BarId} was not found");
                 }
 
-                song.RemoveSongBarFromAllVoices(bar.BarNumber);
+                song.RemoveSongBarFromAllVoices(bar.Position);
 
                 song.UpdateAllSongVoices(currentUser.Id);
 

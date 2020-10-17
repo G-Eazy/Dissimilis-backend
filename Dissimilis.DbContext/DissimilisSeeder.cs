@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Dissimilis.DbContext.Models;
-using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.DbContext
 {

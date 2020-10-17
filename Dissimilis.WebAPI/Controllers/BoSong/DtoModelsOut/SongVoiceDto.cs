@@ -23,7 +23,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             IsMain = songVoice.IsMainVoice;
 
             Bars = songVoice.SongBars
-                .OrderBy(b => b.BarNumber)
+                .OrderBy(b => b.Position)
                 .Select(b => new BarDto(b))
                 .ToArray();
 

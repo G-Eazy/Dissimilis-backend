@@ -1,11 +1,9 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Exceptions;
-using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -52,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             }
 
             note.Length = request.Command.Length;
-            note.NoteNumber = request.Command.NoteNumber;
+            note.Postition = request.Command.Position;
             note.SetNoteValues(request.Command.Notes);
 
             part.SongVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
