@@ -154,6 +154,9 @@ namespace Dissimilis.WebAPI
             app.UseSwagger();
             app.UseSwaggerUI(SwaggerConfiguration.SetSwaggerUiOptions);
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             if (ConfigurationInfo.IsLocalDebugBuild())
             {
                 app.UseDeveloperExceptionPage();
@@ -164,9 +167,7 @@ namespace Dissimilis.WebAPI
             }
 
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+    
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
