@@ -1,6 +1,4 @@
-﻿using Dissimilis.WebAPI.DTOs;
-
-namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
+﻿namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 {
     public class UpdateBarDto
     {

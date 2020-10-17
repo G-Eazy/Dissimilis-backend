@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
@@ -55,14 +54,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                     throw new NotFoundException($"Voice with Id {voice.Id} not fond");
                 }
 
-                if (voice.SongBars.Any(n => n.BarNumber == request.Command.BarNumber))
-                {
-                    throw new ValidationException("Bar number already in use");
-                }
-
                 songBar = new SongBar()
                 {
-                    BarNumber = request.Command.BarNumber,
+                    Position = voice.SongBars.OrderByDescending(sb => sb.Position).FirstOrDefault()?.Position + 1 ?? 1,
                     RepAfter = request.Command.RepAfter,
                     RepBefore = request.Command.RepBefore,
                     House = request.Command.House

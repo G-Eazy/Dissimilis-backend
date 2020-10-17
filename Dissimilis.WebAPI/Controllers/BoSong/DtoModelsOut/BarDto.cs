@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
@@ -8,7 +9,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int BarId { get; set; }
         public int SongVoiceId { get; set; }
         public int SongId { get; set; }
-        public int BarNumber { get; set; }
+        public int Position { get; set; }
         public bool RepBefore { get; set; }
         public bool RepAfter { get; set; }
         public int? House { get; set; }
@@ -20,12 +21,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongVoiceId = songBar.SongVoiceId;
             SongId = songBar.SongVoice.SongId;
 
-            BarNumber = songBar.BarNumber;
+            Position = songBar.Position;
             RepBefore = songBar.RepBefore;
             RepAfter = songBar.RepAfter;
             House = songBar.House;
-            ChordsAndNotes = songBar.Notes
-                .OrderBy(n => n.NoteNumber)
+            ChordsAndNotes = songBar.GetBarNotes()
+                .OrderBy(n => n.Postition)
                 .Select(n => new NoteDto(n))
                 .ToArray();
         }

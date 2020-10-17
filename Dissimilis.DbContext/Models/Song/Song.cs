@@ -29,10 +29,20 @@ namespace Dissimilis.DbContext.Models.Song
 
         /// <summary>
         /// The time signature of the song (NO: Taktart)
+        ///
+        /// From: https://snl.no/takt_-_musikk
+        /// NO:  I begynnelsen av et musikkstykke angis taktarten. Nevneren i en brøk angir den noteverdien som brukes som taktdel eller telleenhet. Telleren angir antallet av slike taktdeler i en takt.
+        ///
+        /// Telleren
         /// </summary>
-        [Range(-10, 10)]
+        [Range(2, 12)]
         public int Numerator { get; set; }
-        [Range(1, 10)]
+        /// <summary>
+        /// See Numerator for more description
+        ///
+        /// Nevneren
+        /// </summary>
+        [Range(2, 8)]
         public int Denominator { get; set; }
 
 

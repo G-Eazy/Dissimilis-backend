@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 {

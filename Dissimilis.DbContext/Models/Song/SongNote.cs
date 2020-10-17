@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -13,7 +11,7 @@ namespace Dissimilis.DbContext.Models.Song
     {
         internal static string[] _possibleNoteValues = new string[]
         {
-            "G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", " "
+            "G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
 
         /// <summary>
@@ -25,7 +23,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// Priority of the Note in a spesific Bar
         /// </summary>
-        public int NoteNumber { get; set; }
+        public int Postition { get; set; }
 
         /// <summary>
         /// The lenght of this note/chord
@@ -53,17 +51,44 @@ namespace Dissimilis.DbContext.Models.Song
             return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
         }
 
-        public void SetNoteValues(string[] noteValues)
+        public void SetNoteValues(string[] noteValues, bool throwValidationException = true)
         {
-            NoteValues = string.Join("|", GetValidatedNoteValues(noteValues));
+            var validatedNotes = GetValidatedNoteValues(noteValues, false);
+            if (throwValidationException && !validatedNotes.Any())
+            {
+                throw new ValidationException("No valid notes passed in");
+            }
+
+            NoteValues = string.Join("|", validatedNotes);
         }
 
-        public static string[] GetValidatedNoteValues(string[] input)
+        public static int GetNoteOrderValue(string noteValue)
         {
-            return input
+            try
+            {
+                return Array.IndexOf(_possibleNoteValues, noteValue);
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+
+        public static string[] GetValidatedNoteValues(string[] input, bool includeZ = true)
+        {
+            var result = input
                 .Select(v => v.ToUpper().Trim())
                 .Distinct()
                 .Where(v => _possibleNoteValues.Contains(v))
+                .ToArray();
+
+            if (!includeZ)
+            {
+                result = result.Where(n => n != "Z").ToArray();
+            }
+
+            return result
+                .OrderBy(GetNoteOrderValue)
                 .ToArray();
         }
     }

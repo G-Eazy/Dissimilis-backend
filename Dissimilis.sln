@@ -24,9 +24,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Security.Cryptography", "..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Security.Cryptography\Experis.Ciber.Security.Cryptography.csproj", "{4AC72445-A436-4117-94AC-453D430BEB4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.Configuration", "Dissimilis.Configuration\Dissimilis.Configuration.csproj", "{69735D7A-A13C-4584-B952-23B90644D443}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.Configuration", "Dissimilis.Configuration\Dissimilis.Configuration.csproj", "{69735D7A-A13C-4584-B952-23B90644D443}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.DbContext", "Dissimilis.DbContext\Dissimilis.DbContext.csproj", "{DEE68417-688A-4642-8FD0-22BCD149D17B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.DbContext", "Dissimilis.DbContext\Dissimilis.DbContext.csproj", "{DEE68417-688A-4642-8FD0-22BCD149D17B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experis.Ciber", "Experis.Ciber", "{BD825917-DDAE-4C72-BC6F-2070D6484A17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dissimilis.Core", "Dissimilis.Core\Dissimilis.Core.csproj", "{411EB648-63FD-4F1E-910A-D7025BC9A0D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,9 +78,22 @@ Global
 		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6FA469B0-FF79-4476-88EF-19340E778C77} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{1B13CFE8-B99B-42A9-89C3-9C9CB03D97BE} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{490DBAF4-5787-4C72-B6BF-259652933AFE} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{6CAEC514-2661-4DC1-81A5-F675D67DFDCE} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{292C38FF-1A7A-4B55-A951-2A907B1B97C7} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{75944432-E0C3-4250-B8DC-B5E6D29C746B} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
+		{4AC72445-A436-4117-94AC-453D430BEB4E} = {BD825917-DDAE-4C72-BC6F-2070D6484A17}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8786E2B4-697E-4755-8869-816E569571D7}

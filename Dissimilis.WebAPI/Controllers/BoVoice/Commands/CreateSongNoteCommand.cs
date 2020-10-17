@@ -37,22 +37,24 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<UpdatedCommandDto> Handle(CreateSongNoteCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+            var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            if (part.Notes.Any(n => n.NoteNumber == request.Command.NoteNumber))
+            if (songBar.Notes.Any(n => n.Postition == request.Command.Position))
             {
                 throw new ValidationException("Note number already in use");
             }
 
             var note = new SongNote()
             {
-                NoteNumber = request.Command.NoteNumber,
+                Postition = request.Command.Position,
                 Length = request.Command.Length
             };
 
             note.SetNoteValues(request.Command.Notes);
 
-            part.Notes.Add(note);
+            songBar.Notes.Add(note);
+            songBar.CheckSongBarValidation();
+            
 
             await _repository.UpdateAsync(cancellationToken);
 

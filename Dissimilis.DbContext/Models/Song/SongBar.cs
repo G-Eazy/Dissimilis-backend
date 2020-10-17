@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Dissimilis.DbContext.Interfaces;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -19,7 +18,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// Priority of the bar in a spesific part
         /// </summary>
-        public int BarNumber { get; set; }
+        public int Position { get; set; }
 
         /// <summary>
         /// Is there a repetion sign before the bar 
@@ -51,9 +50,9 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         public SongBar() { }
 
-        public SongBar(int barNumber)
+        public SongBar(int position)
         {
-            BarNumber = barNumber;
+            Position = position;
         }
 
 

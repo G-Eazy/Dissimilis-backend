@@ -4,8 +4,12 @@ namespace Dissimilis.WebAPI.DTOs
 {
     public class CreateNoteDto
     {
-        public int NoteNumber { get; set; }
+        [Range(0,int.MaxValue)]
+        public int Position { get; set; }
+
+        [Range(1,int.MaxValue)]
         public int Length { get; set; }
+
 
         [MinLength(1)]
         [MaxLength(100)]

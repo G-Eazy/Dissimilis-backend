@@ -1,10 +1,8 @@
 ﻿using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using Dissimilis.WebAPI.DTOs;
 
 namespace Dissimilis.WebAPI.Repositories
 {

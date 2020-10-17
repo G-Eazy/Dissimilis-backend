@@ -1,12 +1,11 @@
 ﻿using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
     public class NoteDto
     {
-        public int NoteId { get; set; }
-        public int NoteNumber { get; set; }
+        public int? NoteId { get; set; }
+        public int Position { get; set; }
         public int Length { get; set; }
 
         /// <summary>
@@ -17,8 +16,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public NoteDto(SongNote songNote)
         {
-            NoteId = songNote.Id;
-            NoteNumber = songNote.NoteNumber;
+            if (songNote.Id != 0)
+            {
+                NoteId = songNote.Id;
+            }
+            Position = songNote.Postition;
             Length = songNote.Length;
             Notes = songNote.GetNoteValues();
         }

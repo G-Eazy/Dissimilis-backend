@@ -130,7 +130,7 @@ namespace Dissimilis.DbContext
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
             //corresponding Part.
-            entity.HasIndex(x => new { x.SongVoiceId, x.BarNumber }).IsUnique();
+            entity.HasIndex(x => new { x.SongVoiceId, BarNumber = x.Position }).IsUnique();
 
             //Set foregin key for PartId linked to the Id of Part
             entity.HasOne(x => x.SongVoice)
@@ -147,7 +147,7 @@ namespace Dissimilis.DbContext
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
             //corresponding Part.
-            entity.HasIndex(x => new { x.BarId, x.NoteNumber }).IsUnique();
+            entity.HasIndex(x => new { x.BarId, NoteNumber = x.Postition }).IsUnique();
 
             //Set foregin key for PartId linked to the Id of Part
             entity.HasOne(x => x.SongBar)
