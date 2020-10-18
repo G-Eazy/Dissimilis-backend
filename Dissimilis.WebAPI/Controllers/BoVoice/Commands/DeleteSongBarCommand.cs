@@ -30,47 +30,44 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class DeleteSongBarCommandHandler : IRequestHandler<DeleteSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public DeleteSongBarCommandHandler(Repository repository, AuthService authService)
+        public DeleteSongBarCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongBarCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUser();
-            await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+
+            var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+            if (songVoice == null)
             {
-                var song = await _repository.GetSongById(request.SongId, cancellationToken);
+                throw new NotFoundException($"Voice with Id {request.SongVoiceId} was not found");
+            }
 
-                var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
-                if (songVoice == null)
-                {
-                    throw new NotFoundException($"Voice with Id {request.SongVoiceId} was not found");
-                }
+            var bar = songVoice.SongBars.FirstOrDefault(b => b.Id == request.BarId);
+            if (bar == null)
+            {
+                throw new NotFoundException($"Bar with Id {request.BarId} was not found");
+            }
 
-                var bar = songVoice.SongBars.FirstOrDefault(b => b.Id == request.BarId);
-                if (bar == null)
-                {
-                    throw new NotFoundException($"Bar with Id {request.BarId} was not found");
-                }
+            song.RemoveSongBarFromAllVoices(bar.Position);
+            song.UpdateAllSongVoices(currentUser.Id);
 
-                song.RemoveSongBarFromAllVoices(bar.Position);
-
-                song.UpdateAllSongVoices(currentUser.Id);
-
-                try
-                {
-                    await _repository.UpdateAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
-                }
+            try
+            {
+                await _repository.UpdateAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
             }
 
             return null;

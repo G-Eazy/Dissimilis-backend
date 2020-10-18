@@ -31,12 +31,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class UpdateSongNoteCommandHandler : IRequestHandler<UpdateSongNoteCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public UpdateSongNoteCommandHandler(Repository repository, AuthService authService)
+        public UpdateSongNoteCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             note.Postition = request.Command.Position;
             note.SetNoteValues(request.Command.Notes);
 
-            part.SongVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
+            part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

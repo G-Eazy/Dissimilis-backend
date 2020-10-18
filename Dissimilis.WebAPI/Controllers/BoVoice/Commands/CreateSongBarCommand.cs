@@ -32,17 +32,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class CreateSongBarCommandHandler : IRequestHandler<CreateSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public CreateSongBarCommandHandler(Repository repository, AuthService authService)
+        public CreateSongBarCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUser();
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             SongBar songBar = null;
             await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {

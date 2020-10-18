@@ -26,12 +26,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class UpdateSongVoiceCommandHandler : IRequestHandler<UpdateSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public UpdateSongVoiceCommandHandler(Repository repository, AuthService authService)
+        public UpdateSongVoiceCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongVoiceCommand request, CancellationToken cancellationToken)
@@ -44,15 +44,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            if (songVoice.Instrument?.Name != request.Command.Insturment)
+            if (songVoice.Instrument?.Name != request.Command.Instrument)
             {
-                var instrument = await _repository.CreateOrFindInstrument(request.Command.Insturment, cancellationToken);
+                var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
                 songVoice.Instrument = instrument;
             }
 
             songVoice.VoiceNumber = request.Command.VoiceNumber;
 
-            songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
+            songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
             
             await _repository.UpdateAsync(cancellationToken);
 

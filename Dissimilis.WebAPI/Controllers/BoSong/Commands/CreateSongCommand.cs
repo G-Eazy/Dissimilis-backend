@@ -21,9 +21,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     public class CreateSongCommandHandler : IRequestHandler<CreateSongCommand, UpdatedSongCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public CreateSongCommandHandler(Repository repository, AuthService authService)
+        public CreateSongCommandHandler(Repository repository, IAuthService authService)
         {
             _repository = repository;
             _authService = authService;
@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 Title = request.Command.Title,
                 Numerator = request.Command.Numerator,
                 Denominator = request.Command.Denominator,
-                Arranger = currentUser
+                ArrangerId = currentUser.Id
             };
 
             song.SetCreated(currentUser);

@@ -61,6 +61,7 @@ namespace Dissimilis.WebAPI
                 config.AddAzureWebAppDiagnostics();
             });
             services.AddSingleton(new ConfigurationInfo(Configuration, _logger));
+
             ConfigurationInfo.IsConfigurationHealthOk();
 
             services.AddSingleton<ITelemetryInitializer>(new LoggingInitializer(Configuration["Logging:ApplicationInsights:RoleName"]));
@@ -94,6 +95,8 @@ namespace Dissimilis.WebAPI
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
+            AddAuthService(services);
 
             services.AddControllersWithViews()
                 .AddNewtonsoftJson();
@@ -145,8 +148,8 @@ namespace Dissimilis.WebAPI
         {
             EnsureNorwegianCulture(app);
 
-            dbContext.Database.Migrate();
-            InitializeDb(dbContext);
+            Migrate(dbContext);
+            InitializeDb(app, dbContext);
 
             app.UseRouting();
             app.UseCors(CORSPOLICY);
@@ -161,17 +164,24 @@ namespace Dissimilis.WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseWebUserAuthentication();
-            }
 
+            app.UseWebUserAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-    
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
-        public virtual void InitializeDb(DissimilisDbContext context)
+        public virtual void AddAuthService(IServiceCollection services)
+        {
+            services.AddSingleton<IAuthService, AuthService>();
+        }
+
+        public virtual void Migrate(DissimilisDbContext context)
+        {
+
+            context.Database.Migrate();
+        }
+
+        public virtual void InitializeDb(IApplicationBuilder app, DissimilisDbContext context)
         {
 
             DissimilisSeeder.SeedBasicData(context);

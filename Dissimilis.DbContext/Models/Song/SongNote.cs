@@ -88,7 +88,7 @@ namespace Dissimilis.DbContext.Models.Song
             }
 
             return result
-                .OrderBy(GetNoteOrderValue)
+                //.OrderBy(GetNoteOrderValue) // frontend did not like this at this point
                 .ToArray();
         }
     }

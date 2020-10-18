@@ -24,12 +24,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class DeleteSongVoiceCommandHandle : IRequestHandler<DeleteSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(Repository repository, AuthService authService)
+        public DeleteSongVoiceCommandHandle(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             song.Voices.Remove(voice);
 
-            song.SetUpdated(_authService.GetVerifiedCurrentUser().Id);
+            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

@@ -28,17 +28,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class CreatePartCommandHandler : IRequestHandler<CreateSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public CreatePartCommandHandler(Repository repository, AuthService authService)
+        public CreatePartCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUser();
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             SongVoice songVoice = null;
 
             await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                     throw new ValidationException("Voice number already used");
                 }
                 
-                var instrument = await _repository.CreateOrFindInstrument(request.Command.Insturment, cancellationToken);
+                var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
 
                 songVoice = new SongVoice()
                 {

@@ -23,12 +23,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     public class UpdateSongCommandHandler : IRequestHandler<UpdateSongCommand, UpdatedSongCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public UpdateSongCommandHandler(Repository repository, AuthService authService)
+        public UpdateSongCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             //song.Numerator = request.Command.Numerator;
             //song.Denominator = request.Command.Denominator;
 
-            song.SetUpdated(_authService.GetVerifiedCurrentUser());
+            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
 
             await _repository.UpdateAsync(cancellationToken);
 

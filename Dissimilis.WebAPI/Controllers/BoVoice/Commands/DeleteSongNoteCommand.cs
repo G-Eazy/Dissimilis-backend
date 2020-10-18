@@ -28,12 +28,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class DeleteSongNoteCommandHandler : IRequestHandler<DeleteSongNoteCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public DeleteSongNoteCommandHandler(Repository repository, AuthService authService)
+        public DeleteSongNoteCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongNoteCommand request, CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             part.Notes.Remove(note);
 
-            part.SongVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
+            part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 
