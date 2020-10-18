@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Http;
 
 namespace Dissimilis.WebAPI.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IHttpContextAccessor _httpContext;
         private readonly DissimilisDbContext _dbContext;
 
         internal const string USERID_HEADER_NAME = "X-User-ID";
+        private const int TestUserId = -99;
 
         public AuthService(IHttpContextAccessor httpContext, DissimilisDbContext dbContext)
         {

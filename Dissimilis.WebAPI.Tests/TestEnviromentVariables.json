@@ -1,0 +1,7 @@
+{
+  "ASPNETCORE_ENVIRONMENT": "Test",
+  "API_BASEURL": "http://localhost:5010/",
+  "FRONTEND_BASE_URL": "http://localhost:4210/",
+  "SQL_CONNECTION_STRING": "x",
+  "AZURE_CLIENT_SECRET": "x"
+}

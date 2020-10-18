@@ -19,7 +19,6 @@ namespace Dissimilis.Configuration
             APPINSIGHTS_INSTRUMENTATIONKEY,
 
             SQL_CONNECTION_STRING,
-            AzureWebJobsStorage, // AZURE_STORAGE_CONNECTION_STRING
             AZURE_CLIENT_SECRET
         }
 
@@ -128,6 +127,7 @@ namespace Dissimilis.Configuration
         public static Guid GetAzureDirectoryId() => new Guid(GetValue(OptionalValues.AZURE_DIRECTORY_ID, "774897da - 0c2c - 4c71 - 9897 - 873c4d659aee"));
 
         public static Guid GetAzureApplicationId() => new Guid(GetValue(OptionalValues.AZURE_APPLICATION_ID, "5a41da85-fa69-4aa0-93f2-1ce65104a1b2"));
+
     }
 
 }

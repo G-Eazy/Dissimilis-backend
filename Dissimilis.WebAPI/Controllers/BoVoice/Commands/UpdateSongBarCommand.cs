@@ -26,12 +26,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class UpdateSongBarCommandHandler : IRequestHandler<UpdateSongBarCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _IAuthService;
 
-        public UpdateSongBarCommandHandler(Repository repository, AuthService authService)
+        public UpdateSongBarCommandHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
-            _authService = authService;
+            _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             bar.House = request.Command.House;
 
 
-            bar.SongVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
+            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

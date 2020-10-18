@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -7,7 +8,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
     {
         public static int GetMaxBarPosition(this Song song)
         {
-            return ((8 / song.Numerator) * song.Denominator) - 1;
+            var eightParts = 8 / song.Denominator;
+
+            var amoutOfWhole = (double)song.Numerator / song.Denominator;
+
+            return (int)((eightParts * song.Denominator) * amoutOfWhole) -1;
         }
 
         public static void SyncBarCountToMaxInAllVoices(this Song song)
@@ -46,11 +51,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
         }
 
-        public static void RemoveSongBarFromAllVoices(this Song song, int barNumber)
+        public static void RemoveSongBarFromAllVoices(this Song song, int position)
         {
             foreach (var songVoice in song.Voices)
             {
-                var barToRemove = songVoice.SongBars.FirstOrDefault(sb => sb.Position == barNumber) ?? songVoice.SongBars.LastOrDefault();
+                var barToRemove = songVoice.SongBars.FirstOrDefault(sb => sb.Position == position) ?? songVoice.SongBars.LastOrDefault();
 
                 songVoice.SongBars.Remove(barToRemove);
                 songVoice.SortBars();

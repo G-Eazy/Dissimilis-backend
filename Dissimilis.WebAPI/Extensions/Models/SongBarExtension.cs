@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Dissimilis.DbContext.Models.Song;
 using FoodLabellingAPI.Collections;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -18,6 +19,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
             var currentPosition = 0;
             var maxBarPosition = songBar.GetMaxBarPosition();
+            var maxBarLength = maxBarPosition + 1;
             var notesToCheck = songBar.Notes.OrderBy(n => n.Postition).ToQueue();
 
             while (notesToCheck.Any())
@@ -41,9 +43,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
 
             // Fill out the blanks with empty notes until the end of the bar
-            if (currentPosition < maxBarPosition)
+            if (currentPosition < maxBarLength)
             {
-                finalNotes.Add(GetEmptyNote(currentPosition, maxBarPosition - currentPosition));
+                finalNotes.Add(GetEmptyNote(currentPosition, maxBarLength - currentPosition));
             }
 
             return finalNotes.OrderBy(n => n.Postition).ToArray();
@@ -67,7 +69,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static bool CheckSongBarValidation(this SongBar songBar, bool throwValidationException = true)
         {
             var currentPosition = 0;
-            var maxBarPosition = songBar.GetMaxBarPosition();
+            var maxBarLength = songBar.GetMaxBarPosition() + 1;
 
             foreach (var note in songBar.Notes.OrderBy(n => n.Postition))
             {
@@ -80,7 +82,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     return false;
                 }
 
-                if (note.Postition + note.Length >= maxBarPosition)
+                if (note.Postition + note.Length > maxBarLength)
                 {
                     if (throwValidationException)
                     {
