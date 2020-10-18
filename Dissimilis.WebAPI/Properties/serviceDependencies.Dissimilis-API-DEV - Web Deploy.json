@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroup')]/providers/Microsoft.Sql/servers/dissimilis-server-dev/databases/Dissimilis-Azure-SQL-DB-DEV",
+      "type": "mssql.azure",
+      "connectionId": "default",
+      "secretStore": "AzureAppSettings"
+    }
+  }
+}
