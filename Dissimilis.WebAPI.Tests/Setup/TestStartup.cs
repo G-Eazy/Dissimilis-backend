@@ -4,6 +4,7 @@ using Dissimilis.WebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,8 +18,9 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
         public override void ConfigureDatabase(IServiceCollection services)
         {
-            services.AddDbContext<DissimilisDbContext>(options => options
-                .UseInMemoryDatabase($"Dissimilis-Test-db-{(new Guid()).ToString()}"));
+            services.AddDbContext<DissimilisDbContext>(options =>
+                    options.ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .UseInMemoryDatabase(DbInitializer.MemoryDatabaseName));
         }
 
         public override void InitializeDb(IApplicationBuilder app, DissimilisDbContext context)
@@ -33,6 +35,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         {
             services.AddSingleton<TestServerFixture>();
             services.AddSingleton<IAuthService, TestAuthService>();
+            services.AddSingleton<DbContext.DissimilisDbContextFactory>();
         }
     }
 }

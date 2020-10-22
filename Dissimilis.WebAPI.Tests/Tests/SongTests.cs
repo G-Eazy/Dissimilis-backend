@@ -10,13 +10,14 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
+using static Dissimilis.WebAPI.xUnit.Extensions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
     [Collection("Serial")]
     public class SongTests : BaseTestClass
     {
-        public const string DefaultTestSongTitle = "TestSong";
+        
 
         public SongTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
@@ -47,7 +48,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = newCreateSongDto(4,4);
+            var createSongDto = CreateSongDto(4, 4);
 
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
             var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
@@ -61,24 +62,10 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDto.Voices.FirstOrDefault()?.Bars.FirstOrDefault()?.ChordsAndNotes.FirstOrDefault()?.Length.ShouldBe(8, "Length of standard pause note is not correct");
         }
 
-        internal static CreateSongDto newCreateSongDto(int numerator = 4, int denominator = 4, string title = DefaultTestSongTitle)
-        {
-            return new CreateSongDto()
-            {
-                Title = title,
-                Numerator = numerator,
-                Denominator = denominator,
-            };
-        }
 
-        internal static Song NewSong(int numerator, int denominator)
-        {
-            return new Song()
-            {
-                Numerator = numerator,
-                Denominator = denominator
-            };
-        }
+
+
+
 
 
     }

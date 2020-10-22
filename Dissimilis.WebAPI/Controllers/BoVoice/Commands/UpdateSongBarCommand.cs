@@ -1,9 +1,16 @@
-﻿using System.Threading;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
@@ -36,16 +43,42 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var bar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.BarId, cancellationToken);
+            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+
+            var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+            if (voice == null)
+            {
+                throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
+            }
+
+            var bar = voice.SongBars.FirstOrDefault(b => b.Id == request.BarId);
+            if (bar == null)
+            {
+                throw new NotFoundException($"Bar with Id {request.BarId} not found");
+            }
 
             bar.RepAfter = request.Command.RepAfter;
             bar.RepBefore = request.Command.RepBefore;
             bar.House = request.Command.House;
+            if (bar.House == 0)
+            {
+                bar.House = null;
+            }
 
+            song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
+            song.SyncVoicesFrom(voice);
 
-            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
-
-            await _repository.UpdateAsync(cancellationToken);
+            try
+            {
+                await _repository.UpdateAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
+            }
 
             return new UpdatedCommandDto(bar);
         }

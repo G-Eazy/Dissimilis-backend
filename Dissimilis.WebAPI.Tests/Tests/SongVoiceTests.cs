@@ -7,6 +7,7 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
@@ -14,6 +15,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
+using static Dissimilis.WebAPI.xUnit.Extensions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -29,7 +31,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = SongTests.newCreateSongDto(4, 4);
+            var createSongDto = CreateSongDto(4, 4);
 
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
             var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
@@ -53,7 +55,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = SongTests.newCreateSongDto(4, 4);
+            var createSongDto = CreateSongDto(4, 4);
 
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
             var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
@@ -83,47 +85,46 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongNoteId, GetUpdateNoteDto(note1Update1, position: 0, length: 8)));
         }
 
-        public static UpdateNoteDto GetUpdateNoteDto(NoteDto noteDto, int? position = null, int? length = null, string[] notes = null)
+        [Fact]
+        public async Task TestSyncBetweenVoices()
         {
-            var updateDto = new UpdateNoteDto()
-            {
-                Position = noteDto.Position,
-                Length = noteDto.Length,
-                Notes = noteDto.Notes
-            };
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            if (position != null)
-            {
-                updateDto.Position = position.Value;
-            }
+            var createSongDto = CreateSongDto(4, 4);
 
-            if (length != null)
-            {
-                updateDto.Length = length.Value;
-            }
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
 
-            if (notes != null)
-            {
-                updateDto.Notes = notes;
-            }
+            songDto.Voices.FirstOrDefault()?.Bars.FirstOrDefault()?.ChordsAndNotes.FirstOrDefault()?.Length.ShouldBe(8, "Length of standard pause note is not correct");
 
-            return updateDto;
+            var voice = songDto.Voices.First();
+            var bar = voice.Bars.First();
+
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After first and second voice");
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2)));
+            var firstSongBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto()));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After a note and a bar");
+
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(repBefore: true)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(repAfter: true)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 2)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 2)));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After adding several bars");
+
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("ThirdVoice")));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After adding third voice");
+
+            await mediator.Send(new UpdateSongBarCommand(songDto.SongId, voice.SongVoiceId, firstSongBar.SongBarId, CreateUpdateBarDto(repBefore: true, repAfter: true)));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After last songBarUpdate");
         }
 
-        public static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
-        {
-            if (value == null)
-            {
-                value = new string[] { "A" };
-            }
+    
 
-            return new CreateNoteDto()
-            {
-                Position = position,
-                Length = lenght,
-                Notes = value
-            };
-        }
 
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -48,5 +49,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 Email = "test@test.no"
             };
         }
+
+
     }
 }

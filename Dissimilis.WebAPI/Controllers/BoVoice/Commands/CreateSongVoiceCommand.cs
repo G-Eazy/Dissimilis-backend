@@ -39,44 +39,49 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(CreateSongVoiceCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            SongVoice songVoice = null;
 
-            await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
+            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
+            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+
+            if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
             {
-                var song = await _repository.GetSongById(request.SongId, cancellationToken);
+                throw new ValidationException("Voice number already used");
+            }
 
-                if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
-                {
-                    throw new ValidationException("Voice number already used");
-                }
-                
-                var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
+            var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
+            var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
+            nextVoiceNumber++;
 
-                songVoice = new SongVoice()
-                {
-                    VoiceNumber = request.Command.VoiceNumber,
-                    Instrument = instrument,
-                    Song = song
-                };
+            var songVoice = new SongVoice()
+            {
+                VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
+                Instrument = instrument,
+                Song = song
+            };
 
+            var cloneVoice = song.Voices.FirstOrDefault();
+            song.Voices.Add(songVoice);
 
-                song.Voices.Add(songVoice);
+            song.SyncBarCountToMaxInAllVoices();
+            song.SetUpdatedOverAll(currentUser.Id);
 
-                song.SyncBarCountToMaxInAllVoices();
-                song.UpdateAllSongVoices(currentUser.Id);
+            if (cloneVoice != null)
+            {
+                song.SyncVoicesFrom(cloneVoice);
+            }
 
+            await _repository.UpdateAsync(cancellationToken);
+
+            try
+            {
                 await _repository.UpdateAsync(cancellationToken);
-
-                try
-                {
-                    await _repository.UpdateAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
-                }
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
             }
 
             return new UpdatedCommandDto(songVoice);

@@ -62,10 +62,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                     House = request.Command.House
                 };
 
-                voice.SongBars.Add(songBar);
-                song.SyncBarCountToMaxInAllVoices();
+                voice.SongBars = voice.SongBars.Concat(new[] { songBar }).ToArray();
+                song.SyncVoicesFrom(voice);
 
-                song.UpdateAllSongVoices(currentUser.Id);
+                song.SetUpdatedOverAll(currentUser.Id);
 
                 try
                 {
