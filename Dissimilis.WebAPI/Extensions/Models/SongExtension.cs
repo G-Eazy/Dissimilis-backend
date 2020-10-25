@@ -1,7 +1,8 @@
 ﻿using System.Linq;
+using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -46,7 +47,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 highestBarNumber++;
                 while (songVoice.SongBars.Count < maxBarCount)
                 {
-                    songVoice.SongBars.Add(new SongBar(highestBarNumber++));
+                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToArray();
                 }
 
                 songVoice.SortBars();
@@ -66,6 +67,46 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
             song.SetUpdated(userId);
         }
+
+        /// <summary>
+        /// Copies (length of) bars from one position to another position to in the song
+        /// </summary>
+        public static void CopyBars(this Song song, int fromPosition, int copyLength, int toPosition)
+        {
+            SyncBarCountToMaxInAllVoices(song);
+
+            var firstVoice = song.Voices.FirstOrDefault();
+            if (firstVoice == null || firstVoice.SongBars.Count() < fromPosition)
+            {
+                throw new NotFoundException("Voice or bar not found");
+            }
+
+            foreach (var voice in song.Voices)
+            {
+                foreach (var bar in voice.SongBars)
+                {
+                    if (bar.Position >= toPosition)
+                    {
+                        bar.Position += copyLength;
+                    }
+                }
+
+                var barsToInsert = voice.SongBars.OrderBy(b => b.Position)
+                    .Skip(fromPosition - 1)
+                    .Take(copyLength)
+                    .Select(b => b.Clone())
+                    .ToArray();
+                var startIndex = toPosition;
+                foreach (var insertBar in barsToInsert)
+                {
+                    insertBar.Position = startIndex++;
+                }
+
+                voice.SongBars = voice.SongBars.Concat(barsToInsert).ToArray();
+            }
+
+        }
+
 
         /// <summary>
         /// Removes a bar from a given position from all voices

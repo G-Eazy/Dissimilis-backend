@@ -91,5 +91,15 @@ namespace Dissimilis.DbContext.Models.Song
                 //.OrderBy(GetNoteOrderValue) // frontend did not like this at this point
                 .ToArray();
         }
+
+        public SongNote Clone()
+        {
+            return new SongNote()
+            {
+                Length = Length,
+                Postition = Postition,
+                NoteValues = NoteValues
+            };
+        }
     }
 }

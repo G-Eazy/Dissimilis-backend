@@ -86,6 +86,20 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return NoContent();
         }
 
+        /// <summary>
+        /// Copy bars from one position to another across all voices
+        /// </summary>
+        [HttpDelete("{songId:int}/copyBars")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> CopyBars(int songId, [FromBody] CopyBarDto command)
+        {
+            var item = await _mediator.Send(new CopyBarsCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            
+            return Ok(result);
+        }
 
     }
 }

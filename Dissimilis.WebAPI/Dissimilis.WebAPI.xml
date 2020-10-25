@@ -11,7 +11,7 @@
             <param name="NewPartDTO"></param>
             <returns>201</returns>
         </member>
-        <member name="M:Dissimilis.WebAPI.Controllers.SongController.GetSongById(System.Int32)">
+        <member name="M:Dissimilis.WebAPI.Controllers.SongController.GetFullSongById(System.Int32)">
             <summary>
             Get song by Id
             </summary>
@@ -580,7 +580,7 @@
             <param name="InstrumentName"></param>
             <returns>(Model) Instrument</returns>
         </member>
-        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.GetSongById(Dissimilis.WebAPI.DTOs.SuperDTO)">
+        <member name="M:Dissimilis.WebAPI.Repositories.SongRepository.GetFullSongById(Dissimilis.WebAPI.DTOs.SuperDTO)">
             <summary>
             Get song by id provided in DTO
             </summary>

@@ -12,16 +12,16 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     public class Repository
     {
 
-        private DissimilisDbContext _context;
+        internal DissimilisDbContext Context;
         public Repository(DissimilisDbContext context)
         {
-            _context = context;
+            Context = context;
         }
 
 
-        public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
+        public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {
-            var song = await _context.Songs
+            var song = await Context.Songs
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
@@ -29,12 +29,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 throw new NotFoundException($"Song with Id {songId} not found");
             }
 
-            await _context.SongVoices
+            await Context.SongVoices
                 .Include(p => p.Instrument)
                 .Where(p => p.SongId == songId)
                 .LoadAsync(cancellationToken);
 
-            await _context.SongBars
+            await Context.SongBars
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId)
                 .LoadAsync(cancellationToken);
@@ -44,13 +44,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task SaveAsync(Song song, CancellationToken cancellationToken)
         {
-            await _context.Songs.AddAsync(song, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await Context.Songs.AddAsync(song, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
         {
-            var song = await _context.Songs
+            var song = await Context.Songs
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
@@ -63,19 +63,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteSong(Song song, CancellationToken cancellationToken)
         {
-            _context.Songs.Remove(song);
-            await _context.SaveChangesAsync(cancellationToken);
+            Context.Songs.Remove(song);
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Song[]> GetSongSearchList(SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
 
-            var query = _context.Songs
+            var query = Context.Songs
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCommand.Title))

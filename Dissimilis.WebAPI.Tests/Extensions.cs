@@ -34,10 +34,33 @@ namespace Dissimilis.WebAPI.xUnit
             {
                 foreach (var songVoiceDto in songDto.Voices)
                 {
-                    refVoice.Bars[i].House.ShouldBe(songVoiceDto.Bars[i].House, "House not matching - " + stepDescription);
-                    refVoice.Bars[i].RepAfter.ShouldBe(songVoiceDto.Bars[i].RepAfter, "RepAfter not matching - " + stepDescription);
-                    refVoice.Bars[i].RepBefore.ShouldBe(songVoiceDto.Bars[i].RepBefore, "RepBefore not matching - " + stepDescription);
+                    refVoice.Bars[i].CheckBarEqualTo(songVoiceDto.Bars[i], stepDescription: stepDescription);
                 }
+            }
+        }
+
+        internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
+        {
+            firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
+            firstBarDto.RepAfter.ShouldBe(secondBarDto.RepAfter, "RepAfter not matching - " + stepDescription);
+            firstBarDto.RepBefore.ShouldBe(secondBarDto.RepBefore, "RepBefore not matching - " + stepDescription);
+
+            if (!includeNoteComparison)
+            {
+                return;
+            }
+
+            firstBarDto.ChordsAndNotes.Length.ShouldBe(secondBarDto.ChordsAndNotes.Length, "Not matching amount of notes - " + stepDescription);
+            var barLength = firstBarDto.ChordsAndNotes.Length;
+            for (var barI = 0; barI < barLength; barI++)
+            {
+                firstBarDto.ChordsAndNotes[barI].Notes.Length.ShouldBe(secondBarDto.ChordsAndNotes[barI].Notes.Length, "Not matching amount of notes - " + stepDescription);
+                var numberOfNotes = firstBarDto.ChordsAndNotes[barI].Notes.Length;
+                for (var noteI = 0; noteI < numberOfNotes; noteI++)
+                {
+                    firstBarDto.ChordsAndNotes[barI].Notes[noteI].ShouldBe(secondBarDto.ChordsAndNotes[barI].Notes[noteI], "Note values is not as expected - " + stepDescription);
+                }
+
             }
         }
 
@@ -104,6 +127,16 @@ namespace Dissimilis.WebAPI.xUnit
             }
 
             return updateDto;
+        }
+
+        internal static CopyBarDto CreateCopyBarsDto(int fromPosition, int copyLength, int toPosition)
+        {
+            return new CopyBarDto()
+            {
+                FromPosition = fromPosition,
+                CopyLength = copyLength,
+                ToPostition = toPosition
+            };
         }
 
         internal static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
