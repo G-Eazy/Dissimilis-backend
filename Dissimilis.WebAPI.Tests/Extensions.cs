@@ -139,6 +139,16 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
+        internal static MoveBarDto CreateMoveBarsDto(int fromPosition, int moveLength, int toPosition)
+        {
+            return new MoveBarDto()
+            {
+                FromPosition = fromPosition,
+                MoveLength = moveLength,
+                ToPostition = toPosition
+            };
+        }
+
         internal static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
         {
             if (value == null)

@@ -136,13 +136,69 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 secondBarAfterCopy.CheckBarEqualTo(fifthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 2 against 5 after copy");
 
             }
+
         }
 
+        [Fact]
+        public async Task TestMoveBars()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(CreateSongDto(4, 4)));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            var firstVoice = songDto.Voices.First();
+
+            // populate a voice with bars and notes
+            var firstVoiceFirstBar = firstVoice.Bars.First();
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFirstBar.BarId, CreateNoteDto(0, 8, new[] { "A","C" })));
+
+            var firstVoiceSecondBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto()));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceSecondBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "A","H" })));
+
+            var firstVoiceThirdBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceThirdBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "C","D" })));
+
+            var firstVoiceFourthBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 2, repAfter: true)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFourthBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "C","H" })));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(1, "It is supposed to be only one voice");
+
+            // make another voice, and set notes on 1 and 2
+            var secondVoiceId = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
+            
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            var secondVoice = songDto.Voices.First(v => v.SongVoiceId == secondVoiceId.SongVoiceId);
+            
+            var secondVoiceFirstBar = secondVoice.Bars.OrderBy(b => b.Position).First();
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceFirstBar.BarId, CreateNoteDto(0, 2, value: new[] { "F" })));
+            
+            var secondVoiceSecondBar = secondVoice.Bars.OrderBy(b => b.Position).Skip(1).First();
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceSecondBar.BarId, CreateNoteDto(2, 6, value: new[] { "G" })));
+            songDto.Voices.First().Bars.Length.ShouldBe(4, "It should be 4 bars before moving");
 
 
+            // do Moving
+            await mediator.Send(new MoveBarsCommand(songDto.SongId, CreateMoveBarsDto(0, 2, 3)));
+            var afterCopySongDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
 
+            // single check
+            var fistCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 1).ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            fistCheck.ShouldBe(new[] { "C","D" }, "First copied note value not as expected");
+
+            var secondCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 4).ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            secondCheck.ShouldBe(new[] { "C","H" }, "Second copied note value not as expected");
+
+            // check index
+            afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoiceFirstBar.SongVoiceId).Bars.Length.ShouldBe(4, "It should be 4 bars after moving");
+            var index = 1;
+            foreach (var bar in afterCopySongDto.Voices.First().Bars)
+            {
+                bar.Position.ShouldBe(index++, "Index is not as expected after copying");
+            }
+
+        }
     }
-
-
 }
 

@@ -97,7 +97,22 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var item = await _mediator.Send(new CopyBarsCommand(songId, command));
             var result = await _mediator.Send(new QuerySongById(item.SongId));
-            
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Move bars from one position to another across all voices
+        /// </summary>
+        [HttpDelete("{songId:int}/moveBars")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> MoveBars(int songId, [FromBody] MoveBarDto command)
+        {
+            var item = await _mediator.Send(new MoveBarsCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+
             return Ok(result);
         }
 

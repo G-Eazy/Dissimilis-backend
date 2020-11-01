@@ -107,6 +107,46 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         }
 
+        /// <summary>
+        /// Copies (length of) bars from one position to another position to in the song
+        /// </summary>
+        public static void MoveBars(this Song song, int fromPosition, int moveLength, int toPosition)
+        {
+            SyncBarCountToMaxInAllVoices(song);
+
+            var firstVoice = song.Voices.FirstOrDefault();
+            if (firstVoice == null || firstVoice.SongBars.Count() < fromPosition)
+            {
+                throw new NotFoundException("Voice or bar not found");
+            }
+
+            foreach (var voice in song.Voices)
+            {
+                foreach (var bar in voice.SongBars)
+                {
+                    if (bar.Position > toPosition)
+                    {
+                        bar.Position += moveLength;
+                    }else
+                    {
+                        bar.Position -= moveLength;
+                    }
+                }
+
+                var barsToMove = voice.SongBars.OrderBy(b => b.Position)
+                    .Skip(fromPosition - 1)
+                    .Take(moveLength)
+                    .ToArray();
+                var startIndex = toPosition;
+                foreach (var insertBar in barsToMove)
+                {
+                    insertBar.Position = startIndex++;
+                }
+            }
+
+            SyncBarCountToMaxInAllVoices(song);
+        }
+
 
         /// <summary>
         /// Removes a bar from a given position from all voices
