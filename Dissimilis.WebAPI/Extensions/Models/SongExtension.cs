@@ -127,7 +127,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     if (bar.Position > toPosition)
                     {
                         bar.Position += moveLength;
-                    }else
+                    }
+                    else
                     {
                         bar.Position -= moveLength;
                     }
@@ -193,6 +194,18 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 }
             }
 
+        }
+
+        public static Song Clone(this Song song, string title = null)
+        {
+            return new Song()
+            {
+                Title = title ?? song.Title,
+                Denominator = song.Denominator,
+                Numerator = song.Numerator,
+                ArrangerId = song.ArrangerId,
+                Voices = song.Voices.Select(v => v.Clone()).ToArray()
+            };
         }
     }
 }

@@ -31,23 +31,27 @@ namespace Dissimilis.WebAPI.Extensions.Models
             {
                 parts.Remove(lastPart);
                 parts.Add((result + 1).ToString());
-                return string.Join(" ",parts);
+                return string.Join(" ", parts);
             }
 
             return songVoiceInstrumentName + " 1";
         }
 
-        public static SongVoice Clone(this SongVoice songVoice, User user, Instrument instrument, int voiceNumber = -1)
+        public static SongVoice Clone(this SongVoice songVoice, User user = null, Instrument instrument = null, int voiceNumber = -1)
         {
             var newSongVoice = new SongVoice()
             {
                 SongBars = songVoice.SongBars.Select(b => b.Clone()).ToArray(),
-                IsMainVoice = false,
-                Instrument = instrument,
+                Instrument = instrument ?? songVoice.Instrument,
                 VoiceNumber = voiceNumber == -1 ? songVoice.VoiceNumber + 1 : voiceNumber
             };
 
-            newSongVoice.SetCreated(user);
+            if (newSongVoice.VoiceNumber != songVoice.VoiceNumber)
+            {
+                newSongVoice.IsMainVoice = false;
+            }
+
+            newSongVoice.SetCreated(user?.Id ?? songVoice.CreatedById);
 
             return newSongVoice;
         }

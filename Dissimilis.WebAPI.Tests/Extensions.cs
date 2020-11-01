@@ -103,6 +103,14 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
+        internal static DuplicateSongDto DuplicateSongDto(string title)
+        {
+            return new DuplicateSongDto()
+            {
+                Title = title
+            };
+        }
+
         internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
         {
             return new UpdateSongVoiceDto()

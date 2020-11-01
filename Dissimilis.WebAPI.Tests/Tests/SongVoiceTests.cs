@@ -152,8 +152,38 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var duplicatedVoice2 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, duplicatedVoice1.SongVoiceId));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId).Title.ShouldBe("Piano 2", "Second duplicated voice didn't have expected name");
-            
+
             songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId).CheckVoiceBarsEqualTo(songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId), true);
+        }
+
+        [Fact]
+        public async Task TestDuplicateSong()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(title: "Song 1");
+
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Title.ShouldBe("Song 1", "Song title not as expected");
+
+            var baseVoice = songDto.Voices.First();
+            var bar = baseVoice.Bars.First();
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            var duplicatedSong = await mediator.Send(new DuplicateSongCommand(songDto.SongId, DuplicateSongDto("Song 2")));
+            var duplicatedSongDto = await mediator.Send(new QuerySongById(duplicatedSong.SongId));
+            duplicatedSongDto.Title.ShouldBe("Song 2", "Title og duplicated son not as expected");
+
+            songDto.Voices.Length.ShouldBe(duplicatedSongDto.Voices.Length, "Not same amount of voices");
+            var voicesLength = songDto.Voices.Length;
+            for (var i = 0; i < voicesLength; i++)
+            {
+                songDto.Voices[i].CheckVoiceBarsEqualTo(duplicatedSongDto.Voices[i], true);
+            }
         }
 
     }

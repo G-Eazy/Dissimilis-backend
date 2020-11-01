@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// Create song
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateSong([FromBody] CreateSongDto command)
         {
@@ -111,6 +111,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<IActionResult> MoveBars(int songId, [FromBody] MoveBarDto command)
         {
             var item = await _mediator.Send(new MoveBarsCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Duplicate song
+        /// </summary>
+        [HttpPost("{songId:int}/duplicateSong")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> DuplicateSong(int songId, [FromBody] DuplicateSongDto command)
+        {
+            var item = await _mediator.Send(new DuplicateSongCommand(songId, command));
             var result = await _mediator.Send(new QuerySongById(item.SongId));
 
             return Ok(result);
