@@ -39,6 +39,17 @@ namespace Dissimilis.WebAPI.xUnit
             }
         }
 
+        internal static void CheckVoiceBarsEqualTo(this SongVoiceDto firstVoiceDto, SongVoiceDto secondVoiceDto, bool includeNoteComparison)
+        {
+            firstVoiceDto.Bars.Length.ShouldBe(secondVoiceDto.Bars.Length, "Number of bars are not equal");
+            var barLength = firstVoiceDto.Bars.Length;
+            for (var i = 0; i < barLength; i++)
+            {
+                firstVoiceDto.Bars[i].CheckBarEqualTo(secondVoiceDto.Bars[i], true, $"Check bar position {firstVoiceDto.Bars[i].Position}");
+            }
+
+        }
+
         internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
         {
             firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
@@ -86,6 +97,15 @@ namespace Dissimilis.WebAPI.xUnit
         internal static CreateSongVoiceDto CreateSongVoiceDto(string voiceName, int? voiceNumber = null)
         {
             return new CreateSongVoiceDto()
+            {
+                Instrument = voiceName,
+                VoiceNumber = voiceNumber
+            };
+        }
+
+        internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
+        {
+            return new UpdateSongVoiceDto()
             {
                 Instrument = voiceName,
                 VoiceNumber = voiceNumber

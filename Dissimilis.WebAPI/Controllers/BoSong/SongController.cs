@@ -89,7 +89,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Copy bars from one position to another across all voices
         /// </summary>
-        [HttpDelete("{songId:int}/copyBars")]
+        [HttpPost("{songId:int}/copyBars")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -104,7 +104,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Move bars from one position to another across all voices
         /// </summary>
-        [HttpDelete("{songId:int}/moveBars")]
+        [HttpPost("{songId:int}/moveBars")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]

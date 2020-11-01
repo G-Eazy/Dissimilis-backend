@@ -81,7 +81,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             catch (Exception e)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
+                throw new ValidationException("Transaction error, aborting operation. Please try again.");
             }
 
             return new UpdatedCommandDto(songVoice);
