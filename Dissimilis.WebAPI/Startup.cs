@@ -85,7 +85,7 @@ namespace Dissimilis.WebAPI
             {
                 options.AddPolicy(CORSPOLICY,
                     builder => builder.WithOrigins(
-                           "http://localhost:4200",
+                           "http://localhost:3000",
                            "http://localhost:5000",
                            "https://localhost:5001",
                            "https://dissimilisfargenotasjon.azurewebsites.net",
