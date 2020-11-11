@@ -69,8 +69,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<Instrument> CreateOrFindInstrument(string instrumentName, CancellationToken cancellationToken)
         {
 
-            var instrument = await this.context.Instruments
-                .FirstOrDefaultAsync(i => i.Name == instrumentName, cancellationToken: cancellationToken);
+            var instrument = await context.Instruments.FirstOrDefaultAsync(i => i.Name == instrumentName, cancellationToken);
 
             if (instrument != null)
             {

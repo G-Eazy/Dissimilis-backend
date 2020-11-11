@@ -36,8 +36,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var song = await _repository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
             song.Title = request.Command.Title;
-            //song.Numerator = request.Command.Numerator;
-            //song.Denominator = request.Command.Denominator;
 
             song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
 

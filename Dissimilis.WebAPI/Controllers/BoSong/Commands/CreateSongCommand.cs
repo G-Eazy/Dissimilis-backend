@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 ArrangerId = currentUser.Id
             };
 
-            song.SetCreated(currentUser);
+            song.SetCreated(currentUser.Id);
             await _repository.SaveAsync(song, cancellationToken);
 
             var mainVoice = new SongVoice()
@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             };
 
             song.Voices.Add(mainVoice);
-            mainVoice.SetCreated(currentUser);
+            mainVoice.SetCreated(currentUser.Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

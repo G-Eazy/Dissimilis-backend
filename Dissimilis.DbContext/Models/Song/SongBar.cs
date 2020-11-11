@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -56,5 +57,15 @@ namespace Dissimilis.DbContext.Models.Song
         }
 
 
+        public SongBar Clone()
+        {
+            return new SongBar()
+            {
+                House = House,
+                RepAfter = RepAfter,
+                RepBefore = RepBefore,
+                Notes = Notes.Select(n => n.Clone()).ToList()
+            };
+        }
     }
 }

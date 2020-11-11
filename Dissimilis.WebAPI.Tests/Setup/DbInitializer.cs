@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Linq;
+using Dissimilis.Configuration;
 using Dissimilis.DbContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Dissimilis.WebAPI.xUnit.Setup
 {
     public class DbInitializer
     {
         private static DissimilisDbContext _dbContext;
+        internal static string MemoryDatabaseName = "Dissimilis-Test-db";
 
         public static void Initialize(IServiceProvider serviceProvider)
         {
@@ -21,7 +25,8 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
         private static void SeedTestUser()
         {
-            var user = _dbContext.Users.FirstOrDefault(uid => uid.Email == TestServerFixture.GetDefaultTestUser().Email);
+            var user = _dbContext.Users.FirstOrDefault(uid =>
+                uid.Email == TestServerFixture.GetDefaultTestUser().Email);
             if (user == null)
             {
                 user = TestServerFixture.GetDefaultTestUser();
