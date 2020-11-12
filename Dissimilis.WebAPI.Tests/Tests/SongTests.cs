@@ -1,9 +1,11 @@
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
@@ -42,6 +44,18 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             // Expect 6 parts, but starting at 0
             NewSong(6, 8).GetMaxBarPosition().ShouldBe(6 - 1);
+        }
+
+        [Fact]
+        public async Task TestGetSongsFromMyLibrary()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDtos = await mediator.Send(new QuerySongToLibrary());
+
+            songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
 
         [Fact]
