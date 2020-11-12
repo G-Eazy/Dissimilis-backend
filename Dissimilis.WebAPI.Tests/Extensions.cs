@@ -201,5 +201,14 @@ namespace Dissimilis.WebAPI.xUnit
                 RepBefore = repBefore
             };
         }
+
+        internal static SearchQueryDto SearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "Testuser",
+                OrderByDateTime = true 
+            };
+        }
     }
 }

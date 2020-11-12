@@ -76,13 +76,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
 
             var query = Context.Songs
+                .Include(s => s.Arranger)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCommand.Title))
             {
                 var textSearch = $"%{searchCommand.Title.Trim()}%";
                 query = query
-                    .Where(s => EF.Functions.Like(s.Title, textSearch))
+                    .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
                     .AsQueryable();
             }
 
@@ -96,12 +97,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             if (searchCommand.OrderByDateTime)
             {
                 query = query
-                    .OrderByDescending(s => s.UpdatedOn);
+                    .OrderBy(s => s.Arranger.Name)
+                    .ThenByDescending(s => s.UpdatedOn);
             }
             else
             {
                 query = query
-                    .OrderBy(s => s.Title);
+                    .OrderBy(s => s.Arranger.Name);
             }
 
 
@@ -113,7 +115,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             }
 
             var result = await query
-                .Include(s => s.Arranger)
                 .ToArrayAsync(cancellationToken);
 
             return result;
