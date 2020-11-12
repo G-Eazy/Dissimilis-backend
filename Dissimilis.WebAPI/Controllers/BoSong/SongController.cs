@@ -57,6 +57,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Created($"{result.SongId}", result);
         }
 
+        [HttpPost("{songId:int}/transpose")]
+        public async Task<IActionResult> CreateTransposedSong(int songId, [FromBody] TransposeSongDto command)
+        {
+            var item = await _mediator.Send(new CreateTransposedSongCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
+        }
+
         /// <summary>
         /// Get song by Id
         /// </summary>
