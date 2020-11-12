@@ -19,6 +19,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
+        /// Songs created by or arranged by user
+        /// </summary>
+        [HttpGet("mylibrary")]
+        [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> MyLibrary()
+        {
+            var result = await _mediator.Send(new Query.QuerySongToLibrary());
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Search songs with optional filters
         /// </summary>
         [HttpPost("search")]
