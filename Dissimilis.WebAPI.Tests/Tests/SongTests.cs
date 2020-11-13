@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoVoice;
@@ -75,6 +76,59 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             Assert.Single(songDto.Voices);
 
             songDto.Voices.FirstOrDefault()?.Bars.FirstOrDefault()?.ChordsAndNotes.FirstOrDefault()?.Length.ShouldBe(8, "Length of standard pause note is not correct");
+        }
+
+        [Fact]
+        public async Task TestGetTransposedCopyOfSong()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(CreateSongDto(4, 4)));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            var firstVoice = songDto.Voices.First();
+
+            // populate a voice with bars and notes
+            var firstVoiceFirstBar = firstVoice.Bars.First();
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFirstBar.BarId, CreateNoteDto(0, 8, new[] { "A", "C" })));
+
+            var firstVoiceSecondBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto()));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceSecondBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "Z", "H" })));
+
+            var firstVoiceThirdBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceThirdBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "E", "D" })));
+
+            // transpose song by +3
+            var transposedSongByPlus3 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = 3 }));
+            var songDtoPlus3 = await mediator.Send(new QuerySongById(transposedSongByPlus3.SongId));
+
+            // transpose song by -5
+            var transposedSongByMinus5 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = -5 }));
+            var songDtoMinus5 = await mediator.Send(new QuerySongById(transposedSongByMinus5.SongId));
+
+            // check titles
+            songDtoPlus3.Title.ShouldBe($"{songDto.Title} (transposed +3)");
+            songDtoMinus5.Title.ShouldBe($"{songDto.Title} (transposed -5)");
+
+            // check noteValues transposed +3
+            var firstCheck = songDtoPlus3.Voices[0].Bars[0].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            firstCheck.ShouldBe(new[] { "C", "D#" }, "First copied note value not as expected");
+
+            var secondCheck = songDtoPlus3.Voices[0].Bars[1].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            secondCheck.ShouldBe(new[] { "Z", "D" }, "First copied note value not as expected");
+
+            var thirdCheck = songDtoPlus3.Voices[0].Bars[2].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            thirdCheck.ShouldBe(new[] { "G", "F" }, "First copied note value not as expected");
+
+            // check noteValues transposed -5
+            var fourthCheck = songDtoMinus5.Voices[0].Bars[0].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            fourthCheck.ShouldBe(new[] { "E", "G" }, "First copied note value not as expected");
+
+            var fifthCheck = songDtoMinus5.Voices[0].Bars[1].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            fifthCheck.ShouldBe(new[] { "Z", "F#" }, "First copied note value not as expected");
+
+            var sixthCheck = songDtoMinus5.Voices[0].Bars[2].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            sixthCheck.ShouldBe(new[] { "H", "A" }, "First copied note value not as expected");
         }
 
 
