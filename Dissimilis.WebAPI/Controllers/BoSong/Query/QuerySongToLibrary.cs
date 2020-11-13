@@ -20,9 +20,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
     public class QuerySongToLibraryHandler : IRequestHandler<QuerySongToLibrary, SongIndexDto[]>
     {
         private readonly Repository _repository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public QuerySongToLibraryHandler(Repository repository, AuthService authService)
+        public QuerySongToLibraryHandler(Repository repository, IAuthService authService)
         {
             _repository = repository;
             _authService = authService;
