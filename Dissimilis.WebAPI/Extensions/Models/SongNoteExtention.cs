@@ -36,7 +36,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 {
                     var index = SongNote.GetNoteOrderValue(noteValue);
 
-                    var valueToAdd = possibleNoteValuesWithoutZ[index + transpose % possibleNoteValuesWithoutZ.Length];
+                    // transpose can range from -12 to int.MaxValue
+                    transpose = transpose >= 0 ? transpose : transpose + possibleNoteValuesWithoutZ.Length;
+
+                    var valueToAdd = possibleNoteValuesWithoutZ[(index + transpose) % possibleNoteValuesWithoutZ.Length];
                     transposedNoteValues.Add(valueToAdd);
                 }
             }

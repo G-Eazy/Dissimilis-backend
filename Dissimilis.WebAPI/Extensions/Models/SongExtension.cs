@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
@@ -218,10 +219,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
                 ArrangerId = song.ArrangerId,
-                Voices = song.Voices.Select(v => v.Clone()).ToArray()
+                Voices = song.Voices.Select(v => v.Transpose(transpose)).ToArray()
             };
 
-            newSong.Voices.Select(v => v.SongBars.Select(sb => sb.Notes.Select(n => n.TransposeNoteValues(transpose))));
+            //newSong.Voices.Select(v => v.SongBars.Select(sb => sb.Notes.Select(n => n.TransposeNoteValues(transpose)).ToArray()));
 
             return newSong;
         }

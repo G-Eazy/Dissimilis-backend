@@ -96,5 +96,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
             return true;
         }
+
+        public static SongBar Transpose(this SongBar songBar, int transpose = 0)
+        {
+            return new SongBar()
+            {
+                House = songBar.House,
+                RepAfter = songBar.RepAfter,
+                RepBefore = songBar.RepBefore,
+                Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToArray()
+            };
+        }
     }
 }
