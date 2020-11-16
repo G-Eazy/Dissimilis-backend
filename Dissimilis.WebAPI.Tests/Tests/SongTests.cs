@@ -48,6 +48,21 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
+        public async Task TestSearchForSongs()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+
+            //Search for the user who created the song
+            var searchQueryDto = SearchQueryDto();
+            var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
+
+            songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
+        }
+
+        [Fact]
         public async Task TestGetSongsFromMyLibrary()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
