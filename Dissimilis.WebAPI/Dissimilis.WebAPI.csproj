@@ -22,6 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Experis.Ciber.Authentication.Microsoft" Version="1.0.8" />
+    <PackageReference Include="Experis.Ciber.Configuration" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Databasing" Version="1.0.1" />
+    <PackageReference Include="Experis.Ciber.Interfaces" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Security.Cryptography" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Web.API" Version="1.1.0" />
+    <PackageReference Include="Experis.Ciber.Xml" Version="1.0.0" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.16.0" />
@@ -41,8 +48,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj" />
-    <ProjectReference Include="..\..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj" />
     <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
     <ProjectReference Include="..\Dissimilis.Core\Dissimilis.Core.csproj" />
     <ProjectReference Include="..\Dissimilis.DbContext\Dissimilis.DbContext.csproj" />
