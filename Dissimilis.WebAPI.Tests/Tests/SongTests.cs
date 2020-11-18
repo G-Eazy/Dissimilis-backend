@@ -106,6 +106,10 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var transposedSongByMinus5 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = -5 }));
             var songDtoMinus5 = await mediator.Send(new QuerySongById(transposedSongByMinus5.SongId));
 
+            // transpose song by -15
+            var transposedSongByMinus15 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = -15 }));
+            var songDtoMinus15 = await mediator.Send(new QuerySongById(transposedSongByMinus15.SongId));
+
             // check titles
             songDtoPlus3.Title.ShouldBe($"{songDto.Title} (transposed +3)");
             songDtoMinus5.Title.ShouldBe($"{songDto.Title} (transposed -5)");
@@ -130,7 +134,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var thirdCheck = songDtoPlus3.Voices[0].Bars[2].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
             thirdCheck.ShouldBe(new[] { "G", "F" }, "First copied note value not as expected");
 
-            //    // check noteValues transposed -5
+            // check noteValues transposed -5
             var fourthCheck = songDtoMinus5.Voices[0].Bars[0].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
             fourthCheck.ShouldBe(new[] { "E", "G" }, "First copied note value not as expected");
 
@@ -139,6 +143,16 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var sixthCheck = songDtoMinus5.Voices[0].Bars[2].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
             sixthCheck.ShouldBe(new[] { "H", "A" }, "First copied note value not as expected");
+
+            // check noteValues transposed -15
+            var seventhCheck = songDtoMinus15.Voices[0].Bars[0].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            seventhCheck.ShouldBe(new[] { "F#", "A" }, "First copied note value not as expected");
+
+            var eightCheck = songDtoMinus15.Voices[0].Bars[1].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            eightCheck.ShouldBe(new[] { "G#" }, "First copied note value not as expected");
+
+            var ninthCheck = songDtoMinus15.Voices[0].Bars[2].ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
+            ninthCheck.ShouldBe(new[] { "C#", "H" }, "First copied note value not as expected");
         }
 
 

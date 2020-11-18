@@ -34,12 +34,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 }
                 else
                 {
-                    var index = SongNote.GetNoteOrderValue(noteValue);
+                    var index = SongNote.GetNoteOrderValue(noteValue) + transpose;
 
-                    // transpose can range from -12 to int.MaxValue
-                    transpose = transpose >= 0 ? transpose : transpose + possibleNoteValuesWithoutZ.Length;
+                    // Map negative transpose-values to positive equivalent
+                    var transposedIndex = index >= 0 ? index % possibleNoteValuesWithoutZ.Length
+                        : (index % possibleNoteValuesWithoutZ.Length) + possibleNoteValuesWithoutZ.Length;
 
-                    var valueToAdd = possibleNoteValuesWithoutZ[(index + transpose) % possibleNoteValuesWithoutZ.Length];
+                    var valueToAdd = possibleNoteValuesWithoutZ[transposedIndex];
                     transposedNoteValues.Add(valueToAdd);
                 }
             }
