@@ -42,10 +42,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
             var duplicatedSong = duplicateFromSong.Transpose(request.Command.Transpose);
 
-            var currentUser = _authService.GetVerifiedCurrentUser();
-            duplicatedSong.SetUpdated(currentUser.Id);
+            duplicatedSong.SetUpdated(_authService.GetVerifiedCurrentUser().Id);
 
-            await _repository.SaveAsync(duplicatedSong, cancellationToken);
+            await _repository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
         }
