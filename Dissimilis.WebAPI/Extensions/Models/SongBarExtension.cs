@@ -104,7 +104,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 House = songBar.House,
                 RepAfter = songBar.RepAfter,
                 RepBefore = songBar.RepBefore,
-                Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToArray()
+                Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToList()
             };
         }
     }

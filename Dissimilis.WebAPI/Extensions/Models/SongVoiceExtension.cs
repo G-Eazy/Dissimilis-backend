@@ -65,6 +65,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 VoiceNumber = songVoice.VoiceNumber
             };
 
+            newSongVoice.SetCreated(songVoice.CreatedById);
+
             return newSongVoice;
         }
     }
