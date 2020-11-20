@@ -173,7 +173,7 @@ namespace Dissimilis.WebAPI
 
         public virtual void AddAuthService(IServiceCollection services)
         {
-            services.AddSingleton<IAuthService, AuthService>();
+            services.AddScoped<IAuthService, AuthService>();
         }
 
         public virtual void Migrate(DissimilisDbContext context)
