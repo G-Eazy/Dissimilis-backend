@@ -15,17 +15,11 @@ namespace Dissimilis.WebAPI.Extensions.Interfaces
             item.UpdatedOn = DateTimeOffset.Now;
         }
 
-        public static void SetCreated(this ICreatedAndUpdated item, User user)
-        {
-            item.SetCreated(user.Id);
-        }
-
         public static void SetUpdated(this ICreatedAndUpdated item, int? userId)
         {
             item.UpdatedById = userId;
             item.UpdatedOn = DateTimeOffset.Now;
-
-        }
+       }
 
         public static void SetUpdated(this ICreatedAndUpdated item, User user)
         {

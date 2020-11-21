@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dissimilis.DbContext;
-using Dissimilis.WebAPI.xUnit.Setup;
-using Microsoft.EntityFrameworkCore;
+﻿using Dissimilis.WebAPI.xUnit.Setup;
 using Xunit;
 
 namespace Dissimilis.WebAPI.xUnit

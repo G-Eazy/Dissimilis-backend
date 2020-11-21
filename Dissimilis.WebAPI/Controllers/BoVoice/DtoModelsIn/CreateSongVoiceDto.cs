@@ -9,7 +9,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
         [MaxLength(100)]
         public string Instrument { get; set; }
 
-        public int VoiceNumber { get; set; }
+        public int? VoiceNumber { get; set; }
 
     }
 }

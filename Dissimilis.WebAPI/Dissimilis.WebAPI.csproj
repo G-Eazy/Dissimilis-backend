@@ -22,11 +22,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Experis.Ciber.Authentication.Microsoft" Version="1.0.8" />
+    <PackageReference Include="Experis.Ciber.Configuration" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Databasing" Version="1.0.1" />
+    <PackageReference Include="Experis.Ciber.Interfaces" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Security.Cryptography" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Web.API" Version="1.1.0" />
+    <PackageReference Include="Experis.Ciber.Xml" Version="1.0.0" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.16.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
       <PrivateAssets>all</PrivateAssets>
@@ -34,15 +41,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.9" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
-    <PackageReference Include="Scrutor" Version="3.2.2" />
+    <PackageReference Include="Scrutor" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj" />
-    <ProjectReference Include="..\..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj" />
     <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
     <ProjectReference Include="..\Dissimilis.Core\Dissimilis.Core.csproj" />
     <ProjectReference Include="..\Dissimilis.DbContext\Dissimilis.DbContext.csproj" />

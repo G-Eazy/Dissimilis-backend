@@ -42,6 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
 
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
@@ -57,7 +58,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             }
 
             song.RemoveSongBarFromAllVoices(bar.Position);
-            song.UpdateAllSongVoices(currentUser.Id);
+            song.SetUpdatedOverAll(currentUser.Id);
+            song.SyncVoicesFrom(songVoice);
 
             try
             {
@@ -67,7 +69,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             catch (Exception e)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error happend, aborting operation. Please try again.");
+                throw new ValidationException("Transaction error, aborting operation. Please try again.");
             }
 
             return null;

@@ -62,5 +62,7 @@ namespace Dissimilis.DbContext.Models.Song
         public DateTimeOffset? UpdatedOn { get; set; }
 
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
+
+        
     }
 }

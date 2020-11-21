@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Services;

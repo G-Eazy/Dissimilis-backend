@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<SongByIdDto> Handle(QuerySongById request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetSongById(request.SongId, cancellationToken);
+            var result = await _repository.GetFullSongById(request.SongId, cancellationToken);
 
             return new SongByIdDto(result);
         }

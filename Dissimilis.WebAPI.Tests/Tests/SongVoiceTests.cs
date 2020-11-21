@@ -1,19 +1,13 @@
-using System;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice;
-using Dissimilis.WebAPI.DTOs;
-using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
+using static Dissimilis.WebAPI.xUnit.Extensions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -29,7 +23,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = SongTests.newCreateSongDto(4, 4);
+            var createSongDto = CreateSongDto(4, 4);
 
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
             var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
@@ -53,7 +47,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = SongTests.newCreateSongDto(4, 4);
+            var createSongDto = CreateSongDto(4, 4);
 
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
             var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
@@ -83,46 +77,105 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongNoteId, GetUpdateNoteDto(note1Update1, position: 0, length: 8)));
         }
 
-        public static UpdateNoteDto GetUpdateNoteDto(NoteDto noteDto, int? position = null, int? length = null, string[] notes = null)
+        [Fact]
+        public async Task TestSyncBetweenVoices()
         {
-            var updateDto = new UpdateNoteDto()
-            {
-                Position = noteDto.Position,
-                Length = noteDto.Length,
-                Notes = noteDto.Notes
-            };
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            if (position != null)
-            {
-                updateDto.Position = position.Value;
-            }
+            var createSongDto = CreateSongDto(4, 4);
 
-            if (length != null)
-            {
-                updateDto.Length = length.Value;
-            }
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
 
-            if (notes != null)
-            {
-                updateDto.Notes = notes;
-            }
+            songDto.Voices.FirstOrDefault()?.Bars.FirstOrDefault()?.ChordsAndNotes.FirstOrDefault()?.Length.ShouldBe(8, "Length of standard pause note is not correct");
 
-            return updateDto;
+            var voice = songDto.Voices.First();
+            var bar = voice.Bars.First();
+
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After first and second voice");
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2)));
+            var firstSongBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto()));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After a note and a bar");
+
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(repBefore: true)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(repAfter: true)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 1)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 2)));
+            await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto(house: 2)));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After adding several bars");
+
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("ThirdVoice")));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After adding third voice");
+
+            await mediator.Send(new UpdateSongBarCommand(songDto.SongId, voice.SongVoiceId, firstSongBar.SongBarId, CreateUpdateBarDto(repBefore: true, repAfter: true)));
+            CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After last songBarUpdate");
         }
 
-        public static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
+        [Fact]
+        public async Task TestDuplicateVoice()
         {
-            if (value == null)
-            {
-                value = new string[] { "A" };
-            }
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            return new CreateNoteDto()
+            var createSongDto = CreateSongDto(4, 4);
+
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            var baseVoice = songDto.Voices.First();
+            var bar = baseVoice.Bars.First();
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(1, "More voices than expected");
+            songDto.Voices.First().Title.ShouldBe("Piano");
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+
+            var duplicatedVoice1 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, baseVoice.SongVoiceId));
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId).Title.ShouldBe("Piano 1", "Duplicated voice didn't have expected name");
+
+            songDto.Voices.First(v => v.SongVoiceId == baseVoice.SongVoiceId).CheckVoiceBarsEqualTo(songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId), true);
+
+            var duplicatedVoice2 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, duplicatedVoice1.SongVoiceId));
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId).Title.ShouldBe("Piano 2", "Second duplicated voice didn't have expected name");
+
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId).CheckVoiceBarsEqualTo(songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId), true);
+        }
+
+        [Fact]
+        public async Task TestDuplicateSong()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(title: "Song 1");
+
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Title.ShouldBe("Song 1", "Song title not as expected");
+
+            var baseVoice = songDto.Voices.First();
+            var bar = baseVoice.Bars.First();
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
+            await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            var duplicatedSong = await mediator.Send(new DuplicateSongCommand(songDto.SongId, DuplicateSongDto("Song 2")));
+            var duplicatedSongDto = await mediator.Send(new QuerySongById(duplicatedSong.SongId));
+            duplicatedSongDto.Title.ShouldBe("Song 2", "Title og duplicated son not as expected");
+
+            songDto.Voices.Length.ShouldBe(duplicatedSongDto.Voices.Length, "Not same amount of voices");
+            var voicesLength = songDto.Voices.Length;
+            for (var i = 0; i < voicesLength; i++)
             {
-                Position = position,
-                Length = lenght,
-                Notes = value
-            };
+                songDto.Voices[i].CheckVoiceBarsEqualTo(duplicatedSongDto.Voices[i], true);
+            }
         }
 
     }

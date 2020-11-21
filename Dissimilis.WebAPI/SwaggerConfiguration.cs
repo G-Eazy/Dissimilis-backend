@@ -36,23 +36,7 @@ namespace Dissimilis.WebAPI
 
             options.CustomSchemaIds(x => x.FullName);
 
-
-            // Adding security token
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-            {
-                Reference = new OpenApiReference()
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Description =
-                    "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-
-            });
-
+            options.OperationFilter<Authentication.AddRequiredHeaderParameter>();
         }
 
         public static void SetSwaggerUiOptions(SwaggerUIOptions c)
