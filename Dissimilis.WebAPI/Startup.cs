@@ -97,8 +97,6 @@ namespace Dissimilis.WebAPI
                         .AllowCredentials());
             });
 
-            AddAuthService(services);
-
             services.AddControllersWithViews()
                 .AddNewtonsoftJson();
             services.AddMvcCore(options =>
@@ -169,11 +167,6 @@ namespace Dissimilis.WebAPI
             app.UseWebUserAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseEndpoints(endpoints => endpoints.MapControllers());
-        }
-
-        public virtual void AddAuthService(IServiceCollection services)
-        {
-            services.AddSingleton<IAuthService, AuthService>();
         }
 
         public virtual void Migrate(DissimilisDbContext context)

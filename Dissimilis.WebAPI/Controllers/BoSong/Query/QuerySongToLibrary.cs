@@ -30,12 +30,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 
         public async Task<SongIndexDto[]> Handle(QuerySongToLibrary request, CancellationToken cancellationToken)
         {
-            var userId = _authService.GetCurrentUserId();
+            var user = _authService.GetVerifiedCurrentUser();
 
-            if (!userId.HasValue)
+            if (user == null)
                 return null;
 
-            var result = await _repository.GetAllSongs(userId.Value, cancellationToken);
+            var result = await _repository.GetAllSongs(user.Id, cancellationToken);
 
             return result.Select(s => new SongIndexDto(s)).ToArray();
         }

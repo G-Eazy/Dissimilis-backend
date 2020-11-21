@@ -38,12 +38,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
         public async Task<UpdatedSongCommandDto> Handle(CreateTransposedSongCommand request, CancellationToken cancellationToken)
         {
+            // Do we have to get the fullsong to transpose
             var duplicateFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
 
             var duplicatedSong = duplicateFromSong.Transpose(request.Command.Transpose);
 
-            var currentUser = _authService.GetVerifiedCurrentUser();
-            duplicatedSong.SetUpdated(currentUser.Id);
+            duplicatedSong.SetUpdated(_authService.GetVerifiedCurrentUser());
 
             await _repository.SaveAsync(duplicatedSong, cancellationToken);
 
