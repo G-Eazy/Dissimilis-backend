@@ -20,6 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{26EB3E56
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.WebAPI.xUnit", "Dissimilis.WebAPI.Tests\Dissimilis.WebAPI.xUnit.csproj", "{DEC0D065-9263-4DC2-BF7E-92DE03873A89}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{33100C0F-0727-4E7A-91BB-A3DD673DCD6D}"
+	ProjectSection(SolutionItems) = preProject
+		Dissimilis.WebApi.Build.yaml = Dissimilis.WebApi.Build.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
