@@ -1,0 +1,61 @@
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  BuildPlatform: 'x64'
+  BuildConfiguration: 'Release x64'
+  Solution: '**/*.sln'
+
+steps:
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 5.8.*'
+  inputs:
+    versionSpec: 5.8.*
+
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+  inputs:
+    nugetConfigPath: nuget.config
+    feedsToUse: config
+    restoreSolution: '$(Solution)'
+
+- task: VSBuild@1
+  displayName: 'Build Dissimilis Api'
+  inputs:
+    solution: '**/Dissimilis.WebAPI.csproj'
+    msbuildArchitecture: x64
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package  /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\DissimilisApi"'
+    platform: '$(BuildPlatform)'
+    clean: true
+    configuration: '$(BuildConfiguration)'
+
+
+- task: VSTest@2
+  displayName: 'Test Assemblies'
+  inputs:
+    testAssemblyVer2: |
+     **\$(BuildConfiguration)\*test*.dll
+     !**\obj\**
+
+    platform: '$(BuildPlatform)'
+
+    configuration: '$(BuildConfiguration)'
+
+
+- task: PublishSymbols@2
+  displayName: 'Publish symbols path'
+  inputs:
+    SearchPattern: '**\bin\**\*.pdb'
+
+    PublishSymbols: false
+
+  continueOnError: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    pathtoPublish: '$(build.artifactstagingdirectory)'
+
+    artifactName: 'drop'
+
+

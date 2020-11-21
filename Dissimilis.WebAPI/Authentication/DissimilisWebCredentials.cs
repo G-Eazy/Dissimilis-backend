@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Dissimilis.WebAPI.Authentication
+﻿namespace Dissimilis.WebAPI.Authentication
 {
     public class DissimilisWebCredentials : Experis.Ciber.Web.API.Interfaces.IAPICredentials
     {

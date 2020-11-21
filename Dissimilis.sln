@@ -5,23 +5,25 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.WebAPI", "Dissimilis.WebAPI\Dissimilis.WebAPI.csproj", "{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Authentication.Microsoft", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj", "{157AD7A2-726E-4202-94E2-B1C8C8E0C1F0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Web.API", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj", "{FDBD5445-D9BF-4693-A79E-689AD139E576}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Security.Cryptography", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Security.Cryptography\Experis.Ciber.Security.Cryptography.csproj", "{E59E0798-22AA-4075-AAEA-CCC396003F4B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Databasing", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Databasing\Experis.Ciber.Databasing.csproj", "{2D1F421F-79D4-4C7C-8489-1558CA3D67D8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Xml", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Xml\Experis.Ciber.Xml.csproj", "{19234317-8414-4F39-8AA2-AB96CF740B6A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Time", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Time\Experis.Ciber.Time.csproj", "{1F306CAC-D01F-4F49-A554-BCE9A49FB2DF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experis.Ciber.Interfaces", "..\ExperisCiberDotNetLibrary\Experis.Ciber.Interfaces\Experis.Ciber.Interfaces.csproj", "{FDAEAA99-A3A1-4D22-9A26-526787E6D1D3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9EBE43EF-B2B9-48D6-9548-1DB0910B140E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.Configuration", "Dissimilis.Configuration\Dissimilis.Configuration.csproj", "{69735D7A-A13C-4584-B952-23B90644D443}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.DbContext", "Dissimilis.DbContext\Dissimilis.DbContext.csproj", "{DEE68417-688A-4642-8FD0-22BCD149D17B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.Core", "Dissimilis.Core\Dissimilis.Core.csproj", "{411EB648-63FD-4F1E-910A-D7025BC9A0D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{26EB3E56-879E-4BD9-BE78-C513D25D128D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dissimilis.WebAPI.xUnit", "Dissimilis.WebAPI.Tests\Dissimilis.WebAPI.xUnit.csproj", "{DEC0D065-9263-4DC2-BF7E-92DE03873A89}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{33100C0F-0727-4E7A-91BB-A3DD673DCD6D}"
+	ProjectSection(SolutionItems) = preProject
+		Dissimilis.WebApi.Build.yaml = Dissimilis.WebApi.Build.yaml
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Global
@@ -34,37 +36,28 @@ Global
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DE17CA6-9BF5-4534-A206-7C4B61539CAA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{157AD7A2-726E-4202-94E2-B1C8C8E0C1F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{157AD7A2-726E-4202-94E2-B1C8C8E0C1F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{157AD7A2-726E-4202-94E2-B1C8C8E0C1F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{157AD7A2-726E-4202-94E2-B1C8C8E0C1F0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDBD5445-D9BF-4693-A79E-689AD139E576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDBD5445-D9BF-4693-A79E-689AD139E576}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDBD5445-D9BF-4693-A79E-689AD139E576}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDBD5445-D9BF-4693-A79E-689AD139E576}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E59E0798-22AA-4075-AAEA-CCC396003F4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E59E0798-22AA-4075-AAEA-CCC396003F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E59E0798-22AA-4075-AAEA-CCC396003F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E59E0798-22AA-4075-AAEA-CCC396003F4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D1F421F-79D4-4C7C-8489-1558CA3D67D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D1F421F-79D4-4C7C-8489-1558CA3D67D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D1F421F-79D4-4C7C-8489-1558CA3D67D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D1F421F-79D4-4C7C-8489-1558CA3D67D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19234317-8414-4F39-8AA2-AB96CF740B6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19234317-8414-4F39-8AA2-AB96CF740B6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19234317-8414-4F39-8AA2-AB96CF740B6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19234317-8414-4F39-8AA2-AB96CF740B6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F306CAC-D01F-4F49-A554-BCE9A49FB2DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F306CAC-D01F-4F49-A554-BCE9A49FB2DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F306CAC-D01F-4F49-A554-BCE9A49FB2DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F306CAC-D01F-4F49-A554-BCE9A49FB2DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDAEAA99-A3A1-4D22-9A26-526787E6D1D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDAEAA99-A3A1-4D22-9A26-526787E6D1D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDAEAA99-A3A1-4D22-9A26-526787E6D1D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDAEAA99-A3A1-4D22-9A26-526787E6D1D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69735D7A-A13C-4584-B952-23B90644D443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69735D7A-A13C-4584-B952-23B90644D443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69735D7A-A13C-4584-B952-23B90644D443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69735D7A-A13C-4584-B952-23B90644D443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEE68417-688A-4642-8FD0-22BCD149D17B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{411EB648-63FD-4F1E-910A-D7025BC9A0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC0D065-9263-4DC2-BF7E-92DE03873A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC0D065-9263-4DC2-BF7E-92DE03873A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC0D065-9263-4DC2-BF7E-92DE03873A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC0D065-9263-4DC2-BF7E-92DE03873A89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DEC0D065-9263-4DC2-BF7E-92DE03873A89} = {26EB3E56-879E-4BD9-BE78-C513D25D128D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8786E2B4-697E-4755-8869-816E569571D7}

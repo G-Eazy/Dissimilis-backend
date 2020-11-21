@@ -2,36 +2,68 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>be3811c2-9b19-4a15-a73e-d34183bfe62c</UserSecretsId>
+    <UserSecretsId>c0bc65ef-b037-417d-86ca-62dbc46fbabe</UserSecretsId>
+    <StartupObject>Dissimilis.WebAPI.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Dissimilis.WebAPI.xml</DocumentationFile>
+    <DocumentationFile>obj\Dissimilis.WebAPI.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>obj\Dissimilis.WebAPI.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
-    <PackageReference Include="Swashbuckle" Version="5.6.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.5.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1" />
+    <Compile Remove="wwwroot\Resources\**" />
+    <Content Remove="wwwroot\Resources\**" />
+    <EmbeddedResource Remove="wwwroot\Resources\**" />
+    <None Remove="wwwroot\Resources\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Authentication.Microsoft\Experis.Ciber.Authentication.Microsoft.csproj" />
-    <ProjectReference Include="..\..\ExperisCiberDotNetLibrary\Experis.Ciber.Web.API\Experis.Ciber.Web.API.csproj" />
+    <PackageReference Include="Experis.Ciber.Authentication.Microsoft" Version="1.0.8" />
+    <PackageReference Include="Experis.Ciber.Configuration" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Databasing" Version="1.0.1" />
+    <PackageReference Include="Experis.Ciber.Interfaces" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Security.Cryptography" Version="1.0.0" />
+    <PackageReference Include="Experis.Ciber.Web.API" Version="1.1.0" />
+    <PackageReference Include="Experis.Ciber.Xml" Version="1.0.0" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.16.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="Scrutor" Version="3.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.6.3" />
   </ItemGroup>
 
-	<ItemGroup>
-		<None Update="Dissimilis.WebAPI.xml">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
+    <ProjectReference Include="..\Dissimilis.Core\Dissimilis.Core.csproj" />
+    <ProjectReference Include="..\Dissimilis.DbContext\Dissimilis.DbContext.csproj" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+	
 </Project>

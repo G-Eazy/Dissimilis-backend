@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dissimilis.WebAPI.Database;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Dissimilis.WebAPI
@@ -14,20 +9,19 @@ namespace Dissimilis.WebAPI
     {
         public static void Main(string[] args)
         {
-            //Run the hostbuilder
-            CreateHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        /// <summary>
-        /// This function created the HostBuilder from Startup.cs
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseIISIntegration() // Necessary for Azure.
+                .ConfigureLogging((hostingContext, logging) =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                });
+                    var configSectionForLogging = hostingContext.Configuration.GetSection("Logging");
+                    logging.AddFilter("", Enum.Parse<LogLevel>(configSectionForLogging["LogLevel:Default"] ?? "Information"));
+                    logging.AddFilter("Microsoft", Enum.Parse<LogLevel>(configSectionForLogging["LogLevel:Microsoft"] ?? "Warning"));
+                    logging.AddFilter("System", Enum.Parse<LogLevel>(configSectionForLogging["LogLevel:System"] ?? "Warning"));
+                })
+                .UseStartup<Startup>();
     }
 }
