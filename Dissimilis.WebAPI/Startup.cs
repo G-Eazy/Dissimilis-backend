@@ -90,6 +90,8 @@ namespace Dissimilis.WebAPI
                            "https://localhost:5001",
                            "https://dissimilisfargenotasjon.azurewebsites.net",
                            "https://dissimilis-pwa-dev.azurewebsites.net",
+                           "https://dissimilis-pwa-test.azurewebsites.net",
+                           "https://dissimilis-pwa-prod.azurewebsites.net",
                            ConfigurationInfo.GetFrontendBaseUrl()
                            )
                         .AllowAnyMethod()

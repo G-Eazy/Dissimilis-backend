@@ -12,7 +12,6 @@ steps:
   inputs:
     versionSpec: 5.8.*
 
-
 - task: NuGetCommand@2
   displayName: 'NuGet restore'
   inputs:
