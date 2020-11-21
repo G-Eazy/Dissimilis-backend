@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> MyLibrary()
         {
-            var result = await _mediator.Send(new Query.QuerySongToLibrary());
+            var result = await _mediator.Send(new QuerySongToLibrary());
             return Ok(result);
         }
 
