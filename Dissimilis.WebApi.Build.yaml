@@ -1,3 +1,6 @@
+pool:
+  vmImage: 'windows-latest'
+
 variables:
   BuildPlatform: 'x64'
   BuildConfiguration: 'Release x64'
