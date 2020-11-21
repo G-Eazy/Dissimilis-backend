@@ -72,20 +72,20 @@ namespace Dissimilis.WebAPI
 
             services.AddServices<Startup>();
 
+
             services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddHttpContextAccessor();
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddTransient<DissimilisDbContextFactory>();
+            AddAuthService(services);
 
             services.AddControllers();
-
             services.AddSwaggerGen(SwaggerConfiguration.SetSwaggerGenOptions);
-
             services.AddCors(options =>
             {
                 options.AddPolicy(CORSPOLICY,
                     builder => builder.WithOrigins(
-                           "http://localhost:3000",
+                           "https://localhost:3000",
                            "http://localhost:5000",
                            "https://localhost:5001",
                            "https://dissimilisfargenotasjon.azurewebsites.net",
@@ -167,6 +167,11 @@ namespace Dissimilis.WebAPI
             app.UseWebUserAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        public virtual void AddAuthService(IServiceCollection services)
+        {
+            services.AddScoped<IAuthService, AuthService>();
         }
 
         public virtual void Migrate(DissimilisDbContext context)

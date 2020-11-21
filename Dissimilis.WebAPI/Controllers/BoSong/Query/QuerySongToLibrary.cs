@@ -8,21 +8,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.Query
+namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-
-    // Should probably pipeline this using IPipelineBehaviour
-    public class QuerySongToLibrary : IRequest<SongIndexDto[]>
-    {
-        public QuerySongToLibrary() { }
-    }
+    public class QuerySongToLibrary : IRequest<SongIndexDto[]> { }
 
     public class QuerySongToLibraryHandler : IRequestHandler<QuerySongToLibrary, SongIndexDto[]>
     {
         private readonly Repository _repository;
         private readonly IAuthService _authService;
 
-        public QuerySongToLibraryHandler(Repository repository, IAuthService authService)
+        public QuerySongToLibraryHandler(Repository repository, IAuthService authService) 
         {
             _repository = repository;
             _authService = authService;
@@ -35,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
             if (user == null)
                 return null;
 
-            var result = await _repository.GetAllSongs(user.Id, cancellationToken);
+            var result = await _repository.GetAllSongsInMyLibrary(user.Id, cancellationToken);
 
             return result.Select(s => new SongIndexDto(s)).ToArray();
         }

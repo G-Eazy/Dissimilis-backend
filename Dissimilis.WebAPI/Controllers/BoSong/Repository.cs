@@ -42,17 +42,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return song;
         }
 
-        public async Task<Song[]> GetAllSongs(int userId, CancellationToken cancellationToken)
+        public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
         {
             var songs = await Context.Songs
                 .Where(s => s.CreatedById == userId || s.ArrangerId == userId)
-                .ToArrayAsync();
-
-            if (songs == null)
-            {
-                throw new NotFoundException($"No songs arranged or created by user with Id {userId} found");
-            }
-
+                .ToArrayAsync(cancellationToken);
+            
             return songs;
         }
 
