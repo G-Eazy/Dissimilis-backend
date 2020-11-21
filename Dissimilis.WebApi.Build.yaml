@@ -1,3 +1,6 @@
+pool:
+  vmImage: 'windows-latest'
+
 variables:
   BuildPlatform: 'x64'
   BuildConfiguration: 'Release x64'
@@ -12,7 +15,8 @@ steps:
 - task: NuGetCommand@2
   displayName: 'NuGet restore'
   inputs:
-    nugetConfigPath: 'Deployment/NuGet.config'
+    nugetConfigPath: nuget.config
+    feedsToUse: config
     restoreSolution: '$(Solution)'
 
 - task: VSBuild@1
