@@ -23,6 +23,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{33100C0F-0727-4E7A-91BB-A3DD673DCD6D}"
 	ProjectSection(SolutionItems) = preProject
 		Dissimilis.WebApi.Build.yaml = Dissimilis.WebApi.Build.yaml
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Global
