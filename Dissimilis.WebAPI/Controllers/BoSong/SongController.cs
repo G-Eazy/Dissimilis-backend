@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using MediatR;
@@ -16,6 +17,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public SongController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        /// <summary>
+        /// Songs created by or arranged by user
+        /// </summary>
+        [HttpGet("mylibrary")]
+        [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> MyLibrary()
+        {
+            var result = await _mediator.Send(new QuerySongToLibrary());
+            return Ok(result);
         }
 
         /// <summary>
@@ -43,6 +56,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var result = await _mediator.Send(new QuerySongById(item.SongId));
 
             return Created($"{result.SongId}", result);
+        }
+
+        /// <summary>
+        /// Create transposed copy of song
+        /// </summary>
+        [HttpPost("{songId:int}/transpose")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> CreateTransposedSong(int songId, [FromBody] TransposeSongDto command)
+        {
+            var item = await _mediator.Send(new CreateTransposedSongCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+
+            return Ok(result);
         }
 
         /// <summary>

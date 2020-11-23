@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Dissimilis.Configuration;
 using Dissimilis.DbContext;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Dissimilis.WebAPI.xUnit.Setup
 {

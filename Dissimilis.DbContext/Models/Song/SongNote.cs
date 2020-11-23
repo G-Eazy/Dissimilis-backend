@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Internal;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -11,7 +13,9 @@ namespace Dissimilis.DbContext.Models.Song
     {
         internal static string[] _possibleNoteValues = new string[]
         {
-            "G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
+            // Notes ordered from low to high pitch
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z"
+            //"G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
 
         /// <summary>
@@ -100,6 +104,40 @@ namespace Dissimilis.DbContext.Models.Song
                 Postition = Postition,
                 NoteValues = NoteValues
             };
+        }
+
+        public SongNote TransposeNoteValues(int transpose = 0)
+        {
+            var transposedNote = new SongNote()
+            {
+                Length = Length,
+                Postition = Postition,
+                NoteValues = NoteValues
+            };
+
+            var transposedNoteValues = new List<string>();
+            var possibleNoteValuesWithoutZ = _possibleNoteValues.Take(_possibleNoteValues.Length - 1).ToArray();
+
+            foreach (var noteValue in transposedNote.GetNoteValues())
+            {
+                if (noteValue == "Z")
+                {
+                    continue;
+                }
+
+                var index = GetNoteOrderValue(noteValue) + transpose;
+
+                // Map negative transpose-values to positive equivalent
+                var transposedIndex = index >= 0 ? index % possibleNoteValuesWithoutZ.Length
+                    : (index % possibleNoteValuesWithoutZ.Length) + possibleNoteValuesWithoutZ.Length;
+
+                var valueToAdd = possibleNoteValuesWithoutZ[transposedIndex];
+                transposedNoteValues.Add(valueToAdd);
+            }
+
+            transposedNote.SetNoteValues(transposedNoteValues.ToArray());
+
+            return transposedNote;
         }
     }
 }
