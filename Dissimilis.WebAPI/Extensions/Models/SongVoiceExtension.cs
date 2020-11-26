@@ -58,16 +58,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static SongVoice Transpose(this SongVoice songVoice, int transpose = 0)
         {
-            var newSongVoice = new SongVoice()
-            {
-                SongBars = songVoice.SongBars.Select(b => b.Transpose(transpose)).ToArray(),
-                Instrument = songVoice.Instrument,
-                VoiceNumber = songVoice.VoiceNumber
-            };
+            songVoice.SongBars = songVoice.SongBars.Select(b => b.Transpose(transpose)).ToArray();
 
-            newSongVoice.SetCreated(songVoice.CreatedById);
-
-            return newSongVoice;
+            return songVoice;
         }
     }
 }
