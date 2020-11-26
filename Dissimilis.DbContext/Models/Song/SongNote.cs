@@ -108,17 +108,10 @@ namespace Dissimilis.DbContext.Models.Song
 
         public SongNote TransposeNoteValues(int transpose = 0)
         {
-            var transposedNote = new SongNote()
-            {
-                Length = Length,
-                Postition = Postition,
-                NoteValues = NoteValues
-            };
-
             var transposedNoteValues = new List<string>();
             var possibleNoteValuesWithoutZ = _possibleNoteValues.Take(_possibleNoteValues.Length - 1).ToArray();
 
-            foreach (var noteValue in transposedNote.GetNoteValues())
+            foreach (var noteValue in GetNoteValues())
             {
                 if (noteValue == "Z")
                 {
@@ -135,9 +128,9 @@ namespace Dissimilis.DbContext.Models.Song
                 transposedNoteValues.Add(valueToAdd);
             }
 
-            transposedNote.SetNoteValues(transposedNoteValues.ToArray());
+            SetNoteValues(transposedNoteValues.ToArray());
 
-            return transposedNote;
+            return this;
         }
     }
 }

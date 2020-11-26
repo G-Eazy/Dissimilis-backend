@@ -212,17 +212,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static Song Transpose(this Song song, int transpose = 0)
         {
-            string transposeString = transpose < 0 ? transpose.ToString() : "+" + transpose;
-            var transposedSong = new Song()
-            {
-                Title = song.Title + $" (transposed {transposeString})",
-                Denominator = song.Denominator,
-                Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
-                Voices = song.Voices.Select(v => v.Transpose(transpose)).ToArray()
-            };
+            song.Voices = song.Voices.Select(v => v.Transpose(transpose)).ToArray();
 
-            return transposedSong;
+            return song;
         }
     }
 }
