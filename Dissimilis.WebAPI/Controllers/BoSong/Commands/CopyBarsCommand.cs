@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var song = await _repository.GetFullSongById(request.SongId, cancellationToken);
 
-            song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPostition);
+            song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
 

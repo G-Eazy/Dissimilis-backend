@@ -160,7 +160,7 @@ namespace Dissimilis.WebAPI.xUnit
             {
                 FromPosition = fromPosition,
                 CopyLength = copyLength,
-                ToPostition = toPosition
+                ToPosition = toPosition
             };
         }
 

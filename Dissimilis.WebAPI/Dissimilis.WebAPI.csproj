@@ -64,6 +64,9 @@
     <Content Update="wwwroot\index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\robots.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 	
 </Project>

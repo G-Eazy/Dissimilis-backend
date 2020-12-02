@@ -18,6 +18,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
 
         [Required]
         [Range(1, int.MaxValue)]
-        public int ToPostition { get; set; }
+        public int ToPosition { get; set; }
     }
 }
