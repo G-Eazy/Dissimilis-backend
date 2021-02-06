@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading;
 using Dissimilis.DbContext.Models.Song;
 using FoodLabellingAPI.Collections;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {

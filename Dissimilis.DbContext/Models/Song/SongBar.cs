@@ -64,6 +64,7 @@ namespace Dissimilis.DbContext.Models.Song
                 House = House,
                 RepAfter = RepAfter,
                 RepBefore = RepBefore,
+                Position = Position,
                 Notes = Notes.Select(n => n.Clone()).ToList()
             };
         }

@@ -1,6 +1,9 @@
-﻿using Dissimilis.DbContext.Models;
+﻿using System;
+using System.Linq;
+using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dissimilis.DbContext
 {
@@ -41,8 +44,36 @@ namespace Dissimilis.DbContext
             BuildCountry(modelBuilder);
             BuildOrganisation(modelBuilder);
 
+            FixForSqlLite(modelBuilder);
         }
 
+        private void FixForSqlLite(ModelBuilder builder)
+        {
+            if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                return;
+            }
+
+            // SQLite does not have proper support for DateTimeOffset via Entity Framework Core, see the limitations
+            // here: https://docs.microsoft.com/en-us/ef/core/providers/sqlite/limitations#query-limitations
+            // To work around this, when the Sqlite database provider is used, all model properties of type DateTimeOffset
+            // use the DateTimeOffsetToBinaryConverter
+            // Based on: https://github.com/aspnet/EntityFrameworkCore/issues/10784#issuecomment-415769754
+            // This only supports millisecond precision, but should be sufficient for most use cases.
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                var properties = entityType.ClrType.GetProperties().Where(p => p.PropertyType == typeof(DateTimeOffset)
+                    || p.PropertyType == typeof(DateTimeOffset?));
+                foreach (var property in properties)
+                {
+                    builder
+                        .Entity(entityType.Name)
+                        .Property(property.Name)
+                        .HasConversion(new DateTimeOffsetToBinaryConverter());
+                }
+            }
+
+        }
 
         #region builder for all the models
         /*This region builds all the models, BuildNAMEOFMODEL is
@@ -130,7 +161,7 @@ namespace Dissimilis.DbContext
             //Set a unique Id for barnumber that is related to PartId
             //Each barnumber needs to be unique but only within it's
             //corresponding Part.
-            entity.HasIndex(x => new { x.SongVoiceId, BarNumber = x.Position }).IsUnique();
+            entity.HasIndex(x => new { x.SongVoiceId, x.Position });
 
             //Set foregin key for PartId linked to the Id of Part
             entity.HasOne(x => x.SongVoice)

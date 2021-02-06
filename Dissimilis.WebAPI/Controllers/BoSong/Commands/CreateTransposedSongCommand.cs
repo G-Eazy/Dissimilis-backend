@@ -1,13 +1,8 @@
-﻿using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
