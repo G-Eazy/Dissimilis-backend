@@ -4,7 +4,6 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -42,7 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var song = await _repository.GetFullSongById(request.SongId, cancellationToken);
 
-            song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPostition);
+            song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
 
