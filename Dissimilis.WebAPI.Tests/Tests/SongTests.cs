@@ -15,6 +15,7 @@ using static Dissimilis.WebAPI.xUnit.Extensions;
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
     [Collection("Serial")]
+    [CollectionDefinition("Serial", DisableParallelization = true)]
     public class SongTests : BaseTestClass
     {
 

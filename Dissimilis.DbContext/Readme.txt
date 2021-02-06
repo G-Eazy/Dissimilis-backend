@@ -3,8 +3,8 @@
 
 
 # Install/Update ef tools
-    dotnet tool install --global dotnet-ef --version 3.1.8
-    dotnet tool update --global dotnet-ef --version 3.1.8
+    dotnet tool install --global dotnet-ef --version 5.0.2
+    dotnet tool update --global dotnet-ef --version 5.0.2
 
 
 # Migration help

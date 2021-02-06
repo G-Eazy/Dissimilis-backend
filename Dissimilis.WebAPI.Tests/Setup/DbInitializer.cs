@@ -7,7 +7,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
     public class DbInitializer
     {
         private static DissimilisDbContext _dbContext;
-        internal static string MemoryDatabaseName = "Dissimilis-Test-db";
 
         public static void Initialize(IServiceProvider serviceProvider)
         {

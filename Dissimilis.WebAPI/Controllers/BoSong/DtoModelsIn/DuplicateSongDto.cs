@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
+﻿namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
 {
     public class DuplicateSongDto
     {
