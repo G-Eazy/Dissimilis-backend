@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading;
 using Dissimilis.DbContext.Models.Song;
 using FoodLabellingAPI.Collections;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -99,13 +97,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static SongBar Transpose(this SongBar songBar, int transpose = 0)
         {
-            return new SongBar()
-            {
-                House = songBar.House,
-                RepAfter = songBar.RepAfter,
-                RepBefore = songBar.RepBefore,
-                Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToList()
-            };
+            songBar.Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToList();
+
+            return songBar;
         }
     }
 }

@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
-using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
