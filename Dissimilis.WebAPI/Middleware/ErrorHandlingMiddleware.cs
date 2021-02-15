@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Newtonsoft.Json;
+using BadHttpRequestException = Microsoft.AspNetCore.Http.BadHttpRequestException;
 
 namespace Dissimilis.WebAPI
 {
