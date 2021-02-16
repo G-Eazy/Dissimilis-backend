@@ -43,12 +43,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
             {
                 SongBars = songVoice.SongBars.Select(b => b.Clone()).ToArray(),
                 Instrument = instrument ?? songVoice.Instrument,
-                VoiceNumber = voiceNumber == -1 ? songVoice.VoiceNumber + 1 : voiceNumber
+                VoiceNumber = voiceNumber == -1 ? songVoice.VoiceNumber : voiceNumber + 1
             };
 
             if (newSongVoice.VoiceNumber != songVoice.VoiceNumber)
             {
                 newSongVoice.IsMainVoice = false;
+            } 
+            else
+            {
+                newSongVoice.IsMainVoice = songVoice.IsMainVoice;
             }
 
             newSongVoice.SetCreated(user?.Id ?? songVoice.CreatedById);
