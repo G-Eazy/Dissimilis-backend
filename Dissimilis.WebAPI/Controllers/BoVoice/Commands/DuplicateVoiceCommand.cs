@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var instrumentName = songVoice.Instrument?.Name.GetNextSongVoiceName();
-            var instrument = instrumentName == null? null : await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
+            var instrument = await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
 
             var duplicatedVoice = songVoice.Clone(user, instrument, song.Voices.Last().VoiceNumber);
             song.Voices.Add(duplicatedVoice);

@@ -76,7 +76,19 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 return instrument;
             }
 
-            instrument = new Instrument(instrumentName);
+            if (instrumentName == null)
+            {
+                var mainDuplicate = await context.Instruments.FirstOrDefaultAsync(i => i.Name == "Main 1", cancellationToken);
+                if(mainDuplicate != null)
+                {
+                    return mainDuplicate;
+                }
+                instrument = new Instrument("Main 1");
+            }
+            else
+            {
+                instrument = new Instrument(instrumentName);
+            }
 
             await context.Instruments.AddAsync(instrument, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
