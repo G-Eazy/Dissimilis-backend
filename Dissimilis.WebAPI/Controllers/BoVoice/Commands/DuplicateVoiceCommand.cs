@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var instrumentName = songVoice.Instrument?.Name.GetNextSongVoiceName();
             var instrument = await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
 
-            var duplicatedVoice = songVoice.Clone(user, instrument, song.Voices.Last().VoiceNumber);
+            var duplicatedVoice = songVoice.Clone(user, instrument, song.Voices.Max(v => v.VoiceNumber));
             song.Voices.Add(duplicatedVoice);
 
             try
