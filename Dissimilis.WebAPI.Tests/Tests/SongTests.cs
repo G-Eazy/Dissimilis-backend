@@ -219,6 +219,10 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                             .ChordsAndNotes.FirstOrDefault(n => n.NoteId != null).Notes;
             secondCheck.ShouldBe(new[] { "A" }, "Second copied note value not as expected");
 
+            // Check that the first voice is the main voice and that the next voice is not the main
+            afterCopySongDto.Voices[0].IsMain.ShouldBe(true);
+            afterCopySongDto.Voices[1].IsMain.ShouldBe(false);
+
             // check index
             afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoiceFirstBar.SongVoiceId).Bars.Length.ShouldBe(6, "It should be 6 bars after copying");
             var index = 1;
