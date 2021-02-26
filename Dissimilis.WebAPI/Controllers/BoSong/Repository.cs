@@ -103,7 +103,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                     .AsQueryable();
             }
 
-            if (searchCommand.OrderByDateTime)
+            if (searchCommand.OrderBy == "song")
+            {
+                query = query
+                    .OrderBy(s => s.Title)
+                    .ThenByDescending(s => s.UpdatedOn);
+            }
+            else if (searchCommand.OrderBy == "user")
             {
                 query = query
                     .OrderBy(s => s.Arranger.Name)
@@ -112,7 +118,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             else
             {
                 query = query
-                    .OrderBy(s => s.Arranger.Name);
+                    .OrderByDescending(s => s.UpdatedOn);
             }
 
 
