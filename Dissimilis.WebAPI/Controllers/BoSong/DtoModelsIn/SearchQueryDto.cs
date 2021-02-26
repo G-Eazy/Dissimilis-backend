@@ -9,7 +9,6 @@
 
         public int? Num { get; set; }
 
-        public bool OrderByDateTime { get; set; } = false;
-
+        public string OrderBy { get; set; }
     }
 }
