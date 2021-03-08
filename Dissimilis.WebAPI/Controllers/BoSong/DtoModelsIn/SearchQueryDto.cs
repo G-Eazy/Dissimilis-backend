@@ -10,5 +10,7 @@
         public int? Num { get; set; }
 
         public string OrderBy { get; set; }
+
+        public bool OrderDescending { get; set; }
     }
 }
