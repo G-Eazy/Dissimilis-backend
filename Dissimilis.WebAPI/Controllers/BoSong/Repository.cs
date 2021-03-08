@@ -103,18 +103,28 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                     .AsQueryable();
             }
 
-            if (searchCommand.OrderByDateTime)
+            if (searchCommand.OrderBy == "song")
             {
-                query = query
-                    .OrderBy(s => s.Arranger.Name)
+                query = searchCommand.OrderDescending ?
+                    query.OrderBy(s => s.Title)
+                    .ThenByDescending(s => s.UpdatedOn) :
+                    query.OrderByDescending(s => s.Title)
+                    .ThenByDescending(s => s.UpdatedOn);
+            }
+            else if (searchCommand.OrderBy == "user")
+            {
+                query = searchCommand.OrderDescending ?
+                    query.OrderBy(s => s.Arranger.Name)
+                    .ThenByDescending(s => s.UpdatedOn) :
+                    query.OrderByDescending(s => s.Arranger.Name)
                     .ThenByDescending(s => s.UpdatedOn);
             }
             else
             {
-                query = query
-                    .OrderBy(s => s.Arranger.Name);
+                query = searchCommand.OrderDescending ? 
+                    query.OrderByDescending(s => s.UpdatedOn) :
+                    query.OrderBy(s => s.UpdatedOn);
             }
-
 
             if (searchCommand.Num != null)
             {
