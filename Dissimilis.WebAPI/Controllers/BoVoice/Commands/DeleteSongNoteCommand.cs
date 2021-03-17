@@ -14,14 +14,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public int SongId { get; }
         public int SongVoiceId { get; set; }
         public int SongBarId { get; }
-        public int SongNoteId { get; }
+        public int SongChordId { get; }
 
-        public DeleteSongNoteCommand(int songId, int songVoiceId, int songBarId, int songNoteId)
+        public DeleteSongNoteCommand(int songId, int songVoiceId, int songBarId, int songChordId)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
             SongBarId = songBarId;
-            SongNoteId = songNoteId;
+            SongChordId = songChordId;
         }
     }
 
@@ -40,10 +40,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongNoteId);
+            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
             if (note == null)
             {
-                throw new NotFoundException($"Note with Id {request.SongNoteId} not found");
+                throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
 
             part.Notes.Remove(note);
