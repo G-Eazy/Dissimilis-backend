@@ -115,18 +115,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var item = await _mediator.Send(new CreateSongNoteCommand(songId, voiceId, barId, command));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
-            return Created($"{item.SongNoteId}", result);
+            return Created($"{item.SongChordId}", result);
         }
 
 
         /// <summary>
         /// Update note
         /// </summary>
-        [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
+        [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{chordId:int}")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int noteId, [FromBody] UpdateNoteDto command)
+        public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int chordId, [FromBody] UpdateNoteDto command)
         {
-            var item = await _mediator.Send(new UpdateSongNoteCommand(songId, voiceId, barId, noteId, command));
+            var item = await _mediator.Send(new UpdateSongNoteCommand(songId, voiceId, barId, chordId, command));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
@@ -134,11 +134,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         /// <summary>
         /// Delete note
         /// </summary>
-        [HttpDelete("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{noteId:int}")]
+        [HttpDelete("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{chordId:int}")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteNote(int songId, int voiceId, int barId, int noteId)
+        public async Task<IActionResult> DeleteNote(int songId, int voiceId, int barId, int chordId)
         {
-            await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, noteId));
+            await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, chordId));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }

@@ -13,7 +13,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public bool RepBefore { get; set; }
         public bool RepAfter { get; set; }
         public int? House { get; set; }
-        public NoteDto[] ChordsAndNotes { get; set; }
+        public NoteDto[] Chords { get; set; }
 
         public BarDto(SongBar songBar)
         {
@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             RepBefore = songBar.RepBefore;
             RepAfter = songBar.RepAfter;
             House = songBar.House;
-            ChordsAndNotes = songBar.GetBarNotes()
+            Chords = songBar.GetBarNotes()
                 .OrderBy(n => n.Postition)
                 .Select(n => new NoteDto(n))
                 .ToArray();

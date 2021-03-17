@@ -7,7 +7,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
         public int SongId { get; set; }
         public int SongVoiceId { get; set; }
         public int SongBarId { get; set; }
-        public int SongNoteId { get; set; }
+        public int SongChordId { get; set; }
 
         public UpdatedCommandDto(SongVoice songVoice)
         {
@@ -22,7 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 
         public UpdatedCommandDto(SongNote songNote)
         {
-            SongNoteId = songNote.Id;
+            SongChordId = songNote.Id;
         }
 
      
