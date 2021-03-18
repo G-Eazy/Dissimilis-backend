@@ -38,9 +38,9 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         /// <returns>User</returns>
         [HttpGet("currentUser")]
         [ProducesResponseType(typeof(UserDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetUser()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var result = await _mediator.Send(new QueryUserById());
+            var result = await _mediator.Send(new QueryCurrentUser());
             return Ok(result);
         }
     }

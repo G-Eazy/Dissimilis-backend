@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
 {
-    public class QueryUserById : IRequest<UserDto> { }
+    public class QueryCurrentUser : IRequest<UserDto> { }
 
-    public class QueryUserByIdHandler : IRequestHandler<QueryUserById, UserDto>
+    public class QueryCurrentUserHandler : IRequestHandler<QueryCurrentUser, UserDto>
     {
         private readonly Repository _repository;
         private readonly IAuthService _IAuthService;
 
-        public QueryUserByIdHandler(Repository repository, IAuthService IAuthService)
+        public QueryCurrentUserHandler(Repository repository, IAuthService IAuthService)
         {
             _repository = repository;
             _IAuthService = IAuthService;
         }
 
-        public async Task<UserDto> Handle(QueryUserById request, CancellationToken cancellationToken)
+        public async Task<UserDto> Handle(QueryCurrentUser request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
 
