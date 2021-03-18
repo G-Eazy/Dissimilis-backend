@@ -8,7 +8,7 @@ using MediatR;
 namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     // TODO add authorization
-    [Route("api/User")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : Controller
     {
@@ -29,6 +29,18 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _mediator.Send(new QueryAll());
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Fetch the current user from the database
+        /// </summary>
+        /// <returns>User</returns>
+        [HttpGet("currentUser")]
+        [ProducesResponseType(typeof(UserDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetUser()
+        {
+            var result = await _mediator.Send(new QueryUserById());
             return Ok(result);
         }
     }
