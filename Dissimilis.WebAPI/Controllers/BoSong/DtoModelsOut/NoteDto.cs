@@ -4,7 +4,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
     public class NoteDto
     {
-        public int? NoteId { get; set; }
+        public int? ChordId { get; set; }
         public int Position { get; set; }
         public int Length { get; set; }
 
@@ -18,7 +18,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         {
             if (songNote.Id != 0)
             {
-                NoteId = songNote.Id;
+                ChordId = songNote.Id;
             }
             Position = songNote.Postition;
             Length = songNote.Length;
