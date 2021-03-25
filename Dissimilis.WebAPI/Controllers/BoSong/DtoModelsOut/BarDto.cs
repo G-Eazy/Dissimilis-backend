@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             RepAfter = songBar.RepAfter;
             House = songBar.House;
             Chords = songBar.GetBarNotes()
-                .OrderBy(n => n.Postition)
+                .OrderBy(n => n.Position)
                 .Select(n => new NoteDto(n))
                 .ToArray();
         }

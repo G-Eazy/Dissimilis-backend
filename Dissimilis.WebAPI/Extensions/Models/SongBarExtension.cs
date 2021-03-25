@@ -18,7 +18,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             var currentPosition = 0;
             var maxBarPosition = songBar.GetMaxBarPosition();
             var maxBarLength = maxBarPosition + 1;
-            var notesToCheck = songBar.Notes.OrderBy(n => n.Postition).ToQueue();
+            var notesToCheck = songBar.Notes.OrderBy(n => n.Position).ToQueue();
 
             while (notesToCheck.Any())
             {
@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 var noteToCheck = notesToCheck.Peek();
 
                 // if not fits current position, then add it
-                if (noteToCheck.Postition == currentPosition)
+                if (noteToCheck.Position == currentPosition)
                 {
                     finalNotes.Add(notesToCheck.Dequeue());
                     currentPosition = currentPosition + noteToCheck.Length;
@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 // if note does not fits current position then fill with empty note up until the note's starting point
                 else
                 {
-                    var lengthToFill = noteToCheck.Postition - currentPosition;
+                    var lengthToFill = noteToCheck.Position - currentPosition;
                     finalNotes.Add(GetEmptyNote(currentPosition, lengthToFill));
                     currentPosition = currentPosition + lengthToFill;
                 }
@@ -46,14 +46,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 finalNotes.Add(GetEmptyNote(currentPosition, maxBarLength - currentPosition));
             }
 
-            return finalNotes.OrderBy(n => n.Postition).ToArray();
+            return finalNotes.OrderBy(n => n.Position).ToArray();
         }
 
         public static SongNote GetEmptyNote(int position, int length)
         {
             return new SongNote()
             {
-                Postition = position,
+                Position = position,
                 Length = length,
                 NoteValues = "Z"
             };
@@ -69,9 +69,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             var currentPosition = 0;
             var maxBarLength = songBar.GetMaxBarPosition() + 1;
 
-            foreach (var note in songBar.Notes.OrderBy(n => n.Postition))
+            foreach (var note in songBar.Notes.OrderBy(n => n.Position))
             {
-                if (note.Postition < currentPosition)
+                if (note.Position < currentPosition)
                 {
                     if (throwValidationException)
                     {
@@ -80,7 +80,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     return false;
                 }
 
-                if (note.Postition + note.Length > maxBarLength)
+                if (note.Position + note.Length > maxBarLength)
                 {
                     if (throwValidationException)
                     {
@@ -89,7 +89,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     return false;
                 }
 
-                currentPosition = note.Postition + note.Length;
+                currentPosition = note.Position + note.Length;
             }
 
             return true;
