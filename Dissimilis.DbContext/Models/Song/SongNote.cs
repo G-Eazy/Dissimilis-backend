@@ -31,6 +31,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// The active chord if a chord is selected
         /// </summary>
+        [MaxLength(10)]
         public string ActiveChord { get; set; }
 
         /// <summary>
