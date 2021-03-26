@@ -148,6 +148,36 @@ namespace Dissimilis.WebAPI.Extensions.Models
             SyncBarCountToMaxInAllVoices(song);
         }
 
+        /// <summary>
+        /// Deletes bars 
+        /// </summary>
+        public static void DeleteBars(this Song song, int fromPosition, int deleteLength)
+        {
+            SyncBarCountToMaxInAllVoices(song);
+
+            var firstVoice = song.Voices.FirstOrDefault();
+            if (firstVoice == null || firstVoice.SongBars.Count() < fromPosition)
+            {
+                throw new NotFoundException("Voice or bar not found");
+            }
+
+            foreach (var voice in song.Voices.ToList())
+            {
+                foreach (var bar in voice.SongBars.ToList())
+                {
+                    if (fromPosition <= bar.Position && bar.Position < deleteLength + fromPosition)
+                    {
+                        voice.SongBars.Remove(bar);
+                    }
+                    if (bar.Position >= deleteLength + fromPosition)
+                    {
+                        bar.Position -= deleteLength;
+                    }
+                }
+            }
+
+            SyncBarCountToMaxInAllVoices(song);
+        }
 
         /// <summary>
         /// Removes a bar from a given position from all voices

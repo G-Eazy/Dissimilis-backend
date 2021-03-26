@@ -145,6 +145,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
+        /// Delete a number of bars from a position  
+        /// </summary>
+        [HttpPost("{songId:int}/deleteBars")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> DeleteBars(int songId, [FromBody] DeleteBarDto command)
+        {
+            var item = await _mediator.Send(new DeleteBarsCommand(songId, command));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Duplicate song
         /// </summary>
         [HttpPost("{songId:int}/duplicateSong")]
