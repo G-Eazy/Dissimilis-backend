@@ -7,6 +7,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int? ChordId { get; set; }
         public int Position { get; set; }
         public int Length { get; set; }
+        public string ActiveChord { get; set; }
 
         /// <summary>
         /// One or of the following values
@@ -20,9 +21,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             {
                 ChordId = songNote.Id;
             }
-            Position = songNote.Postition;
+            Position = songNote.Position;
             Length = songNote.Length;
             Notes = songNote.GetNoteValues();
+            ActiveChord = songNote.ActiveChord;
         }
     }
 }
