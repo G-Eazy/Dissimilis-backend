@@ -1,0 +1,3 @@
+﻿# Disallow crawling of the entire api
+User-agent: *
+disallow: /
