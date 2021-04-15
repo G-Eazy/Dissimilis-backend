@@ -43,5 +43,16 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             var result = await _mediator.Send(new QueryCurrentUser());
             return Ok(result);
         }
+
+        /// <summary>
+        /// Draft of a logout method
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("logout")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Logout()
+        {
+            return Ok();
+        }
     }
 }
