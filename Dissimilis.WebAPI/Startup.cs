@@ -23,7 +23,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using Newtonsoft.Json.Serialization;
-using Dissimilis.WebAPI.Middleware;
 
 namespace Dissimilis.WebAPI
 {
@@ -157,7 +156,6 @@ namespace Dissimilis.WebAPI
             app.UseCors(CORSPOLICY);
 
             app.UseSwagger();
-            app.UseRobotsTxt(env);
             app.UseSwaggerUI(SwaggerConfiguration.SetSwaggerUiOptions);
 
             app.UseDefaultFiles();
