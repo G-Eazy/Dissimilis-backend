@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             {
                 Position = request.Command.Position,
                 Length = request.Command.Length,
-                ActiveChord = request.Command.ActiveChord
+                ChordName = request.Command.ChordName
             };
 
             note.SetNoteValues(request.Command.Notes);

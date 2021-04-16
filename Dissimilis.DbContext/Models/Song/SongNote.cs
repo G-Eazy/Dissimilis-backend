@@ -32,7 +32,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// The active chord if a chord is selected
         /// </summary>
         [MaxLength(10)]
-        public string ActiveChord { get; set; }
+        public string ChordName { get; set; }
 
         /// <summary>
         /// The lenght of this note/chord
@@ -108,7 +108,7 @@ namespace Dissimilis.DbContext.Models.Song
                 Length = Length,
                 Position = Position,
                 NoteValues = NoteValues,
-                ActiveChord = ActiveChord
+                ChordName = ChordName
             };
         }
 
