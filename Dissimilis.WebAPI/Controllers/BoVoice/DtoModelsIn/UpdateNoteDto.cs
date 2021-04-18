@@ -15,6 +15,6 @@ namespace Dissimilis.WebAPI.DTOs
         public string[] Notes { get; set; } = new string[0];
 
         [MaxLength(10)]
-        public string ActiveChord { get; set; }
+        public string ChordName { get; set; }
     }
 }
