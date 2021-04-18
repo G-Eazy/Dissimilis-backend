@@ -7,6 +7,7 @@ using Dissimilis.WebAPI.Repositories;
 using Experis.Ciber.Authentication.Microsoft;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Dissimilis.WebAPI.Controllers
 {
@@ -15,11 +16,12 @@ namespace Dissimilis.WebAPI.Controllers
     {
         private readonly UserHandlingRepository _repository;
         //Private variable to get the DissimilisDbContext
-        
-        
-        public AuthenticationController(DissimilisDbContext context)
+        private readonly ILogger<AuthenticationController> _logger;
+
+        public AuthenticationController(DissimilisDbContext context, ILogger<AuthenticationController> logger)
         {
             this._repository = new UserHandlingRepository(context);
+            _logger = logger;
         }
 
         protected override DissimilisWebCredentials GetCredentials(UserEntityMetadata user, MSGraphAPI graphApi, HttpContext httpContext, out string error)
@@ -35,6 +37,7 @@ namespace Dissimilis.WebAPI.Controllers
             else
             {
                 error = null;
+                _logger.LogInformation($"User with MSID {webUser.MsId} Logged in");
                 return new DissimilisWebCredentials(Convert.ToUInt32(webUser.Id));
             }
         }
@@ -44,5 +47,6 @@ namespace Dissimilis.WebAPI.Controllers
         {
             return new DissimilisServicePrincipal(webAppUrl);
         }
+
     }
 }

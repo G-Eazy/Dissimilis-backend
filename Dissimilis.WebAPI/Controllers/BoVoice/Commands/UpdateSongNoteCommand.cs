@@ -15,15 +15,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public int SongId { get; }
         public int SongVoiceId { get; set; }
         public int SongBarId { get; }
-        public int SongNoteId { get; }
+        public int SongChordId { get; }
         public UpdateNoteDto Command { get; }
 
-        public UpdateSongNoteCommand(int songId, int songVoiceId, int songBarId, int songNoteId, UpdateNoteDto command)
+        public UpdateSongNoteCommand(int songId, int songVoiceId, int songBarId, int songChordId, UpdateNoteDto command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
             SongBarId = songBarId;
-            SongNoteId = songNoteId;
+            SongChordId = songChordId;
             Command = command;
         }
     }
@@ -43,14 +43,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongNoteId);
+            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
             if (note == null)
             {
-                throw new NotFoundException($"Note with Id {request.SongNoteId} not found");
+                throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
 
             note.Length = request.Command.Length;
-            note.Postition = request.Command.Position;
+            note.Position = request.Command.Position;
+            note.ChordName = request.Command.ChordName;
             note.SetNoteValues(request.Command.Notes);
 
             part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);

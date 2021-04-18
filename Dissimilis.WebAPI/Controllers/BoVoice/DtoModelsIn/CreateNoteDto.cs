@@ -15,5 +15,7 @@ namespace Dissimilis.WebAPI.DTOs
         [MaxLength(100)]
         public string[] Notes { get; set; } = new string[0];
 
+        [MaxLength(10)]
+        public string ChordName { get; set; }
     }
 }

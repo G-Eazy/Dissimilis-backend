@@ -58,15 +58,15 @@ namespace Dissimilis.WebAPI.xUnit
                 return;
             }
 
-            firstBarDto.ChordsAndNotes.Length.ShouldBe(secondBarDto.ChordsAndNotes.Length, "Not matching amount of notes - " + stepDescription);
-            var barLength = firstBarDto.ChordsAndNotes.Length;
+            firstBarDto.Chords.Length.ShouldBe(secondBarDto.Chords.Length, "Not matching amount of notes - " + stepDescription);
+            var barLength = firstBarDto.Chords.Length;
             for (var barI = 0; barI < barLength; barI++)
             {
-                firstBarDto.ChordsAndNotes[barI].Notes.Length.ShouldBe(secondBarDto.ChordsAndNotes[barI].Notes.Length, "Not matching amount of notes - " + stepDescription);
-                var numberOfNotes = firstBarDto.ChordsAndNotes[barI].Notes.Length;
+                firstBarDto.Chords[barI].Notes.Length.ShouldBe(secondBarDto.Chords[barI].Notes.Length, "Not matching amount of notes - " + stepDescription);
+                var numberOfNotes = firstBarDto.Chords[barI].Notes.Length;
                 for (var noteI = 0; noteI < numberOfNotes; noteI++)
                 {
-                    firstBarDto.ChordsAndNotes[barI].Notes[noteI].ShouldBe(secondBarDto.ChordsAndNotes[barI].Notes[noteI], "Note values is not as expected - " + stepDescription);
+                    firstBarDto.Chords[barI].Notes[noteI].ShouldBe(secondBarDto.Chords[barI].Notes[noteI], "Note values is not as expected - " + stepDescription);
                 }
 
             }
@@ -204,7 +204,8 @@ namespace Dissimilis.WebAPI.xUnit
             return new SearchQueryDto()
             {
                 Title = "Testuser",
-                OrderByDateTime = true 
+                OrderBy = "date",
+                OrderDescending = true
             };
         }
     }

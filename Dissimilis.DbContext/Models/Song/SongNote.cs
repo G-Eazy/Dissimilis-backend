@@ -26,7 +26,13 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// Priority of the Note in a spesific Bar
         /// </summary>
-        public int Postition { get; set; }
+        public int Position { get; set; }
+
+        /// <summary>
+        /// The active chord if a chord is selected
+        /// </summary>
+        [MaxLength(10)]
+        public string ChordName { get; set; }
 
         /// <summary>
         /// The lenght of this note/chord
@@ -100,8 +106,9 @@ namespace Dissimilis.DbContext.Models.Song
             return new SongNote()
             {
                 Length = Length,
-                Postition = Postition,
-                NoteValues = NoteValues
+                Position = Position,
+                NoteValues = NoteValues,
+                ChordName = ChordName
             };
         }
 

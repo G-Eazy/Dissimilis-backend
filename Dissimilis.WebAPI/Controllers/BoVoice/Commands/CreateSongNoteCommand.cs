@@ -39,15 +39,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            if (songBar.Notes.Any(n => n.Postition == request.Command.Position))
+            if (songBar.Notes.Any(n => n.Position == request.Command.Position))
             {
                 throw new ValidationException("Note number already in use");
             }
 
             var note = new SongNote()
             {
-                Postition = request.Command.Position,
-                Length = request.Command.Length
+                Position = request.Command.Position,
+                Length = request.Command.Length,
+                ChordName = request.Command.ChordName
             };
 
             note.SetNoteValues(request.Command.Notes);
