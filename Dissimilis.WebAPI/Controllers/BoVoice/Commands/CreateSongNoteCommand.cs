@@ -48,7 +48,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
                 var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
-                var song = await _repository.GetSongById(request.SongId, cancellationToken);
 
                 if (songBar.Notes.Any(n => n.Position == request.Command.Position))
                 {
@@ -66,8 +65,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
                 songBar.Notes.Add(note);
                 songBar.CheckSongBarValidation();
-
-                song.SetUpdatedOverAll(currentUser.Id);
+                songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
 
                 try
                 {
