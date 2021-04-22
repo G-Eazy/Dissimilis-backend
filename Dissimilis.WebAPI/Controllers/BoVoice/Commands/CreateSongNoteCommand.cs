@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +7,10 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
@@ -29,36 +33,51 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class CreateSongNoteCommandHandler : IRequestHandler<CreateSongNoteCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
+        private readonly IAuthService _IAuthService;
 
-        public CreateSongNoteCommandHandler(Repository repository)
+        public CreateSongNoteCommandHandler(Repository repository, IAuthService authService)
         {
             _repository = repository;
-        }
+            _IAuthService = authService;
+    }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongNoteCommand request, CancellationToken cancellationToken)
         {
-            var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
-
-            if (songBar.Notes.Any(n => n.Position == request.Command.Position))
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            SongNote note = null;
+            await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
-                throw new ValidationException("Note number already in use");
+                var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+
+                if (songBar.Notes.Any(n => n.Position == request.Command.Position))
+                {
+                    throw new ValidationException("Note number already in use");
+                }
+
+                note = new SongNote()
+                {
+                    Position = request.Command.Position,
+                    Length = request.Command.Length,
+                    ChordName = request.Command.ChordName
+                };
+
+                note.SetNoteValues(request.Command.Notes);
+
+                songBar.Notes.Add(note);
+                songBar.CheckSongBarValidation();
+                songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
+
+                try
+                {
+                    await _repository.UpdateAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw new ValidationException("Transaction error, aborting operation. Please try again.");
+                }
             }
-
-            var note = new SongNote()
-            {
-                Position = request.Command.Position,
-                Length = request.Command.Length,
-                ChordName = request.Command.ChordName
-            };
-
-            note.SetNoteValues(request.Command.Notes);
-
-            songBar.Notes.Add(note);
-            songBar.CheckSongBarValidation();
-            
-
-            await _repository.UpdateAsync(cancellationToken);
-
             return new UpdatedCommandDto(note);
         }
     }
