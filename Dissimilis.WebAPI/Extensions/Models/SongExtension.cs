@@ -156,7 +156,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
             SyncBarCountToMaxInAllVoices(song);
 
             var firstVoice = song.Voices.FirstOrDefault();
-            if (firstVoice == null || firstVoice.SongBars.Count() < fromPosition)
+            var firstVoiceLength = firstVoice.SongBars.Count();
+            if (firstVoice == null || firstVoiceLength < fromPosition)
             {
                 throw new NotFoundException("Voice or bar not found");
             }
@@ -173,6 +174,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     {
                         bar.Position -= deleteLength;
                     }
+                }
+            }
+            
+            if(firstVoiceLength == deleteLength)
+            { 
+                foreach(var voice in song.Voices)
+                {
+                    voice.SongBars.Add(new SongBar());
                 }
             }
 
