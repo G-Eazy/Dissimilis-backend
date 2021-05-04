@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using System;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -32,7 +33,7 @@ namespace Dissimilis.WebAPI.Repositories
             var user = new User()
             {
                 Name = meta.displayName,
-                Email = meta.Email(),
+                Email = (meta.mail ?? meta.userPrincipalName).ToLower(),
                 MsId = meta.id
             };
             await _context.Users.AddAsync(user);
@@ -40,7 +41,6 @@ namespace Dissimilis.WebAPI.Repositories
 
             return user;
         }
-
 
         /// <summary>
         /// Get user by give email
