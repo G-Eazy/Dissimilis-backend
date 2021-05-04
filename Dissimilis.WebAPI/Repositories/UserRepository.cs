@@ -20,11 +20,24 @@ namespace Dissimilis.WebAPI.Repositories
             var user = await GetUserByMsIdAsync(userMeta.id);
             if (user != null)
             {
+                if (string.IsNullOrWhiteSpace(user.Email))
+                {
+                    user = await AddEmailToUser(user, userMeta);
+                }
                 return user;
             }
 
-            user = await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
+            user = string.IsNullOrWhiteSpace(userMeta.Email())
+                ? await CreateUserAsync(userMeta)
+                : await GetUserByEmailAsync(userMeta.Email());
 
+            return user;
+        }
+
+        public async Task<User> AddEmailToUser(User user, UserEntityMetadata meta)
+        {
+            user.Email = meta.mail ?? meta.userPrincipalName;
+            await _context.SaveChangesAsync();
             return user;
         }
 
