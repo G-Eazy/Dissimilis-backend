@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Repositories
 
         public async Task<User> AddEmailToUser(User user, UserEntityMetadata meta)
         {
-            user.Email = meta.mail ?? meta.userPrincipalName;
+            user.Email = (meta.mail ?? meta.userPrincipalName).ToLower();
             await _context.SaveChangesAsync();
             return user;
         }
