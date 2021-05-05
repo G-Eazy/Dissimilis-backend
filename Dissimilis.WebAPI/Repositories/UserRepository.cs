@@ -29,7 +29,7 @@ namespace Dissimilis.WebAPI.Repositories
 
             user = string.IsNullOrWhiteSpace(userMeta.Email())
                 ? await CreateUserAsync(userMeta)
-                : await GetUserByEmailAsync(userMeta.Email());
+                : await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
 
             return user;
         }
