@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int Numerator { get; set; }
         public int Denominator { get; set; }
 
-        public string ArrangerName { get; set; }
+        public string ArrangerEmail { get; set; }
 
         public DateTimeOffset? UpdatedOn { get; set; }
 
@@ -19,11 +19,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         {
             SongId = song.Id;
             Title = song.Title;
-            ArrangerName = song.Arranger?.Name;
+            ArrangerEmail = song.Arranger?.Email;
             UpdatedOn = song.UpdatedOn;
             Numerator = song.Numerator;
             Denominator = song.Denominator;
-
         }
     }
 }
