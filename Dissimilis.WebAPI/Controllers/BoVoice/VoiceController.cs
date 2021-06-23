@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
@@ -77,7 +78,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<IActionResult> CreateBar(int songId, int voiceId, [FromBody] CreateBarDto command)
         {
             var item = await _mediator.Send(new CreateSongBarCommand(songId, voiceId, command));
-            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            var result = await _mediator.Send(new QuerySongById(songId));
             return Created($"{item.SongBarId}", result);
         }
 
