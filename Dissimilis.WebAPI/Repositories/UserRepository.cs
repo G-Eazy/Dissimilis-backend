@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using System;
 
 namespace Dissimilis.WebAPI.Repositories
 {
@@ -19,11 +20,24 @@ namespace Dissimilis.WebAPI.Repositories
             var user = await GetUserByMsIdAsync(userMeta.id);
             if (user != null)
             {
+                if (string.IsNullOrWhiteSpace(user.Email))
+                {
+                    user = await AddEmailToUser(user, userMeta);
+                }
                 return user;
             }
 
-            user = await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
+            user = string.IsNullOrWhiteSpace(userMeta.Email())
+                ? await CreateUserAsync(userMeta)
+                : await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
 
+            return user;
+        }
+
+        public async Task<User> AddEmailToUser(User user, UserEntityMetadata meta)
+        {
+            user.Email = (meta.mail ?? meta.userPrincipalName).ToLower();
+            await _context.SaveChangesAsync();
             return user;
         }
 
@@ -32,7 +46,7 @@ namespace Dissimilis.WebAPI.Repositories
             var user = new User()
             {
                 Name = meta.displayName,
-                Email = meta.Email(),
+                Email = (meta.mail ?? meta.userPrincipalName).ToLower(),
                 MsId = meta.id
             };
             await _context.Users.AddAsync(user);
@@ -40,7 +54,6 @@ namespace Dissimilis.WebAPI.Repositories
 
             return user;
         }
-
 
         /// <summary>
         /// Get user by give email
