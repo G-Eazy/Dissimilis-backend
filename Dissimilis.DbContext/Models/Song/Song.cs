@@ -65,8 +65,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// Notes that describes the song
         /// </summary>
 
-#nullable enable
-        public string? SongNotes { get; set; }
+        public string SongNotes { get; set; }
 
         /// <summary>
         /// The speed of the song
@@ -79,7 +78,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// how hard the song is to play
         /// (could change the range)
         /// </summary>
-        [Range(1,10)]
+        [Range(1, 10)]
         public int? DegreeOfDifficulty { get; set; }
 
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();

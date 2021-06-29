@@ -17,8 +17,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public DateTimeOffset? UpdatedOn { get; set; }
 
         public SongVoiceDto[] Voices { get; set; }
-#nullable enable
-        public string? SongNotes { get; set; }
+        public string SongNotes { get; set; }
 
         public int? Speed { get; set; }
 
