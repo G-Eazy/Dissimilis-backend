@@ -243,6 +243,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
                 ArrangerId = song.ArrangerId,
+                Speed = song.Speed,
+                DegreeOfDifficulty = song.DegreeOfDifficulty,
+                SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone()).ToArray()
             };
         }

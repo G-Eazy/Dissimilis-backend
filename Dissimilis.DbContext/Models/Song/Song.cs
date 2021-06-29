@@ -61,6 +61,27 @@ namespace Dissimilis.DbContext.Models.Song
         public int? UpdatedById { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
 
+        /// <summary>
+        /// Notes that describes the song
+        /// </summary>
+
+#nullable enable
+        public string? SongNotes { get; set; }
+
+        /// <summary>
+        /// The speed of the song
+        /// ( set a max range of 256) 
+        /// </summary>
+        [Range(0, 256)]
+        public int? Speed { get; set; }
+
+        /// <summary>
+        /// how hard the song is to play
+        /// (could change the range)
+        /// </summary>
+        [Range(1,10)]
+        public int? DegreeOfDifficulty { get; set; }
+
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
 
         

@@ -15,6 +15,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public DateTimeOffset? UpdatedOn { get; set; }
 
+        public string? SongNotes { get; set; }
+        public int? Speed { get; set; }
+
+        public int? DegreeOfDifficulty { get; set; }
+
         public SongIndexDto(Song song)
         {
             SongId = song.Id;
@@ -23,6 +28,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             UpdatedOn = song.UpdatedOn;
             Numerator = song.Numerator;
             Denominator = song.Denominator;
+            Speed = song.Speed;
+            DegreeOfDifficulty = song.DegreeOfDifficulty;
+            SongNotes = song.SongNotes;
         }
     }
 }
