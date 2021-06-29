@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -58,6 +59,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
             newSongVoice.SetCreated(user?.Id ?? songVoice.CreatedById);
 
             return newSongVoice;
+        }
+
+        public static SongVoice CopyComponentInterval(this SongVoice songVoice, SongVoice sourceSongVoice, User user, int intervalPosition, Instrument instrument = null, int voiceNumber = -1)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                bar.CopyComponentInterval(
+                    sourceSongVoice.SongBars.First(sourceBar => sourceBar.Position == bar.Position),
+                    intervalPosition))
+                .ToArray();
+            return songVoice;
         }
 
         public static SongVoice Transpose(this SongVoice songVoice, int transpose = 0)
