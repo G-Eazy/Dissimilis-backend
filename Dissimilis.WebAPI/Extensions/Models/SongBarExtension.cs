@@ -95,6 +95,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return true;
         }
 
+        public static SongBar CopyComponentInterval(this SongBar songBar, SongBar sourceSongBar, int intervalPosition)
+        {
+            //Adds all notes from the source bar which belongs to the specified interval position.
+            sourceSongBar.Notes
+                .Where(note => note.Length > 1 && note.Length > intervalPosition)
+                .Select(note =>
+                {
+                    var newNote = note.Clone();
+                    newNote.SetNoteValues(new string[] { newNote.GetNoteValues()[intervalPosition] });
+                    songBar.Notes.Add(newNote);
+                    return newNote;
+                });
+            return songBar;
+        }
+
         public static SongBar Transpose(this SongBar songBar, int transpose = 0)
         {
             songBar.Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToList();
