@@ -10,30 +10,28 @@ using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
+namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
     public class DuplicateComponentIntervalCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
         public int SongVoiceId { get; set; }
-        public int SourceVoiceId { get; set; }
-        public int IntervalPosition { get; set; }
+        public DuplicateComponentIntervalDto Command { get; }
 
-        public DuplicateComponentIntervalCommand(int songId, int songVoiceId, int sourceVoiceId, int intervalPosition)
+        public DuplicateComponentIntervalCommand(int songId, int songVoiceId, DuplicateComponentIntervalDto command)
         {
-            this.SongId = songId;
-            this.SongVoiceId = songVoiceId;
-            this.SourceVoiceId = sourceVoiceId;
-            this.IntervalPosition = intervalPosition;
+            SongId = songId;
+            SongVoiceId = songVoiceId;
+            Command = command;
         }
     }
 
-    public class DuplicateVoiceCommandHandler : IRequestHandler<DuplicateComponentIntervalCommand, UpdatedCommandDto>
+    public class DuplicateComponentIntervalHandler : IRequestHandler<DuplicateComponentIntervalCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
         private readonly AuthService _authService;
 
-        public DuplicateVoiceCommandHandler(Repository repository, AuthService authService)
+        public DuplicateComponentIntervalHandler(Repository repository, AuthService authService)
         {
             _repository = repository;
             _authService = authService;
@@ -46,10 +44,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-            var sourceVoice = song.Voices.FirstOrDefault(v => v.Id == request.SourceVoiceId);
+            var sourceVoice = song.Voices.FirstOrDefault(v => v.Id == request.Command.SourceVoiceId);
             if (sourceVoice == null)
             {
-                throw new NotFoundException($"Source voice with id {request.SourceVoiceId} not found");
+                throw new NotFoundException($"Source voice with id {request.Command.SourceVoiceId} not found");
             }
 
             var user = _authService.GetVerifiedCurrentUser();
@@ -58,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             var instrumentName = songVoice.Instrument?.Name.GetNextSongVoiceName();
             var instrument = await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
 
-            songVoice.CopyComponentInterval(sourceVoice, user, request.IntervalPosition);
+            songVoice.CopyComponentInterval(sourceVoice, user, request.Command.ComponentInterval);
             try
             {
                 await _repository.UpdateAsync(cancellationToken);

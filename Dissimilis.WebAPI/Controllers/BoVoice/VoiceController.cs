@@ -144,6 +144,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             return Ok(result);
         }
 
+        /// <summary>
+        /// Create collection of notes in desired component interval
+        /// </summary>
+        [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateComponentInterval")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> DuplicateComponentInterval(int songId, int voiceId, [FromBody] DuplicateComponentIntervalDto command)
+        {
+            var item = await _mediator.Send(new DuplicateComponentIntervalCommand(songId, voiceId, command));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            return Created($"{item.SongVoiceId}", result);
+        }
 
     }
 }
