@@ -7,6 +7,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
         [Required]
         [MinLength(1)]
         [MaxLength(100)]
-        public string Name { get; set; }
+        public string VoiceName { get; set; }
     }
 }
