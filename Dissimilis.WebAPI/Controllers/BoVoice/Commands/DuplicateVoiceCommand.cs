@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -19,11 +20,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public string SongVoice { get; set; }
 
-        public DuplicateVoiceCommand(int songId, int songVoiceId, CreateSongVoiceDto command)
+        public DuplicateVoiceCommand(int songId, int songVoiceId, DuplicateVoiceDto command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
-            SongVoice = command?.Instrument;
+            SongVoice = command.Name;
         }
     }
 
@@ -50,10 +51,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var user = _authService.GetVerifiedCurrentUser();
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-            var instrumentName = songVoice.Instrument?.Name.GetNextSongVoiceName();
-            if (!string.IsNullOrEmpty(request.SongVoice)) instrumentName = request.SongVoice;
+            if (string.IsNullOrEmpty(request.SongVoice))
+            {
+                throw new Exception("Voicename can't be a empty string");
+            }
 
-            var instrument = await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
+            var instrument = await _repository.CreateOrFindInstrument(request.SongVoice, cancellationToken);
 
             var duplicatedVoice = songVoice.Clone(user, instrument, song.Voices.Max(v => v.VoiceNumber));
             song.Voices.Add(duplicatedVoice);

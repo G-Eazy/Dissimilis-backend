@@ -23,20 +23,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songVoice.Song.SetUpdated(userId);
         }
 
-        public static string GetNextSongVoiceName(this string songVoiceInstrumentName)
-        {
-            var parts = songVoiceInstrumentName.Split(' ').ToList();
-            var lastPart = parts.Last();
-            if (!string.IsNullOrWhiteSpace(lastPart) && int.TryParse(lastPart, out var result))
-            {
-                parts.Remove(lastPart);
-                parts.Add((result + 1).ToString());
-                return string.Join(" ", parts);
-            }
-
-            return songVoiceInstrumentName + " 1";
-        }
-
         public static SongVoice Clone(this SongVoice songVoice, User user = null, Instrument instrument = null, int voiceNumber = -1)
         {
             var newSongVoice = new SongVoice()
