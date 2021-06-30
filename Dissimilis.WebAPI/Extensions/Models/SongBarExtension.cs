@@ -98,15 +98,36 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static SongBar CopyComponentInterval(this SongBar songBar, SongBar sourceSongBar, int intervalPosition)
         {
             //Adds all notes from the source bar which belongs to the specified interval position.
-            sourceSongBar.Notes
-                .Where(note => note.Length > 1 && note.Length > intervalPosition)
-                .Select(note =>
+            var updatedBarNotes = new List<SongNote>();
+            foreach (var note in sourceSongBar.Notes)
+            {
+                var newNote = new SongNote()
                 {
-                    var newNote = note.Clone();
-                    newNote.SetNoteValues(new string[] { newNote.GetNoteValues()[intervalPosition] });
-                    songBar.Notes.Add(newNote);
-                    return newNote;
-                });
+                    BarId = songBar.Id,
+                    SongBar = songBar,
+                    Length = note.Length,
+                    Position = note.Position,
+                };
+                newNote.SetNoteValues(new string[] { note.GetNoteValues()[intervalPosition] });
+                //newNote.SetNoteValues(new string[] { "C" });
+                updatedBarNotes.Add(newNote);
+            }
+            songBar.Notes = updatedBarNotes;
+            //var songNotes = new List<SongNote>();
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    var newSongNote = new SongNote()
+            //    {
+            //        BarId = songBar.Id,
+            //        SongBar = songBar,
+            //        Position = i,
+            //        ChordName = "C",
+            //        Length = 1,
+            //    };
+            //    newSongNote.SetNoteValues(new string[] { "C", "E", "G" });
+            //    songNotes.Add(newSongNote);
+            //}
+            //songBar.Notes = songNotes;
             return songBar;
         }
 
