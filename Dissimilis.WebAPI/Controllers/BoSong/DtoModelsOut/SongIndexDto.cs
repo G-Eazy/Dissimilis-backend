@@ -12,7 +12,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int Denominator { get; set; }
 
         public string ArrangerEmail { get; set; }
-
+        public string ArrangerName { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
 
         public int? Speed { get; set; }
@@ -24,6 +24,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongId = song.Id;
             Title = song.Title;
             ArrangerEmail = song.Arranger?.Email;
+            ArrangerName = song.Arranger?.Name;
             UpdatedOn = song.UpdatedOn;
             Numerator = song.Numerator;
             Denominator = song.Denominator;

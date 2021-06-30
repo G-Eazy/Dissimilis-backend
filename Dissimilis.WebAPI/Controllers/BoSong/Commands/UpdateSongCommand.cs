@@ -39,6 +39,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             {
             song.Title = request.Command.Title;
             }
+            if ( request.Command.Composer != null)
+            {
+                song.Composer = request.Command.Composer;
+            }
             if (request.Command.SongNotes != null)
             {
                 song.SongNotes = request.Command.SongNotes;

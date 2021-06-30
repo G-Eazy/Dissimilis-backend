@@ -39,7 +39,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var currentUser = _authService.GetVerifiedCurrentUser();
             duplicatedSong.SetUpdated(currentUser.Id);
-
             await _repository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);

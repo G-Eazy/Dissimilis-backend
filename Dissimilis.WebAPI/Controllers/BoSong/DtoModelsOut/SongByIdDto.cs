@@ -23,18 +23,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public int? DegreeOfDifficulty { get; set; }
 
+        public string Composer { get; set; }
+        
+        public string Creater { get; set; }
+        public string UpdatedBy { get; set; }
         public SongByIdDto(Song song)
         {
             SongId = song.Id;
             Title = song.Title;
-            ArrangerName = song.Arranger?.Name ;
+            ArrangerName = song.Arranger?.Name;
             UpdatedOn = song.UpdatedOn;
+            UpdatedBy = song.UpdatedBy?.Name;
             Numerator = song.Numerator;
             Denominator = song.Denominator;
             Speed = song.Speed;
             DegreeOfDifficulty = song.DegreeOfDifficulty;
             SongNotes = song.SongNotes;
-
+            Composer = song.Composer;
+            Creater = song.CreatedBy?.Name;
             Voices = song.Voices
                 .Select(p => new SongVoiceDto(p))
                 .OrderBy(p => p.PartNumber)

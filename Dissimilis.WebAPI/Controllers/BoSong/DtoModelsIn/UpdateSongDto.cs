@@ -15,5 +15,7 @@
         public int? DegreeOfDifficulty { get; set; }
         
         public string SongNotes { get; set; }
+
+        public string Composer { get; set; }
     }
 }
