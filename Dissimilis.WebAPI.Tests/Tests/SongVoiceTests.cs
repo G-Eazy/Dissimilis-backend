@@ -117,6 +117,112 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
+        public async Task TestCopyComponentInterval()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            //Setup source voice to copy component interval from.
+            var sourceVoice = songDto.Voices.First();
+            var firstSourceBar = sourceVoice.Bars.First();
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongId, firstSourceBar.SongId, CreateNoteDto(0, 1, new string[] { "C", "E", "G" })));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongId, firstSourceBar.SongId, CreateNoteDto(1, 1, new string[] { "C", "E", "G" })));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongId, firstSourceBar.SongId, CreateNoteDto(2, 2, new string[] { "C", "E", "G" })));
+
+            //Test root copy.
+            var destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Root voice")));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(2, "Number of voices should be 2.");
+
+            var updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(0, sourceVoice.SongVoiceId)));
+            var updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+            
+            var expectedNotesCopied = new string[] { "C" };
+            var expectedNotesNotCopied = new string[] { "Z" };
+
+            updatedDestinationVoice.Title.ShouldBe("Root voice", "The title of the destination voice is incorrect.");
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                    //Verify that correct notes are copied over from source voice.
+                {
+                    chord.Notes.ShouldBe(expectedNotesCopied, $"Copy failed for note {chord.Position}.");
+                }
+                else
+                    //Verify that notes that should not receive copy do not have a value. 
+                {
+                    chord.Notes.ShouldBe(expectedNotesNotCopied, $"Unexpected copy happened for note {chord.Position}.");
+                }
+            }
+
+            //Test third copy.
+            destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Third voice")));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(3, "Number of voices should be 2.");
+
+            updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(1, sourceVoice.SongVoiceId)));
+            updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+
+            expectedNotesCopied = new string[] { "E" };
+            expectedNotesNotCopied = new string[] { "Z" };
+
+            updatedDestinationVoice.Title.ShouldBe("Third voice", "The title of the destination voice is incorrect.");
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                //Verify that correct notes are copied over from source voice.
+                {
+                    chord.Notes.ShouldBe(expectedNotesCopied, $"Copy failed for note {chord.Position}.");
+                }
+                else
+                //Verify that notes that should not receive copy do not have a value. 
+                {
+                    chord.Notes.ShouldBe(expectedNotesNotCopied, $"Unexpected copy happened for note {chord.Position}.");
+                }
+            }
+
+            //Test fifth copy.
+            destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Fifth voice")));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(4, "Number of voices should be 2.");
+
+            updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(2, sourceVoice.SongVoiceId)));
+            updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+
+            expectedNotesCopied = new string[] { "G" };
+            expectedNotesNotCopied = new string[] { "Z" };
+
+            updatedDestinationVoice.Title.ShouldBe("Fifth voice", "The title of the destination voice is incorrect.");
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                //Verify that correct notes are copied over from source voice.
+                {
+                    chord.Notes.ShouldBe(expectedNotesCopied, $"Copy failed for note {chord.Position}.");
+                }
+                else
+                //Verify that notes that should not receive copy do not have a value. 
+                {
+                    chord.Notes.ShouldBe(expectedNotesNotCopied, $"Unexpected copy happened for note {chord.Position}.");
+                }
+            }
+
+        }
+
+        [Fact]
         public async Task TestDuplicateVoice()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
