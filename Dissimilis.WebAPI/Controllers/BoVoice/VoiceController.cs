@@ -63,9 +63,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicate")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
-        public async Task<IActionResult> DuplicateVoice(int songId, int voiceId)
+        public async Task<IActionResult> DuplicateVoice(int songId, int voiceId, [FromBody] CreateSongVoiceDto command)
         {
-            var item = await _mediator.Send(new DuplicateVoiceCommand(songId, voiceId));
+            var item = await _mediator.Send(new DuplicateVoiceCommand(songId, voiceId, command));
             var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));
             return Created($"{item.SongVoiceId}", result);
         }
