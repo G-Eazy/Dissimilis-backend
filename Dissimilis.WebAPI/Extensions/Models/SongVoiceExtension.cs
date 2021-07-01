@@ -23,12 +23,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songVoice.Song.SetUpdated(userId);
         }
 
-        public static SongVoice Clone(this SongVoice songVoice, User user = null, Instrument instrument = null, int voiceNumber = -1)
+        public static SongVoice Clone(this SongVoice songVoice, string VoiceName, User user = null, Instrument instrument = null, int voiceNumber = -1)
         {
             var newSongVoice = new SongVoice()
             {
                 SongBars = songVoice.SongBars.Select(b => b.Clone()).ToArray(),
                 Instrument = instrument ?? songVoice.Instrument,
+                VoiceName = VoiceName,
                 VoiceNumber = voiceNumber == -1 ? songVoice.VoiceNumber : voiceNumber + 1
             };
 

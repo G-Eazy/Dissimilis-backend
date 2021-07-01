@@ -12,7 +12,7 @@ namespace Dissimilis.DbContext.Models.Song
     {
         [Key]
         public int Id { get; set; }
-
+        public string VoiceName { get; set; }
         public int VoiceNumber { get; set; }
         public bool IsMainVoice { get; set; }
 

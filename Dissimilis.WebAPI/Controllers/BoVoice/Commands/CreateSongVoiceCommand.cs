@@ -22,6 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             SongId = songId;
             Command = command;
+
         }
     }
 
@@ -57,7 +58,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
                 Instrument = instrument,
-                Song = song
+                Song = song,
+                VoiceName = request.Command.VoiceName ?? "Main"
             };
 
             var cloneVoice = song.Voices.FirstOrDefault();

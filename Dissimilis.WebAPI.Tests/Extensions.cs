@@ -95,7 +95,7 @@ namespace Dissimilis.WebAPI.xUnit
         {
             return new CreateSongVoiceDto()
             {
-                Instrument = voiceName,
+                VoiceName = voiceName,
                 VoiceNumber = voiceNumber
             };
         }
@@ -112,7 +112,7 @@ namespace Dissimilis.WebAPI.xUnit
         {
             return new UpdateSongVoiceDto()
             {
-                Instrument = voiceName,
+                VoiceName = voiceName,
                 VoiceNumber = voiceNumber
             };
         }
