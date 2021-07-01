@@ -12,13 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
-    public class DuplicateComponentIntervalCommand : IRequest<UpdatedCommandDto>
+    public class DuplicateAllChordsCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
         public int SongVoiceId { get; set; }
-        public DuplicateComponentIntervalDto Command { get; }
+        public DuplicateAllChordsDto Command { get; }
 
-        public DuplicateComponentIntervalCommand(int songId, int songVoiceId, DuplicateComponentIntervalDto command)
+        public DuplicateAllChordsCommand(int songId, int songVoiceId, DuplicateAllChordsDto command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
@@ -26,17 +26,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
     }
 
-    public class DuplicateComponentIntervalHandler : IRequestHandler<DuplicateComponentIntervalCommand, UpdatedCommandDto>
+    public class DuplicateAllChordsHandler : IRequestHandler<DuplicateAllChordsCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
         private readonly AuthService _authService;
 
-        public DuplicateComponentIntervalHandler(Repository repository, AuthService authService)
+        public DuplicateAllChordsHandler(Repository repository, AuthService authService)
         {
             _repository = repository;
             _authService = authService;
         }
-        public async Task<UpdatedCommandDto> Handle(DuplicateComponentIntervalCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedCommandDto> Handle(DuplicateAllChordsCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
@@ -53,10 +53,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var user = _authService.GetVerifiedCurrentUser();
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-            var instrumentName = songVoice.Instrument?.Name.GetNextSongVoiceName();
-            var instrument = await _repository.CreateOrFindInstrument(instrumentName, cancellationToken);
 
-            songVoice.CopyComponentInterval(sourceVoice, user, request.Command.ComponentInterval);
+            songVoice.DuplicateAllChords(sourceVoice);
             try
             {
                 await _repository.UpdateAsync(cancellationToken);

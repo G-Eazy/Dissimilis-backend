@@ -1,8 +1,8 @@
 ﻿namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 {
-    public class DuplicateComponentIntervalDto
+    public class DuplicateAllChordsDto
     {
-        public int ComponentInterval { get; set; }
+        public int IntervalPostion { get; set; }
         public int SourceVoiceId { get; set; }
     }
 }
