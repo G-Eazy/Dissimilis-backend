@@ -22,6 +22,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 "F",
                 "Dm",
                 "Faug7",
+                "A#sus4",
             };
             List<List<string>> expectedNoteValues = new List<List<string>>()
             {
@@ -32,11 +33,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 new List<string> { "F", "A", "C" },
                 new List<string> { "D", "F", "A" },
                 new List<string> { "F", "A", "C#", "D#" },
+                new List<string> { "A#", "D#", "F" },
             };
 
             for (int index = 0; index < chordNamesToTest.Length; index++)
             {
-                SongNoteExtension.GetNoteValues(chordNamesToTest[index]).ShouldBeEquivalentTo(expectedNoteValues[index], $"Note values were not correct for chord {chordNamesToTest[index]}");
+                SongNoteExtension.GetNoteValuesFromChordName(chordNamesToTest[index]).ShouldBeEquivalentTo(expectedNoteValues[index], $"Note values were not correct for chord {chordNamesToTest[index]}");
             }
         }
     }

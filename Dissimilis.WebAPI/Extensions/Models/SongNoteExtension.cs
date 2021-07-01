@@ -208,24 +208,32 @@ namespace Dissimilis.WebAPI.Extensions.Models
             new string[] {"1P 5P 7m 9m 11P", "", "11b9"}
         };
 
-        public static List<string> GetNoteValues(string ChordName)
+        public static List<string> GetNoteValuesFromChordName(string ChordName)
         {
-            string rootNote = ChordName.Substring(0, 1);
+            string rootNote;
             string chordPattern;
             if (ChordName.Length == 1)
             {
+                rootNote = ChordName.Substring(0, 1);
                 chordPattern = "M";
+            }
+            else if (ChordName[1] == '#')
+            {
+                rootNote = ChordName.Substring(0, 2);
+                chordPattern = ChordName[2..];
             } else
             {
+                rootNote = ChordName.Substring(0, 1);
                 chordPattern = ChordName[1..];
             }
 
             int startIndex = AllNotes.IndexOf(rootNote);
             string[] intervalCodes = ChordFormulas.Where(formula => formula[2].Split(" ").Contains(chordPattern)).Select(formula => formula[0].Split(" ")).First();
             List<string> noteValues = new List<string>();
+
             foreach (string intervalCode in intervalCodes)
             {
-                noteValues.Add(AllNotes[(startIndex + IntervalMapping[intervalCode]) % 12]);
+                noteValues.Add(AllNotes[(startIndex + IntervalMapping[intervalCode]) % AllNotes.Count]);
             }
             return noteValues;
         }
