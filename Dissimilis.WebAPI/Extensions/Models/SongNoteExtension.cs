@@ -237,5 +237,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
             return noteValues;
         }
+
+        public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
+        {
+            var updatedNoteValues = songNote.GetNoteValues();
+            updatedNoteValues[intervalPosition] = "X";
+            songNote.SetNoteValues(updatedNoteValues);
+            return songNote;
+        }
+
+        public static SongNote AddComponentInterval(this SongNote songNote, int intervalPosition)
+        {
+            var updatedNoteValues = songNote.GetNoteValues();
+            updatedNoteValues[intervalPosition] = GetNoteValuesFromChordName(songNote.ChordName)[intervalPosition];
+            songNote.SetNoteValues(updatedNoteValues);
+            return songNote;
+        }
     }
 }

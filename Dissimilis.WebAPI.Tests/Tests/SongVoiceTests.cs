@@ -134,13 +134,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongId, firstSourceBar.SongId, CreateNoteDto(2, 2, new string[] { "C", "E", "G" })));
 
             //Test root copy.
-            var destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Root voice")));
+            var destinationVoiceRoot = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Root voice")));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.Length.ShouldBe(2, "Number of voices should be 2.");
 
             var updatedDestinationVoiceDto = await mediator.Send(
-                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(0, sourceVoice.SongVoiceId)));
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceRoot.SongVoiceId, DuplicateComponentIntervalDto(0, sourceVoice.SongVoiceId)));
             var updatedDestinationVoice = await mediator.Send(
                 new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
             
@@ -163,13 +163,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             }
 
             //Test third copy.
-            destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Third voice")));
+            var destinationVoiceThird = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Third voice")));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.Length.ShouldBe(3, "Number of voices should be 2.");
+            songDto.Voices.Length.ShouldBe(3, "Number of voices should be 3.");
 
             updatedDestinationVoiceDto = await mediator.Send(
-                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(1, sourceVoice.SongVoiceId)));
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceThird.SongVoiceId, DuplicateComponentIntervalDto(1, sourceVoice.SongVoiceId)));
             updatedDestinationVoice = await mediator.Send(
                 new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
 
@@ -192,13 +192,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             }
 
             //Test fifth copy.
-            destinationVoice = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Fifth voice")));
+            var destinationVoiceFifth = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Fifth voice")));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.Length.ShouldBe(4, "Number of voices should be 2.");
+            songDto.Voices.Length.ShouldBe(4, "Number of voices should be 4.");
 
             updatedDestinationVoiceDto = await mediator.Send(
-                new DuplicateComponentIntervalCommand(songDto.SongId, destinationVoice.SongVoiceId, DuplicateComponentIntervalDto(2, sourceVoice.SongVoiceId)));
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceFifth.SongVoiceId, DuplicateComponentIntervalDto(2, sourceVoice.SongVoiceId)));
             updatedDestinationVoice = await mediator.Send(
                 new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
 
@@ -220,6 +220,30 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 }
             }
 
+            //Test copy third when root is present.
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceRoot.SongVoiceId, DuplicateComponentIntervalDto(2, sourceVoice.SongVoiceId)));
+            updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+
+            expectedNotesCopied = new string[] { "C", "E" };
+            expectedNotesNotCopied = new string[] { "Z" };
+
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                //Verify that correct notes are copied over from source voice.
+                {
+                    chord.Notes.ShouldBe(expectedNotesCopied, $"Copy failed for note {chord.Position}.");
+                }
+                else
+                //Verify that notes that should not receive copy do not have a value. 
+                {
+                    chord.Notes.ShouldBe(expectedNotesNotCopied, $"Unexpected copy happened for note {chord.Position}.");
+                }
+            }
         }
 
         [Fact]

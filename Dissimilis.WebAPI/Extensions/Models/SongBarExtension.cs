@@ -95,45 +95,50 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return true;
         }
 
-        public static SongBar CopyComponentInterval(this SongBar songBar, SongBar sourceSongBar, int intervalPosition)
+        public static SongBar DuplicateAllChordsWithoutComponentIntervals(this SongBar songBar, SongBar sourceSongBar)
         {
-            //Adds all notes from the source bar which belongs to the specified interval position.
-            var updatedBarNotes = new List<SongNote>();
-            foreach (var note in sourceSongBar.Notes)
-            {
-                var newNote = new SongNote()
-                {
-                    BarId = songBar.Id,
-                    SongBar = songBar,
-                    Length = note.Length,
-                    Position = note.Position,
-                };
-                newNote.SetNoteValues(new string[] { note.GetNoteValues()[intervalPosition] });
-                //newNote.SetNoteValues(new string[] { "C" });
-                updatedBarNotes.Add(newNote);
-            }
-            songBar.Notes = updatedBarNotes;
-            //var songNotes = new List<SongNote>();
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    var newSongNote = new SongNote()
-            //    {
-            //        BarId = songBar.Id,
-            //        SongBar = songBar,
-            //        Position = i,
-            //        ChordName = "C",
-            //        Length = 1,
-            //    };
-            //    newSongNote.SetNoteValues(new string[] { "C", "E", "G" });
-            //    songNotes.Add(newSongNote);
-            //}
-            //songBar.Notes = songNotes;
+            songBar.Notes = sourceSongBar.Notes.Where(note => note.ChordName != null).Select(note => note.Clone(false)).ToList();
             return songBar;
         }
 
+        public static SongBar RemoveComponentInterval(this SongBar songBar, int intervalPosition)
+        {
+            songBar.Notes = songBar.Notes.Where(note => note.ChordName != null).Select(note => note.RemoveComponentInterval(intervalPosition)).ToList();
+            return songBar;
+        }
+
+        public static SongBar AddComponentInterval(this SongBar songBar, int intervalPosition)
+        {
+            songBar.Notes = songBar.Notes.Where(note => note.ChordName != null).Select(note => note.AddComponentInterval(intervalPosition)).ToList();
+            return songBar;
+        }
+
+        //public static SongBar CopyComponentInterval(this SongBar songBar, SongBar sourceSongBar, int intervalPosition)
+        //{
+        //    //Adds all notes from the source bar which belongs to the specified interval position.
+        //    var updatedBarNotes = new List<SongNote>();
+        //    foreach (var note in sourceSongBar.Notes)
+        //    {
+        //        var newNote = new SongNote()
+        //        {
+        //            BarId = songBar.Id,
+        //            SongBar = songBar,
+        //            Length = note.Length,
+        //            Position = note.Position,
+        //            ChordName = note.ChordName,
+        //        };
+        //        var updatedNoteValues = newNote.GetNoteValues();
+
+        //        newNote.SetNoteValues(updatedNoteValues);
+        //        updatedBarNotes.Add(newNote);
+        //    }
+        //    songBar.Notes = updatedBarNotes;
+        //    return songBar;
+        //}
+
         public static SongBar Transpose(this SongBar songBar, int transpose = 0)
         {
-            songBar.Notes = songBar.Notes.Select(n => n.TransposeNoteValues(transpose)).ToList();
+            songBar.Notes = songBar.Notes.Select(n => n.TransposeNoteValues()).ToList();
 
             return songBar;
         }

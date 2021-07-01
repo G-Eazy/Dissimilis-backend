@@ -199,11 +199,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static DuplicateComponentIntervalDto DuplicateComponentIntervalDto(int intervalPosition, int sourceVoiceId)
+        internal static DuplicateAllChordsDto DuplicateComponentIntervalDto(int intervalPosition, int sourceVoiceId)
         {
-            return new DuplicateComponentIntervalDto()
+            return new DuplicateAllChordsDto()
             {
-                ComponentInterval = intervalPosition,
+                IntervalPostion = intervalPosition,
                 SourceVoiceId = sourceVoiceId
             };
         }
