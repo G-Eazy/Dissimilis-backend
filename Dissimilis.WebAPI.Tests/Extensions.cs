@@ -113,7 +113,7 @@ namespace Dissimilis.WebAPI.xUnit
             return new UpdateSongVoiceDto()
             {
                 VoiceName = voiceName,
-                VoiceNumber = voiceNumber
+                VoiceNumber = voiceNumber,
             };
         }
 

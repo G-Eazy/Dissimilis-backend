@@ -45,11 +45,12 @@ namespace Dissimilis.DbContext.Models.Song
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
         /// <param name="voiceNumber"></param>
-        public SongVoice(int songId, int instrumentId, int voiceNumber)
+        public SongVoice(int songId, int instrumentId, int voiceNumber, string voiceName)
         {
             SongId = songId;
             InstrumentId = instrumentId;
             VoiceNumber = voiceNumber;
+            VoiceName = voiceName;
         }
 
     }
