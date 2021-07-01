@@ -70,12 +70,6 @@ namespace Dissimilis.DbContext.Models.Song
             NoteValues = string.Join("|", validatedNotes);
         }
 
-        public string ConvertToNewFormat(string oldNoteValues, string chordName)
-        {
-            string[] oldValues = oldNoteValues.Split("|");
-
-        }
-
         public static int GetNoteOrderValue(string noteValue)
         {
             try
@@ -93,7 +87,7 @@ namespace Dissimilis.DbContext.Models.Song
             var result = input
                 .Select(v => v.ToUpper().Trim())
                 .Distinct()
-                .Where(v => _possibleNoteValues.Contains(v))
+                .Where(v => _possibleNoteValues.Contains(v) || v == "X")
                 .ToArray();
 
             if (!includeZ)

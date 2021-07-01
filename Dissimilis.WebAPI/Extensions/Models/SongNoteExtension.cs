@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
@@ -236,6 +237,19 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 noteValues.Add(AllNotes[(startIndex + IntervalMapping[intervalCode]) % AllNotes.Count]);
             }
             return noteValues;
+        }
+
+        public static string[] ConvertToNewChordFormat(string[] oldChord, string chordName)
+        {
+            List<string> chordNotes = GetNoteValuesFromChordName(chordName);
+            string[] newChordArr = new string[chordNotes.Count];
+            
+            for(int i = 0; i < chordNotes.Count; i++)
+            {
+                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "X";
+            }
+            Console.WriteLine(string.Concat(newChordArr));
+            return newChordArr;
         }
 
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
