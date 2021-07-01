@@ -100,15 +100,29 @@ namespace Dissimilis.DbContext.Models.Song
                 .ToArray();
         }
 
-        public SongNote Clone()
+        public SongNote Clone(bool hasComponentIntervals = true)
         {
-            return new SongNote()
+            if (hasComponentIntervals)
             {
-                Length = Length,
-                Position = Position,
-                NoteValues = NoteValues,
-                ChordName = ChordName
-            };
+                return new SongNote()
+                    {
+                        Length = Length,
+                        Position = Position,
+                        NoteValues = NoteValues,
+                        ChordName = ChordName
+                    };
+            }
+            else
+            {
+                return new SongNote()
+                {
+                    Length = Length,
+                    Position = Position,
+                    NoteValues = String.Join("|", Enumerable.Repeat("X", NoteValues.Length)),
+                    ChordName = ChordName
+                };
+            }
+            
         }
 
         public SongNote TransposeNoteValues(int transpose = 0)
