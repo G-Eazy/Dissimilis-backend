@@ -71,6 +71,12 @@ namespace Dissimilis.DbContext.Models.Song
             NoteValues = string.Join("|", validatedNotes);
         }
 
+        public string ConvertToNewFormat(string oldNoteValues, string chordName)
+        {
+            string[] oldValues = oldNoteValues.Split("|");
+
+        }
+
         public static int GetNoteOrderValue(string noteValue)
         {
             try
