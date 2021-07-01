@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -60,20 +61,44 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return newSongVoice;
         }
 
-        public static SongVoice CopyComponentInterval(this SongVoice songVoice, SongVoice sourceSongVoice, User user, int intervalPosition, Instrument instrument = null, int voiceNumber = -1)
+        public static SongVoice AddComponentInterval(this SongVoice songVoice, int intervalPosition)
         {
             songVoice.SongBars = songVoice.SongBars.Select(bar =>
-                bar.CopyComponentInterval(
-                    sourceSongVoice.SongBars.First(sourceBar => sourceBar.Position == bar.Position),
-                    intervalPosition))
-                .ToArray();
+                    bar.AddComponentInterval(intervalPosition)
+                ).ToArray();
+            return songVoice;
+        }
+
+        public static SongVoice RemoveComponentInterval(this SongVoice songVoice, int intervalPosition)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                    bar.RemoveComponentInterval(intervalPosition)
+                ).ToArray();
+            return songVoice;
+        }
+
+        public static SongVoice DuplicateAllChords(this SongVoice songVoice, SongVoice sourceSongVoice, bool hasComponentIntervals = true)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+            {
+                var sourceBar = sourceSongVoice.SongBars.First(srcBar => srcBar.Position == bar.Position);
+                if (hasComponentIntervals)
+                {
+                    return sourceBar.Clone();
+                }
+                else
+                {
+                    return bar.DuplicateAllChordsWithoutComponentIntervals(sourceBar);
+                }
+            }).ToList();
             return songVoice;
         }
 
         public static SongVoice Transpose(this SongVoice songVoice, int transpose = 0)
         {
-            songVoice.SongBars = songVoice.SongBars.Select(b => b.Transpose(transpose)).ToArray();
-
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                    bar.Transpose(transpose)
+                ).ToArray();
             return songVoice;
         }
     }
