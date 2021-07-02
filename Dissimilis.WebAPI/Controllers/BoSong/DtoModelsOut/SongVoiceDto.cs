@@ -8,7 +8,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int SongVoiceId { get; set; }
         public int SongId { get; set; }
         public string Instrument { get; set; }
-        public string Title { get; set; }
+        public string VoiceName { get; set; }
         public bool IsMain { get; set; }
         public int PartNumber { get; set; }
         public BarDto[] Bars { get; set; }
@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongVoiceId = songVoice.Id;
             SongId = songVoice.SongId;
             PartNumber = songVoice.VoiceNumber;
-            Title = songVoice.VoiceName ?? "Main";
+            VoiceName = songVoice.VoiceName ?? "Main";
             IsMain = songVoice.IsMainVoice;
             Instrument = songVoice.Instrument?.Name;
             Bars = songVoice.SongBars
