@@ -6,7 +6,7 @@ using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
-
+using System.Collections.Generic;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
@@ -79,7 +79,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             if (instrumentName == null)
             {
                 var mainDuplicate = await context.Instruments.FirstOrDefaultAsync(i => i.Name == "Main 1", cancellationToken);
-                if(mainDuplicate != null)
+                if (mainDuplicate != null)
                 {
                     return mainDuplicate;
                 }
@@ -118,6 +118,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             return song;
         }
 
+        public async Task<List<SongVoice>> MigrateSongVoice(CancellationToken cancellationToken)
+        {
+
+            var voices = await context.SongVoices
+                .Include(v=> v.Instrument)
+                .ToListAsync(cancellationToken);
+
+
+            return voices;
+        }
 
     }
 }
