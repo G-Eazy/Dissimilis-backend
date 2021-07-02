@@ -51,13 +51,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var user = _authService.GetVerifiedCurrentUser();
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-            var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
             if (string.IsNullOrEmpty(request.Command.VoiceName))
             {
                 throw new Exception("Voicename can't be a empty string");
             }
 
-            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, instrument, song.Voices.Max(v => v.VoiceNumber));
+            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, song.Voices.Max(v => v.VoiceNumber));
             song.Voices.Add(duplicatedVoice);
 
             try

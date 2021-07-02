@@ -54,14 +54,13 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new ValidationException("VoiceName not defined");
             }
 
-            var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;
 
             var songVoice = new SongVoice()
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
-                Instrument = instrument,
+                Instrument = null,
                 Song = song,
                 VoiceName = request.Command.VoiceName
             };

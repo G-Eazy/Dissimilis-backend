@@ -44,12 +44,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            if (songVoice.Instrument?.Name != request.Command.Instrument)
-            {
-                var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
-                songVoice.Instrument = instrument;
-            }
-
             songVoice.VoiceNumber = request.Command.VoiceNumber;
             songVoice.VoiceName = request.Command.VoiceName;
             songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
