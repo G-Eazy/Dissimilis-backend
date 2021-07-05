@@ -24,35 +24,35 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                             Position = 1,
                             ChordName = "C",
                             Length = 1,
-                            NoteValues = "C|X|G",
+                            NoteValues = "C||G",
                         },
                         new SongNote()
                         {
                             Position = 1,
                             ChordName = "D",
                             Length = 1,
-                            NoteValues = "X|F#|A",
+                            NoteValues = "|F#|A",
                         },
                         new SongNote()
                         {
                             Position = 1,
                             ChordName = "Cmaj7",
                             Length = 1,
-                            NoteValues = "C|E|G|X",
+                            NoteValues = "C|E|G|",
                         },
                         new SongNote()
                         {
                             Position = 1,
                             ChordName = "Am",
                             Length = 1,
-                            NoteValues = "X|C|X",
+                            NoteValues = "|C|",
                         },
                         new SongNote()
                         {
                             Position = 1,
                             ChordName = "Dsus4",
                             Length = 1,
-                            NoteValues = "X|X|X",
+                            NoteValues = "||",
                         }
             };
             }

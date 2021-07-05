@@ -239,23 +239,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return noteValues;
         }
 
-        public static string[] ConvertToNewChordFormat(string[] oldChord, string chordName)
-        {
-            List<string> chordNotes = GetNoteValuesFromChordName(chordName);
-            string[] newChordArr = new string[chordNotes.Count];
-            
-            for(int i = 0; i < chordNotes.Count; i++)
-            {
-                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "";
-            }
-            Console.WriteLine(string.Concat(newChordArr));
-            return newChordArr;
-        }
-
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
-            updatedNoteValues[intervalPosition] = "X";
+            updatedNoteValues[intervalPosition] = "";
             songNote.SetNoteValues(updatedNoteValues);
             return songNote;
         }

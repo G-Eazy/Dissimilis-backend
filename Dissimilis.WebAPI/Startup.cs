@@ -186,6 +186,7 @@ namespace Dissimilis.WebAPI
         {
 
             DissimilisSeeder.SeedBasicData(context);
+            DBMigrationJobs.MigrateFromOldToNewChordFormat(context);
 
             if (ConfigurationInfo.IsLocalDebugBuild())
             {

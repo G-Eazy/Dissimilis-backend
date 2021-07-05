@@ -87,7 +87,7 @@ namespace Dissimilis.DbContext.Models.Song
             var result = input
                 .Select(v => v.ToUpper().Trim())
                 .Distinct()
-                .Where(v => _possibleNoteValues.Contains(v) || v == "X")
+                .Where(v => _possibleNoteValues.Contains(v) || v == "")
                 .ToArray();
 
             if (!includeZ)
@@ -118,7 +118,7 @@ namespace Dissimilis.DbContext.Models.Song
                 {
                     Length = Length,
                     Position = Position,
-                    NoteValues = String.Join("|", Enumerable.Repeat("X", NoteValues.Length)),
+                    NoteValues = String.Join("|", Enumerable.Repeat("", NoteValues.Length)),
                     ChordName = ChordName
                 };
             }
