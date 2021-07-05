@@ -68,7 +68,7 @@ namespace Dissimilis.DbContext.Models.Song
         public string SongNotes { get; set; }
 
         /// <summary>
-        /// The speed of the song
+        /// The speed of the song in BPM
         /// ( set a max range of 256) 
         /// </summary>
         [Range(0, 256)]

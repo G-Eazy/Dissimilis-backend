@@ -22,24 +22,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
                 throw new NotFoundException($"Song with Id {songId} not found");
             }
-            await Context.Songs
-                .Include(p => p.Arranger)
-                .Where(p => p.Id == songId)
-                .LoadAsync(cancellationToken);
-            await Context.Songs
-                .Include(p => p.CreatedBy)
-                .Where(p => p.Id == songId)
-                .LoadAsync(cancellationToken);
-            await Context.Songs
-                .Include(p => p.UpdatedBy)
-                .Where(p => p.Id == songId)
-                .LoadAsync(cancellationToken);
 
             await Context.SongVoices
                 .Include(p => p.Instrument)

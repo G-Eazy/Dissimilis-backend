@@ -47,19 +47,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             {
                 song.SongNotes = request.Command.SongNotes;
             }
-            if (request.Command.Speed < 0)
-            {
-                throw new Exception("Song speed needs to be a positive number");
-            }
-            else if (request.Command.Speed != null)
+            if (request.Command.Speed != null)
             {
                 song.Speed = request.Command.Speed;
             }
-           if ( request.Command.DegreeOfDifficulty < 1 || request.Command.DegreeOfDifficulty > 10)
-            {
-                throw new Exception("Degree of difficulty needs to be a number between and inclusive 1 and 10");
-            }
-            else if ( request.Command.DegreeOfDifficulty != null)
+            if ( request.Command.DegreeOfDifficulty != null)
             {
                 song.DegreeOfDifficulty = request.Command.DegreeOfDifficulty;
             }
