@@ -6,6 +6,9 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System;
+using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -38,6 +41,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId)
                 .LoadAsync(cancellationToken);
+
+            // Temporary solution to convert old songs to the new format. Remove after all/most songs are converted. A bit ugly, but is faster to remove when the time comes than distributing function calls to their respective files.
+            // If old songs are not converted, they will not work with the new solution.
+            if(DateTimeOffset.Compare((DateTimeOffset)song.CreatedOn, new DateTimeOffset(new DateTime(2022, 1, 1, 0, 0, 0))) < 0)
+                foreach (var voice in Context.SongVoices)
+                {
+                    foreach(var bar in voice.SongBars)
+                    {
+                        foreach(var note in bar.Notes)
+                        {
+                            if (note.ChordName != null)
+                            {
+                                //Console.WriteLine(note.ChordName);
+                                note.SetNoteValues(ConvertToNewChordFormat(note.NoteValues.Split("|"), note.ChordName));
+                            }
+                        }
+                    }
+                }
+            // End of temp function
 
             return song;
         }

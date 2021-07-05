@@ -246,7 +246,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             
             for(int i = 0; i < chordNotes.Count; i++)
             {
-                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "X";
+                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "";
             }
             Console.WriteLine(string.Concat(newChordArr));
             return newChordArr;

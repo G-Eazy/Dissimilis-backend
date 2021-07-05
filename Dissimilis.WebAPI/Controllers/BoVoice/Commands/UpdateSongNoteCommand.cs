@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             note.ChordName = request.Command.ChordName;
             //note.SetNoteValues(request.Command.Notes);
 
-            if (note.ChordName != null)
+            /*if (note.ChordName != null)
             {
                 string[] noteValues = SongNoteExtension.GetNoteValuesFromChordName(note.ChordName).ToArray();
                 if (request.Command.Length != noteValues.Length)
@@ -71,8 +71,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             else
             {
                 note.SetNoteValues(request.Command.Notes);
-            }
-            
+            }*/
+            note.SetNoteValues(request.Command.Notes);
+
 
             part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
