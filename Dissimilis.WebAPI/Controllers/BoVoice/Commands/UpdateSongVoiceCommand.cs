@@ -13,9 +13,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     {
         public int SongId { get; }
         public int SongVoiceId { get; }
-        public UpdateSongVoiceDto Command { get; }
+        public CreateSongVoiceDto Command { get; }
 
-        public UpdateSongVoiceCommand(int songId, int songVoiceId, UpdateSongVoiceDto command)
+        public UpdateSongVoiceCommand(int songId, int songVoiceId, CreateSongVoiceCommand command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
@@ -44,7 +44,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            songVoice.VoiceNumber = request.Command.VoiceNumber;
+            songVoice.VoiceNumber = request.Command?.VoiceNumber ?? songVoice.VoiceNumber;
             songVoice.VoiceName = request.Command.VoiceName;
             songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
             
