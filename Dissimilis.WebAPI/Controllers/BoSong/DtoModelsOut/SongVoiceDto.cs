@@ -19,7 +19,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongVoiceId = songVoice.Id;
             SongId = songVoice.SongId;
             PartNumber = songVoice.VoiceNumber;
-            VoiceName = songVoice.VoiceName ?? songVoice.Instrument?.Name ?? "Main";
+            VoiceName = songVoice.VoiceName ?? songVoice.Instrument?.Name;
             IsMain = songVoice.IsMainVoice;
             Instrument = songVoice.Instrument?.Name;
             Bars = songVoice.SongBars

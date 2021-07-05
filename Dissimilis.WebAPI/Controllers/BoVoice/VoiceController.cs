@@ -146,6 +146,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         /// <summary>
         /// Endpoint used for updating voiceName. Need to be called to update the database to the new format
+        /// DEPRECATED
+        /// ONE_TIME_RUN
         /// </summary>
         [HttpPost("ChangeNameFromInstrumentToVoiceName")]
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
