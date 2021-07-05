@@ -134,15 +134,15 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var duplicatedVoice1 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, createSongVoiceDto));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.Length.ShouldBe(2, "More voices than expected");
-            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId).Title.ShouldBe("Per", "Duplicated voice didn't have expected name");
-            baseVoice.Title.ShouldBe("Main");
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice1.SongVoiceId).VoiceName.ShouldBe("Per", "Duplicated voice didn't have expected name");
+            baseVoice.VoiceName.ShouldBe("Main");
 
 
             await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
             await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.First().Title.ShouldBe("Piano");
+            songDto.Voices.First().VoiceName.ShouldBe("Piano");
             await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
             
             songDto.Voices.First().Instrument.ShouldBe(null);
@@ -151,14 +151,14 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var duplicatedVoice2 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, createSongVoiceDto2));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId).Title.ShouldBe("Frank", "Duplicated voice didn't have expected name");
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId).VoiceName.ShouldBe("Frank", "Duplicated voice didn't have expected name");
 
             songDto.Voices.First(v => v.SongVoiceId == baseVoice.SongVoiceId).CheckVoiceBarsEqualTo(songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId), true);
             var createSongVoiceDto3 = CreateSongVoiceDto("Siri", baseVoice.PartNumber);
 
             var duplicatedVoice3 = await mediator.Send(new DuplicateVoiceCommand(songDto.SongId, duplicatedVoice2.SongVoiceId, createSongVoiceDto3));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice3.SongVoiceId).Title.ShouldBe("Siri", "Second duplicated voice didn't have expected name");
+            songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice3.SongVoiceId).VoiceName.ShouldBe("Siri", "Second duplicated voice didn't have expected name");
 
             songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice2.SongVoiceId).CheckVoiceBarsEqualTo(songDto.Voices.First(v => v.SongVoiceId == duplicatedVoice3.SongVoiceId), true);
         }
