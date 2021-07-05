@@ -138,12 +138,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             baseVoice.VoiceName.ShouldBe("Main");
 
 
-            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, CreateSongVoiceDto("Piano", 1)));
             await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.First().VoiceName.ShouldBe("Piano");
-            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, CreateSongVoiceDto("Piano", 1)));
             
             songDto.Voices.First().Instrument.ShouldBe(null);
 
@@ -176,7 +176,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var baseVoice = songDto.Voices.First();
             var bar = baseVoice.Bars.First();
-            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, UpdateSongVoiceDto("Piano", 1)));
+            await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, CreateSongVoiceDto("Piano", 1)));
             await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
             await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));

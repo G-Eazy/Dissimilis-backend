@@ -108,15 +108,6 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
-        {
-            return new UpdateSongVoiceDto()
-            {
-                VoiceName = voiceName,
-                VoiceNumber = voiceNumber,
-            };
-        }
-
         internal static UpdateBarDto CreateUpdateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
         {
             return new UpdateBarDto()

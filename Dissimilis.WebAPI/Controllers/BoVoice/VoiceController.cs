@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         [HttpPatch("song/{songId:int}/voice/{voiceId:int}")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateSongVoice(int songId, int voiceId, [FromBody] UpdateSongVoiceDto command)
+        public async Task<IActionResult> UpdateSongVoice(int songId, int voiceId, [FromBody] CreateSongVoiceDto command)
         {
             var item = await _mediator.Send(new UpdateSongVoiceCommand(songId, voiceId, command));
             var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));

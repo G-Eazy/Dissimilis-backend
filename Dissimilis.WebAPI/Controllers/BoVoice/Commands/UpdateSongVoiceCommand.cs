@@ -15,7 +15,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public int SongVoiceId { get; }
         public CreateSongVoiceDto Command { get; }
 
-        public UpdateSongVoiceCommand(int songId, int songVoiceId, CreateSongVoiceCommand command)
+        public UpdateSongVoiceCommand(int songId, int songVoiceId, CreateSongVoiceDto command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
