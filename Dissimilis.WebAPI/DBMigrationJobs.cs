@@ -1,7 +1,9 @@
-﻿using Dissimilis.DbContext.Models;
+﻿using Dissimilis.Core.Collections;
+using Dissimilis.DbContext.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 
@@ -46,39 +48,7 @@ namespace Dissimilis.DbContext
             return newChordArr;
         }
 
-        enum DefinedInstruments
-        {
-            Accordion      ,
-            Acoustic_Guitar,
-            Bagpipes       ,
-            Banjo          ,
-            Bass_Guitar    ,
-            Bongo_Grums    ,
-            Bugle          ,
-            Cello          ,
-            Clarinet       ,
-            Cymbals        ,
-            Drums          ,
-            Electric_Guitar,
-            Flute          ,
-            French_Gorn    ,
-            Harmonica      ,
-            Keyboard       ,
-            Maracas        ,
-            Organ          ,
-            Pan_Glute      ,
-            Piano          ,
-            Recorder       ,
-            Saxophone      ,
-            Tambourine     ,
-            Triangle       ,
-            Trombone       ,
-            Trumpet        ,
-            Tuba           ,
-            Ukulele        ,
-            Violin         ,
-            Xylophone            
-    }
+       
         public static async void SetInstrumentAsVoiceName(DissimilisDbContext Context)
         {
             var voices = await Context.SongVoices
@@ -97,31 +67,26 @@ namespace Dissimilis.DbContext
             }
             //Deleting the "old" instruments, then making the new Instruments
             var instruments = await Context.Instruments
-                .Where(i => !Enum.IsDefined(typeof(DefinedInstruments), i.Name))
+                .Where(i => i.DefinedInstrument == null)
                 .ToListAsync();
-            if(instruments.Count > 0)
-            {
-            foreach(var instrument in instruments)
-            {
-                Context.Instruments.Remove(instrument);
-            }
-            }
+            Context.RemoveRange(instruments);
+            
+            var allInstruments = EnumExtensions.GetEnumValues<DefinedInstruments>().ToArray();
+            var storedInstruments = Context.Instruments.ToArray();
+
             //creating the new instruments from the defined enums
-            var newInstruments = await Context.Instruments.ToListAsync();
-            foreach(var enumInstrument in Enum.GetValues(typeof(DefinedInstruments)))
-            {
-                foreach( var instrument in newInstruments)
-                {
-                    if(!Enum.IsDefined(typeof(DefinedInstruments), (instrument.Name)))
-                    {
-                        var createdInstrument = new Instrument(Enum.GetName(typeof(DefinedInstruments), enumInstrument));
-                        await Context.Instruments.AddAsync(createdInstrument);
-                    }
-                }
-            }
 
+            var toAdd = allInstruments
+                .Where(ai => storedInstruments.All(si => si.DefinedInstrument != ai))
+                .Select(i=> new Instrument(i))
+                .ToArray();
+            Context.Instruments.AddRange(toAdd);
 
-
+            //checking if some of the instrumentNames deviates from the enum description, if so changes it. 
+            var updatedInstruments = Context.Instruments.ToArray();
+            var toChange = updatedInstruments.Where(i => allInstruments.All(ai => i.Name != ai.GetDescription()))
+                .Where(di => di.DefinedInstrument != null) 
+            .Select(ti => ti.Name = ti.DefinedInstrument?.GetDescription());
         }
     }
 }

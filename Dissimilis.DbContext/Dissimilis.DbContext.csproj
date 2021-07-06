@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
+    <ProjectReference Include="..\Dissimilis.Core\Dissimilis.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

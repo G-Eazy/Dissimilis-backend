@@ -146,7 +146,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-<<<<<<< HEAD
         /// Endpoint used for updating voiceName. Need to be called to update the database to the new format
         /// DEPRECATED
         /// ONE_TIME_RUN
@@ -157,10 +156,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             await _mediator.Publish(new MigrateVoiceNameCommand());
             return Ok();
-=======
-        /// Create collection of notes in desired component interval
-        /// </summary>
-        [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
+            /// <summary>
+            /// Create collection of notes in desired component interval
+            /// </summary>
+        }
+            [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> DuplicateAllChords(int songId, int voiceId, [FromBody] DuplicateAllChordsDto command)
         {
@@ -191,7 +191,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var item = await _mediator.Send(new RemoveComponentIntervalCommand(songId, voiceId, command));
             var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
             return Created($"{item.SongVoiceId}", result);
->>>>>>> 7091c2a03a4ac04e4eaa28ac193188bb21071387
         }
     }
 }
