@@ -96,7 +96,7 @@ namespace Dissimilis.WebAPI.xUnit
         {
             return new CreateSongVoiceDto()
             {
-                Instrument = voiceName,
+                VoiceName = voiceName,
                 VoiceNumber = voiceNumber
             };
         }
@@ -106,15 +106,6 @@ namespace Dissimilis.WebAPI.xUnit
             return new DuplicateSongDto()
             {
                 Title = title
-            };
-        }
-
-        internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
-        {
-            return new UpdateSongVoiceDto()
-            {
-                Instrument = voiceName,
-                VoiceNumber = voiceNumber
             };
         }
 
