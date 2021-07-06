@@ -148,7 +148,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updatedDestinationVoice = await mediator.Send(
                 new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
 
-            updatedDestinationVoice.Title.ShouldBe("Duplicate w voice", "The title of the destination voice is incorrect.");
 
             foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
             {
@@ -177,7 +176,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedDestinationVoice = await mediator.Send(
                 new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
 
-            updatedDestinationVoice.Title.ShouldBe("Duplicate wo voice", "The title of the destination voice is incorrect.");
 
             foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
             {
