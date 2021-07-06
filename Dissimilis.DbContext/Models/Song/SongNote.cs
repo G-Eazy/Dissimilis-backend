@@ -56,8 +56,7 @@ namespace Dissimilis.DbContext.Models.Song
 
         public string[] GetNoteValues()
         {
-            return NoteValues.Split('|');
-            //return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
+            return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
         }
 
         public void SetNoteValues(string[] noteValues, bool throwValidationException = true)
