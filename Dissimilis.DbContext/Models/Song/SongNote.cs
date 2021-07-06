@@ -13,7 +13,7 @@ namespace Dissimilis.DbContext.Models.Song
         internal static string[] _possibleNoteValues = new string[]
         {
             // Notes ordered from low to high pitch
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z"
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z", "X"
             //"G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
 
@@ -56,7 +56,8 @@ namespace Dissimilis.DbContext.Models.Song
 
         public string[] GetNoteValues()
         {
-            return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
+            return NoteValues.Split('|');
+            //return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
         }
 
         public void SetNoteValues(string[] noteValues, bool throwValidationException = true)
@@ -86,7 +87,6 @@ namespace Dissimilis.DbContext.Models.Song
         {
             var result = input
                 .Select(v => v.ToUpper().Trim())
-                .Distinct()
                 .Where(v => _possibleNoteValues.Contains(v))
                 .ToArray();
 
@@ -100,9 +100,9 @@ namespace Dissimilis.DbContext.Models.Song
                 .ToArray();
         }
 
-        public SongNote Clone(bool hasComponentIntervals = true)
+        public SongNote Clone(bool includeComponentIntervals = true)
         {
-            if (hasComponentIntervals)
+            if (includeComponentIntervals)
             {
                 return new SongNote()
                     {
@@ -118,7 +118,7 @@ namespace Dissimilis.DbContext.Models.Song
                 {
                     Length = Length,
                     Position = Position,
-                    NoteValues = String.Join("|", Enumerable.Repeat("X", NoteValues.Length)),
+                    NoteValues = String.Join("|", Enumerable.Repeat("X", this.GetNoteValues().Length)),
                     ChordName = ChordName
                 };
             }
