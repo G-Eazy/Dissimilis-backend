@@ -190,6 +190,15 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
+        internal static DuplicateAllChordsDto DuplicateComponentIntervalDto(int intervalPosition, int sourceVoiceId)
+        {
+            return new DuplicateAllChordsDto()
+            {
+                IntervalPostion = intervalPosition,
+                SourceVoiceId = sourceVoiceId
+            };
+        }
+
         internal static SearchQueryDto SearchQueryDto()
         {
             return new SearchQueryDto()

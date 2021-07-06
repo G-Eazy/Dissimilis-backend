@@ -54,7 +54,6 @@ namespace Dissimilis.DbContext.Models.Song
         public SongBar SongBar { get; set; }
         public int BarId { get; set; }
 
-
         public string[] GetNoteValues()
         {
             return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
@@ -88,7 +87,7 @@ namespace Dissimilis.DbContext.Models.Song
             var result = input
                 .Select(v => v.ToUpper().Trim())
                 .Distinct()
-                .Where(v => _possibleNoteValues.Contains(v))
+                .Where(v => _possibleNoteValues.Contains(v) || v == "")
                 .ToArray();
 
             if (!includeZ)
@@ -101,21 +100,37 @@ namespace Dissimilis.DbContext.Models.Song
                 .ToArray();
         }
 
-        public SongNote Clone()
+        public SongNote Clone(bool hasComponentIntervals = true)
         {
-            return new SongNote()
+            if (hasComponentIntervals)
             {
-                Length = Length,
-                Position = Position,
-                NoteValues = NoteValues,
-                ChordName = ChordName
-            };
+                return new SongNote()
+                    {
+                        Length = Length,
+                        Position = Position,
+                        NoteValues = NoteValues,
+                        ChordName = ChordName
+                    };
+            }
+            else
+            {
+                return new SongNote()
+                {
+                    Length = Length,
+                    Position = Position,
+                    NoteValues = String.Join("|", Enumerable.Repeat("", NoteValues.Length)),
+                    ChordName = ChordName
+                };
+            }
+            
         }
 
         public SongNote TransposeNoteValues(int transpose = 0)
         {
             var transposedNoteValues = new List<string>();
             var possibleNoteValuesWithoutZ = _possibleNoteValues.Take(_possibleNoteValues.Length - 1).ToArray();
+
+
 
             foreach (var noteValue in GetNoteValues())
             {
