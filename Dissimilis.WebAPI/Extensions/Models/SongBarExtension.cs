@@ -95,9 +95,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return true;
         }
 
-        public static SongBar DuplicateAllChordsWithoutComponentIntervals(this SongBar songBar, SongBar sourceSongBar)
+        public static SongBar DuplicateAllChords(this SongBar songBar, SongBar sourceSongBar, bool includeComponentIntervals)
         {
-            songBar.Notes = sourceSongBar.Notes.Where(note => note.ChordName != null).Select(note => note.Clone(false)).ToList();
+            songBar.Notes = sourceSongBar.Notes.Where(note => note.ChordName != null).Select(note => note.Clone(includeComponentIntervals)).ToList();
             return songBar;
         }
 
@@ -113,32 +113,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songBar;
         }
 
-        //public static SongBar CopyComponentInterval(this SongBar songBar, SongBar sourceSongBar, int intervalPosition)
-        //{
-        //    //Adds all notes from the source bar which belongs to the specified interval position.
-        //    var updatedBarNotes = new List<SongNote>();
-        //    foreach (var note in sourceSongBar.Notes)
-        //    {
-        //        var newNote = new SongNote()
-        //        {
-        //            BarId = songBar.Id,
-        //            SongBar = songBar,
-        //            Length = note.Length,
-        //            Position = note.Position,
-        //            ChordName = note.ChordName,
-        //        };
-        //        var updatedNoteValues = newNote.GetNoteValues();
-
-        //        newNote.SetNoteValues(updatedNoteValues);
-        //        updatedBarNotes.Add(newNote);
-        //    }
-        //    songBar.Notes = updatedBarNotes;
-        //    return songBar;
-        //}
-
         public static SongBar Transpose(this SongBar songBar, int transpose = 0)
         {
-            songBar.Notes = songBar.Notes.Select(n => n.TransposeNoteValues()).ToList();
+            songBar.Notes = songBar.Notes.Select(note => note.Transpose(transpose)).ToList();
 
             return songBar;
         }

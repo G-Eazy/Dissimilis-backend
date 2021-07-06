@@ -77,19 +77,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songVoice;
         }
 
-        public static SongVoice DuplicateAllChords(this SongVoice songVoice, SongVoice sourceSongVoice, bool hasComponentIntervals = true)
+        public static SongVoice DuplicateAllChords(this SongVoice songVoice, SongVoice sourceSongVoice, bool includeComponentIntervals = true)
         {
             songVoice.SongBars = songVoice.SongBars.Select(bar =>
             {
                 var sourceBar = sourceSongVoice.SongBars.First(srcBar => srcBar.Position == bar.Position);
-                if (hasComponentIntervals)
-                {
-                    return sourceBar.Clone();
-                }
-                else
-                {
-                    return bar.DuplicateAllChordsWithoutComponentIntervals(sourceBar);
-                }
+                return bar.DuplicateAllChords(sourceBar, includeComponentIntervals);
             }).ToList();
             return songVoice;
         }

@@ -54,7 +54,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-            songVoice.DuplicateAllChords(sourceVoice);
+            songVoice.DuplicateAllChords(sourceVoice, request.Command.IncludeComponentIntervals);
             try
             {
                 await _repository.UpdateAsync(cancellationToken);
