@@ -22,6 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             SongId = songId;
             Command = command;
+
         }
     }
 
@@ -48,16 +49,20 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             {
                 throw new ValidationException("Voice number already used");
             }
+            if (string.IsNullOrEmpty(request.Command.VoiceName))
+            {
+                throw new ValidationException("VoiceName not defined");
+            }
 
-            var instrument = await _repository.CreateOrFindInstrument(request.Command.Instrument, cancellationToken);
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;
 
             var songVoice = new SongVoice()
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
-                Instrument = instrument,
-                Song = song
+                Instrument = null,
+                Song = song,
+                VoiceName = request.Command.VoiceName
             };
 
             var cloneVoice = song.Voices.FirstOrDefault();
