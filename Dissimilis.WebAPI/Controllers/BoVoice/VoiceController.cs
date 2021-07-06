@@ -143,18 +143,5 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
-
-        /// <summary>
-        /// Endpoint used for updating voiceName. Need to be called to update the database to the new format
-        /// DEPRECATED
-        /// ONE_TIME_RUN
-        /// </summary>
-        [HttpPost("ChangeNameFromInstrumentToVoiceName")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> MigrateVoiceName()
-        {
-            await _mediator.Publish(new MigrateVoiceNameCommand());
-            return Ok();
-        }
     }
 }
