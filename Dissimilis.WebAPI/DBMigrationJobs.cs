@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
@@ -42,6 +43,24 @@ namespace Dissimilis.DbContext
                 newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "";
             }
             return newChordArr;
+        }
+
+        public enum InstrumentsTypes
+        {
+            Piano
+        }
+        public static async void SetInstrumentAsVoiceName(DissimilisDbContext Context)
+        {
+            var voices = await Context.SongVoices.Include(v => v.Instrument).Where(v => v.VoiceName == null).ToListAsync();
+
+            if(voices.Count > 0)
+            {
+                foreach(var voice in voices)
+                {
+                    voice.VoiceName = voice.Instrument?.Name;
+                    voice.Instrument = null;
+                }
+            }
         }
     }
 }
