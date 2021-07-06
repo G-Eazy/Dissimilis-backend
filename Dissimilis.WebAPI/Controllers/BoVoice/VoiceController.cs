@@ -146,7 +146,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Duplicates all chords from the provided source voice with or without the component intervals included in the duplicated chords.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
@@ -158,7 +158,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Adds a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/addComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
@@ -170,7 +170,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Removes a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/removeComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
