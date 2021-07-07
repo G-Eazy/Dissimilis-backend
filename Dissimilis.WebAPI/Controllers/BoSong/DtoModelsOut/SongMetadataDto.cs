@@ -4,7 +4,7 @@ using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
-    public class SongByIdDto
+    public class SongMetadataDto
     {
         public int SongId { get; set; }
         public string Title { get; set; }
@@ -16,7 +16,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public DateTimeOffset? UpdatedOn { get; set; }
 
-        public SongVoiceDto[] Voices { get; set; }
         public string SongNotes { get; set; }
 
         public int? Speed { get; set; }
@@ -24,10 +23,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int? DegreeOfDifficulty { get; set; }
 
         public string Composer { get; set; }
-        
+
         public string Creator { get; set; }
         public string UpdatedBy { get; set; }
-        public SongByIdDto(Song song)
+        public SongMetadataDto(Song song)
         {
             SongId = song.Id;
             Title = song.Title;
@@ -41,10 +40,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongNotes = song.SongNotes;
             Composer = song.Composer;
             Creator = song.CreatedBy?.Name;
-            Voices = song.Voices
-                .Select(p => new SongVoiceDto(p))
-                .OrderBy(p => p.PartNumber)
-                .ToArray();
         }
     }
 }

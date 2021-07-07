@@ -22,6 +22,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
@@ -60,6 +63,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)

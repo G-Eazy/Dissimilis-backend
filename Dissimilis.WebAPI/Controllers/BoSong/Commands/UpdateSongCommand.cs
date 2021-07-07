@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -34,10 +35,27 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongByIdForUpdate(request.SongId, cancellationToken);
-
+            if (!String.IsNullOrEmpty(request.Command.Title))
+            {
             song.Title = request.Command.Title;
-
-            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
+            }
+            if ( request.Command.Composer != null)
+            {
+                song.Composer = request.Command.Composer;
+            }
+            if (request.Command.SongNotes != null)
+            {
+                song.SongNotes = request.Command.SongNotes;
+            }
+            if (request.Command.Speed != null)
+            {
+                song.Speed = request.Command.Speed;
+            }
+            if ( request.Command.DegreeOfDifficulty != null)
+            {
+                song.DegreeOfDifficulty = request.Command.DegreeOfDifficulty;
+            }
+                song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
 
             await _repository.UpdateAsync(cancellationToken);
 

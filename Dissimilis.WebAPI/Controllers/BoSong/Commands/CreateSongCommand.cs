@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 Title = request.Command.Title,
                 Numerator = request.Command.Numerator,
                 Denominator = request.Command.Denominator,
-                ArrangerId = currentUser.Id
+                ArrangerId = currentUser.Id,
             };
 
             song.SetCreated(currentUser.Id);
@@ -55,7 +55,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             song.Voices.Add(mainVoice);
             mainVoice.SetCreated(currentUser.Id);
-
             await _repository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(song);
