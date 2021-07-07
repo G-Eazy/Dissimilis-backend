@@ -40,7 +40,7 @@ namespace Dissimilis.DbContext
 
             for (int i = 0; i < chordNotes.Count; i++)
             {
-                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "";
+                newChordArr[i] = (oldChord.Contains(chordNotes.ElementAt(i))) ? chordNotes.ElementAt(i) : "X";
             }
             return newChordArr;
         }
