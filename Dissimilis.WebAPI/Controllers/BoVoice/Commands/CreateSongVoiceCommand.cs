@@ -76,11 +76,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 song.SyncVoicesFrom(cloneVoice);
             }
 
-            await _repository.UpdateAsync(song, currentUser, cancellationToken);
+            await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(song, currentUser, cancellationToken);
+                await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)

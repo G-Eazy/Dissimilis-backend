@@ -177,8 +177,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Undo last action performed on a song
         /// </summary>
-        [HttpDelete("song/{songId:int}/undo")]
-        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
+        [HttpPatch("{songId:int}/undo")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Undo(int songId)
         {
             var item = await _mediator.Send(new UndoCommand(songId));

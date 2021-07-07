@@ -47,7 +47,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             SongNote note = null;
             await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
+                var song = await _repository.GetSongById(request.SongId, cancellationToken);
                 var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+                Console.WriteLine(songBar);
 
                 if (songBar.Notes.Any(n => n.Position == request.Command.Position))
                 {
@@ -69,13 +71,13 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
                 try
                 {
-                    await _repository.UpdateAsync(song, currentUser, cancellationToken);
+                    await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
                 }
                 catch (Exception e)
                 {
                     await transaction.RollbackAsync(cancellationToken);
-                    throw new ValidationException("Transaction error, aborting operation. Please try again.");
+                    throw new ValidationException(e.Message);
                 }
             }
             return new UpdatedCommandDto(note);

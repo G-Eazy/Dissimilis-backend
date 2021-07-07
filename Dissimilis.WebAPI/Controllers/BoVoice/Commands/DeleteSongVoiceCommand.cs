@@ -43,10 +43,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             }
 
             song.Voices.Remove(voice);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            song.SetUpdated(currentUser.Id);
 
-            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
-
-            await _repository.UpdateAsync(song, currentUser, cancellationToken);
+            await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
 
             return null;
         }

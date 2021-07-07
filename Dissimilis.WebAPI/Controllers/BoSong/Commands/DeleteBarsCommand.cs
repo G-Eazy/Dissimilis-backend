@@ -45,13 +45,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
             song.DeleteBars(request.Command.FromPosition, request.Command.DeleteLength);
 
-            song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            song.SetUpdatedOverAll(currentUser.Id);
 
-            await _repository.UpdateAsync(song, currentUser, cancellationToken);
+            await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(song, currentUser, cancellationToken);
+                await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)

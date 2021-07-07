@@ -5,9 +5,11 @@ using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Extensions.Models;
+using System;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -74,6 +76,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task UpdateAsync(Song song, User user, CancellationToken cancellationToken)
         {
+            Console.WriteLine($"UpdateAsync with objects used:\n{song}\n{user}");
             song.PerformSnapshot(user);
             await Context.SaveChangesAsync(cancellationToken);
         }

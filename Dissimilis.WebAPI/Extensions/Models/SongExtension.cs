@@ -5,6 +5,7 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using System;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -259,7 +260,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static void Undo(this Song song)
         {
             SongSnapshot snapshot = song.PopSnapshot();
-            Song snapshotSong = (Song)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+            var snapshotSong = Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             
             song.Title = snapshotSong.Title;
             song.UpdatedBy = snapshot.CreatedBy;
@@ -274,12 +275,15 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
-            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(song);
+            var s = new SongByIdDto(song);
+            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(new {
+                Title = s.Title,
+                Voices = s.Voices
+            });
             Console.WriteLine(JSONsnapshot);
             SongSnapshot snapshot = new SongSnapshot()
             {
-                SongId = song.Id,
-                Song = song,
+                SongId = s.SongId,
                 CreatedById = user.Id,
                 CreatedOn = DateTimeOffset.Now,
                 SongObjectJSON = JSONsnapshot
