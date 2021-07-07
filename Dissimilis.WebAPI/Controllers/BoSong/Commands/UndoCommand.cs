@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var undoFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var result = undoFromSong.Undo();
+            undoFromSong.Undo();
             undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             try
             {
@@ -49,8 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 await transaction.RollbackAsync(cancellationToken);
                 throw new ValidationException("Transaction error, aborting operation. Please try again.");
             }
-            return result;
-
+            return new UpdatedSongCommandDto(undoFromSong);
         }
     }
 }
