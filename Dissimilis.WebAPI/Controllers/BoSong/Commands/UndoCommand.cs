@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(song, user, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             } catch(Exception e)
             {

@@ -7,6 +7,8 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using System.Collections.Generic;
+using Dissimilis.WebAPI.Extensions.Models;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
@@ -37,8 +39,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
 
-        public async Task UpdateAsync(CancellationToken cancellationToken)
+        public async Task UpdateAsync(Song song, User user, CancellationToken cancellationToken)
         {
+            song.PerformSnapshot(user);
             await context.SaveChangesAsync(cancellationToken);
         }
 

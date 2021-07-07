@@ -63,7 +63,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(song, user, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)

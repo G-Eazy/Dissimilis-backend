@@ -265,6 +265,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// This method should be called before any action that updates a song, except when the song itself is created.
         /// </summary>
         /// <param name="song"></param>
+        /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
             string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(song);

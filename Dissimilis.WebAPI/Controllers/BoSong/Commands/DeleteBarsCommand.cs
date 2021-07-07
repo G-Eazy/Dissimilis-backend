@@ -47,11 +47,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            await _repository.UpdateAsync(cancellationToken);
+            await _repository.UpdateAsync(song, user, cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(song, user, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)
