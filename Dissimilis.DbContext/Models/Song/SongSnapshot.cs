@@ -14,10 +14,13 @@ namespace Dissimilis.DbContext.Models.Song
         public Song Song { get; set; }
 
         [Required]
-        public int MadeById { get; set; }
+        public int CreatedById { get; set; }
 
         [Required]
-        public User MadeBy { get; set; }
+        public User CreatedBy { get; set; }
+
+        [Required]
+        public DateTimeOffset CreatedOn { get; set; }
         
         [Required]
         public string SongObjectJSON { get; set; }

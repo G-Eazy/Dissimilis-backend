@@ -258,5 +258,29 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             return null;
         }
+
+        /// <summary>
+        /// This method should be called before any action that updates a song, except when the song itself is created.
+        /// </summary>
+        /// <param name="song"></param>
+        public static async void PerformAndSaveSnapshot(this Song song)
+        {
+            string snapshot = Newtonsoft.Json.JsonConvert.SerializeObject(song);
+            Console.WriteLine(snapshot);
+
+            if(song)
+                song.Snapshots.Add(snapshot);
+        }
+
+        public static void PopSnapshot(this Song song)
+        {
+            if(song.Snapshots.Count > 0)
+            {
+                var orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
+                var snapshotToRemove = orderedSnapshots[0];
+
+                song.Snapshots.Remove(snapshotToRemove);
+            }
+        }
     }
 }
