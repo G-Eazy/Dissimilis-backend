@@ -13,7 +13,8 @@ namespace Dissimilis.DbContext
             var notes = Context.SongNotes.ToArray();
             foreach (var note in notes)
             {
-                note.SetNoteValues(ConvertToNewChordFormat(note.NoteValues.Split("|"), note.ChordName));
+                if(note.ChordName != null)
+                    note.SetNoteValues(ConvertToNewChordFormat(note.NoteValues.Split("|"), note.ChordName));
             }
             Context.SaveChanges();
         }
