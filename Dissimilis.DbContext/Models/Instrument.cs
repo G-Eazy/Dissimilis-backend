@@ -8,7 +8,7 @@ namespace Dissimilis.DbContext.Models
 {
     public enum DefinedInstruments
     {
-        [Description("Accordin")]
+        [Description("Accordion")]
         Accordion = 0,
 
         [Description("Acoustic Guitar")]
@@ -23,8 +23,8 @@ namespace Dissimilis.DbContext.Models
         [Description("Bass Guitar")]
         Bass_Guitar = 40,
 
-        [Description("Bongo Grums")]
-        Bongo_Grums = 50,
+        [Description("Bongo Drums")]
+        Bongo_Drums = 50,
 
         [Description("Bugle")]
         Bugle = 60,
@@ -47,8 +47,8 @@ namespace Dissimilis.DbContext.Models
         [Description("Flute")]
         Flute = 120,
 
-        [Description("French Gorn")]
-        French_Gorn = 130,
+        [Description("French Horn")]
+        French_Horn = 130,
 
         [Description("Harmonica")]
         Harmonica = 140,
@@ -62,8 +62,8 @@ namespace Dissimilis.DbContext.Models
         [Description("Organ")]
         Organ = 170,
 
-        [Description("Pan Glute")]
-        Pan_Glute = 180,
+        [Description("Pan Flute")]
+        Pan_Flute = 180,
 
         [Description("Piano")]
         Piano = 190,

@@ -156,11 +156,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             await _mediator.Publish(new MigrateVoiceNameCommand());
             return Ok();
+        }
             /// <summary>
             /// Create collection of notes in desired component interval
             /// </summary>
-        }
-            [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
+        [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> DuplicateAllChords(int songId, int voiceId, [FromBody] DuplicateAllChordsDto command)
         {
