@@ -4,10 +4,10 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -38,7 +38,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var undoFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var result = await undoFromSong.undo(currentUser);
+            var result = await undoFromSong.Undo(currentUser);
+            undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             try
             {
                 await _repository.UpdateAsync(cancellationToken);
