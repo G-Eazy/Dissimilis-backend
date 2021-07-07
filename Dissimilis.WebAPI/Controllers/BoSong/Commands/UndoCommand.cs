@@ -38,11 +38,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var undoFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var result = undoFromSong.Undo(currentUser);
+            var result = undoFromSong.Undo();
             undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             try
             {
-                await _repository.UpdateAsync(song, user, cancellationToken);
+                await _repository.UpdateAsync(undoFromSong, currentUser, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             } catch(Exception e)
             {

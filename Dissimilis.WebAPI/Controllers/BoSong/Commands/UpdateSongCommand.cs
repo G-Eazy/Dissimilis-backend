@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
 
-            await _repository.UpdateAsync(song, user, cancellationToken);
+            await _repository.UpdateAsync(song, currentUser, cancellationToken);
 
             return new UpdatedSongCommandDto(song);
         }

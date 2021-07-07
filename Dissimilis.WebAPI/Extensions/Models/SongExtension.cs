@@ -256,9 +256,15 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
-        public static string[] Undo(this Song song)
+        public static void Undo(this Song song)
         {
-            return null;
+            SongSnapshot snapshot = song.PopSnapshot();
+            Song snapshotSong = (Song)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+            
+            song.Title = snapshotSong.Title;
+            song.UpdatedBy = snapshot.CreatedBy;
+            song.UpdatedOn = DateTimeOffset.Now;
+            song.Voices = snapshotSong.Voices;
         }
 
         /// <summary>

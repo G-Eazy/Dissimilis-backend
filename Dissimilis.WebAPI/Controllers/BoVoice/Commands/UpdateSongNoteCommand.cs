@@ -56,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            await _repository.UpdateAsync(song, user, cancellationToken);
+            await _repository.UpdateAsync(song, currentUser, cancellationToken);
 
             return null;
         }
