@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Dissimilis.DbContext.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -14,13 +11,13 @@ namespace Dissimilis.DbContext.Models.Song
         public int SongId { get; set; }
 
         [Required]
+        public Song Song { get; set; }
+
+        [Required]
         public int MadeById { get; set; }
 
         [Required]
         public User MadeBy { get; set; }
-        
-        [Required]
-        public Song song { get; set; }
         
         [Required]
         public string SongObjectJSON { get; set; }
