@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice;
+using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.xUnit.Setup;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +60,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var voice = songDto.Voices.First();
             var bar = voice.Bars.First();
 
-            var note1Post = await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2)));
+            var note1Post = await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2, null)));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.First().Bars.First().Chords.Length.ShouldBe(2);
             var zNote1Update1 = songDto.Voices.First().Bars.First().Chords.FirstOrDefault(n => n.Notes.Any(n => n == "Z"));
@@ -97,7 +99,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
             CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After first and second voice");
 
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, CreateNoteDto(6, 2, null)));
             var firstSongBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, voice.SongVoiceId, CreateBarDto()));
             CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After a note and a bar");
 
@@ -114,6 +116,312 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             await mediator.Send(new UpdateSongBarCommand(songDto.SongId, voice.SongVoiceId, firstSongBar.SongBarId, CreateUpdateBarDto(repBefore: true, repAfter: true)));
             CheckSongVoiceIntegrity(await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId)), "After last songBarUpdate");
+        }
+
+        [Fact]
+        public async Task TestDuplicateAllChords()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            //Setup source voice to duplicate chords from.
+            var sourceVoice = songDto.Voices.First();
+            var firstSourceBar = sourceVoice.Bars.First();
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(0, 1, "C")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(1, 1, "Dm9")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(2, 2, "G#maj7")));
+
+            firstSourceBar = await mediator.Send(new QueryBarById(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId));
+
+            //Test duplicate with component intervals included.
+            var destinationVoiceWith = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Duplicate w voice")));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(2, "Number of voices should be 2.");
+
+            var updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceWith.SongVoiceId, DuplicateAllChordsDto(sourceVoice.SongVoiceId, true)));
+            var updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+
+
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                {
+                    var expectedChord = firstSourceBar.Chords.First(srcChord => srcChord.Position == chord.Position);
+                    chord.ChordName.ShouldBe(expectedChord.ChordName, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Length.ShouldBe(expectedChord.Length, $"The length was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedChord.Notes, $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+
+            //Test duplicate without component intervals included.
+            var destinationVoiceWithout = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("Duplicate wo voice")));
+
+            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            songDto.Voices.Length.ShouldBe(3, "Number of voices should be 3.");
+
+            updatedDestinationVoiceDto = await mediator.Send(
+                new DuplicateAllChordsCommand(songDto.SongId, destinationVoiceWithout.SongVoiceId, DuplicateAllChordsDto(sourceVoice.SongVoiceId, false)));
+            updatedDestinationVoice = await mediator.Send(
+                new QuerySongVoiceById(updatedDestinationVoiceDto.SongId, updatedDestinationVoiceDto.SongVoiceId));
+
+
+            foreach (var chord in updatedDestinationVoice.Bars[0].Chords)
+            {
+                if (chord.Position < 4)
+                //Verify that correct notes are copied over from source voice.
+                {
+                    var expectedChord = firstSourceBar.Chords.First(srcChord => srcChord.Position == chord.Position);
+                    chord.ChordName.ShouldBe(expectedChord.ChordName, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Length.ShouldBe(expectedChord.Length, $"The length was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(Enumerable.Repeat("X", expectedChord.Notes.Length).ToArray(), $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that should not receive copy do not have a value. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+        }
+
+        [Fact]
+        public async Task TestRemoveComponentInterval()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            //Setup source voice to duplicate chords from.
+            var sourceVoice = songDto.Voices.First();
+            var firstSourceBar = sourceVoice.Bars.First();
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(0, 1, "C")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(1, 1, "Dm9")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(2, 2, "G#maj7")));
+
+            //Test remove root component interval
+
+            var expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            var expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "X", "E", "G" },
+                new string[] { "X", "F", "A", "C", "E" },
+                new string[] { "X", "C", "D#", "G" },
+            };
+            
+            await mediator.Send(new RemoveComponentIntervalCommand(songDto.SongId, sourceVoice.SongVoiceId, RemoveComponentIntervalDto(0)));
+
+            //Verify updated chords
+            firstSourceBar = await mediator.Send(new QueryBarById(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId));
+
+            foreach (var chord in firstSourceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+
+            //Test remove fifth component interval
+
+            expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "X", "E", "X" },
+                new string[] { "X", "F", "X", "C", "E" },
+                new string[] { "X", "C", "X", "G" },
+            };
+
+            await mediator.Send(new RemoveComponentIntervalCommand(songDto.SongId, sourceVoice.SongVoiceId, RemoveComponentIntervalDto(2)));
+
+            //Verify updated chords
+            firstSourceBar = await mediator.Send(new QueryBarById(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId));
+
+            foreach (var chord in firstSourceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+
+            //Test remove seventh component interval
+
+            expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "X", "E", "X" },
+                new string[] { "X", "F", "X", "X", "E" },
+                new string[] { "X", "C", "X", "X" },
+            };
+
+            await mediator.Send(new RemoveComponentIntervalCommand(songDto.SongId, sourceVoice.SongVoiceId, RemoveComponentIntervalDto(3)));
+
+            //Verify updated chords
+            firstSourceBar = await mediator.Send(new QueryBarById(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId));
+
+            foreach (var chord in firstSourceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+        }
+
+        [Fact]
+        public async Task TestAddComponentInterval()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var createSongDto = CreateSongDto(4, 4);
+            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
+            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+
+            //Setup source voice to duplicate chords from.
+            var sourceVoice = songDto.Voices.First();
+            var firstSourceBar = sourceVoice.Bars.First();
+
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(0, 1, "C")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(1, 1, "Dm9")));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, sourceVoice.SongVoiceId, firstSourceBar.BarId, CreateNoteDto(2, 2, "G#maj7")));
+
+            var newVoiceResponse = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("New voice")));
+            await mediator.Send(new DuplicateAllChordsCommand(songDto.SongId, newVoiceResponse.SongVoiceId, DuplicateAllChordsDto(sourceVoice.SongVoiceId, false)));
+            var newVoice = await mediator.Send(new QuerySongVoiceById(songDto.SongId, newVoiceResponse.SongVoiceId));
+
+            var firstNewVoiceBar = newVoice.Bars.First();
+
+            //Test add root component interval
+
+            var expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            var expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "C", "X", "X" },
+                new string[] { "D", "X", "X", "X", "X" },
+                new string[] { "G#", "X", "X", "X" },
+            };
+
+            await mediator.Send(new AddComponentIntervalCommand(songDto.SongId, newVoice.SongVoiceId, AddComponentIntervalDto(0)));
+
+            //Verify updated chords
+            firstNewVoiceBar = await mediator.Send(new QueryBarById(songDto.SongId, newVoice.SongVoiceId, firstNewVoiceBar.BarId));
+
+            foreach (var chord in firstNewVoiceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+
+            //Test add fifth component interval
+
+            expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "C", "X", "G" },
+                new string[] { "D", "X", "A", "X", "X" },
+                new string[] { "G#", "X", "D#", "X" },
+            };
+
+            await mediator.Send(new AddComponentIntervalCommand(songDto.SongId, newVoice.SongVoiceId, AddComponentIntervalDto(2)));
+
+            //Verify updated chords
+            firstNewVoiceBar = await mediator.Send(new QueryBarById(songDto.SongId, newVoice.SongVoiceId, firstNewVoiceBar.BarId));
+
+            foreach (var chord in firstNewVoiceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
+
+            //Test add seventh component interval
+
+            expectedChordNames = new string[] { "C", "Dm9", "G#maj7" };
+            expectedNoteValues = new List<string[]>()
+            {
+                new string[] { "C", "X", "G" },
+                new string[] { "D", "X", "A", "C", "X" },
+                new string[] { "G#", "X", "D#", "G" },
+            };
+
+            await mediator.Send(new AddComponentIntervalCommand(songDto.SongId, newVoice.SongVoiceId, AddComponentIntervalDto(3)));
+
+            //Verify updated chords
+            firstNewVoiceBar = await mediator.Send(new QueryBarById(songDto.SongId, newVoice.SongVoiceId, firstNewVoiceBar.BarId));
+
+            foreach (var chord in firstNewVoiceBar.Chords)
+            {
+                //Verify that all chords are updated.
+                if (chord.Position < 4)
+                {
+                    chord.ChordName.ShouldBe(expectedChordNames[chord.Position], $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(expectedNoteValues[chord.Position], $"The notes was incorrect for chord on position {chord.Position}");
+                }
+                else
+                //Verify that notes that does not contain a chord remain the same. 
+                {
+                    chord.ChordName.ShouldBe(null, $"The chordname was incorrect for chord on position {chord.Position}");
+                    chord.Notes.ShouldBeEquivalentTo(new string[] { "Z" }, $"The otes was incorrect for chord on position {chord.Position}");
+                }
+            }
         }
 
         [Fact]
@@ -139,7 +447,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
 
             await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, CreateSongVoiceDto("Piano", 1)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4, null)));
 
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
             songDto.Voices.First().VoiceName.ShouldBe("Piano");
@@ -177,7 +485,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var baseVoice = songDto.Voices.First();
             var bar = baseVoice.Bars.First();
             await mediator.Send(new UpdateSongVoiceCommand(songDto.SongId, baseVoice.SongVoiceId, CreateSongVoiceDto("Piano", 1)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4)));
+            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, baseVoice.SongVoiceId, bar.BarId, CreateNoteDto(1, 4, null)));
             await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("FirstVoice")));
             songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
 

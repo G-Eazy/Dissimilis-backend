@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using MediatR;
@@ -142,6 +143,42 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, chordId));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Duplicates all chords from the provided source voice with or without the component intervals included in the duplicated chords.
+        /// </summary>
+        [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> DuplicateAllChords(int songId, int voiceId, [FromBody] DuplicateAllChordsDto command)
+        {
+            var item = await _mediator.Send(new DuplicateAllChordsCommand(songId, voiceId, command));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            return Created($"{item.SongVoiceId}", result);
+        }
+
+        /// <summary>
+        /// Adds a specified component interval to all chords in the targeted voice.
+        /// </summary>
+        [HttpPost("song/{songId:int}/voice/{voiceId:int}/addComponentInterval")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> AddComponentInterval(int songId, int voiceId, [FromBody] AddComponentIntervalDto command)
+        {
+            var item = await _mediator.Send(new AddComponentIntervalCommand(songId, voiceId, command));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            return Created($"{item.SongVoiceId}", result);
+        }
+
+        /// <summary>
+        /// Removes a specified component interval to all chords in the targeted voice.
+        /// </summary>
+        [HttpPost("song/{songId:int}/voice/{voiceId:int}/removeComponentInterval")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> RemoveComponentInterval(int songId, int voiceId, [FromBody] RemoveComponentIntervalDto command)
+        {
+            var item = await _mediator.Send(new RemoveComponentIntervalCommand(songId, voiceId, command));
+            var result = await _mediator.Send(new QuerySongVoiceById(songId, voiceId));
+            return Created($"{item.SongVoiceId}", result);
         }
     }
 }
