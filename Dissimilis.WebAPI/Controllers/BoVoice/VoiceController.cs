@@ -143,17 +143,5 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
-
-        /// <summary>
-        /// Undo last action performed on a song
-        /// </summary>
-        [HttpDelete("song/{songId:int}/undo")]
-        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Undo(int songId)
-        {
-            await _mediator.Send(new UndoCommand(songId));
-            var result = await _mediator.Send(new QuerySongUndoStackById(songId));
-            return Ok(result);
-        }
     }
 }
