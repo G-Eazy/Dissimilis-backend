@@ -4,14 +4,16 @@ using Dissimilis.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    partial class DissimilisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210702092750_addVoiceName")]
+    partial class addVoiceName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,19 +104,10 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("DegreeOfDifficulty")
-                        .HasColumnType("int");
-
                     b.Property<int>("Denominator")
                         .HasColumnType("int");
 
                     b.Property<int>("Numerator")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SongNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Speed")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")

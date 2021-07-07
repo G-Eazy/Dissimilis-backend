@@ -48,6 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             {
                 SongId = song.Id,
                 VoiceNumber = 1,
+                VoiceName = "Main",
                 IsMainVoice = true,
                 SongBars = new SongBar[] { new SongBar() { Position = 1 } }
             };

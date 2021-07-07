@@ -246,7 +246,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Speed = song.Speed,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
-                Voices = song.Voices.Select(v => v.Clone()).ToArray()
+                Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
             };
         }
 
