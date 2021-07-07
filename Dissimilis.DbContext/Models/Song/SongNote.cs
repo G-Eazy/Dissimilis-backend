@@ -101,27 +101,13 @@ namespace Dissimilis.DbContext.Models.Song
 
         public SongNote Clone(bool includeComponentIntervals = true)
         {
-            if (includeComponentIntervals)
+            return new SongNote()
             {
-                return new SongNote()
-                    {
-                        Length = Length,
-                        Position = Position,
-                        NoteValues = NoteValues,
-                        ChordName = ChordName
-                    };
-            }
-            else
-            {
-                return new SongNote()
-                {
-                    Length = Length,
-                    Position = Position,
-                    NoteValues = String.Join("|", Enumerable.Repeat("X", this.GetNoteValues().Length)),
-                    ChordName = ChordName
-                };
-            }
-            
+                Length = Length,
+                Position = Position,
+                NoteValues = includeComponentIntervals ? NoteValues : String.Join("|", Enumerable.Repeat("X", this.GetNoteValues().Length)),
+                ChordName = ChordName
+            };
         }
 
         public SongNote TransposeNoteValues(int transpose = 0)
