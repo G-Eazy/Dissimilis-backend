@@ -6,6 +6,9 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System;
+using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {

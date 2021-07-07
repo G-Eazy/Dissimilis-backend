@@ -62,10 +62,13 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 };
 
                 if (note.ChordName != null)
+                {
                     note.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(note.ChordName).ToArray());
-                else
+                }
+                else 
+                {
                     note.SetNoteValues(request.Command.Notes);
-
+                }
                 songBar.Notes.Add(note);
                 songBar.CheckSongBarValidation();
                 songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
