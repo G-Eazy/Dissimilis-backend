@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var undoFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var result = await undoFromSong.Undo(currentUser);
+            var result = undoFromSong.Undo(currentUser);
             undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             try
             {

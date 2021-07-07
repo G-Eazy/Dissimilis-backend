@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -16,7 +17,6 @@ namespace Dissimilis.DbContext.Models.Song
         [Required]
         public int CreatedById { get; set; }
 
-        [Required]
         public User CreatedBy { get; set; }
 
         [Required]
@@ -24,5 +24,7 @@ namespace Dissimilis.DbContext.Models.Song
         
         [Required]
         public string SongObjectJSON { get; set; }
+
+        public SongSnapshot() { }
     }
 }

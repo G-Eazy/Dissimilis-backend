@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using System;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -263,24 +265,39 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// This method should be called before any action that updates a song, except when the song itself is created.
         /// </summary>
         /// <param name="song"></param>
-        public static async void PerformAndSaveSnapshot(this Song song)
+        public static void PerformSnapshot(this Song song, User user)
         {
-            string snapshot = Newtonsoft.Json.JsonConvert.SerializeObject(song);
-            Console.WriteLine(snapshot);
+            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(song);
+            Console.WriteLine(JSONsnapshot);
+            SongSnapshot snapshot = new SongSnapshot()
+            {
+                SongId = song.Id,
+                Song = song,
+                CreatedById = user.Id,
+                CreatedOn = DateTimeOffset.Now,
+                SongObjectJSON = JSONsnapshot
+            };
 
-            if(song)
-                song.Snapshots.Add(snapshot);
+            if(song.Snapshots.Count > 5)
+            {
+                song.PopSnapshot();
+            }
+
+            song.Snapshots.Add(snapshot);
         }
 
-        public static void PopSnapshot(this Song song)
+        public static SongSnapshot PopSnapshot(this Song song)
         {
+            SongSnapshot result = null;
+
             if(song.Snapshots.Count > 0)
             {
                 var orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
-                var snapshotToRemove = orderedSnapshots[0];
+                result = orderedSnapshots[0];
 
-                song.Snapshots.Remove(snapshotToRemove);
+                song.Snapshots.Remove(result);
             }
+            return result;
         }
     }
 }
