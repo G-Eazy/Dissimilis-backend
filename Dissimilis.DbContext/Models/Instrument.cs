@@ -20,7 +20,9 @@ namespace Dissimilis.DbContext.Models
         [Required]
         public string Name { get; set; }
 
-        
+        /// <summary>
+        /// the different songVoices in the whole database using this instrument
+        /// </summary>
         public ICollection<SongVoice> SongVoices { get; set; } = new List<SongVoice>();
 
         public Instrument() { }
@@ -31,7 +33,7 @@ namespace Dissimilis.DbContext.Models
         /// <param name="instrument"></param>
         public Instrument(string instrument)
         {
-            this.Name = instrument;
+            Name = instrument;
         }
     }
 }

@@ -6,6 +6,21 @@ using Dissimilis.DbContext.Interfaces;
 namespace Dissimilis.DbContext.Models.Song
 {
     /// <summary>
+    /// The different sharing options a song could have:
+    /// private: only you and people in sharedUsers
+    /// Group: all in sharedUsers and sharedGroups
+    /// Organisation: same as group + all in sharedOrganisation
+    /// all: public song
+    /// </summary>
+    public enum ProtectionLevels
+    {
+        Private,
+        Group,
+        Organisation,
+        all
+    }
+
+    /// <summary>
     /// This is the whole songs, which contains one or more parts 
     /// </summary>
     public class Song : ICreatedAndUpdated
@@ -64,7 +79,6 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// Notes that describes the song
         /// </summary>
-
         public string SongNotes { get; set; }
 
         /// <summary>
@@ -83,6 +97,23 @@ namespace Dissimilis.DbContext.Models.Song
 
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
 
-        
+        /// <summary>
+        /// The protection level of the song, a inner scope to easy set a song private
+        /// </summary>
+        public ProtectionLevels ProtectionLevel { get; set; }
+        /// <summary>
+        /// the users with write permission on the song
+        /// </summary>
+        public ICollection<User> SharedUsers { get; set; } = new List<User>();
+
+        /// <summary>
+        /// The groups with read permission on the song
+        /// </summary>
+        public ICollection<Group> SharedGroups { get; set; } = new List<Group>();
+
+        /// <summary>
+        /// The organisations with read permission on this song
+        /// </summary>
+        public ICollection<Organisation> SharedOrganisations { get; set; } = new List<Organisation>();
     }
 }

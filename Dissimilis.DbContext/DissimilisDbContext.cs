@@ -24,6 +24,13 @@ namespace Dissimilis.DbContext
         public DbSet<Country> Countries { get; set; }
         public DbSet<Instrument> Instruments { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupUser> GroupUsers { get; set; }
+        public DbSet<OrganisationUser> OrganisationUsers { get; set; }
+        public DbSet<SystemAdmin> SystemAdmins{ get; set; }
+
+
+
 
 
         /// <summary>
@@ -43,6 +50,10 @@ namespace Dissimilis.DbContext
             BuildNote(modelBuilder);
             BuildCountry(modelBuilder);
             BuildOrganisation(modelBuilder);
+            BuildGroup(modelBuilder);
+            BuildGroupUser(modelBuilder);
+            BuildOrganisationUser(modelBuilder);
+            BuildSystemAdmin(modelBuilder);
 
             FixForSqlLite(modelBuilder);
         }
@@ -91,12 +102,6 @@ namespace Dissimilis.DbContext
                 .WithMany(x => x.Users)
                 .HasForeignKey(x => x.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(x => x.Organisation)
-                .WithMany(x => x.Users)
-                .HasForeignKey(x => x.OrganisationId)
-                .OnDelete(DeleteBehavior.Restrict);
-
         }
 
         static void BuildSong(ModelBuilder builder)
@@ -191,6 +196,7 @@ namespace Dissimilis.DbContext
         {
             var entity = builder.Entity<Instrument>();
             entity.HasIndex(x => x.Name).IsUnique();
+            entity.Property(x => x.Name).IsRequired();
         }
 
         static void BuildCountry(ModelBuilder builder)
@@ -206,8 +212,72 @@ namespace Dissimilis.DbContext
             var entity = builder.Entity<Organisation>();
 
             entity.HasIndex(x => x.Name).IsUnique();
-        }
+            entity.Property(x => x.Name).IsRequired();
 
+
+            entity.HasOne(x => x.CreatedBy)
+                .WithMany(x => x.OrganisationsCreated)
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.UpdatedBy)
+                .WithMany(x => x.OrganisationsUpdated)
+                .HasForeignKey(x => x.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildGroup(ModelBuilder builder)
+        {
+            var entity = builder.Entity<Group>();
+            entity.Property(x => x.Name).IsRequired();
+
+            entity.HasOne(x => x.Organisation)
+                .WithMany(x => x.Groups)
+                .HasForeignKey(x => x.OrganisationId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.CreatedBy)
+                .WithMany(x => x.GroupsCreated)
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.UpdatedBy)
+                .WithMany(x => x.GroupsUpdated)
+                .HasForeignKey(x => x.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildGroupUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<GroupUser>();
+
+            entity.HasOne(x => x.Group)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.GroupId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.Groups)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildOrganisationUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<OrganisationUser>();
+
+            entity.HasOne(x => x.Organisation)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.OrganisationId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.Organisations)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildSystemAdmin(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SystemAdmin>();
+
+        }
 
         #endregion
 
