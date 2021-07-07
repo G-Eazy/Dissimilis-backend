@@ -253,5 +253,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
             return song;
         }
+
+        public static string[] Undo(this Song song)
+        {
+            return null;
+        }
     }
 }
