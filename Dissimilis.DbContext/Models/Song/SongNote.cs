@@ -13,7 +13,7 @@ namespace Dissimilis.DbContext.Models.Song
         internal static string[] _possibleNoteValues = new string[]
         {
             // Notes ordered from low to high pitch
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z"
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z", "X"
             //"G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
 
@@ -86,8 +86,7 @@ namespace Dissimilis.DbContext.Models.Song
         {
             var result = input
                 .Select(v => v.ToUpper().Trim())
-                .Distinct()
-                .Where(v => _possibleNoteValues.Contains(v) || v == "")
+                .Where(v => _possibleNoteValues.Contains(v))
                 .ToArray();
 
             if (!includeZ)
@@ -100,29 +99,15 @@ namespace Dissimilis.DbContext.Models.Song
                 .ToArray();
         }
 
-        public SongNote Clone(bool hasComponentIntervals = true)
+        public SongNote Clone(bool includeComponentIntervals = true)
         {
-            if (hasComponentIntervals)
+            return new SongNote()
             {
-                return new SongNote()
-                    {
-                        Length = Length,
-                        Position = Position,
-                        NoteValues = NoteValues,
-                        ChordName = ChordName
-                    };
-            }
-            else
-            {
-                return new SongNote()
-                {
-                    Length = Length,
-                    Position = Position,
-                    NoteValues = String.Join("|", Enumerable.Repeat("", NoteValues.Length)),
-                    ChordName = ChordName
-                };
-            }
-            
+                Length = Length,
+                Position = Position,
+                NoteValues = includeComponentIntervals ? NoteValues : String.Join("|", Enumerable.Repeat("X", this.GetNoteValues().Length)),
+                ChordName = ChordName
+            };
         }
 
         public SongNote TransposeNoteValues(int transpose = 0)

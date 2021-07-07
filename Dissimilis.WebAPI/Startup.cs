@@ -186,8 +186,11 @@ namespace Dissimilis.WebAPI
         {
 
             DissimilisSeeder.SeedBasicData(context);
-            DBMigrationJobs.MigrateFromOldToNewChordFormat(context);
-
+            DBMigrationJobs.MigrateFromOldToNewChordFormatAsync(context);
+            DBMigrationJobs.SetInstrumentAsVoiceName(context);
+            DBMigrationJobs.DeleteOldInstruments(context);
+            DBMigrationJobs.CreateNewInstruments(context);
+            DBMigrationJobs.UpdateExistingInstrumentName(context);
             if (ConfigurationInfo.IsLocalDebugBuild())
             {
                 // local seeding

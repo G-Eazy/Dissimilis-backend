@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System;
 using Dissimilis.Core.Collections;
@@ -15,6 +16,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H"
         };
 
+        //Source: https://en.wikipedia.org/wiki/Interval_(music)
+        //Provides a mapping from interval types to how many semitones used to calculate next note value.
+        //If a chord contains the intervals perfect unison (1P), minor third (3m), and perfect fifth (5P)
+        //The intervals would be 0, 3, and 7 semitones respectivily. For further explaination, please refer to
+        //the provided source article from Wikipedia linked above.
         public static Dictionary<string, int> IntervalMapping = new Dictionary<string, int>()
         {
             //==Main intervals==
@@ -53,8 +59,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
             ["9M"] = 14,
             ["10m"] = 15,
             ["10M"] = 16,
-            ["P11"] = 17,
-            ["P12"] = 19,
+            ["11P"] = 17,
+            ["12P"] = 19,
             ["13m"] = 20,
             ["13M"] = 21,
             ["14m"] = 22,
@@ -79,6 +85,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             ["15A"] = 25,
         };
 
+        //Source: https://en.wikibooks.org/wiki/Music_Theory/Complete_List_of_Chord_Patterns
+        //Provides a list of all chordpatterns. Each pattern can be identified by its name or one of its abreviations.
+        //Each element in the list is an array on the format [pattern, name, abbreviations].
+        //The pattern can be used together with the interval mapper to construct a chord based on its root tone and
+        //interval values. For further explanation please see Wikibooks source article provided as a link above.
         public static List<string[]> ChordFormulas = new List<string[]> {
             new string[] {"1P 3M 5P", "major", "M ^ "},
             new string[] {"1P 3M 5P 7M", "major seventh", "maj7 Δ ma7 M7 Maj7 ^7"},
@@ -221,7 +232,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
             else if (ChordName[1] == '#')
             {
                 rootNote = ChordName.Substring(0, 2);
-                chordPattern = ChordName[2..];
+                if (ChordName.Length == 2)
+                {
+                    chordPattern = "M";
+                }
+                else
+                {
+                    chordPattern = ChordName[2..];
+                }
             } else
             {
                 rootNote = ChordName.Substring(0, 1);
@@ -229,7 +247,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
 
             int startIndex = AllNotes.IndexOf(rootNote);
-            string[] intervalCodes = ChordFormulas.Where(formula => formula[2].Split(" ").Contains(chordPattern)).Select(formula => formula[0].Split(" ")).First();
+            string[] intervalCodes = ChordFormulas
+                .Where(formula => formula[2].Split(" ").Contains(chordPattern))
+                .Select(formula => formula[0].Split(" "))
+                .FirstOrDefault();
+            
             List<string> noteValues = new List<string>();
 
             foreach (string intervalCode in intervalCodes)
@@ -242,7 +264,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
-            updatedNoteValues[intervalPosition] = "";
+            if (songNote.ChordName == null)
+            {
+                throw new ValidationException("A note needs to be a chord to have component intervals removed.");
+            }
+            if (updatedNoteValues.Length > intervalPosition)
+            {
+                updatedNoteValues[intervalPosition] = "X";
+            }
             songNote.SetNoteValues(updatedNoteValues);
             return songNote;
         }
@@ -250,8 +279,63 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static SongNote AddComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
-            updatedNoteValues[intervalPosition] = GetNoteValuesFromChordName(songNote.ChordName)[intervalPosition];
+            if (songNote.ChordName == null)
+            {
+                throw new ValidationException("A note needs to be a chord to have component intervals added.");
+            }
+            if (updatedNoteValues.Length > intervalPosition)
+            {
+                updatedNoteValues[intervalPosition] = GetNoteValuesFromChordName(songNote.ChordName)[intervalPosition];
+            }
             songNote.SetNoteValues(updatedNoteValues);
+            return songNote;
+        }
+
+        public static SongNote Transpose(this SongNote songNote, int transposeValue)
+        {
+            string rootNote;
+            string chordPattern;
+            if (songNote.ChordName == null)
+            {
+                int newNoteIndex = (AllNotes.IndexOf(songNote.GetNoteValues()[0]) + transposeValue) % AllNotes.Count;
+                string[] tranposedNotes = new string[]
+                {
+                    AllNotes[newNoteIndex < 0 ? newNoteIndex + AllNotes.Count : newNoteIndex]
+                };
+                songNote.SetNoteValues(tranposedNotes);
+            }
+            else
+            {
+                if (songNote.ChordName.Length == 1)
+                {
+                    rootNote = songNote.ChordName.Substring(0, 1);
+                    chordPattern = "M";
+                }
+                else if (songNote.ChordName[1] == '#')
+                {
+                    rootNote = songNote.ChordName.Substring(0, 2);
+                    if (songNote.ChordName.Length == 2)
+                    {
+                        chordPattern = "M";
+                    }
+                    else
+                    {
+                        chordPattern = songNote.ChordName[2..];
+                    }
+                }
+                else
+                {
+                    rootNote = songNote.ChordName.Substring(0, 1);
+                    chordPattern = songNote.ChordName[1..];
+                }
+                int tranposedRootNoteIndex = (AllNotes.IndexOf(rootNote) + transposeValue) % AllNotes.Count;
+                string transposedRootNote = AllNotes[tranposedRootNoteIndex < 0 ? tranposedRootNoteIndex + AllNotes.Count : tranposedRootNoteIndex];
+                string transposedChordPattern = chordPattern == "M" ? "" : chordPattern;
+
+                songNote.ChordName = transposedRootNote + transposedChordPattern;
+
+                songNote.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(songNote.ChordName).ToArray());
+            }
             return songNote;
         }
     }

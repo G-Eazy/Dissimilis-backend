@@ -7,7 +7,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 {
     public class RemoveComponentIntervalDto
     {
-        public int SongId { get; set; }
         public int IntervalPosition { get; set; }
     }
 }

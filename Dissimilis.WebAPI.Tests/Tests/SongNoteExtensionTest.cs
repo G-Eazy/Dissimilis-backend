@@ -52,7 +52,21 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                             Position = 1,
                             ChordName = "Dsus4",
                             Length = 1,
-                            NoteValues = "||",
+                            NoteValues = "X|X|X",
+                        },
+                        new SongNote()
+                        {
+                            Position = 1,
+                            ChordName = null,
+                            Length = 1,
+                            NoteValues = "C",
+                        },
+                        new SongNote()
+                        {
+                            Position = 1,
+                            ChordName = null,
+                            Length = 1,
+                            NoteValues = "A#",
                         }
             };
             }
@@ -94,13 +108,27 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                             ChordName = "Dsus4",
                             Length = 1,
                             NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("Dsus4")),
-                    }
+                        },
+                        new SongNote()
+                        {
+                            Position = 1,
+                            ChordName = null,
+                            Length = 1,
+                            NoteValues = "C",
+                        },
+                        new SongNote()
+                        {
+                            Position = 1,
+                            ChordName = null,
+                            Length = 1,
+                            NoteValues = "A#",
+                        }
                 };
             }
         }
 
         [Fact]
-        public void TestGetNoteValues()
+        public void TestGetNoteValuesFromChordName()
         {
             string[] chordNamesToTest = new string[]
             {
@@ -109,6 +137,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 "D",
                 "E",
                 "F",
+                "F#",
                 "Dm",
                 "Faug7",
                 "A#sus4",
@@ -120,6 +149,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 new List<string> { "D", "F#", "A" },
                 new List<string> { "E", "G#", "H" },
                 new List<string> { "F", "A", "C" },
+                new List<string> { "F#", "A#", "C#" },
                 new List<string> { "D", "F", "A" },
                 new List<string> { "F", "A", "C#", "D#" },
                 new List<string> { "A#", "D#", "F" },
@@ -170,6 +200,32 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             for (int index = 0; index < songNotesToTest.Count; index++)
             {
                 songNotesToTest[index].ShouldBeEquivalentTo(expectedSongNotes[index], $"Songnote number {index} failed.");
+            }
+        }
+
+        [Fact]
+        public void TestTranspose()
+        {
+            List<SongNote> songNotesToTest = CreateSongNotes(true);
+            List<int> transposeValues = new List<int>() { 1, 0, 3, -3, 5, -1, 2 };
+            List<string> expectedChordNames = new List<string>() { "C#", "D", "D#maj7", "F#m", "Gsus4", null, null };
+            List<List<string>> expectedNoteValues = new List<List<string>>()
+            {
+                SongNoteExtension.GetNoteValuesFromChordName("C#"),
+                SongNoteExtension.GetNoteValuesFromChordName("D"),
+                SongNoteExtension.GetNoteValuesFromChordName("D#maj7"),
+                SongNoteExtension.GetNoteValuesFromChordName("F#m"),
+                SongNoteExtension.GetNoteValuesFromChordName("Gsus4"),
+                new List<string>() { "H" },
+                new List<string>() { "C" },
+            };
+
+            for (int index = 0; index < songNotesToTest.Count; index++)
+            {
+                songNotesToTest[index].Transpose(transposeValues[index]);
+                songNotesToTest[index].ChordName.ShouldBe(expectedChordNames[index]);
+                List<string> actualNoteValues = new List<string>(songNotesToTest[index].GetNoteValues());
+                actualNoteValues.ShouldBeEquivalentTo(expectedNoteValues[index]);
             }
         }
     }

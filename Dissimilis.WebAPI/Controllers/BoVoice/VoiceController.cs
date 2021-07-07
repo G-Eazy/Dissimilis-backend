@@ -146,20 +146,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Endpoint used for updating voiceName. Need to be called to update the database to the new format
-        /// DEPRECATED
-        /// ONE_TIME_RUN
+        /// Duplicates all chords from the provided source voice with or without the component intervals included in the duplicated chords.
         /// </summary>
-        [HttpPost("ChangeNameFromInstrumentToVoiceName")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> MigrateVoiceName()
-        {
-            await _mediator.Publish(new MigrateVoiceNameCommand());
-            return Ok();
-        }
-            /// <summary>
-            /// Create collection of notes in desired component interval
-            /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> DuplicateAllChords(int songId, int voiceId, [FromBody] DuplicateAllChordsDto command)
@@ -170,7 +158,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Adds a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/addComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
@@ -182,7 +170,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Removes a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/removeComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
