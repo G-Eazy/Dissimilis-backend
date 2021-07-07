@@ -8,7 +8,7 @@ namespace Dissimilis.DbContext.Models
 {
     public enum DefinedInstruments
     {
-        [Description("test1234")]
+        [Description("Accordion")]
         Accordion = 0,
 
         [Description("Acoustic Guitar")]
