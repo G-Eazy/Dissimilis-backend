@@ -65,7 +65,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 {
                     note.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(note.ChordName).ToArray());
                 }
-                else {
+                else 
+                {
                     note.SetNoteValues(request.Command.Notes);
                 }
                 songBar.Notes.Add(note);

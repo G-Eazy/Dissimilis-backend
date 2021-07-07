@@ -4,6 +4,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
+using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 
 namespace Dissimilis.WebAPI.xUnit
@@ -95,7 +96,7 @@ namespace Dissimilis.WebAPI.xUnit
         {
             return new CreateSongVoiceDto()
             {
-                Instrument = voiceName,
+                VoiceName = voiceName,
                 VoiceNumber = voiceNumber
             };
         }
@@ -105,15 +106,6 @@ namespace Dissimilis.WebAPI.xUnit
             return new DuplicateSongDto()
             {
                 Title = title
-            };
-        }
-
-        internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
-        {
-            return new UpdateSongVoiceDto()
-            {
-                Instrument = voiceName,
-                VoiceNumber = voiceNumber
             };
         }
 
@@ -174,9 +166,9 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
+        internal static CreateNoteDto CreateNoteDto(int position, int length, string chordName, string[] value = null)
         {
-            if (value == null)
+            if (value == null && chordName == null)
             {
                 value = new string[] { "A" };
             }
@@ -184,8 +176,9 @@ namespace Dissimilis.WebAPI.xUnit
             return new CreateNoteDto()
             {
                 Position = position,
-                Length = lenght,
-                Notes = value
+                Length = length,
+                Notes = chordName != null ? SongNoteExtension.GetNoteValuesFromChordName(chordName).ToArray() : value,
+                ChordName = chordName
             };
         }
 
@@ -199,12 +192,28 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static DuplicateAllChordsDto DuplicateComponentIntervalDto(int intervalPosition, int sourceVoiceId)
+        internal static DuplicateAllChordsDto DuplicateAllChordsDto(int sourceVoiceId, bool includeComponentIntervals)
         {
             return new DuplicateAllChordsDto()
             {
-                IntervalPostion = intervalPosition,
-                SourceVoiceId = sourceVoiceId
+                SourceVoiceId = sourceVoiceId,
+                IncludeComponentIntervals = includeComponentIntervals,
+            };
+        }
+
+        internal static AddComponentIntervalDto AddComponentIntervalDto(int IntervalPosition)
+        {
+            return new AddComponentIntervalDto()
+            {
+                IntervalPosition = IntervalPosition
+            };
+        }
+
+        internal static RemoveComponentIntervalDto RemoveComponentIntervalDto(int IntervalPosition)
+        {
+            return new RemoveComponentIntervalDto()
+            {
+                IntervalPosition = IntervalPosition
             };
         }
 

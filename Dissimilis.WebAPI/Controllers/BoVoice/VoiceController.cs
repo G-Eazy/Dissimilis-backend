@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         [HttpPatch("song/{songId:int}/voice/{voiceId:int}")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateSongVoice(int songId, int voiceId, [FromBody] UpdateSongVoiceDto command)
+        public async Task<IActionResult> UpdateSongVoice(int songId, int voiceId, [FromBody] CreateSongVoiceDto command)
         {
             var item = await _mediator.Send(new UpdateSongVoiceCommand(songId, voiceId, command));
             var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));
@@ -64,9 +64,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicate")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
-        public async Task<IActionResult> DuplicateVoice(int songId, int voiceId)
+        public async Task<IActionResult> DuplicateVoice(int songId, int voiceId, [FromBody] CreateSongVoiceDto command)
         {
-            var item = await _mediator.Send(new DuplicateVoiceCommand(songId, voiceId));
+            var item = await _mediator.Send(new DuplicateVoiceCommand(songId, voiceId, command));
             var result = await _mediator.Send(new QuerySongVoiceById(songId, item.SongVoiceId));
             return Created($"{item.SongVoiceId}", result);
         }
@@ -146,7 +146,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Duplicates all chords from the provided source voice with or without the component intervals included in the duplicated chords.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/duplicateAllChords")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
@@ -158,7 +158,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Adds a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/addComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
@@ -170,7 +170,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
-        /// Create collection of notes in desired component interval
+        /// Removes a specified component interval to all chords in the targeted voice.
         /// </summary>
         [HttpPost("song/{songId:int}/voice/{voiceId:int}/removeComponentInterval")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
