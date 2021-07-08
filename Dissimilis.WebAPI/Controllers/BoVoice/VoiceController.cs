@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
+using Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.DTOs;
 using MediatR;
@@ -129,6 +130,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int chordId, [FromBody] UpdateNoteDto command)
         {
             var item = await _mediator.Send(new UpdateSongNoteCommand(songId, voiceId, barId, chordId, command));
+            var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Add a specified component interval to a single chord.
+        /// </summary>
+        [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{chordId:int}/addComponentInterval")]
+        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> AddComponentIntervalNote(int songId, int voiceId, int barId, int chordId, [FromBody] AddComponentIntervalNoteDto command)
+        {
+            var item = await _mediator.Send(new AddComponentIntervalNoteCommand(songId, voiceId, barId, chordId, command));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
