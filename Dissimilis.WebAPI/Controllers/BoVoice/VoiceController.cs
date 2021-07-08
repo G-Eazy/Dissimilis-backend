@@ -147,6 +147,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
         /// <summary>
+        /// Remove a specified component interval from the note.
+        /// </summary>
+        [HttpPatch("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{chordId:int}/removeComponentInterval")]
+        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RemoveComponentIntervalNote(int songId, int voiceId, int barId, int chordId, [FromBody] RemoveComponentIntervalNoteDto command)
+        {
+            var item = await _mediator.Send(new RemoveComponentIntervalNoteCommand(songId, voiceId, barId, chordId, command));
+            var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Delete note
         /// </summary>
         [HttpDelete("song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note/{chordId:int}")]
