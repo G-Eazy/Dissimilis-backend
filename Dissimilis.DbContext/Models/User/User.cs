@@ -25,7 +25,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// Boolean value to check if the user is systemAdmin, 
         /// </summary>
-        public bool isSystemAdmin { get; set;}
+        public bool IsSystemAdmin { get; set;}
 
         /// <summary>
         /// Email address of user
@@ -55,10 +55,8 @@ namespace Dissimilis.DbContext.Models
 
 
         public ICollection<Group> GroupsCreated { get; set; } = new List<Group>();
-        public ICollection<Group> GroupsUpdated { get; set; } = new List<Group>();
 
         public ICollection<Organisation> OrganisationsCreated { get; set; } = new List<Organisation>();
-        public ICollection<Organisation> OrganisationsUpdated { get; set; } = new List<Organisation>();
 
         /// <summary>
         /// the different groups this user is in with the corresponding role

@@ -8,7 +8,7 @@ namespace Dissimilis.DbContext.Models
     /// <summary>
     /// Group entity
     /// </summary>
-    public class Group : ICreatedAndUpdated
+    public class Group
     {
         /// <summary>
         /// The id of the group
@@ -20,6 +20,7 @@ namespace Dissimilis.DbContext.Models
         /// The name of the group
         /// </summary>
         [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
 
         /// <summary>
@@ -33,15 +34,7 @@ namespace Dissimilis.DbContext.Models
         public Organisation Organisation { get; set; }
         public int OrganisationId { get; set; }
 
-        /// <summary>
-        /// The info description of the group
-        /// </summary>
-        public string GroupInfo { get; set; }
-
         public DateTimeOffset? CreatedOn { get; set; }
-        public User UpdatedBy { get; set; }
-        public int? UpdatedById { get; set; }
-        public DateTimeOffset? UpdatedOn { get; set; }
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
 

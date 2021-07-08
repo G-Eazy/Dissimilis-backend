@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Dissimilis.DbContext.Interfaces;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.DbContext.Models.Song
 {
@@ -12,13 +13,7 @@ namespace Dissimilis.DbContext.Models.Song
     /// Organisation: same as group + all in sharedOrganisation
     /// all: public song
     /// </summary>
-    public enum ProtectionLevels
-    {
-        Private,
-        Group,
-        Organisation,
-        all
-    }
+    
 
     /// <summary>
     /// This is the whole songs, which contains one or more parts 

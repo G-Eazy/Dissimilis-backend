@@ -9,7 +9,7 @@ namespace Dissimilis.DbContext.Models
     /// Entity class for organisation
     /// Contains Id and Name
     /// </summary>
-    public class Organisation : ICreatedAndUpdated
+    public class Organisation
     {
         /// <summary>
         /// ID of the organisation
@@ -17,7 +17,6 @@ namespace Dissimilis.DbContext.Models
         [Key]
         public int Id { get; set; }
 
-        public Guid? MsId { get; set; }
 
         /// <summary>
         /// The name of the organisation
@@ -39,9 +38,6 @@ namespace Dissimilis.DbContext.Models
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
         public DateTimeOffset? CreatedOn { get; set; }
-        public User UpdatedBy { get; set; }
-        public int? UpdatedById { get; set; }
-        public DateTimeOffset? UpdatedOn { get; set; }
 
         /// <summary>
         /// Empty constructor 

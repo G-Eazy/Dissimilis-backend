@@ -218,10 +218,6 @@ namespace Dissimilis.DbContext
                 .HasForeignKey(x => x.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(x => x.UpdatedBy)
-                .WithMany(x => x.OrganisationsUpdated)
-                .HasForeignKey(x => x.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
         }
         static void BuildGroup(ModelBuilder builder)
         {
@@ -238,10 +234,6 @@ namespace Dissimilis.DbContext
                 .HasForeignKey(x => x.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(x => x.UpdatedBy)
-                .WithMany(x => x.GroupsUpdated)
-                .HasForeignKey(x => x.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
         }
         static void BuildGroupUser(ModelBuilder builder)
         {

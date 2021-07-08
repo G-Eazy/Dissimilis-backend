@@ -1,16 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Dissimilis.DbContext.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.DbContext.Models
 {
-
-    /// <summary>
-    /// The enum containing the different roles in the system, used in GroupUser and OrganisationUser
-    /// </summary>
-    public enum Role
-    {
-    Instructur,
- 	Admin
-    }
     /// <summary>
     /// the mapping between Group and user with the predefined enum role
     /// </summary>
