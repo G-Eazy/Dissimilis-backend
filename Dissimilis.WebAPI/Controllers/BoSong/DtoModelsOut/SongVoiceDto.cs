@@ -31,7 +31,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         }
 
-        public SongVoice ConvertToSongVoice(this SongVoiceDto voiceDto, DateTimeOffset updatedOn, User updatedBy, int updatedById, Song song, int songId)
+        public static SongVoice ConvertToSongVoice( SongVoiceDto voiceDto, DateTimeOffset updatedOn, User updatedBy, int updatedById, Song song)
         {
             return new SongVoice()
             {
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
                 UpdatedById = updatedById,
                 UpdatedOn = updatedOn,
                 Song = song,
-                SongId = songId
+                SongId = song.Id
             };
         }
     }

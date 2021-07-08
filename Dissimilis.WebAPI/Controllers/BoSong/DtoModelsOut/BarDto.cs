@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
                 .ToArray();
         }
 
-        public SongBar ConvertToSongBar(this BarDto barDto)
+        public static SongBar ConvertToSongBar(BarDto barDto)
         {
             return new SongBar()
             {

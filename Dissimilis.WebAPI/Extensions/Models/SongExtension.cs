@@ -258,26 +258,27 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
-        private static Song _DeserializeSnapshot(this Song song, SongSnapshot snapshot)
+        private static List<SongVoice> _GetVoicesFromSnapshot(Song song, SongSnapshot snapshot)
         {
             SongSnapshotDto snapshotSong = (SongSnapshotDto)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             List<SongVoice> voices = new List<SongVoice>();
 
-            foreach(var voice in snapshotSong.SongVoices)
+            foreach(SongVoiceDto voiceDto in snapshotSong.SongVoices)
             {
-                var v = new SongVoice()
+                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedBy, snapshot.CreatedById, song);
+                voices.Add(voice);
+                foreach(BarDto barDto in voiceDto.Bars)
                 {
-                    Id = voice.SongVoiceId,
-                    VoiceName = voice.VoiceName,
-                    VoiceNumber = voice.PartNumber,
-                    IsMainVoice = voice.IsMain,
-                    UpdatedBy = snapshot.CreatedBy,
-                    UpdatedById = snapshot.CreatedById,
-                    UpdatedOn = DateTimeOffset.Now,
-                    Song = snapshot.Song,
-                    SongId = snapshot.SongId
-                };
+                    SongBar bar = BarDto.ConvertToSongBar(barDto);
+                    voice.SongBars.Add(bar);
+                    foreach(NoteDto noteDto in barDto.Chords)
+                    {
+                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
+                        bar.Notes.Add(note);
+                    }
+                }
             }
+            return voices;
 
         }
 
@@ -289,7 +290,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             song.Title = snapshotSong.SongTitle;
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-            song.Voices = snapshotSong.SongVoices;
+            song.Voices = _GetVoicesFromSnapshot(song, snapshot);
         }
 
         /// <summary>
