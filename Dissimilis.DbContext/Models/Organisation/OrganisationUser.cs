@@ -29,6 +29,9 @@ namespace Dissimilis.DbContext.Models
         ///predefined roles; admin and instructor
         /// </summary>
         public Role Role { get; set; }
+
+        public OrganisationUser() { }
+
     public OrganisationUser(Organisation organisation, User user, Role role)
     {
         Organisation = organisation;
