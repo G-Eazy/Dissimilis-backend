@@ -27,7 +27,6 @@ namespace Dissimilis.DbContext
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<OrganisationUser> OrganisationUsers { get; set; }
-        public DbSet<SystemAdmin> SystemAdmins{ get; set; }
 
 
 
@@ -53,7 +52,6 @@ namespace Dissimilis.DbContext
             BuildGroup(modelBuilder);
             BuildGroupUser(modelBuilder);
             BuildOrganisationUser(modelBuilder);
-            BuildSystemAdmin(modelBuilder);
 
             FixForSqlLite(modelBuilder);
         }
@@ -273,12 +271,6 @@ namespace Dissimilis.DbContext
                 .HasForeignKey(x => x.UserId)
                  .OnDelete(DeleteBehavior.Restrict);
         }
-        static void BuildSystemAdmin(ModelBuilder builder)
-        {
-            var entity = builder.Entity<SystemAdmin>();
-
-        }
-
         #endregion
 
 

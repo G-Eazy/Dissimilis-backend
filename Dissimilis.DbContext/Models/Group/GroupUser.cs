@@ -20,23 +20,23 @@ namespace Dissimilis.DbContext.Models
         /// the key
         /// </summary>
         [Key]
-        public int Id;
+        public int Id { get; set; }
 
         /// <summary>
         /// the Group this user has the given role
         /// </summary>
-        public Group Group;
-        public int? GroupId;
+        public Group Group { get; set; }
+        public int? GroupId { get; set; }
 
         /// <summary>
         /// the user with the given role in the Group
         /// </summary>
-        public User User;
-        public int? UserId;
+        public User User { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         ///predefined roles; admin and instructor
         /// </summary>
-        public Role Role;
+        public Role Role { get; set; }
     }
 }

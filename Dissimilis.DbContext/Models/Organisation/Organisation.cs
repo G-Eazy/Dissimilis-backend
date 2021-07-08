@@ -36,12 +36,12 @@ namespace Dissimilis.DbContext.Models
         public ICollection<Group> Groups { get; set; } = new List<Group>();
 
 
-        public User CreatedBy { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int? CreatedById { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTimeOffset? CreatedOn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public User UpdatedBy { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int? UpdatedById { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTimeOffset? UpdatedOn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public User CreatedBy { get; set; }
+        public int? CreatedById { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; }
+        public User UpdatedBy { get; set; }
+        public int? UpdatedById { get; set; }
+        public DateTimeOffset? UpdatedOn { get; set; }
 
         /// <summary>
         /// Empty constructor 

@@ -22,6 +22,10 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(200)]
         public string MsId { get; set; }
 
+        /// <summary>
+        /// Boolean value to check if the user is systemAdmin, 
+        /// </summary>
+        public bool isSystemAdmin { get; set;}
 
         /// <summary>
         /// Email address of user
