@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    [Migration("20210708063741_addRolesFix")]
-    partial class addRolesFix
+    [Migration("20210708115928_RolesMigration")]
+    partial class RolesMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -54,24 +54,16 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("GroupInfo")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("OrganisationId")
+                    b.Property<int>("OrganisationId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SongId")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -80,8 +72,6 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasIndex("OrganisationId");
 
                     b.HasIndex("SongId");
-
-                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Groups");
                 });
@@ -93,13 +83,13 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("GroupId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -117,6 +107,9 @@ namespace Dissimilis.DbContext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<int?>("DefinedInstrument")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -144,9 +137,6 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("MsId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -154,12 +144,6 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Property<int?>("SongId")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedOn")
-                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -169,8 +153,6 @@ namespace Dissimilis.DbContext.Migrations
                         .IsUnique();
 
                     b.HasIndex("SongId");
-
-                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Organisations");
                 });
@@ -182,13 +164,13 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("OrganisationId")
+                    b.Property<int>("OrganisationId")
                         .HasColumnType("int");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -384,6 +366,9 @@ namespace Dissimilis.DbContext.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("IsSystemAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MsId")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -395,9 +380,6 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Property<int?>("SongId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isSystemAdmin")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -425,22 +407,16 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
                         .WithMany("Groups")
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.Song.Song", null)
                         .WithMany("SharedGroups")
                         .HasForeignKey("SongId");
 
-                    b.HasOne("Dissimilis.DbContext.Models.User", "UpdatedBy")
-                        .WithMany("GroupsUpdated")
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Organisation");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.GroupUser", b =>
@@ -448,12 +424,14 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Group", "Group")
                         .WithMany("Users")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "User")
                         .WithMany("Groups")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -471,14 +449,7 @@ namespace Dissimilis.DbContext.Migrations
                         .WithMany("SharedOrganisations")
                         .HasForeignKey("SongId");
 
-                    b.HasOne("Dissimilis.DbContext.Models.User", "UpdatedBy")
-                        .WithMany("OrganisationsUpdated")
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.OrganisationUser", b =>
@@ -486,12 +457,14 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
                         .WithMany("Users")
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "User")
                         .WithMany("Organisations")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Organisation");
 
@@ -639,13 +612,9 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Navigation("GroupsCreated");
 
-                    b.Navigation("GroupsUpdated");
-
                     b.Navigation("Organisations");
 
                     b.Navigation("OrganisationsCreated");
-
-                    b.Navigation("OrganisationsUpdated");
 
                     b.Navigation("SongsArranged");
 
