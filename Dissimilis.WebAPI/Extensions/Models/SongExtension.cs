@@ -297,6 +297,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// This method should be called before any action that updates a song, except when the song itself is created.
         /// </summary>
         /// <param name="song"></param>
+        /// <param name="oldSong"></param>
         /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
@@ -318,20 +319,22 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 song.PopSnapshot();
             }
             song.Snapshots.Add(snapshot);
+            Console.WriteLine($"Snapshot object: {snapshot}");
         }
 
         public static SongSnapshot PopSnapshot(this Song song)
         {
             SongSnapshot result = null;
-            Console.WriteLine(song.Snapshots.Count);
+            Console.WriteLine($"Song currently has this many snapshots: {song.Snapshots.Count}");
             if (song.Snapshots.Count > 0)
             {
                 var orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
-                Console.WriteLine(orderedSnapshots.Length);
+                Console.WriteLine($"Length of ordered snapshots: {orderedSnapshots.Length}");
                 result = orderedSnapshots[0];
 
                 song.Snapshots.Remove(result);
             }
+            Console.WriteLine($"Popped snapshot: {result}");
             return result;
         }
     }

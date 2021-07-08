@@ -41,7 +41,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task UpdateAsync(Song song, User user, CancellationToken cancellationToken)
         {
-            song.PerformSnapshot(user);
+            Song oldSong = (Song)context.Entry(song).OriginalValues.ToObject();
+            song.PerformSnapshot(oldSong, user);
             await context.SaveChangesAsync(cancellationToken);
         }
 

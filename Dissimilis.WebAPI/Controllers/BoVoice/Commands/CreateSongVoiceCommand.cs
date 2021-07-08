@@ -56,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;
-
+            Console.WriteLine($"SongId for voice: {song.Id}");
             var songVoice = new SongVoice()
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,

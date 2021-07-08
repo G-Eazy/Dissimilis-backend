@@ -37,6 +37,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(UpdateSongVoiceCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
+
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
 
             if (songVoice == null)

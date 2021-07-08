@@ -21,7 +21,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         {
             BarId = songBar.Id;
             SongVoiceId = songBar.SongVoiceId;
-            Console.WriteLine(songBar.SongVoice.Song);
             SongId = songBar.SongVoice.SongId;
 
             Position = songBar.Position;

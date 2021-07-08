@@ -77,7 +77,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task UpdateAsync(Song song, User user, CancellationToken cancellationToken)
         {
             Console.WriteLine($"UpdateAsync with objects used:\n{song}\n{user}");
-            song.PerformSnapshot(user);
+            Song oldSong = (Song)Context.Entry(song).OriginalValues.ToObject();
+            song.PerformSnapshot(oldSong, user);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
