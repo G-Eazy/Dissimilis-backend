@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -20,6 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         {
             BarId = songBar.Id;
             SongVoiceId = songBar.SongVoiceId;
+            Console.WriteLine(songBar.SongVoice.Song);
             SongId = songBar.SongVoice.SongId;
 
             Position = songBar.Position;

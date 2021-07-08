@@ -24,6 +24,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             VoiceName = songVoice.VoiceName ?? songVoice.Instrument?.Name;
             IsMain = songVoice.IsMainVoice;
             Instrument = songVoice.Instrument?.Name;
+            foreach(var bar in songVoice.SongBars)
+            {
+                Console.WriteLine(bar.SongVoice);
+            }
             Bars = songVoice.SongBars
                 .OrderBy(b => b.Position)
                 .Select(b => new BarDto(b))

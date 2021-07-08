@@ -305,7 +305,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Title = s.Title,
                 Voices = s.Voices
             });
-            Console.WriteLine(JSONsnapshot);
+            Console.WriteLine($"Snapshot:\n{JSONsnapshot}");
             SongSnapshot snapshot = new SongSnapshot()
             {
                 SongId = s.SongId,
@@ -313,22 +313,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 CreatedOn = DateTimeOffset.Now,
                 SongObjectJSON = JSONsnapshot
             };
-
             if(song.Snapshots.Count > 5)
             {
                 song.PopSnapshot();
             }
-
             song.Snapshots.Add(snapshot);
         }
 
         public static SongSnapshot PopSnapshot(this Song song)
         {
             SongSnapshot result = null;
-
-            if(song.Snapshots.Count > 0)
+            Console.WriteLine(song.Snapshots.Count);
+            if (song.Snapshots.Count > 0)
             {
                 var orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
+                Console.WriteLine(orderedSnapshots.Length);
                 result = orderedSnapshots[0];
 
                 song.Snapshots.Remove(result);

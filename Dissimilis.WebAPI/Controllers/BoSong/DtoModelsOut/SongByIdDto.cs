@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             UpdatedOn = song.UpdatedOn;
             Numerator = song.Numerator;
             Denominator = song.Denominator;
-
+            Console.WriteLine($"Songvoices:\n{song.Voices.ToString()}");
             Voices = song.Voices
                 .Select(p => new SongVoiceDto(p))
                 .OrderBy(p => p.PartNumber)
