@@ -33,14 +33,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval
     public class AddComponentIntervalNoteHandler : IRequestHandler<AddComponentIntervalNoteCommand, UpdatedCommandDto>
     {
         private readonly Repository _repository;
+        private readonly IAuthService _IAuthUserService;
 
-        public AddComponentIntervalNoteHandler(Repository repository)
+        public AddComponentIntervalNoteHandler(Repository repository, IAuthService authService)
         {
             _repository = repository;
+            _IAuthUserService = authService;
         }
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthUserService.GetVerifiedCurrentUser());
+
             var songVoice = song.Voices.FirstOrDefault(voice => voice.Id == request.SongVoiceId);
             if (songVoice == null)
             {
@@ -62,7 +66,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval
             songNote.AddComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(song, null, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

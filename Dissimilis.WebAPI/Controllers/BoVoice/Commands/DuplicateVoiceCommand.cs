@@ -42,13 +42,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(DuplicateVoiceCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var user = _IAuthService.GetVerifiedCurrentUser();
+
+            song.PerformSnapshot(user);
+
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-
-            var user = _IAuthService.GetVerifiedCurrentUser();
 
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             if (string.IsNullOrEmpty(request.Command.VoiceName))

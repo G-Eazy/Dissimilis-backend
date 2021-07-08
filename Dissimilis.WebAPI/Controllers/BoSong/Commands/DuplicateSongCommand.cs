@@ -5,7 +5,6 @@ using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -36,8 +35,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var duplicateFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _authService.GetVerifiedCurrentUser();
-            song.PerformSnapshot(currentUser);
-
 
             var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
 

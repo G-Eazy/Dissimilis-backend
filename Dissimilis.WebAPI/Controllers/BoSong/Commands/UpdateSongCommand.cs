@@ -5,6 +5,8 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Dissimilis.WebAPI.Extensions.Models;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -35,6 +37,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
+
             if (!String.IsNullOrEmpty(request.Command.Title))
             {
             song.Title = request.Command.Title;

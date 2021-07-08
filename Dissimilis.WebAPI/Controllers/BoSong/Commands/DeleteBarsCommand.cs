@@ -42,10 +42,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
             await using var transaction = await _repository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             var song = await _repository.GetFullSongById(request.SongId, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+
+            song.PerformSnapshot(currentUser);
+
 
             song.DeleteBars(request.Command.FromPosition, request.Command.DeleteLength);
 
-            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             song.SetUpdatedOverAll(currentUser.Id);
 
             await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);

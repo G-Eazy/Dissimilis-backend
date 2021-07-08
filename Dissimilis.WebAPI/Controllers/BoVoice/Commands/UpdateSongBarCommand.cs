@@ -44,6 +44,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
+
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (voice == null)

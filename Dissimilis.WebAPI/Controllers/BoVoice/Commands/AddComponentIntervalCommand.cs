@@ -39,20 +39,21 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var user = _authService.GetVerifiedCurrentUser();
+            song.PerformSnapshot(user);
+
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            var user = _authService.GetVerifiedCurrentUser();
-
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             songVoice.AddComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(song, user, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

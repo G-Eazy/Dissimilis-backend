@@ -5,14 +5,9 @@ using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System;
-using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
-using Dissimilis.WebAPI.Extensions.Models;
-using System;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -47,6 +42,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SongBars
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongSnapshots
+                .Include(s => s.Song)
+                .Where(s => s.SongId == songId)
                 .LoadAsync(cancellationToken);
 
             return song;
@@ -85,9 +85,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task UpdateAsync(Song song, User user, CancellationToken cancellationToken)
         {
-            Console.WriteLine($"UpdateAsync with objects used:\n{song}\n{user}");
+            /*Console.WriteLine($"UpdateAsync with objects used:\n{song}\n{user}");
             Song oldSong = (Song)Context.Entry(song).OriginalValues.ToObject();
-            song.PerformSnapshot(oldSong, user);
+            song.PerformSnapshot(oldSong, user);*/
             await Context.SaveChangesAsync(cancellationToken);
         }
 

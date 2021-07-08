@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
@@ -35,6 +36,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            song.PerformSnapshot(currentUser);
+
 
             var voice = song.Voices.FirstOrDefault(sv => sv.Id == request.SongVoiceId);
             if (voice == null)
@@ -43,7 +47,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             }
 
             song.Voices.Remove(voice);
-            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             song.SetUpdated(currentUser.Id);
 
             await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);

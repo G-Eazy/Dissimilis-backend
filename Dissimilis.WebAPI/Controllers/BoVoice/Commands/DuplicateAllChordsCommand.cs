@@ -39,6 +39,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(DuplicateAllChordsCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var user = _authService.GetVerifiedCurrentUser();
+            song.PerformSnapshot(user);
+
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)
             {
@@ -50,14 +53,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Source voice with id {request.Command.SourceVoiceId} not found");
             }
 
-            var user = _authService.GetVerifiedCurrentUser();
-
             await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             songVoice.DuplicateAllChords(sourceVoice, request.Command.IncludeComponentIntervals);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _repository.UpdateAsync(null,null,cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch
