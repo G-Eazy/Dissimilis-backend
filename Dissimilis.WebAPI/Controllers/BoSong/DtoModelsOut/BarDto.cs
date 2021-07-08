@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Models;
 
@@ -29,6 +30,20 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
                 .OrderBy(n => n.Position)
                 .Select(n => new NoteDto(n))
                 .ToArray();
+        }
+
+        public SongBar ConvertToSongBar(this BarDto barDto)
+        {
+            return new SongBar()
+            {
+                Id = barDto.BarId,
+                Position = barDto.Position,
+                RepBefore = barDto.RepBefore,
+                RepAfter = barDto.RepAfter,
+                House = barDto.House,
+                SongVoiceId = barDto.SongVoiceId,
+                Notes = new List<SongNote>()
+            };
         }
     }
 }

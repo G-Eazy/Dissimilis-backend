@@ -26,5 +26,22 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             Notes = songNote.GetNoteValues();
             ChordName = songNote.ChordName;
         }
+
+        public SongNote ConvertToSongNote(this NoteDto note, SongBar bar, int barId)
+        {
+            if (note.ChordId != null)
+                return new SongNote()
+                {
+                    Id = (int)note.ChordId,
+                    Position = note.Position,
+                    ChordName = note.ChordName,
+                    Length = note.Length,
+                    NoteValues = string.Concat(note.Notes),
+                    SongBar = bar,
+                    BarId = barId
+                };
+            else
+                return null;
+        }
     }
 }

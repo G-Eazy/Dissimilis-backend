@@ -16,7 +16,7 @@ namespace Dissimilis.DbContext.Models.Song
             "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z"
             //"G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
-
+        
         /// <summary>
         /// The id of this Note
         /// </summary>

@@ -14,7 +14,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         [Key]
         public int Id { get; set; }
-
+        
 
         /// <summary>
         /// Priority of the bar in a spesific part

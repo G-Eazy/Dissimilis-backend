@@ -64,7 +64,5 @@ namespace Dissimilis.DbContext.Models.Song
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
 
         public ICollection<SongSnapshot> Snapshots { get; set; } = new List<SongSnapshot>();
-
-        
     }
 }

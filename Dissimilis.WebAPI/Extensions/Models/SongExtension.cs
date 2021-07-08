@@ -6,6 +6,7 @@ using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using System;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using System.Collections.Generic;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -257,15 +258,38 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
+        private static Song _DeserializeSnapshot(this Song song, SongSnapshot snapshot)
+        {
+            SongSnapshotDto snapshotSong = (SongSnapshotDto)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+            List<SongVoice> voices = new List<SongVoice>();
+
+            foreach(var voice in snapshotSong.SongVoices)
+            {
+                var v = new SongVoice()
+                {
+                    Id = voice.SongVoiceId,
+                    VoiceName = voice.VoiceName,
+                    VoiceNumber = voice.PartNumber,
+                    IsMainVoice = voice.IsMain,
+                    UpdatedBy = snapshot.CreatedBy,
+                    UpdatedById = snapshot.CreatedById,
+                    UpdatedOn = DateTimeOffset.Now,
+                    Song = snapshot.Song,
+                    SongId = snapshot.SongId
+                };
+            }
+
+        }
+
         public static void Undo(this Song song)
         {
             SongSnapshot snapshot = song.PopSnapshot();
-            var snapshotSong = Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+            SongSnapshotDto snapshotSong = (SongSnapshotDto)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             
-            song.Title = snapshotSong.Title;
+            song.Title = snapshotSong.SongTitle;
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-            song.Voices = snapshotSong.Voices;
+            song.Voices = snapshotSong.SongVoices;
         }
 
         /// <summary>
