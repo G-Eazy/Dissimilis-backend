@@ -57,6 +57,7 @@ namespace Dissimilis.DbContext.Models
         {
             Name = name;
             Users.Add(adminUser);
+            
         }
     }
 }
