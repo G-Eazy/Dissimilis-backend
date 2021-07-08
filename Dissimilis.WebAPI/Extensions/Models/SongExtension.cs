@@ -263,11 +263,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
-        private static List<SongVoice> _GetVoicesFromSnapshot(Song song, SongSnapshot snapshot)
+        /*private static List<SongVoice> _GetVoicesFromDeserialisedSong(Song song, JObject deserialisedObj)
         {
-            JObject deserialisedObj = Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(snapshot.SongObjectJSON);
-            Console.WriteLine($"Deserialised obj title: {deserialisedObj["Title"]}.ToString()");
-            SongSnapshotDto songSnapshot = new SongSnapshotDto()
+            /*SongSnapshotDto songSnapshot = new SongSnapshotDto()
             {
                 SongTitle = deserialisedObj["Title"].Value<string>(),
                 SongVoices = deserialisedObj["Voices"].Value<SongVoiceDto[]>()
@@ -289,20 +287,62 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     }
                 }
             }
+            List<SongVoice> voices = new List<SongVoice>();
+            SongVoiceDto[] voiceDtos = deserialisedObj["Voices"].Value<SongVoiceDto[]>();
+            User createdBy = deserialisedObj[""]
+
+            foreach (SongVoiceDto voiceDto in voiceDtos)
+            {
+                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, deserialisedObj.CreatedBy, snapshot.CreatedById, song);
+                voices.Add(voice);
+                foreach (BarDto barDto in voiceDto.Bars)
+                {
+                    SongBar bar = BarDto.ConvertToSongBar(barDto);
+                    voice.SongBars.Add(bar);
+                    foreach (NoteDto noteDto in barDto.Chords)
+                    {
+                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
+                        bar.Notes.Add(note);
+                    }
+                }
+            }
             return voices;
 
-        }
+        }*/
 
         public static void Undo(this Song song)
         {
             Console.WriteLine(song.Snapshots.Count);
             SongSnapshot snapshot = song.PopSnapshot();
-            SongSnapshotDto snapshotSong = (SongSnapshotDto)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
-            
-            song.Title = snapshotSong.SongTitle;
+            JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+
+            song.Title = deserialisedSong["Title"].Value<string>();
+            Console.WriteLine(deserialisedSong["Title"].Value<string>());
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-            song.Voices = _GetVoicesFromSnapshot(song, snapshot);
+
+            // Constructing voices from deserialised json
+            List<SongVoice> voices = new List<SongVoice>();
+            Console.WriteLine(deserialisedSong["Voices"]);
+            List<SongVoiceDto> voiceDtos = deserialisedSong["Voices"].Value<JArray>().Values<List<SongVoiceDto>>();
+            User createdBy = song.CreatedBy;
+
+            foreach (SongVoiceDto voiceDto in voiceDtos)
+            {
+                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, createdBy, snapshot.CreatedById, song);
+                voices.Add(voice);
+                foreach (BarDto barDto in voiceDto.Bars)
+                {
+                    SongBar bar = BarDto.ConvertToSongBar(barDto);
+                    voice.SongBars.Add(bar);
+                    foreach (NoteDto noteDto in barDto.Chords)
+                    {
+                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
+                        bar.Notes.Add(note);
+                    }
+                }
+            }
+            song.Voices = voices;
         }
 
         /// <summary>
