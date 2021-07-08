@@ -13,7 +13,7 @@ namespace Dissimilis.DbContext.Models.Song
         internal static string[] _possibleNoteValues = new string[]
         {
             // Notes ordered from low to high pitch
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z"
+            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H", "Z", "X"
             //"G", "E", "C", "D#", "A#", "H", "A", "D", "F", "F#", "G#", "C#", "Z"
         };
         
@@ -54,7 +54,6 @@ namespace Dissimilis.DbContext.Models.Song
         public SongBar SongBar { get; set; }
         public int BarId { get; set; }
 
-
         public string[] GetNoteValues()
         {
             return GetValidatedNoteValues(NoteValues.Split('|')).ToArray();
@@ -87,7 +86,6 @@ namespace Dissimilis.DbContext.Models.Song
         {
             var result = input
                 .Select(v => v.ToUpper().Trim())
-                .Distinct()
                 .Where(v => _possibleNoteValues.Contains(v))
                 .ToArray();
 
@@ -101,13 +99,13 @@ namespace Dissimilis.DbContext.Models.Song
                 .ToArray();
         }
 
-        public SongNote Clone()
+        public SongNote Clone(bool includeComponentIntervals = true)
         {
             return new SongNote()
             {
                 Length = Length,
                 Position = Position,
-                NoteValues = NoteValues,
+                NoteValues = includeComponentIntervals ? NoteValues : String.Join("|", Enumerable.Repeat("X", this.GetNoteValues().Length)),
                 ChordName = ChordName
             };
         }
@@ -116,6 +114,8 @@ namespace Dissimilis.DbContext.Models.Song
         {
             var transposedNoteValues = new List<string>();
             var possibleNoteValuesWithoutZ = _possibleNoteValues.Take(_possibleNoteValues.Length - 1).ToArray();
+
+
 
             foreach (var noteValue in GetNoteValues())
             {

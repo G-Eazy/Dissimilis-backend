@@ -8,6 +8,9 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System;
+using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 using Dissimilis.WebAPI.Extensions.Models;
 using System;
 
@@ -26,6 +29,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
@@ -64,6 +70,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
                 .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)

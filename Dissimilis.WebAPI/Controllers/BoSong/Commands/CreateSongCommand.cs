@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 Title = request.Command.Title,
                 Numerator = request.Command.Numerator,
                 Denominator = request.Command.Denominator,
-                ArrangerId = currentUser.Id
+                ArrangerId = currentUser.Id,
             };
 
             song.SetCreated(currentUser.Id);

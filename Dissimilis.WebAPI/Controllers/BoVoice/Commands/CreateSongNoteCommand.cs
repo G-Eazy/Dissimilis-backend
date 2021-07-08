@@ -44,7 +44,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(CreateSongNoteCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            SongNote note = null;
+            SongNote note;
             await using (var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
                 var song = await _repository.GetSongById(request.SongId, cancellationToken);
@@ -63,8 +63,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                     ChordName = request.Command.ChordName
                 };
 
-                note.SetNoteValues(request.Command.Notes);
-
+                if (note.ChordName != null)
+                {
+                    note.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(note.ChordName).ToArray());
+                }
+                else 
+                {
+                    note.SetNoteValues(request.Command.Notes);
+                }
                 songBar.Notes.Add(note);
                 songBar.CheckSongBarValidation();
                 songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);

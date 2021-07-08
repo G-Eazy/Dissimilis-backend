@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models;
@@ -247,6 +248,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
                 ArrangerId = song.ArrangerId,
+                Speed = song.Speed,
+                DegreeOfDifficulty = song.DegreeOfDifficulty,
+                SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
             };
         }

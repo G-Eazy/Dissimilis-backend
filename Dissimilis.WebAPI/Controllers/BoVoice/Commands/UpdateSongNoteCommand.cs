@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
@@ -54,6 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             note.Position = request.Command.Position;
             note.ChordName = request.Command.ChordName;
             note.SetNoteValues(request.Command.Notes);
+
 
             part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 

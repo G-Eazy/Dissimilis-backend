@@ -4,14 +4,16 @@ using Dissimilis.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    partial class DissimilisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210706105428_addEnumInstruments")]
+    partial class addEnumInstruments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,19 +107,10 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("DegreeOfDifficulty")
-                        .HasColumnType("int");
-
                     b.Property<int>("Denominator")
                         .HasColumnType("int");
 
                     b.Property<int>("Numerator")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SongNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Speed")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -201,35 +194,6 @@ namespace Dissimilis.DbContext.Migrations
                         .IsUnique();
 
                     b.ToTable("SongNotes");
-                });
-
-            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("SongId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SongObjectJSON")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("SongId");
-
-                    b.ToTable("SongSnapshots");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
@@ -369,25 +333,6 @@ namespace Dissimilis.DbContext.Migrations
                     b.Navigation("SongBar");
                 });
 
-            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
-                {
-                    b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
-                        .WithMany("Snapshots")
-                        .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Song");
-                });
-
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
@@ -454,8 +399,6 @@ namespace Dissimilis.DbContext.Migrations
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
                 {
-                    b.Navigation("Snapshots");
-
                     b.Navigation("Voices");
                 });
 

@@ -42,7 +42,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
 
             duplicatedSong.SetUpdated(currentUser.Id);
-
             await _repository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);

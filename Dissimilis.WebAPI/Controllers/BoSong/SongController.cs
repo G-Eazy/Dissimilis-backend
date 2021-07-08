@@ -85,6 +85,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get metadata for a song by Id
+        /// </summary>
+        [HttpGet("{songId:int}/metadata")]
+        [ProducesResponseType(typeof(SongMetadataDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetMetadataSongById(int songId)
+        {
+            var result = await _mediator.Send(new QueryMetadataSongById(songId));
+            return Ok(result);
+        }
+
 
         /// <summary>
         /// Update song by id

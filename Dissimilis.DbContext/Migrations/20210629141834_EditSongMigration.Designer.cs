@@ -4,14 +4,16 @@ using Dissimilis.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    partial class DissimilisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210629141834_EditSongMigration")]
+    partial class EditSongMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +47,6 @@ namespace Dissimilis.DbContext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
-
-                    b.Property<int?>("DefinedInstrument")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -203,35 +202,6 @@ namespace Dissimilis.DbContext.Migrations
                     b.ToTable("SongNotes");
                 });
 
-            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("SongId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SongObjectJSON")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("SongId");
-
-                    b.ToTable("SongSnapshots");
-                });
-
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.Property<int>("Id")
@@ -259,9 +229,6 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("VoiceName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VoiceNumber")
                         .HasColumnType("int");
@@ -369,25 +336,6 @@ namespace Dissimilis.DbContext.Migrations
                     b.Navigation("SongBar");
                 });
 
-            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
-                {
-                    b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
-                        .WithMany("Snapshots")
-                        .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Song");
-                });
-
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
@@ -454,8 +402,6 @@ namespace Dissimilis.DbContext.Migrations
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
                 {
-                    b.Navigation("Snapshots");
-
                     b.Navigation("Voices");
                 });
 
