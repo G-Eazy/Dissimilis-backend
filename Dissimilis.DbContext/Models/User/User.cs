@@ -42,7 +42,6 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         public Country Country { get; set; }
         public int? CountryId { get; set; }
-
         /// <summary>
         /// The Organisation object associated with this user
         /// </summary>
