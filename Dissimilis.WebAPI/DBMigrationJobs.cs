@@ -1,5 +1,6 @@
 ﻿using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

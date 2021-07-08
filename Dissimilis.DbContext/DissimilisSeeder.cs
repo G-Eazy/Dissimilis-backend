@@ -8,10 +8,9 @@ namespace Dissimilis.DbContext
     {
         public static void SeedBasicData(DissimilisDbContext context)
         {
-            var user = context.Users.SingleOrDefault(x => x.Name == "AdminUser");
-            if (user is null)
+            if (context.Users.All(x => !x.IsSystemAdmin))
             {
-                context.Users.Add(new User() { Name = "AdminUser", Email = "admin@support.no", isSystemAdmin=true });
+                context.Users.Add(new User() { Name = "AdminUser", Email = "per.christian.kofstad@ciber.no", IsSystemAdmin=true });
             }
 
             context.SaveChanges();
