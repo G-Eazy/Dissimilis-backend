@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    [Migration("20210708115928_RolesMigration")]
+    [Migration("20210708125758_RolesMigration")]
     partial class RolesMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

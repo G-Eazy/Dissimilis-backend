@@ -12,7 +12,7 @@ namespace Dissimilis.DbContext.Models
         /// the key
         /// </summary>
         [Key]
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         /// <summary>
         /// the organisation this user has the given role

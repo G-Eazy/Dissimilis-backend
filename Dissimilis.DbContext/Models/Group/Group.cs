@@ -15,7 +15,7 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         [Key]
         public int Id { get; set; }
-
+         
         /// <summary>
         /// The name of the group
         /// </summary>
@@ -27,6 +27,11 @@ namespace Dissimilis.DbContext.Models
         /// The different users and their roles in the group
         /// </summary>
         public ICollection<GroupUser> Users { get; set; } = new List<GroupUser>();
+
+        /// <summary>
+        /// List of all shared songs in this group
+        /// </summary>
+        public ICollection<SongSharedGroup> SharedSongs { get; set; } = new List<SongSharedGroup>();
 
         /// <summary>
         /// this groups organisation

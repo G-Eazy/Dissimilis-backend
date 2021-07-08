@@ -18,7 +18,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// String containing the InstrumentType
         /// </summary>
-        [MaxLength(250)]
+        [MaxLength(250)] 
         [Required]
         public string Name { get; set; }
 

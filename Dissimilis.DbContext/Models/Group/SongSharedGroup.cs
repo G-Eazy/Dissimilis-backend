@@ -1,12 +1,12 @@
-﻿using Dissimilis.DbContext.Models.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.DbContext.Models
-{ 
+{
     /// <summary>
     /// the mapping between Group and user with the predefined enum role
     /// </summary>
-    public class GroupUser
+    public class SongSharedGroup
     {
         /// <summary>
         /// the key
@@ -23,12 +23,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// the user with the given role in the Group
         /// </summary>
-        public User User { get; set; }
-        public int UserId { get; set; }
-
-        /// <summary>
-        ///predefined roles; admin and instructor
-        /// </summary>
-        public Role Role { get; set; }
+        public Song.Song Song { get; set; }
+        public int SongId { get; set; }
     }
 }

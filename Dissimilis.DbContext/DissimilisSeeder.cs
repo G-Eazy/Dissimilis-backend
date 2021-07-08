@@ -14,8 +14,6 @@ namespace Dissimilis.DbContext
             }
 
             context.SaveChanges();
-
-
         }
     }
 }

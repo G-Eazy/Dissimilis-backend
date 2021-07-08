@@ -104,11 +104,11 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// The groups with read permission on the song
         /// </summary>
-        public ICollection<Group> SharedGroups { get; set; } = new List<Group>();
+        public ICollection<SongSharedGroup> SharedGroups { get; set; } = new List<SongSharedGroup>();
 
         /// <summary>
         /// The organisations with read permission on this song
         /// </summary>
-        public ICollection<Organisation> SharedOrganisations { get; set; } = new List<Organisation>();
+        public ICollection<SongSharedOrganisation> SharedOrganisations { get; set; } = new List<SongSharedOrganisation>();
     }
 }

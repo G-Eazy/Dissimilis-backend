@@ -13,7 +13,7 @@ namespace Dissimilis.DbContext.Models
     {
         /// <summary>
         /// ID of the organisation
-        /// </summary>
+        /// </summary> 
         [Key]
         public int Id { get; set; }
 
@@ -34,6 +34,10 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         public ICollection<Group> Groups { get; set; } = new List<Group>();
 
+        /// <summary>
+        /// List of all shared songs in this organisation
+        /// </summary>
+        public ICollection<SongSharedOrganisation> SharedSongs { get; set; } = new List<SongSharedOrganisation>();
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
