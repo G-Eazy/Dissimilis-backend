@@ -31,7 +31,7 @@ namespace Dissimilis.DbContext.Models
         /// this groups organisation
         /// </summary>
         public Organisation Organisation { get; set; }
-        public int? OrganisationId { get; set; }
+        public int OrganisationId { get; set; }
 
         /// <summary>
         /// The info description of the group
@@ -56,7 +56,7 @@ namespace Dissimilis.DbContext.Models
         /// <param name="name"></param>
         /// <param name="adminUser"></param>
         /// <param name="organisationId"></param>
-        public Group(GroupUser adminUser, int? organisationId, string name)
+        public Group(GroupUser adminUser, int organisationId, string name)
         {
             Name = name;
             Users.Add(adminUser);

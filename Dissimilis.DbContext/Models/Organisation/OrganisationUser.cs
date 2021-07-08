@@ -17,13 +17,13 @@ namespace Dissimilis.DbContext.Models
         /// the organisation this user has the given role
         /// </summary>
         public Organisation Organisation { get; set; }
-        public int? OrganisationId { get; set; }
+        public int OrganisationId { get; set; }
 
         /// <summary>
         /// the user with the given role in the organisation
         /// </summary>
         public User User { get; set; }
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         ///predefined roles; admin and instructor
