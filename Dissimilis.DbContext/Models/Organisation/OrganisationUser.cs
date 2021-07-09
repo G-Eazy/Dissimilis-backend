@@ -9,12 +9,6 @@ namespace Dissimilis.DbContext.Models
     public class OrganisationUser
     {
         /// <summary>
-        /// the key
-        /// </summary>
-        [Key]
-        public int Id { get; set; } 
-
-        /// <summary>
         /// the organisation this user has the given role
         /// </summary>
         public Organisation Organisation { get; set; }

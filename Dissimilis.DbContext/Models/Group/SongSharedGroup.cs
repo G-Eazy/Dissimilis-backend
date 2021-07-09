@@ -8,11 +8,7 @@ namespace Dissimilis.DbContext.Models
     /// </summary>
     public class SongSharedGroup
     {
-        /// <summary>
-        /// the key
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
+ 
 
         /// <summary>
         /// the Group this user has the given role

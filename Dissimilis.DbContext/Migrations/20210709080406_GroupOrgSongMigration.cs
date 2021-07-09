@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Dissimilis.DbContext.Migrations
 {
-    public partial class addRolesFix : Migration
+    public partial class GroupOrgSongMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,21 +12,23 @@ namespace Dissimilis.DbContext.Migrations
                 table: "Users");
 
             migrationBuilder.DropIndex(
+                name: "IX_Users_OrganisationId",
+                table: "Users");
+
+            migrationBuilder.DropIndex(
                 name: "IX_Organisations_Name",
                 table: "Organisations");
 
-            migrationBuilder.RenameColumn(
+            migrationBuilder.DropColumn(
                 name: "OrganisationId",
-                table: "Users",
-                newName: "SongId");
+                table: "Users");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_Users_OrganisationId",
-                table: "Users",
-                newName: "IX_Users_SongId");
+            migrationBuilder.DropColumn(
+                name: "MsId",
+                table: "Organisations");
 
             migrationBuilder.AddColumn<bool>(
-                name: "isSystemAdmin",
+                name: "IsSystemAdmin",
                 table: "Users",
                 type: "bit",
                 nullable: false,
@@ -63,38 +65,16 @@ namespace Dissimilis.DbContext.Migrations
                 type: "datetimeoffset",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "SongId",
-                table: "Organisations",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "UpdatedById",
-                table: "Organisations",
-                type: "int",
-                nullable: true);
-
-            migrationBuilder.AddColumn<DateTimeOffset>(
-                name: "UpdatedOn",
-                table: "Organisations",
-                type: "datetimeoffset",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrganisationId = table.Column<int>(type: "int", nullable: true),
-                    GroupInfo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    OrganisationId = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    UpdatedById = table.Column<int>(type: "int", nullable: true),
-                    UpdatedOn = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedById = table.Column<int>(type: "int", nullable: true),
-                    SongId = table.Column<int>(type: "int", nullable: true)
+                    CreatedById = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -104,22 +84,10 @@ namespace Dissimilis.DbContext.Migrations
                         column: x => x.OrganisationId,
                         principalTable: "Organisations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Groups_Songs_SongId",
-                        column: x => x.SongId,
-                        principalTable: "Songs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Groups_Users_CreatedById",
                         column: x => x.CreatedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Groups_Users_UpdatedById",
-                        column: x => x.UpdatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -129,15 +97,13 @@ namespace Dissimilis.DbContext.Migrations
                 name: "OrganisationUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrganisationId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    OrganisationId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrganisationUsers", x => x.Id);
+                    table.PrimaryKey("PK_OrganisationUsers", x => new { x.UserId, x.OrganisationId });
                     table.ForeignKey(
                         name: "FK_OrganisationUsers_Organisations_OrganisationId",
                         column: x => x.OrganisationId,
@@ -153,18 +119,64 @@ namespace Dissimilis.DbContext.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SongSharedOrganisations",
+                columns: table => new
+                {
+                    OrganisationId = table.Column<int>(type: "int", nullable: false),
+                    SongId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SongSharedOrganisations", x => new { x.OrganisationId, x.SongId });
+                    table.ForeignKey(
+                        name: "FK_SongSharedOrganisations_Organisations_OrganisationId",
+                        column: x => x.OrganisationId,
+                        principalTable: "Organisations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SongSharedOrganisations_Songs_SongId",
+                        column: x => x.SongId,
+                        principalTable: "Songs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SongSharedUser",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    SongId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SongSharedUser", x => new { x.UserId, x.SongId });
+                    table.ForeignKey(
+                        name: "FK_SongSharedUser_Songs_SongId",
+                        column: x => x.SongId,
+                        principalTable: "Songs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SongSharedUser_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GroupUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupUsers", x => x.Id);
+                    table.PrimaryKey("PK_GroupUsers", x => new { x.UserId, x.GroupId });
                     table.ForeignKey(
                         name: "FK_GroupUsers_Groups_GroupId",
                         column: x => x.GroupId,
@@ -175,6 +187,30 @@ namespace Dissimilis.DbContext.Migrations
                         name: "FK_GroupUsers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SongSharedGroups",
+                columns: table => new
+                {
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    SongId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SongSharedGroups", x => new { x.GroupId, x.SongId });
+                    table.ForeignKey(
+                        name: "FK_SongSharedGroups_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SongSharedGroups_Songs_SongId",
+                        column: x => x.SongId,
+                        principalTable: "Songs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -191,16 +227,6 @@ namespace Dissimilis.DbContext.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Organisations_SongId",
-                table: "Organisations",
-                column: "SongId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Organisations_UpdatedById",
-                table: "Organisations",
-                column: "UpdatedById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Groups_CreatedById",
                 table: "Groups",
                 column: "CreatedById");
@@ -211,24 +237,9 @@ namespace Dissimilis.DbContext.Migrations
                 column: "OrganisationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_SongId",
-                table: "Groups",
-                column: "SongId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Groups_UpdatedById",
-                table: "Groups",
-                column: "UpdatedById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_GroupUsers_GroupId",
                 table: "GroupUsers",
                 column: "GroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupUsers_UserId",
-                table: "GroupUsers",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrganisationUsers_OrganisationId",
@@ -236,17 +247,19 @@ namespace Dissimilis.DbContext.Migrations
                 column: "OrganisationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganisationUsers_UserId",
-                table: "OrganisationUsers",
-                column: "UserId");
+                name: "IX_SongSharedGroups_SongId",
+                table: "SongSharedGroups",
+                column: "SongId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Organisations_Songs_SongId",
-                table: "Organisations",
-                column: "SongId",
-                principalTable: "Songs",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            migrationBuilder.CreateIndex(
+                name: "IX_SongSharedOrganisations_SongId",
+                table: "SongSharedOrganisations",
+                column: "SongId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SongSharedUser_SongId",
+                table: "SongSharedUser",
+                column: "SongId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Organisations_Users_CreatedById",
@@ -255,47 +268,28 @@ namespace Dissimilis.DbContext.Migrations
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Organisations_Users_UpdatedById",
-                table: "Organisations",
-                column: "UpdatedById",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Users_Songs_SongId",
-                table: "Users",
-                column: "SongId",
-                principalTable: "Songs",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Organisations_Songs_SongId",
-                table: "Organisations");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Organisations_Users_CreatedById",
                 table: "Organisations");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Organisations_Users_UpdatedById",
-                table: "Organisations");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Users_Songs_SongId",
-                table: "Users");
 
             migrationBuilder.DropTable(
                 name: "GroupUsers");
 
             migrationBuilder.DropTable(
                 name: "OrganisationUsers");
+
+            migrationBuilder.DropTable(
+                name: "SongSharedGroups");
+
+            migrationBuilder.DropTable(
+                name: "SongSharedOrganisations");
+
+            migrationBuilder.DropTable(
+                name: "SongSharedUser");
 
             migrationBuilder.DropTable(
                 name: "Groups");
@@ -308,16 +302,8 @@ namespace Dissimilis.DbContext.Migrations
                 name: "IX_Organisations_Name",
                 table: "Organisations");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Organisations_SongId",
-                table: "Organisations");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Organisations_UpdatedById",
-                table: "Organisations");
-
             migrationBuilder.DropColumn(
-                name: "isSystemAdmin",
+                name: "IsSystemAdmin",
                 table: "Users");
 
             migrationBuilder.DropColumn(
@@ -332,27 +318,11 @@ namespace Dissimilis.DbContext.Migrations
                 name: "CreatedOn",
                 table: "Organisations");
 
-            migrationBuilder.DropColumn(
-                name: "SongId",
-                table: "Organisations");
-
-            migrationBuilder.DropColumn(
-                name: "UpdatedById",
-                table: "Organisations");
-
-            migrationBuilder.DropColumn(
-                name: "UpdatedOn",
-                table: "Organisations");
-
-            migrationBuilder.RenameColumn(
-                name: "SongId",
+            migrationBuilder.AddColumn<int>(
+                name: "OrganisationId",
                 table: "Users",
-                newName: "OrganisationId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Users_SongId",
-                table: "Users",
-                newName: "IX_Users_OrganisationId");
+                type: "int",
+                nullable: true);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -363,6 +333,17 @@ namespace Dissimilis.DbContext.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(100)",
                 oldMaxLength: 100);
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "MsId",
+                table: "Organisations",
+                type: "uniqueidentifier",
+                nullable: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_OrganisationId",
+                table: "Users",
+                column: "OrganisationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Organisations_Name",

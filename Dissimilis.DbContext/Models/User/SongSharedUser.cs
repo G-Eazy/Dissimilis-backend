@@ -9,12 +9,6 @@ namespace Dissimilis.DbContext.Models
     public class SongSharedUser
     {
         /// <summary>
-        /// the key
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary>
         /// the User with writing permissions on this song 
         /// </summary>
         public User User { get; set; }

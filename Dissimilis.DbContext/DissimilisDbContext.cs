@@ -245,6 +245,8 @@ namespace Dissimilis.DbContext
         static void BuildGroupUser(ModelBuilder builder)
         {
             var entity = builder.Entity<GroupUser>();
+            entity.HasKey(x => new { x.UserId, x.GroupId });
+
 
             entity.HasOne(x => x.Group)
                 .WithMany(x => x.Users)
@@ -259,6 +261,8 @@ namespace Dissimilis.DbContext
         static void BuildOrganisationUser(ModelBuilder builder)
         {
             var entity = builder.Entity<OrganisationUser>();
+            entity.HasKey(x => new { x.UserId, x.OrganisationId });
+
 
             entity.HasOne(x => x.Organisation)
                 .WithMany(x => x.Users)
@@ -273,6 +277,8 @@ namespace Dissimilis.DbContext
         static void BuildSongSharedGroup(ModelBuilder builder)
         {
             var entity = builder.Entity<SongSharedGroup>();
+            entity.HasKey(x => new { x.GroupId, x.SongId });
+
 
             entity.HasOne(x => x.Group)
                 .WithMany(x => x.SharedSongs)
@@ -287,6 +293,8 @@ namespace Dissimilis.DbContext
         static void BuildSongSharedOrganisation(ModelBuilder builder)
         {
             var entity = builder.Entity<SongSharedOrganisation>();
+            entity.HasKey(x => new { x.OrganisationId, x.SongId });
+
 
             entity.HasOne(x => x.Organisation)
                 .WithMany(x => x.SharedSongs)
@@ -301,6 +309,7 @@ namespace Dissimilis.DbContext
         static void BuildSongSharedUser(ModelBuilder builder)
         {
             var entity = builder.Entity<SongSharedUser>();
+            entity.HasKey(x => new { x.UserId, x.SongId });
 
             entity.HasOne(x => x.User)
                 .WithMany(x => x.SongsShared)

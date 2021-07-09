@@ -9,12 +9,6 @@ namespace Dissimilis.DbContext.Models
     public class GroupUser
     {
         /// <summary>
-        /// the key
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary>
         /// the Group this user has the given role
         /// </summary>
         public Group Group { get; set; }
