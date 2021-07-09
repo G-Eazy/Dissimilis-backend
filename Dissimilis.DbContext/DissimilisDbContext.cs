@@ -29,6 +29,7 @@ namespace Dissimilis.DbContext
         public DbSet<OrganisationUser> OrganisationUsers { get; set; }
         public DbSet<SongSharedGroup> SongSharedGroups { get; set; }
         public DbSet<SongSharedOrganisation> SongSharedOrganisations { get; set; }
+        public DbSet<SongSharedUser> SongSharedUser { get; set; }
 
 
 
@@ -57,6 +58,7 @@ namespace Dissimilis.DbContext
             BuildOrganisationUser(modelBuilder);
             BuildSongSharedGroup(modelBuilder);
             BuildSongSharedOrganisation(modelBuilder);
+            BuildSongSharedUser(modelBuilder);
 
             FixForSqlLite(modelBuilder);
         }
@@ -232,7 +234,7 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.Organisation)
                 .WithMany(x => x.Groups)
                 .HasForeignKey(x => x.OrganisationId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.CreatedBy)
                 .WithMany(x => x.GroupsCreated)
@@ -293,6 +295,20 @@ namespace Dissimilis.DbContext
 
             entity.HasOne(x => x.Song)
                 .WithMany(x => x.SharedOrganisations)
+                .HasForeignKey(x => x.SongId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildSongSharedUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SongSharedUser>();
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.SongsShared)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Song)
+                .WithMany(x => x.SharedUsers)
                 .HasForeignKey(x => x.SongId)
                  .OnDelete(DeleteBehavior.Restrict);
         }

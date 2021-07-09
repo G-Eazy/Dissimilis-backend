@@ -99,7 +99,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// the users with write permission on the song
         /// </summary>
-        public ICollection<User> SharedUsers { get; set; } = new List<User>();
+        public ICollection<SongSharedUser> SharedUsers { get; set; } = new List<SongSharedUser>();
 
         /// <summary>
         /// The groups with read permission on the song

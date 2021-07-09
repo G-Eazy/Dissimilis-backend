@@ -68,6 +68,10 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         public ICollection<OrganisationUser> Organisations { get; set; } = new List<OrganisationUser>();
 
+        /// <summary>
+        /// the different Organisations this user is in with the corresponding role
+        /// </summary>
+        public ICollection<SongSharedUser> SongsShared { get; set; } = new List<SongSharedUser>();
 
         /// <summary>
         /// Empty constructor for User
