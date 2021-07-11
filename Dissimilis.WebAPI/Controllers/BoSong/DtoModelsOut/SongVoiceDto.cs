@@ -2,6 +2,7 @@
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
@@ -26,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             Instrument = songVoice.Instrument?.Name;
             foreach(var bar in songVoice.SongBars)
             {
-                Console.WriteLine(bar.SongVoice);
+                Console.WriteLine($"Constructing barDtos: {bar}");
             }
             Bars = songVoice.SongBars
                 .OrderBy(b => b.Position)
@@ -35,7 +36,23 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         }
 
-        public static SongVoice ConvertToSongVoice( SongVoiceDto voiceDto, DateTimeOffset updatedOn, User updatedBy, int updatedById, Song song)
+        public SongVoiceDto () { }
+
+        public static SongVoiceDto JsonToSongVoiceDto(JToken json)
+        {
+            return new SongVoiceDto()
+            {
+                SongVoiceId = json["SongVoiceId"].Value<int>(),
+                SongId = json["SongId"].Value<int>(),
+                PartNumber = json["PartNumber"].Value<int>(),
+                VoiceName = json["VoiceName"].Value<string>(),
+                IsMain = json["IsMain"].Value<bool>(),
+                Instrument = json["Instrument"].Value<string>(),
+                Bars = null,
+            };
+        }
+
+        public static SongVoice ConvertToSongVoice( SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById)
         {
             return new SongVoice()
             {
@@ -43,11 +60,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
                 VoiceName = voiceDto.VoiceName,
                 VoiceNumber = voiceDto.PartNumber,
                 IsMainVoice = voiceDto.IsMain,
-                UpdatedBy = updatedBy,
                 UpdatedById = updatedById,
                 UpdatedOn = updatedOn,
-                Song = song,
-                SongId = song.Id
+                SongId = voiceDto.SongId
             };
         }
     }

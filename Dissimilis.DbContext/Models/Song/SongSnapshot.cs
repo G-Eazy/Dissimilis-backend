@@ -11,7 +11,6 @@ namespace Dissimilis.DbContext.Models.Song
         [Required]
         public int SongId { get; set; }
 
-        [Required]
         public Song Song { get; set; }
 
         [Required]

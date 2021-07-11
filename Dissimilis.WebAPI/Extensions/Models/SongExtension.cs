@@ -313,34 +313,52 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static void Undo(this Song song)
         {
             Console.WriteLine(song.Snapshots.Count);
-            SongSnapshot snapshot = song.PopSnapshot();
+            SongSnapshot snapshot = song.PopSnapshot(true);
             JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
 
             song.Title = deserialisedSong["Title"].Value<string>();
-            Console.WriteLine(deserialisedSong["Title"].Value<string>());
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-
+            
             // Constructing voices from deserialised json
             List<SongVoice> voices = new List<SongVoice>();
-            Console.WriteLine(deserialisedSong["Voices"]);
-            List<SongVoiceDto> voiceDtos = deserialisedSong["Voices"].Value<JArray>().Values<List<SongVoiceDto>>();
+            Console.WriteLine(snapshot.SongObjectJSON);
+            JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();
             User createdBy = song.CreatedBy;
 
-            foreach (SongVoiceDto voiceDto in voiceDtos)
+            foreach (var voiceJSON in voiceJSONs)
             {
-                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, createdBy, snapshot.CreatedById, song);
-                voices.Add(voice);
-                foreach (BarDto barDto in voiceDto.Bars)
+                SongVoiceDto voiceDto = SongVoiceDto.JsonToSongVoiceDto(voiceJSON);
+                SongVoice voice = song.Voices.FirstOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
+                if(voice == null)
+                    voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById);
+
+                List<SongBar> newBars = new List<SongBar>();
+                foreach (var barJSON in voiceJSON["Bars"])
                 {
-                    SongBar bar = BarDto.ConvertToSongBar(barDto);
-                    voice.SongBars.Add(bar);
-                    foreach (NoteDto noteDto in barDto.Chords)
+                    BarDto barDto = BarDto.JsonToBarDto(barJSON);
+                    SongBar bar = voice.SongBars.FirstOrDefault(b => b.Position == barDto.Position);
+                    if(bar == null)
+                        bar = BarDto.ConvertToSongBar(barDto);
+
+                    foreach (var noteJSON in barJSON["Chords"])
                     {
-                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
-                        bar.Notes.Add(note);
+                        NoteDto noteDto = NoteDto.JsonToNoteDto(noteJSON);
+                        SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
+                        if(note == null)
+                            note = NoteDto.ConvertToSongNote(noteDto, bar);
+
+                        string[] noteValues = SongNote.GetValidatedNoteValues(noteDto.Notes, false);
+                        if (noteValues.Length > 0)
+                        {
+                            note.SetNoteValues(noteValues);
+                            bar.Notes.Add(note);
+                        }
                     }
+                    newBars.Add(bar);
                 }
+                voice.SongBars = newBars;
+                voices.Add(voice);
             }
             song.Voices = voices;
         }
@@ -368,19 +386,23 @@ namespace Dissimilis.WebAPI.Extensions.Models
             };
             if(song.Snapshots.Count > 5)
             {
-                song.PopSnapshot();
+                song.PopSnapshot(false);
             }
             song.Snapshots.Add(snapshot);
             Console.WriteLine($"Snapshot object: {snapshot}");
         }
 
-        public static SongSnapshot PopSnapshot(this Song song)
+        public static SongSnapshot PopSnapshot(this Song song, bool descendingOrder)
         {
             SongSnapshot result = null;
             Console.WriteLine($"Song currently has this many snapshots: {song.Snapshots.Count}");
+            SongSnapshot[] orderedSnapshots;
             if (song.Snapshots.Count > 0)
             {
-                var orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
+                if(descendingOrder)
+                    orderedSnapshots = song.Snapshots.OrderByDescending(s => s.CreatedOn).ToArray();
+                else
+                    orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
                 Console.WriteLine($"Length of ordered snapshots: {orderedSnapshots.Length}");
                 result = orderedSnapshots[0];
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -67,6 +68,11 @@ namespace Dissimilis.DbContext.Models.Song
                 Position = Position,
                 Notes = Notes.Select(n => n.Clone()).ToList()
             };
+        }
+
+        public static string[] GetValidatedNoteValues()
+        {
+            throw new NotImplementedException();
         }
     }
 }

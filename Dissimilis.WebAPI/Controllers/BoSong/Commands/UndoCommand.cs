@@ -47,7 +47,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             } catch(Exception e)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
+                throw new ValidationException(e.Message);
             }
             return new UpdatedSongCommandDto(undoFromSong);
         }
