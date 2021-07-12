@@ -2,14 +2,15 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoBar;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
-using Dissimilis.WebAPI.DTOs;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
     public class UpdateSongNoteCommand : IRequest<UpdatedCommandDto>
     {
@@ -31,36 +32,38 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class UpdateSongNoteCommandHandler : IRequestHandler<UpdateSongNoteCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly NoteRepository _noteRepository;
+        private readonly BarRepository _barRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongNoteCommandHandler(Repository repository, IAuthService IAuthService)
+        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _noteRepository = noteRepository;
+            _barRepository = barRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+            var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
-            if (note == null)
+            var songNote = await _noteRepository.GetSongNoteById(request.SongChordId, cancellationToken);
+
+            if (songNote == null)
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
 
-            note.Length = request.Command.Length;
-            note.Position = request.Command.Position;
-            note.ChordName = request.Command.ChordName;
-            note.SetNoteValues(request.Command.Notes);
+            songNote.Length = request.Command?.Length ?? songNote.Length;
+            songNote.Position = request.Command?.Position ?? songNote.Position;
+            songNote.ChordName = request.Command?.ChordName ?? songNote.ChordName;
+            songNote.SetNoteValues(request.Command.Notes);
 
+            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            await _noteRepository.UpdateAsync(cancellationToken);
 
-            await _repository.UpdateAsync(cancellationToken);
-
-            return null;
+            return new UpdatedCommandDto(songNote);
         }
     }
 }

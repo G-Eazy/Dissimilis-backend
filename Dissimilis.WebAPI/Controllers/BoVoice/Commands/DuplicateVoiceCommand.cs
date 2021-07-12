@@ -30,19 +30,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class DuplicateVoiceCommandHandler : IRequestHandler<DuplicateVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly AuthService _authService;
 
-        public DuplicateVoiceCommandHandler(Repository repository, AuthService authService)
+        public DuplicateVoiceCommandHandler(VoiceRepository voiceRepository, AuthService authService)
         {
-            _repository = repository;
+            _voiceRepository = voiceRepository;
             _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DuplicateVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
-            var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+            var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
@@ -50,18 +49,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             var user = _authService.GetVerifiedCurrentUser();
 
-            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             if (string.IsNullOrEmpty(request.Command.VoiceName))
             {
                 throw new Exception("Voicename can't be a empty string");
             }
 
-            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, song.Voices.Max(v => v.VoiceNumber));
-            song.Voices.Add(duplicatedVoice);
+            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, songVoice.Song.Voices.Max(v => v.VoiceNumber));
+            songVoice.Song.Voices.Add(duplicatedVoice);
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _voiceRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

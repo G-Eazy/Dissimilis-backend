@@ -1,18 +1,39 @@
-﻿using Experis.Ciber.Authentication.Microsoft.APIObjects;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using System;
+using Dissimilis.WebAPI.Exceptions;
+using Experis.Ciber.Authentication.Microsoft.APIObjects;
+using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Repositories
+namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     public class UserRepository
     {
-        private readonly DissimilisDbContext _context;
+
+        private DissimilisDbContext _context;
         public UserRepository(DissimilisDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<User[]> GetAllUsers(CancellationToken cancellationToken)
+        {
+            return await _context.Users
+                .OrderBy(u => u.Name)
+                .ToArrayAsync(cancellationToken);
+        }
+
+        public async Task<User> GetUserById(int userId, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+
+            if (user == null)
+            {
+                throw new NotFoundException($"User with Id {userId} not found");
+            }
+            return user;
         }
 
         public async Task<User> CreateOrFindUserAsync(UserEntityMetadata userMeta)
@@ -88,7 +109,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<User> UpdateUserCountryAsync(User user, Country country)
         {
             user.CountryId = country?.Id;
-            
+
             await this._context.SaveChangesAsync();
             return user;
         }
@@ -102,7 +123,7 @@ namespace Dissimilis.WebAPI.Repositories
         public async Task<User> UpdateUserOrganisationAsync(User user, Organisation organisation)
         {
             user.OrganisationId = organisation?.Id;
-            
+
             await this._context.SaveChangesAsync();
             return user;
         }

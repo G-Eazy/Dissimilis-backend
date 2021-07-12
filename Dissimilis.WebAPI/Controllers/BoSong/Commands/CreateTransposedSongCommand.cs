@@ -1,4 +1,5 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
@@ -22,25 +23,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
     public class CreateTransposedSongCommandHandler : IRequestHandler<CreateTransposedSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
 
-        public CreateTransposedSongCommandHandler(Repository repository, IAuthService authService)
+        public CreateTransposedSongCommandHandler(SongRepository songRepository, IAuthService authService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = authService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(CreateTransposedSongCommand request, CancellationToken cancellationToken)
         {
             // Do we have to get the fullsong to transpose
-            var duplicateFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
+            var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
             var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
             duplicatedSong = duplicatedSong.Transpose(request.Command.Transpose);
 
             duplicatedSong.SetUpdated(_authService.GetVerifiedCurrentUser());
-            await _repository.SaveAsync(duplicatedSong, cancellationToken);
+            await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
         }

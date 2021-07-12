@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
     public class QueryMetadataSongById : IRequest<SongMetadataDto>
     {
@@ -17,9 +17,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class QueryMetadataSongByIdHandler : IRequestHandler<QueryMetadataSongById, SongMetadataDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _repository;
 
-        public QueryMetadataSongByIdHandler(Repository repository)
+        public QueryMetadataSongByIdHandler(SongRepository repository)
         {
             _repository = repository;
         }

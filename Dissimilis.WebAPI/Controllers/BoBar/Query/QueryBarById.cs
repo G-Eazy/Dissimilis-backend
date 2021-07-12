@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoBar.Query
 {
     public class QueryBarById : IRequest<BarDto>
     {
@@ -21,16 +21,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class QuerySongByIdHandler : IRequestHandler<QueryBarById, BarDto>
     {
-        private readonly Repository _repository;
+        private readonly BarRepository _barRepository;
 
-        public QuerySongByIdHandler(Repository repository)
+        public QuerySongByIdHandler(BarRepository barRepository)
         {
-            _repository = repository;
+            _barRepository = barRepository;
         }
 
         public async Task<BarDto> Handle(QueryBarById request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetSongBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
+            var result = await _barRepository.GetSongBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
 
             return new BarDto(result);
         }

@@ -1,10 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -22,24 +23,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class DuplicateSongCommandHandler : IRequestHandler<DuplicateSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
 
-        public DuplicateSongCommandHandler(Repository repository, IAuthService authService)
+        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = authService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(DuplicateSongCommand request, CancellationToken cancellationToken)
         {
-            var duplicateFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
+            var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
             var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
 
             var currentUser = _authService.GetVerifiedCurrentUser();
             duplicatedSong.SetUpdated(currentUser.Id);
-            await _repository.SaveAsync(duplicatedSong, cancellationToken);
+            await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
         }
