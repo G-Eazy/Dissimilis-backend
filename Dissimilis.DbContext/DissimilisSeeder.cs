@@ -14,7 +14,7 @@ namespace Dissimilis.DbContext
 
                 if(adminUser == null)
                 {
-                context.Users.Add(new User() { Name = "AdminUser", Email = "per.christian.kofstad@ciber.no", IsSystemAdmin=true });
+                    context.Users.Add(new User() { Name = "AdminUser", Email = "per.christian.kofstad@ciber.no", IsSystemAdmin=true });
                 }
                 else
                 {
