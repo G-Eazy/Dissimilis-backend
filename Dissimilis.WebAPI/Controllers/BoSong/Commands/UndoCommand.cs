@@ -47,8 +47,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             } catch(Exception e)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException(e.Message);
+                throw new ValidationException(e.StackTrace);
             }
+            Console.WriteLine("Yo");
             return new UpdatedSongCommandDto(undoFromSong);
         }
     }

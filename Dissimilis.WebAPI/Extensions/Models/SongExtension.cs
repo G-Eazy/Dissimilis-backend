@@ -314,12 +314,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             Console.WriteLine(song.Snapshots.Count);
             SongSnapshot snapshot = song.PopSnapshot(true);
+            SongSnapshotDto snapshotDto = Newtonsoft.Json.JsonConvert.DeserializeObject<SongSnapshotDto>(snapshot.SongObjectJSON);
+
             JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
 
             song.Title = deserialisedSong["Title"].Value<string>();
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-            
+
             // Constructing voices from deserialised json
             List<SongVoice> voices = new List<SongVoice>();
             Console.WriteLine(snapshot.SongObjectJSON);
@@ -341,20 +343,31 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     if(bar == null)
                         bar = BarDto.ConvertToSongBar(barDto);
 
+                    List<SongNote> newNotes = new List<SongNote>();
                     foreach (var noteJSON in barJSON["Chords"])
                     {
                         NoteDto noteDto = NoteDto.JsonToNoteDto(noteJSON);
-                        SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
-                        if(note == null)
-                            note = NoteDto.ConvertToSongNote(noteDto, bar);
-
-                        string[] noteValues = SongNote.GetValidatedNoteValues(noteDto.Notes, false);
-                        if (noteValues.Length > 0)
+                        bool emptyNote = noteDto.Notes[0] == "Z";
+                        if (emptyNote)
                         {
-                            note.SetNoteValues(noteValues);
-                            bar.Notes.Add(note);
+                            for(int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
+                            {
+                                var noteToBeRemoved = bar.Notes.FirstOrDefault(n => n.Position == i);
+                                bar.Notes.Remove(noteToBeRemoved);
+                            }
                         }
+                        else
+                        {
+                            SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
+                            if (note == null)
+                                note = NoteDto.ConvertToSongNote(noteDto, bar);
+                            note.SetNoteValues(noteDto.Notes);
+                            newNotes.Add(note);
+                        }
+                        
                     }
+                    bar.Notes = newNotes;
+                    Array.ForEach(bar.Notes.ToArray(), Console.WriteLine);
                     newBars.Add(bar);
                 }
                 voice.SongBars = newBars;
