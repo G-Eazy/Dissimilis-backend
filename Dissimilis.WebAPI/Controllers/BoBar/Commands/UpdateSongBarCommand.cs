@@ -3,15 +3,16 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
-
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {
     public class UpdateSongBarCommand : IRequest<UpdatedCommandDto>
     {
@@ -31,19 +32,21 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class UpdateSongBarCommandHandler : IRequestHandler<UpdateSongBarCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly BarRepository _barRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongBarCommandHandler(Repository repository, IAuthService IAuthService)
+        public UpdateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _barRepository = barRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            await using var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (voice == null)
@@ -57,9 +60,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new NotFoundException($"Bar with Id {request.BarId} not found");
             }
 
-            bar.RepAfter = request.Command.RepAfter;
-            bar.RepBefore = request.Command.RepBefore;
-            bar.House = request.Command.House;
+            bar.RepAfter = request.Command?.RepAfter ?? bar.RepAfter;
+            bar.RepBefore = request.Command?.RepBefore ?? bar.RepBefore;
+            bar.House = request.Command?.House ?? bar.House;
             if (bar.House == 0)
             {
                 bar.House = null;
@@ -70,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _barRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

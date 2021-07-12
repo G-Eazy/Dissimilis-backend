@@ -6,7 +6,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
     public class QuerySongSearch : IRequest<SongIndexDto[]>
     {

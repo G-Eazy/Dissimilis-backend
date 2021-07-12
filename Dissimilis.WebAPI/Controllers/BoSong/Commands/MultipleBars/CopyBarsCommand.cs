@@ -4,12 +4,13 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
 {
     public class CopyBarsCommand : IRequest<UpdatedSongCommandDto>
     {
@@ -26,30 +27,30 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class CopyBarsCommandHandler : IRequestHandler<CopyBarsCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public CopyBarsCommandHandler(Repository repository, IAuthService IAuthService)
+        public CopyBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(CopyBarsCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _repository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-            var song = await _repository.GetFullSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
             song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            await _repository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)

@@ -250,7 +250,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             string[] intervalCodes = ChordFormulas
                 .Where(formula => formula[2].Split(" ").Contains(chordPattern))
                 .Select(formula => formula[0].Split(" "))
-                .FirstOrDefault();
+                .SingleOrDefault();
             
             List<string> noteValues = new List<string>();
 

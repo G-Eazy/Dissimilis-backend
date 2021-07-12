@@ -2,11 +2,12 @@
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class CreateSongCommand : IRequest<UpdatedSongCommandDto>
     {
@@ -20,12 +21,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class CreateSongCommandHandler : IRequestHandler<CreateSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
 
-        public CreateSongCommandHandler(Repository repository, IAuthService authService)
+        public CreateSongCommandHandler(SongRepository songRepository, IAuthService authService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = authService;
         }
 
@@ -42,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             };
 
             song.SetCreated(currentUser.Id);
-            await _repository.SaveAsync(song, cancellationToken);
+            await _songRepository.SaveAsync(song, cancellationToken);
 
             var mainVoice = new SongVoice()
             {
@@ -55,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             song.Voices.Add(mainVoice);
             mainVoice.SetCreated(currentUser.Id);
-            await _repository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(song);
         }

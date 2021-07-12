@@ -5,16 +5,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
     public class QuerySongToLibrary : IRequest<SongIndexDto[]> { }
 
     public class QuerySongToLibraryHandler : IRequestHandler<QuerySongToLibrary, SongIndexDto[]>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _repository;
         private readonly IAuthService _authService;
 
-        public QuerySongToLibraryHandler(Repository repository, IAuthService authService) 
+        public QuerySongToLibraryHandler(SongRepository repository, IAuthService authService) 
         {
             _repository = repository;
             _authService = authService;

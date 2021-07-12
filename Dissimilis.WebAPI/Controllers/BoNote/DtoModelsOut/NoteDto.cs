@@ -1,6 +1,6 @@
 ﻿using Dissimilis.DbContext.Models.Song;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut
 {
     public class NoteDto
     {

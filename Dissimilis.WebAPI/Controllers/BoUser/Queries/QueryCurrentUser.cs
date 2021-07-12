@@ -13,10 +13,10 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
 
     public class QueryCurrentUserHandler : IRequestHandler<QueryCurrentUser, UserDto>
     {
-        private readonly Repository _repository;
+        private readonly UserRepository _repository;
         private readonly IAuthService _IAuthService;
 
-        public QueryCurrentUserHandler(Repository repository, IAuthService IAuthService)
+        public QueryCurrentUserHandler(UserRepository repository, IAuthService IAuthService)
         {
             _repository = repository;
             _IAuthService = IAuthService;
