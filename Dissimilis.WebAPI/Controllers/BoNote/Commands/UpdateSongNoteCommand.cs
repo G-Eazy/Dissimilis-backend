@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoBar;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
@@ -14,17 +13,11 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
     public class UpdateSongNoteCommand : IRequest<UpdatedCommandDto>
     {
-        public int SongId { get; }
-        public int SongVoiceId { get; set; }
-        public int SongBarId { get; }
         public int SongChordId { get; }
         public UpdateNoteDto Command { get; }
 
-        public UpdateSongNoteCommand(int songId, int songVoiceId, int songBarId, int songChordId, UpdateNoteDto command)
+        public UpdateSongNoteCommand(int songChordId, UpdateNoteDto command)
         {
-            SongId = songId;
-            SongVoiceId = songVoiceId;
-            SongBarId = songBarId;
             SongChordId = songChordId;
             Command = command;
         }
@@ -33,20 +26,16 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
     public class UpdateSongNoteCommandHandler : IRequestHandler<UpdateSongNoteCommand, UpdatedCommandDto>
     {
         private readonly NoteRepository _noteRepository;
-        private readonly BarRepository _barRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, IAuthService IAuthService)
+        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, IAuthService IAuthService)
         {
             _noteRepository = noteRepository;
-            _barRepository = barRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
         {
-            var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
-
             var songNote = await _noteRepository.GetSongNoteById(request.SongChordId, cancellationToken);
 
             if (songNote == null)
@@ -59,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             songNote.ChordName = request.Command?.ChordName ?? songNote.ChordName;
             songNote.SetNoteValues(request.Command.Notes);
 
-            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            songNote.SongBar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _noteRepository.UpdateAsync(cancellationToken);
 
