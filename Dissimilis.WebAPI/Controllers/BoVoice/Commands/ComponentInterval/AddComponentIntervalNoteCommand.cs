@@ -42,17 +42,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
-            var songVoice = song.Voices.FirstOrDefault(voice => voice.Id == request.SongVoiceId);
+            var songVoice = song.Voices.SingleOrDefault(voice => voice.Id == request.SongVoiceId);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-            var songBar = songVoice.SongBars.FirstOrDefault(bar => bar.Id == request.SongBarId);
+            var songBar = songVoice.SongBars.SingleOrDefault(bar => bar.Id == request.SongBarId);
             if (songBar == null)
             {
                 throw new NotFoundException($"Bar with id {request.SongBarId} not found");
             }
-            var songNote = songBar.Notes.FirstOrDefault(note => note.Id == request.SongNoteId);
+            var songNote = songBar.Notes.SingleOrDefault(note => note.Id == request.SongNoteId);
             if (songNote == null)
             {
                 throw new NotFoundException($"Note with id {request.SongNoteId} not found");

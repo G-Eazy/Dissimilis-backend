@@ -22,7 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
                 .Include(b => b.SongVoice.Song)
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
-                .FirstOrDefaultAsync(x => x.Id == barId, cancellationToken);
+                .SingleOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
             if (bar == null)
             {
