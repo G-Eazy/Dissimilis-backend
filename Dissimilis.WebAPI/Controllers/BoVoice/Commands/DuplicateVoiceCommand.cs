@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -31,16 +32,19 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class DuplicateVoiceCommandHandler : IRequestHandler<DuplicateVoiceCommand, UpdatedCommandDto>
     {
         private readonly VoiceRepository _voiceRepository;
+        private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
 
-        public DuplicateVoiceCommandHandler(VoiceRepository voiceRepository, AuthService authService)
+        public DuplicateVoiceCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService)
         {
             _voiceRepository = voiceRepository;
+            _songRepository = songRepository;
             _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DuplicateVoiceCommand request, CancellationToken cancellationToken)
         {
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
@@ -55,8 +59,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 throw new Exception("Voicename can't be a empty string");
             }
 
-            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, songVoice.Song.Voices.Max(v => v.VoiceNumber));
-            songVoice.Song.Voices.Add(duplicatedVoice);
+            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, song.Voices.Max(v => v.VoiceNumber));
+            song.Voices.Add(duplicatedVoice);
 
             try
             {
