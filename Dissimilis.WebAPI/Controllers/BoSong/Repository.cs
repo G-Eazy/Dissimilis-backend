@@ -7,7 +7,6 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
-using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -89,23 +88,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        private static bool AccessToSong(User user, Song song) {
-            return song.ProtectionLevel == ProtectionLevels.All
-            //include only songs within your organisations
-            || !song.SharedOrganisations.All(songOrg =>
-                user.Organisations.All(userOrg =>
-                songOrg.OrganisationId != userOrg.OrganisationId))
-            //include only songs within your groups
-            || !song.SharedGroups.All(songGroup =>
-                user.Groups.All(userGroup =>
-                songGroup.GroupId != userGroup.GroupId))
-            //include only songs shared with you by userSharing
-            || !song.SharedUsers.All(shared => shared.UserId != user.Id)
-            //include songs created by you
-            || song.ArrangerId == user.Id 
-            || song.CreatedById == user.Id;
-        }
-
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
 
@@ -113,7 +95,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(s => s.Arranger)
                 .Include(s => s.SharedGroups)
                 .Include(s => s.SharedOrganisations)
-                .Where(song => AccessToSong(user, song))
+                .Where(song => song.ReadAccessToSong( user))
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCommand.Title))
