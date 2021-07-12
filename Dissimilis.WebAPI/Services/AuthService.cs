@@ -47,7 +47,7 @@ namespace Dissimilis.WebAPI.Services
                 throw new NotFoundException("UserId not found");
             }
 
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == currentUserId.Value);
+            var user = _dbContext.Users.SingleOrDefault(u => u.Id == currentUserId.Value);
             if (user == null)
             {
                 throw new NotFoundException("User not found");

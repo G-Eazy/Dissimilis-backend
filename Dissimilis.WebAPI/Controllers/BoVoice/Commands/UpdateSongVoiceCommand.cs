@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -25,32 +26,32 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class UpdateSongVoiceCommandHandler : IRequestHandler<UpdateSongVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongVoiceCommandHandler(Repository repository, IAuthService IAuthService)
+        public UpdateSongVoiceCommandHandler(SongRepository songRepository, VoiceRepository voiceRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
+            _voiceRepository = voiceRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
-
-            var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
-
+            var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             songVoice.VoiceNumber = request.Command?.VoiceNumber ?? songVoice.VoiceNumber;
-            songVoice.VoiceName = request.Command.VoiceName;
+            songVoice.VoiceName = request.Command?.VoiceName ?? songVoice.VoiceName;
             songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
             
-            await _repository.UpdateAsync(cancellationToken);
+            await _voiceRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

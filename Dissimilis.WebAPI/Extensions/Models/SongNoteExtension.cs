@@ -8,6 +8,7 @@ using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Newtonsoft.Json.Linq;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -252,7 +253,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             string[] intervalCodes = ChordFormulas
                 .Where(formula => formula[2].Split(" ").Contains(chordPattern))
                 .Select(formula => formula[0].Split(" "))
-                .FirstOrDefault();
+                .SingleOrDefault();
             
             List<string> noteValues = new List<string>();
 

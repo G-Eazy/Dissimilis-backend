@@ -16,9 +16,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public class QuerySongUndoStackByIdHandler : IRequestHandler<QuerySongUndoStackById, SongUndoStackByIdDto>
         {
-            private readonly Repository _repository;
+            private readonly SongRepository _repository;
 
-            public QuerySongUndoStackByIdHandler(Repository repository)
+            public QuerySongUndoStackByIdHandler(SongRepository repository)
             {
                 _repository = repository;
             }

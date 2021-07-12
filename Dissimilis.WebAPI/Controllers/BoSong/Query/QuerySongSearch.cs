@@ -5,7 +5,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
     public class QuerySongSearch : IRequest<SongIndexDto[]>
     {
@@ -20,9 +20,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class QuerySongSearchHandler : IRequestHandler<QuerySongSearch, SongIndexDto[]>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _repository;
 
-        public QuerySongSearchHandler(Repository repository)
+        public QuerySongSearchHandler(SongRepository repository)
         {
             _repository = repository;
         }

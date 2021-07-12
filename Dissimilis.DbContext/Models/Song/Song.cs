@@ -2,9 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Dissimilis.DbContext.Interfaces;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.DbContext.Models.Song
 {
+    /// <summary>
+    /// The different sharing options a song could have:
+    /// private: only you and people in sharedUsers
+    /// Group: all in sharedUsers and sharedGroups
+    /// Organisation: same as group + all in sharedOrganisation
+    /// all: public song
+    /// </summary>
+    
+
     /// <summary>
     /// This is the whole songs, which contains one or more parts 
     /// </summary>
@@ -64,7 +74,6 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// Notes that describes the song
         /// </summary>
-
         public string SongNotes { get; set; }
 
         /// <summary>
@@ -83,6 +92,24 @@ namespace Dissimilis.DbContext.Models.Song
 
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
 
+        /// <summary>
+        /// The protection level of the song, a inner scope to easy set a song private
+        /// </summary>
+        public ProtectionLevels ProtectionLevel { get; set; }
+        /// <summary>
+        /// the users with write permission on the song
+        /// </summary>
+        public ICollection<SongSharedUser> SharedUsers { get; set; } = new List<SongSharedUser>();
+
+        /// <summary>
+        /// The groups with read permission on the song
+        /// </summary>
+        public ICollection<SongSharedGroup> SharedGroups { get; set; } = new List<SongSharedGroup>();
+
+        /// <summary>
+        /// The organisations with read permission on this song
+        /// </summary>
+        public ICollection<SongSharedOrganisation> SharedOrganisations { get; set; } = new List<SongSharedOrganisation>();
         public ICollection<SongSnapshot> Snapshots { get; set; } = new List<SongSnapshot>();
     }
 }

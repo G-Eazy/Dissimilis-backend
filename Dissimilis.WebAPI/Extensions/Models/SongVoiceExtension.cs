@@ -4,6 +4,7 @@ using System.Linq;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Newtonsoft.Json.Linq;
 

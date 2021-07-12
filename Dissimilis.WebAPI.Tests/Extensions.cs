@@ -1,9 +1,13 @@
 ﻿using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
-using Dissimilis.WebAPI.DTOs;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 

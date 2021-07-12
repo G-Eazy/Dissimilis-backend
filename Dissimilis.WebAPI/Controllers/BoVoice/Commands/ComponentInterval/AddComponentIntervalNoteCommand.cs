@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -32,41 +33,42 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval
 
     public class AddComponentIntervalNoteHandler : IRequestHandler<AddComponentIntervalNoteCommand, UpdatedCommandDto>
     {
+        private readonly SongRepository _songRepository;
         private readonly Repository _repository;
         private readonly IAuthService _IAuthUserService;
 
-        public AddComponentIntervalNoteHandler(Repository repository, IAuthService authService)
+        public AddComponentIntervalNoteHandler(SongRepository songRepository, IAuthService authService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _IAuthUserService = authService;
         }
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             song.PerformSnapshot(_IAuthUserService.GetVerifiedCurrentUser());
 
-            var songVoice = song.Voices.FirstOrDefault(voice => voice.Id == request.SongVoiceId);
+            var songVoice = song.Voices.SingleOrDefault(voice => voice.Id == request.SongVoiceId);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-            var songBar = songVoice.SongBars.FirstOrDefault(bar => bar.Id == request.SongBarId);
+            var songBar = songVoice.SongBars.SingleOrDefault(bar => bar.Id == request.SongBarId);
             if (songBar == null)
             {
                 throw new NotFoundException($"Bar with id {request.SongBarId} not found");
             }
-            var songNote = songBar.Notes.FirstOrDefault(note => note.Id == request.SongNoteId);
+            var songNote = songBar.Notes.SingleOrDefault(note => note.Id == request.SongNoteId);
             if (songNote == null)
             {
                 throw new NotFoundException($"Note with id {request.SongNoteId} not found");
             }
 
-            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             songNote.AddComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

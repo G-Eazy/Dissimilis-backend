@@ -8,6 +8,7 @@ using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -23,12 +24,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class UndoCommandHandler : IRequestHandler<UndoCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _repository;
         private readonly IAuthService _IAuthService;
 
-        public UndoCommandHandler(Repository repository, IAuthService IAuthService)
+        public UndoCommandHandler(SongRepository songRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _repository = songRepository;
             _IAuthService = IAuthService;
         }
 

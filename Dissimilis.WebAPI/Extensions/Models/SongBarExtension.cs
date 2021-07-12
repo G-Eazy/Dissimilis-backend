@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using FoodLabellingAPI.Collections;
 using Newtonsoft.Json.Linq;
@@ -113,7 +114,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
                                     return originalNoteStartPosition <= srcNote.Position && srcNote.Position <= originalNoteEndPosition;
                                 })
-                            .FirstOrDefault();
+                            .SingleOrDefault();
                         if (originalNote != null)
                         {
                             originalNote.Length -= (srcNote.Position - originalNote.Position);
