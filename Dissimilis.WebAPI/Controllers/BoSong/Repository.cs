@@ -7,6 +7,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -95,6 +96,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(s => s.Arranger)
                 .Include(s => s.SharedGroups)
                 .Include(s => s.SharedOrganisations)
+                .Include(s => s.SharedGroups)
                 .Where(song => song.ReadAccessToSong( user))
                 .AsQueryable();
 
@@ -104,6 +106,37 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 query = query
                     .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
                     .AsQueryable();
+            }
+            //returns only the songs shared with you that you have write permission on
+            if (searchCommand?.SharedByUser == true)
+            {
+                query = query.Where(s => !s.SharedUsers.All(shared => shared.UserId != user.Id)).AsQueryable();
+            }
+            //if you only want to filter on groups 
+            if( searchCommand.OrgId != null && searchCommand.GroupId == null)
+            {
+                query = query.Where(song =>
+                song.SharedOrganisations.Any(org =>
+                searchCommand.OrgId.Contains(org.OrganisationId))).AsQueryable();
+            }
+            //if you only want to filter on organisations
+            else if (searchCommand.GroupId != null && searchCommand.OrgId == null)
+            {
+                query = query.Where(song =>
+                song.SharedGroups.Any(group =>
+                searchCommand.GroupId.Contains(group.GroupId))).AsQueryable();
+            }
+
+            //handles the case if you want one to se one organisation and a group not within that organisation
+            else if( searchCommand.GroupId != null && searchCommand.OrgId != null)
+            {
+                query = query.Where(song => (
+                song.SharedGroups.Any(group =>
+                searchCommand.GroupId.Contains(group.GroupId)) ||
+
+                song.SharedOrganisations.Any(org =>
+                searchCommand.OrgId.Contains(org.OrganisationId)))
+                ).AsQueryable();
             }
 
             if (searchCommand.ArrangerId != null)

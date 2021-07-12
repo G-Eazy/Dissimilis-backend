@@ -23,6 +23,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
             //include songs created by you
             || song.ArrangerId == user.Id
             || song.CreatedById == user.Id
+            //include if user is systemAdmin
+            || user.IsSystemAdmin
             //include only songs shared with you by userSharing
             || !song.SharedUsers.All(shared => shared.UserId != user.Id)
             //include only songs within your groups
