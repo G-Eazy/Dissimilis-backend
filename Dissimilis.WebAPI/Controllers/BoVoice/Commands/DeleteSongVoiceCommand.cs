@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -24,24 +25,27 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
     public class DeleteSongVoiceCommandHandle : IRequestHandler<DeleteSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly VoiceRepository _voiceRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, IAuthService IAuthService)
+        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService)
         {
             _voiceRepository = voiceRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
         {
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
             }
 
-            songVoice.Song.Voices.Remove(songVoice);
-            songVoice.Song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            song.Voices.Remove(songVoice);
+            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _voiceRepository.UpdateAsync(cancellationToken);
 
