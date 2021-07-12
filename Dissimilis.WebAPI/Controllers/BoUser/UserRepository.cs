@@ -113,19 +113,5 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             await this._context.SaveChangesAsync();
             return user;
         }
-
-        /// <summary>
-        /// Update the user organisation fk
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="organisation"></param>
-        /// <returns></returns>
-        public async Task<User> UpdateUserOrganisationAsync(User user, Organisation organisation)
-        {
-            user.OrganisationId = organisation?.Id;
-
-            await this._context.SaveChangesAsync();
-            return user;
-        }
     }
 }
