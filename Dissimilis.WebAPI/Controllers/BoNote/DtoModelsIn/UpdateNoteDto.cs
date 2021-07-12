@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dissimilis.WebAPI.DTOs
+namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn
 {
     public class UpdateNoteDto
     {

@@ -1,9 +1,14 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoBar.Commands;
+using Dissimilis.WebAPI.Controllers.BoNote.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoVoice;
+using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
 using MediatR;

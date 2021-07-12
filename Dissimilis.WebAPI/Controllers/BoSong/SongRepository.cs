@@ -12,15 +12,37 @@ using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
-    public class Repository
+    public class SongRepository
     {
 
         internal DissimilisDbContext Context;
-        public Repository(DissimilisDbContext context)
+        public SongRepository(DissimilisDbContext context)
         {
             Context = context;
         }
 
+        public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
+        {
+            var song = await Context.Songs
+                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with Id {songId} not found");
+            }
+
+            await Context.SongVoices
+                .Include(sv => sv.Instrument)
+                .Where(sv => sv.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongBars
+                .Include(sb => sb.Notes)
+                .Where(sb => sb.SongVoice.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            return song;
+        }
 
         public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {

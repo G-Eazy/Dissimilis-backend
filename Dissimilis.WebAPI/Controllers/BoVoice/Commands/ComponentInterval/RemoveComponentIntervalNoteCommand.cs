@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+﻿using Dissimilis.WebAPI.Controllers.BoSong;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
@@ -32,16 +33,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
     public class RemoveComponentIntervalNoteCommandHandler : IRequestHandler<RemoveComponentIntervalNoteCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
-        public RemoveComponentIntervalNoteCommandHandler(Repository repository, AuthService IAuthService)
+        public RemoveComponentIntervalNoteCommandHandler(SongRepository songRepository, AuthService IAuthService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = IAuthService;
         }
         public async Task<UpdatedCommandDto> Handle(RemoveComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             if (song == null)
             {
                 throw new NotFoundException($"Song with id {request.SongId} not found");
@@ -64,12 +65,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
             var user = _authService.GetVerifiedCurrentUser();
 
-            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             songNote.RemoveComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

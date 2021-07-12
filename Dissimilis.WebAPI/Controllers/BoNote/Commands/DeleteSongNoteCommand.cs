@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
+using Dissimilis.WebAPI.Controllers.BoBar;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
-using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
     public class DeleteSongNoteCommand : IRequest<UpdatedCommandDto>
     {
@@ -27,32 +28,35 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class DeleteSongNoteCommandHandler : IRequestHandler<DeleteSongNoteCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly NoteRepository _noteRepository;
+        private readonly BarRepository _barRepository;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongNoteCommandHandler(Repository repository, IAuthService IAuthService)
+        public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _noteRepository = noteRepository;
+            _barRepository = barRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongNoteCommand request, CancellationToken cancellationToken)
         {
-            var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+            var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
-            if (note == null)
+            var songNote = bar.Notes.FirstOrDefault(songNote => songNote.Id == request.SongChordId);
+
+            if (songNote == null)
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
 
-            part.Notes.Remove(note);
+            bar.Notes.Remove(songNote);
 
-            part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            await _repository.UpdateAsync(cancellationToken);
+            await _noteRepository.UpdateAsync(cancellationToken);
 
-            return null;
+            return new UpdatedCommandDto(songNote);
         }
     }
 }

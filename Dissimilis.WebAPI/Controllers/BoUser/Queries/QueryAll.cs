@@ -10,9 +10,9 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
 
     public class QueryAllHandler : IRequestHandler<QueryAll, UserDto[]>
     {
-        private readonly Repository _repository;
+        private readonly UserRepository _repository;
 
-        public QueryAllHandler(Repository repository)
+        public QueryAllHandler(UserRepository repository)
         {
             _repository = repository;
         }
