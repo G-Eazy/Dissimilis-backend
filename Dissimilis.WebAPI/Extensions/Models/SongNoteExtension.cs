@@ -261,6 +261,29 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return noteValues;
         }
 
+        public static List<string> GetAllSingleNoteOptions()
+        {
+            return new List<string>(AllNotes);
+        }
+
+        public static List<string> GetAllChordOptions()
+        {
+            List<string> chordOptions = new List<string>();
+
+            foreach (var rootNote in AllNotes)
+            {
+                foreach (var chordFormula in ChordFormulas)
+                {
+
+                    string chordPattern = chordFormula[2].Split(" ")[0];
+                    chordPattern = chordPattern == "M" ? "" : chordPattern;
+                    chordOptions.Add(rootNote + chordPattern);
+                }
+            }
+
+            return chordOptions;
+        }
+
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
