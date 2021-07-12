@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 {
     public class DeleteSongVoiceCommand : IRequest<UpdatedCommandDto>
     {
@@ -23,32 +24,32 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class DeleteSongVoiceCommandHandle : IRequestHandler<DeleteSongVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _voiceRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(Repository repository, IAuthService IAuthService)
+        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _voiceRepository = voiceRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
-
-            var voice = song.Voices.FirstOrDefault(sv => sv.Id == request.SongVoiceId);
-            if (voice == null)
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
+            if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
             }
 
-            song.Voices.Remove(voice);
-
+            song.Voices.Remove(songVoice);
             song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
-            await _repository.UpdateAsync(cancellationToken);
+            await _voiceRepository.UpdateAsync(cancellationToken);
 
-            return null;
+            return new UpdatedCommandDto(songVoice);
         }
     }
 }

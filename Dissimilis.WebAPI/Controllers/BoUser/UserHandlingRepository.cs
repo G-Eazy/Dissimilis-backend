@@ -3,8 +3,9 @@ using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using Dissimilis.WebAPI.Repositories;
 
-namespace Dissimilis.WebAPI.Repositories
+namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     public class UserHandlingRepository
     {

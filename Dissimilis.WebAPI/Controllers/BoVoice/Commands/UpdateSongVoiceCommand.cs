@@ -25,30 +25,28 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class UpdateSongVoiceCommandHandler : IRequestHandler<UpdateSongVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongVoiceCommandHandler(Repository repository, IAuthService IAuthService)
+        public UpdateSongVoiceCommandHandler(VoiceRepository voiceRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _voiceRepository = voiceRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
-            var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
-
+            var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
             songVoice.VoiceNumber = request.Command?.VoiceNumber ?? songVoice.VoiceNumber;
-            songVoice.VoiceName = request.Command.VoiceName;
+            songVoice.VoiceName = request.Command?.VoiceName ?? songVoice.VoiceName;
             songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
             
-            await _repository.UpdateAsync(cancellationToken);
+            await _voiceRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
 {
     public class SongVoiceDto
     {

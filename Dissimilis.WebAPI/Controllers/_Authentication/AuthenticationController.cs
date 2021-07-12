@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Authentication;
-using Dissimilis.WebAPI.Repositories;
+using Dissimilis.WebAPI.Controllers.BoUser;
 using Experis.Ciber.Authentication.Microsoft;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.AspNetCore.Http;

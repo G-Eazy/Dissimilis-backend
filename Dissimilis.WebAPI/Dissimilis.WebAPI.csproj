@@ -15,9 +15,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\NewFolder1\**" />
     <Compile Remove="wwwroot\Resources\**" />
+    <Content Remove="Controllers\NewFolder1\**" />
     <Content Remove="wwwroot\Resources\**" />
+    <EmbeddedResource Remove="Controllers\NewFolder1\**" />
     <EmbeddedResource Remove="wwwroot\Resources\**" />
+    <None Remove="Controllers\NewFolder1\**" />
     <None Remove="wwwroot\Resources\**" />
   </ItemGroup>
 
@@ -54,6 +58,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\BoUser\Commands\" />
+    <Folder Include="Controllers\BoUser\DtoModelsIn\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 

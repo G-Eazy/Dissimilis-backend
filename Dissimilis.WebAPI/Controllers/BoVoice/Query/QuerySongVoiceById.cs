@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoVoice.Query
 {
     public class QuerySongVoiceById : IRequest<SongVoiceDto>
     {
@@ -19,9 +20,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class QuerySongVoiceByIdHandler : IRequestHandler<QuerySongVoiceById, SongVoiceDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _repository;
 
-        public QuerySongVoiceByIdHandler(Repository repository)
+        public QuerySongVoiceByIdHandler(VoiceRepository repository)
         {
             _repository = repository;
         }

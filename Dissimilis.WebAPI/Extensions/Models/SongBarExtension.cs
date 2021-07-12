@@ -110,7 +110,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
                                     return originalNoteStartPosition <= srcNote.Position && srcNote.Position <= originalNoteEndPosition;
                                 })
-                            .FirstOrDefault();
+                            .SingleOrDefault();
                         if (originalNote != null)
                         {
                             originalNote.Length -= (srcNote.Position - originalNote.Position);

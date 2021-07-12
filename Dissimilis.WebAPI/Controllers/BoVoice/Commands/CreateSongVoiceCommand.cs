@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 {
     public class CreateSongVoiceCommand : IRequest<UpdatedCommandDto>
     {
@@ -28,12 +29,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class CreatePartCommandHandler : IRequestHandler<CreateSongVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _voiceRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public CreatePartCommandHandler(Repository repository, IAuthService IAuthService)
+        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService)
         {
-            _repository = repository;
+            _voiceRepository = voiceRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
@@ -41,9 +44,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
 
-            await using var transaction = await _repository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
             if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
             {
@@ -76,11 +79,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 song.SyncVoicesFrom(cloneVoice);
             }
 
-            await _repository.UpdateAsync(cancellationToken);
+            await _voiceRepository.UpdateAsync(cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(cancellationToken);
+                await _voiceRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)
