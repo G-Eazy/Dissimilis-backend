@@ -24,6 +24,16 @@ namespace Dissimilis.DbContext
         public DbSet<Country> Countries { get; set; }
         public DbSet<Instrument> Instruments { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupUser> GroupUsers { get; set; }
+        public DbSet<OrganisationUser> OrganisationUsers { get; set; }
+        public DbSet<SongSharedGroup> SongSharedGroups { get; set; }
+        public DbSet<SongSharedOrganisation> SongSharedOrganisations { get; set; }
+        public DbSet<SongSharedUser> SongSharedUser { get; set; }
+
+
+
+
 
 
         /// <summary>
@@ -43,6 +53,12 @@ namespace Dissimilis.DbContext
             BuildNote(modelBuilder);
             BuildCountry(modelBuilder);
             BuildOrganisation(modelBuilder);
+            BuildGroup(modelBuilder);
+            BuildGroupUser(modelBuilder);
+            BuildOrganisationUser(modelBuilder);
+            BuildSongSharedGroup(modelBuilder);
+            BuildSongSharedOrganisation(modelBuilder);
+            BuildSongSharedUser(modelBuilder);
 
             FixForSqlLite(modelBuilder);
         }
@@ -91,12 +107,6 @@ namespace Dissimilis.DbContext
                 .WithMany(x => x.Users)
                 .HasForeignKey(x => x.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(x => x.Organisation)
-                .WithMany(x => x.Users)
-                .HasForeignKey(x => x.OrganisationId)
-                .OnDelete(DeleteBehavior.Restrict);
-
         }
 
         static void BuildSong(ModelBuilder builder)
@@ -191,6 +201,7 @@ namespace Dissimilis.DbContext
         {
             var entity = builder.Entity<Instrument>();
             entity.HasIndex(x => x.Name).IsUnique();
+            entity.Property(x => x.Name).IsRequired();
         }
 
         static void BuildCountry(ModelBuilder builder)
@@ -206,11 +217,112 @@ namespace Dissimilis.DbContext
             var entity = builder.Entity<Organisation>();
 
             entity.HasIndex(x => x.Name).IsUnique();
+            entity.Property(x => x.Name).IsRequired();
+
+
+            entity.HasOne(x => x.CreatedBy)
+                .WithMany(x => x.OrganisationsCreated)
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
+        static void BuildGroup(ModelBuilder builder)
+        {
+            var entity = builder.Entity<Group>();
+            entity.Property(x => x.Name).IsRequired();
+
+            entity.HasOne(x => x.Organisation)
+                .WithMany(x => x.Groups)
+                .HasForeignKey(x => x.OrganisationId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.CreatedBy)
+                .WithMany(x => x.GroupsCreated)
+                .HasForeignKey(x => x.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        }
+        static void BuildGroupUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<GroupUser>();
+            entity.HasKey(x => new { x.UserId, x.GroupId });
 
 
+            entity.HasOne(x => x.Group)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.GroupId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.Groups)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildOrganisationUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<OrganisationUser>();
+            entity.HasKey(x => new { x.UserId, x.OrganisationId });
+
+
+            entity.HasOne(x => x.Organisation)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.OrganisationId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.Organisations)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildSongSharedGroup(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SongSharedGroup>();
+            entity.HasKey(x => new { x.GroupId, x.SongId });
+
+
+            entity.HasOne(x => x.Group)
+                .WithMany(x => x.SharedSongs)
+                .HasForeignKey(x => x.GroupId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Song)
+                .WithMany(x => x.SharedGroups)
+                .HasForeignKey(x => x.SongId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildSongSharedOrganisation(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SongSharedOrganisation>();
+            entity.HasKey(x => new { x.OrganisationId, x.SongId });
+
+
+            entity.HasOne(x => x.Organisation)
+                .WithMany(x => x.SharedSongs)
+                .HasForeignKey(x => x.OrganisationId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Song)
+                .WithMany(x => x.SharedOrganisations)
+                .HasForeignKey(x => x.SongId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        static void BuildSongSharedUser(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SongSharedUser>();
+            entity.HasKey(x => new { x.UserId, x.SongId });
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.SongsShared)
+                .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Song)
+                .WithMany(x => x.SharedUsers)
+                .HasForeignKey(x => x.SongId)
+                 .OnDelete(DeleteBehavior.Restrict);
+        }
+    }
         #endregion
 
-
-    }
 }
+
