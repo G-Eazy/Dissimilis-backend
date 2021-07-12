@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             song.Voices.Remove(voice);
             song.SetUpdated(currentUser.Id);
 
-            await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
+            await _repository.UpdateAsync(cancellationToken);
 
             return null;
         }

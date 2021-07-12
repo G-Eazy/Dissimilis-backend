@@ -6,6 +6,8 @@ using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Newtonsoft.Json.Linq;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -290,6 +292,34 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songNote.SetNoteValues(updatedNoteValues);
             return songNote;
         }
+
+        public static List<SongNote> GetSongNotesFromJson(JToken noteJsonArr, SongBar bar)
+        {
+            List<SongNote> newNotes = new List<SongNote>();
+            foreach (var noteJSON in noteJsonArr)
+            {
+                NoteDto noteDto = NoteDto.JsonToNoteDto(noteJSON);
+                bool emptyNote = noteDto.Notes[0] == "Z";
+                if (emptyNote)
+                {
+                    for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
+                    {
+                        var noteToBeRemoved = bar.Notes.FirstOrDefault(n => n.Position == i);
+                        bar.Notes.Remove(noteToBeRemoved);
+                    }
+                }
+                else
+                {
+                    SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
+                    if (note == null)
+                        note = NoteDto.ConvertToSongNote(noteDto, bar);
+                    note.SetNoteValues(noteDto.Notes);
+                    newNotes.Add(note);
+                }
+            }
+            return newNotes;
+        }
+
 
         public static SongNote Transpose(this SongNote songNote, int transposeValue)
         {

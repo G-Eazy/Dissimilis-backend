@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             songVoice.RemoveComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(null,null,cancellationToken);
+                await _repository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

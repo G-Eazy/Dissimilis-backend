@@ -51,8 +51,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 song.PerformSnapshot(currentUser);
 
                 var songBar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
-                Console.WriteLine(songBar);
-
                 if (songBar.Notes.Any(n => n.Position == request.Command.Position))
                 {
                     throw new ValidationException("Note number already in use");
@@ -79,7 +77,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
                 try
                 {
-                    await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
+                    await _repository.UpdateAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
                 }
                 catch (Exception e)

@@ -28,10 +28,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             RepBefore = songBar.RepBefore;
             RepAfter = songBar.RepAfter;
             House = songBar.House;
-            foreach (var note in songBar.Notes)
-            {
-                Console.WriteLine($"Constructing barDtos: {note}");
-            }
             Chords = songBar.GetBarNotes()
                 .OrderBy(n => n.Position)
                 .Select(n => new NoteDto(n))

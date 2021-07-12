@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -22,6 +25,24 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             songVoice.SetUpdated(userId);
             songVoice.Song.SetUpdated(userId);
+        }
+
+
+        public static List<SongVoice> GetSongVoicesFromJson(Song song, SongSnapshot snapshot, JArray voiceJsonArr)
+        {
+            List<SongVoice> voices = new List<SongVoice>();
+            foreach (var voiceJSON in voiceJsonArr)
+            {
+                SongVoiceDto voiceDto = SongVoiceDto.JsonToSongVoiceDto(voiceJSON);
+                SongVoice voice = song.Voices.FirstOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
+                if (voice == null)
+                    voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById);
+
+                var barJsonArr = voiceJSON["Bars"];
+                voice.SongBars = SongBarExtension.GetSongBarsFromJson(barJsonArr, voice);
+                voices.Add(voice);
+            }
+            return voices;
         }
 
         public static SongVoice Clone(this SongVoice songVoice, string VoiceName, User user = null, Instrument instrument = null, int voiceNumber = -1)

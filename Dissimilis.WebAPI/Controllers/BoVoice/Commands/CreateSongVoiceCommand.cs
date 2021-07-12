@@ -58,7 +58,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;
-            Console.WriteLine($"SongId for voice: {song.Id}");
             var songVoice = new SongVoice()
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
@@ -78,11 +77,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 song.SyncVoicesFrom(cloneVoice);
             }
 
-            await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
+            await _repository.UpdateAsync(cancellationToken);
 
             try
             {
-                await _repository.UpdateAsync(song, _IAuthService.GetVerifiedCurrentUser(), cancellationToken);
+                await _repository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch (Exception e)

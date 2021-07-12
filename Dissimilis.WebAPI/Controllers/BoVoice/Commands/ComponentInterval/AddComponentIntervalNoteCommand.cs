@@ -66,7 +66,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands.ComponentInterval
             songNote.AddComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(song, null, cancellationToken);
+                await _repository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

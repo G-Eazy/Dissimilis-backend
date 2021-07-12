@@ -263,124 +263,35 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
-        /*private static List<SongVoice> _GetVoicesFromDeserialisedSong(Song song, JObject deserialisedObj)
-        {
-            /*SongSnapshotDto songSnapshot = new SongSnapshotDto()
-            {
-                SongTitle = deserialisedObj["Title"].Value<string>(),
-                SongVoices = deserialisedObj["Voices"].Value<SongVoiceDto[]>()
-            };
-            List<SongVoice> voices = new List<SongVoice>();
-
-            foreach(SongVoiceDto voiceDto in songSnapshot.SongVoices)
-            {
-                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedBy, snapshot.CreatedById, song);
-                voices.Add(voice);
-                foreach(BarDto barDto in voiceDto.Bars)
-                {
-                    SongBar bar = BarDto.ConvertToSongBar(barDto);
-                    voice.SongBars.Add(bar);
-                    foreach(NoteDto noteDto in barDto.Chords)
-                    {
-                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
-                        bar.Notes.Add(note);
-                    }
-                }
-            }
-            List<SongVoice> voices = new List<SongVoice>();
-            SongVoiceDto[] voiceDtos = deserialisedObj["Voices"].Value<SongVoiceDto[]>();
-            User createdBy = deserialisedObj[""]
-
-            foreach (SongVoiceDto voiceDto in voiceDtos)
-            {
-                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, deserialisedObj.CreatedBy, snapshot.CreatedById, song);
-                voices.Add(voice);
-                foreach (BarDto barDto in voiceDto.Bars)
-                {
-                    SongBar bar = BarDto.ConvertToSongBar(barDto);
-                    voice.SongBars.Add(bar);
-                    foreach (NoteDto noteDto in barDto.Chords)
-                    {
-                        SongNote note = NoteDto.ConvertToSongNote(noteDto, bar);
-                        bar.Notes.Add(note);
-                    }
-                }
-            }
-            return voices;
-
-        }*/
-
         public static void Undo(this Song song)
         {
-            Console.WriteLine(song.Snapshots.Count);
             SongSnapshot snapshot = song.PopSnapshot(true);
-            SongSnapshotDto snapshotDto = Newtonsoft.Json.JsonConvert.DeserializeObject<SongSnapshotDto>(snapshot.SongObjectJSON);
+            SongSnapshotDto snapshotDto;
+
+            try
+            {
+                snapshotDto = Newtonsoft.Json.JsonConvert.DeserializeObject<SongSnapshotDto>(snapshot.SongObjectJSON);
+            }
+            catch(NullReferenceException e)
+            {
+                throw new NullReferenceException("No more snapshots to pop...");
+            }
 
             JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
-
-            song.Title = deserialisedSong["Title"].Value<string>();
-            song.UpdatedBy = snapshot.CreatedBy;
-            song.UpdatedOn = DateTimeOffset.Now;
-
-            // Constructing voices from deserialised json
-            List<SongVoice> voices = new List<SongVoice>();
-            Console.WriteLine(snapshot.SongObjectJSON);
             JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();
             User createdBy = song.CreatedBy;
 
-            foreach (var voiceJSON in voiceJSONs)
-            {
-                SongVoiceDto voiceDto = SongVoiceDto.JsonToSongVoiceDto(voiceJSON);
-                SongVoice voice = song.Voices.FirstOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
-                if(voice == null)
-                    voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById);
-
-                List<SongBar> newBars = new List<SongBar>();
-                foreach (var barJSON in voiceJSON["Bars"])
-                {
-                    BarDto barDto = BarDto.JsonToBarDto(barJSON);
-                    SongBar bar = voice.SongBars.FirstOrDefault(b => b.Position == barDto.Position);
-                    if(bar == null)
-                        bar = BarDto.ConvertToSongBar(barDto);
-
-                    List<SongNote> newNotes = new List<SongNote>();
-                    foreach (var noteJSON in barJSON["Chords"])
-                    {
-                        NoteDto noteDto = NoteDto.JsonToNoteDto(noteJSON);
-                        bool emptyNote = noteDto.Notes[0] == "Z";
-                        if (emptyNote)
-                        {
-                            for(int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
-                            {
-                                var noteToBeRemoved = bar.Notes.FirstOrDefault(n => n.Position == i);
-                                bar.Notes.Remove(noteToBeRemoved);
-                            }
-                        }
-                        else
-                        {
-                            SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
-                            if (note == null)
-                                note = NoteDto.ConvertToSongNote(noteDto, bar);
-                            note.SetNoteValues(noteDto.Notes);
-                            newNotes.Add(note);
-                        }
-                        
-                    }
-                    bar.Notes = newNotes;
-                    Array.ForEach(bar.Notes.ToArray(), Console.WriteLine);
-                    newBars.Add(bar);
-                }
-                voice.SongBars = newBars;
-                voices.Add(voice);
-            }
-            song.Voices = voices;
+            // Construct new song from snapshot
+            song.Title = deserialisedSong["Title"].Value<string>();
+            song.UpdatedBy = snapshot.CreatedBy;
+            song.UpdatedOn = DateTimeOffset.Now;
+            song.Voices = SongVoiceExtension.GetSongVoicesFromJson(song, snapshot, voiceJSONs);
         }
 
         /// <summary>
         /// This method should be called before any action that updates a song, except when the song itself is created.
         /// </summary>
         /// <param name="song"></param>
-        /// <param name="oldSong"></param>
         /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
@@ -389,7 +300,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Title = s.Title,
                 Voices = s.Voices
             });
-            Console.WriteLine($"Snapshot:\n{JSONsnapshot}");
+
             SongSnapshot snapshot = new SongSnapshot()
             {
                 SongId = s.SongId,
@@ -397,18 +308,17 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 CreatedOn = DateTimeOffset.Now,
                 SongObjectJSON = JSONsnapshot
             };
-            if(song.Snapshots.Count > 5)
+
+            if(song.Snapshots.Count >= 5)
             {
                 song.PopSnapshot(false);
             }
             song.Snapshots.Add(snapshot);
-            Console.WriteLine($"Snapshot object: {snapshot}");
         }
 
         public static SongSnapshot PopSnapshot(this Song song, bool descendingOrder)
         {
             SongSnapshot result = null;
-            Console.WriteLine($"Song currently has this many snapshots: {song.Snapshots.Count}");
             SongSnapshot[] orderedSnapshots;
             if (song.Snapshots.Count > 0)
             {
@@ -416,12 +326,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     orderedSnapshots = song.Snapshots.OrderByDescending(s => s.CreatedOn).ToArray();
                 else
                     orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
-                Console.WriteLine($"Length of ordered snapshots: {orderedSnapshots.Length}");
-                result = orderedSnapshots[0];
 
+                result = orderedSnapshots[0];
                 song.Snapshots.Remove(result);
             }
-            Console.WriteLine($"Popped snapshot: {result}");
             return result;
         }
     }

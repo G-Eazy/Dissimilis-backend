@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             songVoice.DuplicateAllChords(sourceVoice, request.Command.IncludeComponentIntervals);
             try
             {
-                await _repository.UpdateAsync(null,null,cancellationToken);
+                await _repository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

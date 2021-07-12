@@ -5,6 +5,10 @@ using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
+    /*
+     * This Dto could be used in the future, but is not needed for now...
+     */
+
     public class SongUndoStackByIdDto
     {
         public int SongId { get; set; }

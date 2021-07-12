@@ -195,7 +195,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<IActionResult> Undo(int songId)
         {
             var item = await _mediator.Send(new UndoCommand(songId));
-            Console.WriteLine("yes");
             var result = await _mediator.Send(new QuerySongById(songId));
             return Ok(result);
         }

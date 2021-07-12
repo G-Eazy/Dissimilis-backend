@@ -70,7 +70,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             songNote.RemoveComponentInterval(request.Command.IntervalPosition);
             try
             {
-                await _repository.UpdateAsync(song, user, cancellationToken);
+                await _repository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             }
             catch

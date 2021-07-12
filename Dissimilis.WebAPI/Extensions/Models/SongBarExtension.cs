@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using FoodLabellingAPI.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -139,6 +142,23 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 })
                 .ToList();
             return songBar;
+        }
+
+        public static List<SongBar> GetSongBarsFromJson(JToken barJsonArr, SongVoice voice)
+        {
+            List<SongBar> newBars = new List<SongBar>();
+            foreach (var barJSON in barJsonArr)
+            {
+                BarDto barDto = BarDto.JsonToBarDto(barJSON);
+                SongBar bar = voice.SongBars.FirstOrDefault(b => b.Position == barDto.Position);
+                if (bar == null)
+                    bar = BarDto.ConvertToSongBar(barDto);
+
+                var noteJsonArr = barJSON["Chords"];
+                bar.Notes = SongNoteExtension.GetSongNotesFromJson(noteJsonArr, bar);
+                newBars.Add(bar);
+            }
+            return newBars;
         }
 
         public static SongBar AddComponentInterval(this SongBar songBar, int intervalPosition)
