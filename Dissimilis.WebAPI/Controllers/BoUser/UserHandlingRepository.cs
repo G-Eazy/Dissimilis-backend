@@ -34,13 +34,6 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 orgData = null;
             }
 
-            if (user.OrganisationId == null)
-            {
-                //The create or find method handles null values
-                var organisation = await this._orgRepo.CreateOrFindOrganisationAsync(orgData, (uint)user.Id);
-                user = await this._userRepo.UpdateUserOrganisationAsync(user, organisation);
-            }
-
             if (user.CountryId == null)
             {
                 //The create or find method handles null values
