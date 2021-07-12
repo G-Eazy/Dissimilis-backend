@@ -13,9 +13,13 @@ namespace Dissimilis.DbContext.Models.Enums
 
     public enum ProtectionLevels
     {
+        [Description("Private")]
         Private = 10,
+        [Description("Group")]
         Group = 20,
+        [Description("Organisation")]
         Organisation = 30,
+        [Description("All")]
         All = 40
     }
 
