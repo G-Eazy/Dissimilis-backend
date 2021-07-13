@@ -51,7 +51,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             cordNote.Length.ShouldBe(8, "The default length should be 8");
         }
 
-        [Fact]
+        /*[Fact]
         public async Task TestUpdatingBar()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
@@ -84,7 +84,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 2, length: 6)));
             await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 1, length: 7)));
             await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 0, length: 8)));
-        }
+        }*/
 
         [Fact]
         public async Task TestSyncBetweenVoices()
