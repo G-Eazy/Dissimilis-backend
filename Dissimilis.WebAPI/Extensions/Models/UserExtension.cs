@@ -1,8 +1,9 @@
 ﻿using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Extensions.Models
+namespace Dissimilis.WebAPI.Extensions
 {
     public static class UserExtension
     {
@@ -20,14 +21,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             return user.Organisations.Any(x => x.OrganisationId == organisationId && x.Role == Role.Admin);
         }
-        public static int[] getAllOrganisationIds(this User user)
+        public static List<int> GetAllOrganisationIds(this User user)
         {
-            return user.Organisations.Select(o => o.OrganisationId).ToArray();
+            return user.Organisations.Select(o => o.OrganisationId).ToList();
         }
 
-        public static int[] GetAllOrganisationIds(this User user)
+        public static List<int> GetAllGroupIds(this User user)
         {
-            return user.Groups.Select(g => g.GroupId).ToArray();
+            return user.Groups.Select(g => g.GroupId).ToList();
         }
     }
 }

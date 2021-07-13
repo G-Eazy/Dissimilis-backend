@@ -35,8 +35,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<UpdatedSongCommandDto> Handle(ShareSongUserCommand request, CancellationToken cancellationToken)
         {
-            
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            if(song.ArrangerId != currentUser.Id)
+            {
+                throw new UnauthorizedAccessException("You dont have permission to edit this song");
+            }
 
 
             return new UpdatedSongCommandDto(song);
