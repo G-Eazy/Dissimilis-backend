@@ -243,7 +243,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
                 Speed = song.Speed,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
