@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
@@ -228,6 +230,75 @@ namespace Dissimilis.WebAPI.xUnit
                 Title = "Testuser",
                 OrderBy = "date",
                 OrderDescending = true
+            };
+        }
+
+        internal static Organisation NewOrganisation(string Name = "TestOrganisation")
+        {
+            return new Organisation()
+            {
+                Name = Name
+            };
+        }
+        internal static Group NewGroup(int orgId, string Name = "TestGroup")
+        {
+            return new Group()
+            {
+                OrganisationId = orgId,
+                Name = Name
+                
+            };
+        }
+        internal static GroupUser NewGroupUser(int groupId, int userId, Role role)
+        {
+            return new GroupUser()
+            {
+                GroupId = groupId,
+                UserId = userId,
+                Role = role
+            };
+        }
+
+        internal static OrganisationUser NewOrganisationUser(int orgId, int userId, Role role)
+        {
+            return new OrganisationUser()
+            {
+                OrganisationId = orgId,
+                UserId = userId,
+                Role = role
+            };
+        }
+
+        internal static User NewUser(string name = "testUser2", string email = "test2@test.com")
+        {
+            return new User
+            {
+                Name = name,
+                Email = email,
+            };
+        }
+        internal static SongSharedOrganisation NewSharedOrg(int orgId, int songId)
+        {
+            return new SongSharedOrganisation()
+            {
+                OrganisationId = orgId,
+                SongId = songId
+            };
+        }
+        internal static SongSharedGroup NewSharedGroup(int groupId, int songId)
+        {
+            return new SongSharedGroup()
+            {
+                GroupId = groupId,
+                SongId = songId
+            };
+        }
+        internal static SongSharedUser NewSharedUser(int userId, int songId)
+        {
+            return new SongSharedUser()
+            {
+                UserId = userId,
+                SongId = songId
             };
         }
     }

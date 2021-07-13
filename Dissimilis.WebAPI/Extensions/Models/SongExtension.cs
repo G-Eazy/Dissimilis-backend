@@ -1,5 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
@@ -12,29 +14,30 @@ namespace Dissimilis.WebAPI.Extensions.Models
     public static class SongExtension
     {
         /// <summary>
-        /// Return true if the given user have readpermission on this song
+        /// Return true if the given user have readpermission on the song in the expression
         /// </summary>
-        /// <param name="song"></param>
-        /// <param name="user"> user to check readpermission</param>
+        /// <param name="groups"> The groups to check for</param>
+        /// <param name="orgs"> the organisation to check for</param>
+        /// <param name="user"> The user to chek for</param>
         /// <returns> true if readpermission</returns>
-        public static bool ReadAccessToSong(this Song song, User user)
+        public static Expression<Func<Song, bool>> ReadAccessToSong(List<int> groups, List<int> orgs, User user)
         {
-            return song.ProtectionLevel == ProtectionLevels.All
+            return (song => song.ProtectionLevel == ProtectionLevels.All
             //include songs created by you
             || song.ArrangerId == user.Id
             || song.CreatedById == user.Id
             //include if user is systemAdmin
             || user.IsSystemAdmin
             //include only songs shared with you by userSharing
-            || !song.SharedUsers.All(shared => shared.UserId != user.Id)
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id)
             //include only songs within your groups
-            || !song.SharedGroups.All(songGroup =>
-                user.Groups.All(userGroup =>
-                songGroup.GroupId != userGroup.GroupId))
+            || (song.ProtectionLevel > ProtectionLevels.Private &&
+            song.SharedGroups.Any(songGroup =>
+                groups.Contains(songGroup.GroupId)))            
             //include only songs within your organisations
-            || !song.SharedOrganisations.All(songOrg =>
-                user.Organisations.All(userOrg =>
-                songOrg.OrganisationId != userOrg.OrganisationId));
+            || (song.ProtectionLevel > ProtectionLevels.Group &&
+            song.SharedOrganisations.Any(songOrg =>
+              orgs.Contains(songOrg.OrganisationId))));
         }
 
 
