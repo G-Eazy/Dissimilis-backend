@@ -20,7 +20,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="orgs"> the organisation to check for</param>
         /// <param name="user"> The user to chek for</param>
         /// <returns> true if readpermission</returns>
-        public static Expression<Func<Song, bool>> ReadAccessToSong(List<int> groups, List<int> orgs, User user)
+        public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
         {
             return (song => song.ProtectionLevel == ProtectionLevels.All
             //include songs created by you
@@ -33,11 +33,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             //include only songs within your groups
             || (song.ProtectionLevel > ProtectionLevels.Private &&
             song.SharedGroups.Any(songGroup =>
-                groups.Contains(songGroup.GroupId)))            
+                user.GetAllGroupIds().Contains(songGroup.GroupId)))            
             //include only songs within your organisations
             || (song.ProtectionLevel > ProtectionLevels.Group &&
             song.SharedOrganisations.Any(songOrg =>
-              orgs.Contains(songOrg.OrganisationId))));
+              user.GetAllOrganisationIds().Contains(songOrg.OrganisationId))));
         }
 
 

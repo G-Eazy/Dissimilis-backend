@@ -115,16 +115,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-            var userGroups = Context.GroupUsers.Where(u => u.UserId == user.Id).Include(g => g.Group).Select(u => u.GroupId).ToList();
-            var userOrg = Context.OrganisationUsers.Where(u => u.UserId == user.Id).Include(o=>o.Organisation).Select(u=> u.OrganisationId).ToList();
-
             var query = Context.Songs
                 .Include(s => s.Arranger)
                 .Include(s => s.SharedGroups)
                 .ThenInclude(sg => sg.Group)
                 .AsQueryable()
                 .Where(
-                SongExtension.ReadAccessToSong(userGroups, userOrg, user)
+                SongExtension.ReadAccessToSong(user)
                 );
 
 
