@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Controllers.BoBar.Query;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -32,7 +33,6 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
             return Created($"{item.SongChordId}", result);
         }
 
-
         /// <summary>
         /// Update note
         /// </summary>
@@ -54,6 +54,33 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         {
             await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, chordId));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
+            return Ok(result);
+        }
+    }
+
+    [Route("api/note")]
+    [ApiController]
+    public class GlobalNoteController : Controller
+    {
+        /// <summary>
+        /// Used for fetching all possible chord names.
+        /// </summary>
+        [HttpGet("chordOptions/")]
+        [ProducesResponseType(typeof(ChordOptionsDto), (int)HttpStatusCode.OK)]
+        public IActionResult GetChordOptions()
+        {
+            var result = GetChordOptionsCommandHandler.Handle();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Used for fetching all possible single notes.
+        /// </summary>
+        [HttpGet("singleNoteOptions/")]
+        [ProducesResponseType(typeof(SingleNoteOptionsDto), (int)HttpStatusCode.OK)]
+        public IActionResult GetSingleNoteOptions()
+        {
+            var result = GetSingleNoteOptionsCommandHandler.Handle();
             return Ok(result);
         }
     }
