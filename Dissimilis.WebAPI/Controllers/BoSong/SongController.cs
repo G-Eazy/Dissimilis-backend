@@ -188,5 +188,43 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok(result);
         }
 
+        /// <summary>
+        /// Duplicate song
+        /// </summary>
+        [HttpPost("{songId:int}/shareSong/User")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongUser(int songId, [FromBody] ShareSongDto command)
+        {
+            var result = await _mediator.Send(new ShareSongUserCommand(songId, command));
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Duplicate song
+        /// </summary>
+        [HttpPost("{songId:int}/shareSong/Group")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongGroup(int songId, [FromBody] ShareSongDto command)
+        {
+            var result = await _mediator.Send(new ShareSongGroupCommand(songId, command));
+
+            return Ok(result);
+        }
+        /// <summary>
+        /// Duplicate song
+        /// </summary>
+        [HttpPost("{songId:int}/shareSong/Organisation")]
+        [ProducesResponseType(typeof(UpdatedSongCommandDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] ShareSongDto command)
+        {
+            var result = await _mediator.Send(new ShareSongOrganisationCommand(songId, command));
+
+            return Ok(result);
+        }
+
     }
 }

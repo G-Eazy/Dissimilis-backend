@@ -69,7 +69,7 @@ namespace Dissimilis.DbContext.Models
         public ICollection<OrganisationUser> Organisations { get; set; } = new List<OrganisationUser>();
 
         /// <summary>
-        /// the different Organisations this user is in with the corresponding role
+        /// the different songs this user have write permission on
         /// </summary>
         public ICollection<SongSharedUser> SongsShared { get; set; } = new List<SongSharedUser>();
 
