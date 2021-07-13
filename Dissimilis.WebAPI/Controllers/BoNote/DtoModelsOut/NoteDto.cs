@@ -46,7 +46,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut
                 Position = int.Parse(json["Position"].Value<string>()),
                 Length = int.Parse(json["Length"].Value<string>()),
                 Notes = notes.ToArray(),
-                ChordName = (json["ChordName"].HasValues) ? json["ChordName"].Value<string>() : null
+                ChordName = (json["ChordName"].Value<string>() != null) ? json["ChordName"].Value<string>() : null
             };
         }
 

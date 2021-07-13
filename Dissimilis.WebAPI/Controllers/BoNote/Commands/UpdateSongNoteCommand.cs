@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -13,11 +15,13 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
     public class UpdateSongNoteCommand : IRequest<UpdatedCommandDto>
     {
+        public int SongId { get; }
         public int SongChordId { get; }
         public UpdateNoteDto Command { get; }
 
-        public UpdateSongNoteCommand(int songChordId, UpdateNoteDto command)
+        public UpdateSongNoteCommand(int songId, int songChordId, UpdateNoteDto command)
         {
+            SongId = songId;
             SongChordId = songChordId;
             Command = command;
         }
@@ -25,11 +29,13 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
     public class UpdateSongNoteCommandHandler : IRequestHandler<UpdateSongNoteCommand, UpdatedCommandDto>
     {
+        private readonly SongRepository _songRepository;
         private readonly NoteRepository _noteRepository;
         private readonly IAuthService _IAuthService;
 
-        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, IAuthService IAuthService)
+        public UpdateSongNoteCommandHandler(SongRepository songRepository, NoteRepository noteRepository, IAuthService IAuthService)
         {
+            _songRepository = songRepository;
             _noteRepository = noteRepository;
             _IAuthService = IAuthService;
         }
@@ -42,6 +48,8 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
+            Song song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             songNote.Length = request.Command?.Length ?? songNote.Length;
             songNote.Position = request.Command?.Position ?? songNote.Position;

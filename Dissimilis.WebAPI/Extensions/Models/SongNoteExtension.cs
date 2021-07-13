@@ -315,6 +315,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     if (note == null)
                         note = NoteDto.ConvertToSongNote(noteDto, bar);
                     note.SetNoteValues(noteDto.Notes);
+                    note.ChordName = noteDto.ChordName;
+                    note.Length = noteDto.Length;
                     newNotes.Add(note);
                 }
             }

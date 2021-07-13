@@ -279,7 +279,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
             JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();
-            User createdBy = song.CreatedBy;
 
             // Construct new song from snapshot
             song.Title = deserialisedSong["Title"].Value<string>();
