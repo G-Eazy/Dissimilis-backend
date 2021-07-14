@@ -5,6 +5,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -189,41 +190,43 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Duplicate song
+        /// share song with users, all the given users get editpermission
         /// </summary>
         [HttpPost("{songId:int}/shareSong/User")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ShareSongUser(int songId, [FromBody] ShareSongDto command)
         {
-            var result = await _mediator.Send(new ShareSongUserCommand(songId, command));
-
-            return Ok(result);
+            await _mediator.Publish(new ShareSongUserCommand(songId, command));
+            return Ok();
         }
 
         /// <summary>
-        /// Duplicate song
+        /// Share song with groups, alle the users in the groups gets read permission 
         /// </summary>
         [HttpPost("{songId:int}/shareSong/Group")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ShareSongGroup(int songId, [FromBody] ShareSongDto command)
         {
-            var result = await _mediator.Send(new ShareSongGroupCommand(songId, command));
+            await _mediator.Publish(new ShareSongGroupCommand(songId, command));
 
-            return Ok(result);
+            return Ok();
         }
         /// <summary>
-        /// Duplicate song
+        /// Share song with organisations, alle the users in the organisations gets read permission 
         /// </summary>
         [HttpPost("{songId:int}/shareSong/Organisation")]
-        [ProducesResponseType(typeof(UpdatedSongCommandDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] ShareSongDto command)
         {
-            var result = await _mediator.Send(new ShareSongOrganisationCommand(songId, command));
+            await _mediator.Publish(new ShareSongOrganisationCommand(songId, command));
 
-            return Ok(result);
+            return Ok();
         }
 
     }

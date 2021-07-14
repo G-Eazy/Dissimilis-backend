@@ -79,8 +79,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
                 song.SyncVoicesFrom(cloneVoice);
             }
 
-            await _voiceRepository.UpdateAsync(cancellationToken);
-
             try
             {
                 await _voiceRepository.UpdateAsync(cancellationToken);
