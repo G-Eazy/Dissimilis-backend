@@ -49,9 +49,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
             var user = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(user);
 
             await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            song.PerformSnapshot(user);
 
             songVoice.AddComponentInterval(request.Command.IntervalPosition);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);

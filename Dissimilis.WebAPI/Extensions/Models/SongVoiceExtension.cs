@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             foreach (var voiceJSON in voiceJsonArr)
             {
                 SongVoiceDto voiceDto = SongVoiceDto.JsonToSongVoiceDto(voiceJSON);
-                SongVoice voice = song.Voices.FirstOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
+                SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
                 if (voice == null)
                     voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById);
 

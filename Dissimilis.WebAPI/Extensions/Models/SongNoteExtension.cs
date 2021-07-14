@@ -305,13 +305,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 {
                     for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
                     {
-                        var noteToBeRemoved = bar.Notes.FirstOrDefault(n => n.Position == i);
+                        var noteToBeRemoved = bar.Notes.SingleOrDefault(n => n.Position == i);
                         bar.Notes.Remove(noteToBeRemoved);
                     }
                 }
                 else
                 {
-                    SongNote note = bar.Notes.FirstOrDefault(n => n.Position == noteDto.Position);
+                    SongNote note = bar.Notes.SingleOrDefault(n => n.Position == noteDto.Position);
                     if (note == null)
                         note = NoteDto.ConvertToSongNote(noteDto, bar);
                     note.SetNoteValues(noteDto.Notes);

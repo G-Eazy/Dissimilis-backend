@@ -48,15 +48,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             }
             var user = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(user);
-            var sourceVoice = songVoice.Song.Voices.FirstOrDefault(v => v.Id == request.Command.SourceVoiceId);
+            var sourceVoice = songVoice.Song.Voices.SingleOrDefault(v => v.Id == request.Command.SourceVoiceId);
             if (sourceVoice == null)
             {
                 throw new NotFoundException($"Source voice with id {request.Command.SourceVoiceId} not found");
             }
 
             await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
+            song.PerformSnapshot(user);
             songVoice.DuplicateAllChords(sourceVoice, request.Command.IncludeComponentIntervals);
             songVoice.SetSongVoiceUpdated(user.Id);
             try

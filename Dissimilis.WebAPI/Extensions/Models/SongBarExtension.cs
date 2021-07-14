@@ -151,7 +151,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             foreach (var barJSON in barJsonArr)
             {
                 BarDto barDto = BarDto.JsonToBarDto(barJSON);
-                SongBar bar = voice.SongBars.FirstOrDefault(b => b.Position == barDto.Position);
+                SongBar bar = voice.SongBars.SingleOrDefault(b => b.Position == barDto.Position);
                 if (bar == null)
                     bar = BarDto.ConvertToSongBar(barDto);
 
