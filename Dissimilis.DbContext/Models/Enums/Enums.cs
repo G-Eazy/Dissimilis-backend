@@ -15,12 +15,8 @@ namespace Dissimilis.DbContext.Models.Enums
     {
         [Description("Private")]
         Private = 10,
-        [Description("Group")]
-        Group = 20,
-        [Description("Organisation")]
-        Organisation = 30,
-        [Description("All")]
-        All = 40
+        [Description("Public")]
+        Public = 20
     }
 
     public enum DefinedInstruments
