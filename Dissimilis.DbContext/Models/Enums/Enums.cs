@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Dissimilis.DbContext.Models.Enums
 {
@@ -13,10 +14,10 @@ namespace Dissimilis.DbContext.Models.Enums
 
     public enum ProtectionLevels
     {
+        [Description("Private")]
         Private = 10,
-        Group = 20,
-        Organisation = 30,
-        All = 40
+        [Description("Public")]
+        Public = 20
     }
 
     public enum DefinedInstruments

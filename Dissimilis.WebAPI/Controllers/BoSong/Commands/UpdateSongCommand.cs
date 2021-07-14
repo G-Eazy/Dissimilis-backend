@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -42,8 +43,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             song.SongNotes = request.Command?.SongNotes ?? song.SongNotes;
             song.Speed = request.Command?.Speed ?? song.Speed;
             song.DegreeOfDifficulty = request.Command?.DegreeOfDifficulty ?? song.DegreeOfDifficulty;
+            song.ProtectionLevel = request.Command?.ProtectionLevel ?? song.ProtectionLevel;
             song.SetUpdated(_IAuthService.GetVerifiedCurrentUser());
-
             await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(song);

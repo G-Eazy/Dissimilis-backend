@@ -203,9 +203,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Share song with groups, alle the users in the groups gets read permission 
+        /// Add tag song with groups
         /// </summary>
-        [HttpPost("{songId:int}/shareSong/Group")]
+        [HttpPost("{songId:int}/AddTag/Group")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -216,9 +216,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok();
         }
         /// <summary>
-        /// Share song with organisations, alle the users in the organisations gets read permission 
+        /// Add tag with organisations
         /// </summary>
-        [HttpPost("{songId:int}/shareSong/Organisation")]
+        [HttpPost("{songId:int}/AddTag/Organisation")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
