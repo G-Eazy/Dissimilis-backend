@@ -1,12 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoGroup;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoUser;
+using Dissimilis.WebAPI.Extensions;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +54,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 var groupToAdd = await _groupRepository.GetGroupById(group, cancellationToken);
                 var isShared = await _songRepository.GetSongSharedGroup(song.Id, groupToAdd.Id);
+                if (!currentUser.GetAllGroupIds().Contains(group))
+                {
+                    throw new Exception("Can only tag a song with groups you are in");
+                }
 
                 if (isShared != null)
                 {
