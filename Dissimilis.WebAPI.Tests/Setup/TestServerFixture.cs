@@ -86,6 +86,24 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
+        public static List<Organisation> GetSupplementOrganisations()
+        {
+            return new List<Organisation>(){
+                new Organisation()
+                {
+                    Name = "Spain"
+                },
+                new Organisation()
+                {
+                    Name = "Guatamala"
+                },
+                new Organisation()
+                {
+                    Name = "France"
+                }
+            };
+        }
+
         public static OrganisationUser GetDefaultTestOrganisationUser()
         {
             return new OrganisationUser()
