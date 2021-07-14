@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 
                 if (isShared != null)
                 {
-                    throw new Exception("User already added to song");
+                    throw new Exception("Group already added to song");
                 }
 
                 var songSharedGroup = new SongSharedGroup()
