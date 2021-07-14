@@ -9,6 +9,7 @@ using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Dissimilis.WebAPI.Extensions;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
@@ -51,8 +52,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 var organisationToAdd = await _organisationRepository.GetOrganisationById(organisation, cancellationToken);
                 var isShared = await _songRepository.GetSongSharedOrganisation(song.Id, organisationToAdd.Id);
-                
-                if(isShared != null)
+
+                if (!currentUser.GetAllOrganisationIds().Contains(organisation))
+                {
+                    throw new Exception("Can only tag a song with organisations you are in");
+                }
+
+                if (isShared != null)
                 {
                     throw new Exception("Organisation already added to song");
                 }
