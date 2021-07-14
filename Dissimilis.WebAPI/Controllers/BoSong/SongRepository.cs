@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -168,6 +169,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .ToArrayAsync(cancellationToken);
 
             return result;
+        }
+
+        /// <summary>
+        /// Checks if the specified user har writing access to the specified song.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<bool> HasWriteAccess(Song song, User user)
+        {
+            return song.ArrangerId == user.Id
+                || await Context.SongSharedUser.AnyAsync(songSharedUser =>
+                        songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
         }
     }
 }

@@ -7,6 +7,8 @@ using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
+using Dissimilis.WebAPI.Controllers.BoSong;
+using System;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
@@ -30,17 +32,27 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
     {
         private readonly NoteRepository _noteRepository;
         private readonly BarRepository _barRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, IAuthService IAuthService)
+        public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService)
         {
             _noteRepository = noteRepository;
             _barRepository = barRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongNoteCommand request, CancellationToken cancellationToken)
         {
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
             var songNote = bar.Notes.FirstOrDefault(songNote => songNote.Id == request.SongChordId);
