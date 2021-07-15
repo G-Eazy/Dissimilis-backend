@@ -76,7 +76,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public void ChangeCurrentUserId(int newCurrentUserId)
+        public static void ChangeCurrentUserId(int newCurrentUserId)
         {
             TestServerFixture.CurrentUserId = newCurrentUserId;
         }
@@ -89,21 +89,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static List<Organisation> GetSupplementOrganisations()
+        public static Organisation GetSupplementOrganisation()
         {
-            return new List<Organisation>(){
-                new Organisation()
-                {
-                    Name = "Spain"
-                },
-                new Organisation()
-                {
+            return new Organisation(){
                     Name = "Guatamala"
-                },
-                new Organisation()
-                {
-                    Name = "France"
-                }
             };
         }
 
@@ -132,6 +121,33 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Role = DbContext.Models.Enums.Role.Member,
                 },
             };
+        }
+
+        public static List<SongSharedOrganisation> GetDefaultSongSharedOrganisations()
+        {
+            return new List<SongSharedOrganisation>()
+            {
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+            };
+        }
+
+        public static List<SongSharedGroup> GetDefaultSongSharedGroups()
+        {
+            return new List<SongSharedGroup>()
+            {
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+            };
+        }
+
+        public static SongSharedUser GetDefaultSongSharedUser()
+        {
+            return new SongSharedUser() { };
         }
 
         public static List<Group> GetTestGroups()
@@ -189,11 +205,43 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
+        public static List<Song> GetSupplementTestSongs()
+        {
+            return new List<Song>()
+            {
+                new Song()
+                {
+                    Title = "Supplement test song 1",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 2",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 3",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 4",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+            };
+        }
+
+
         public static SongVoice GetDefaultTestSongVoice()
         {
             return new SongVoice()
             {
-                VoiceName = "Sheet",
+                VoiceName = "Main",
                 IsMainVoice = true,
                 VoiceNumber = 1,
             };

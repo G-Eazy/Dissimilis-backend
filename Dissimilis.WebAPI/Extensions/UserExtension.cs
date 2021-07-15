@@ -7,11 +7,6 @@ namespace Dissimilis.WebAPI.Extensions
 {
     public static class UserExtension
     {
-
-        public static bool IsSystemAdmin(this User user)
-        {
-            return user.IsSystemAdmin;
-        }
         public static bool IsAdminForGroup(this User user, int groupId)
         {
             return user.Groups.Any(x => x.GroupId == groupId && x.Role == Role.Admin);

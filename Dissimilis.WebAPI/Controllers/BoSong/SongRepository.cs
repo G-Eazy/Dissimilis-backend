@@ -11,7 +11,6 @@ using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.DbContext.Models.Enums;
 using System;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
-using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
