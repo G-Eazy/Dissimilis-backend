@@ -69,10 +69,5 @@ namespace Dissimilis.DbContext.Models.Song
                 Notes = Notes.Select(n => n.Clone()).ToList()
             };
         }
-
-        public static string[] GetValidatedNoteValues()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

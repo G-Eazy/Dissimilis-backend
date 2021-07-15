@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 .Include(b => b.SongVoice.Song)
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
-                .FirstOrDefaultAsync(x => x.Id == barId, cancellationToken);
+                .SingleOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
             if (bar == null)
             {
@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 .Include(sv => sv.Instrument)
                 .Include(sv => sv.Song)
                 .Where(p => p.SongId == songId)
-                .FirstOrDefaultAsync(p => p.Id == songVoiceId, cancellationToken);
+                .SingleOrDefaultAsync(p => p.Id == songVoiceId, cancellationToken);
 
             if (part == null)
             {
@@ -65,42 +65,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             return part;
         }
 
-        /// <summary>
-        /// Looks for an instrument with title InstrumentName, and creates if non-existant
-        /// </summary>
-        public async Task<Instrument> CreateOrFindInstrument(string instrumentName, CancellationToken cancellationToken)
-        {
-
-            var instrument = await context.Instruments.FirstOrDefaultAsync(i => i.Name == instrumentName, cancellationToken);
-
-            if (instrument != null)
-            {
-                return instrument;
-            }
-
-            if (instrumentName == null)
-            {
-                var mainDuplicate = await context.Instruments.FirstOrDefaultAsync(i => i.Name == "Main 1", cancellationToken);
-                if (mainDuplicate != null)
-                {
-                    return mainDuplicate;
-                }
-                instrument = new Instrument("Main 1");
-            }
-            else
-            {
-                instrument = new Instrument(instrumentName);
-            }
-
-            await context.Instruments.AddAsync(instrument, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return instrument;
-        }
-
         public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await context.Songs
-                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {

@@ -44,7 +44,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         {
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             var user = _authService.GetVerifiedCurrentUser();
-            song.PerformSnapshot(user);
 
             if (song == null)
             {
@@ -67,7 +66,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             }
 
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
+            song.PerformSnapshot(user);
             songNote.RemoveComponentInterval(request.Command.IntervalPosition);
             try
             {
