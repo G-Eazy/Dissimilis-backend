@@ -119,114 +119,16 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-            var query = Context.Songs
-                .Include(s => s.Arranger)
-                .Include(s => s.SharedGroups)
-                .ThenInclude(sg => sg.Group)
-                .AsQueryable()
-                .Where(
-                SongExtension.ReadAccessToSong(user)
-                );
-
-
-            if (!string.IsNullOrEmpty(searchCommand.Title))
-            {
-                var textSearch = $"%{searchCommand.Title.Trim()}%";
-                query = query
-                    .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
-                    .AsQueryable();
-            }
-            //returns only the songs shared with you that you have write permission on
-            if (searchCommand?.IncludeSharedWithUser == true)
-            {
-                query = query
-                    .Where(song =>
-                        song.SharedUsers.Any(sharedSong =>
-                                sharedSong.UserId == user.Id))
-                    .AsQueryable();
-            }
-            //if you only want to filter on groups 
-            if( searchCommand.IncludedOrganisationIdArray != null && searchCommand.IncludedGroupIdArray == null)
-            {
-                query = query
-                    .Where(song =>
-                        song.SharedOrganisations.Any(org =>
-                            searchCommand.IncludedOrganisationIdArray.Contains(org.OrganisationId)))
-                    .AsQueryable();
-            }
-            //if you only want to filter on organisations
-            else if (searchCommand.IncludedGroupIdArray != null && searchCommand.IncludedOrganisationIdArray == null)
-            {
-                query = query
-                    .Where(song =>
-                        song.SharedGroups.Any(group =>
-                                searchCommand.IncludedGroupIdArray.Contains(group.GroupId)))
-                    .AsQueryable();
-            }
-
-            //handles the case if you want one to se one organisation and a group not within that organisation
-            else if( searchCommand.IncludedGroupIdArray != null && searchCommand.IncludedOrganisationIdArray != null)
-            {
-                query = query.Where(song => (
-                song.SharedGroups.Any(group =>
-                searchCommand.IncludedGroupIdArray.Contains(group.GroupId)) ||
-
-                song.SharedOrganisations.Any(org =>
-                searchCommand.IncludedOrganisationIdArray.Contains(org.OrganisationId)))
-                ).AsQueryable();
-            }
-
-            if (searchCommand.ArrangerId != null)
-            {
-                query = query
-                    .Where(s => s.ArrangerId == searchCommand.ArrangerId)
-                    .AsQueryable();
-            }
-
-            if (searchCommand.OrderBy == "song")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else if (searchCommand.OrderBy == "user")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else
-            {
-                query = searchCommand.OrderDescending ? 
-                    query.OrderByDescending(s => s.UpdatedOn) :
-                    query.OrderBy(s => s.UpdatedOn);
-            }
-
-            if (searchCommand.MaxNumberOfSongs != null)
-            {
-                query = query
-                    .Take(searchCommand.MaxNumberOfSongs.Value)
-                    .AsQueryable();
-            }
-
-            var result = await query
-                .ToArrayAsync(cancellationToken);
-
-            return result;
-        }
-
-        public async Task<Song[]> GetSongSearchList2(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
-        {
             return await Context.Songs
+                .Include(song => song.Arranger)
+                .Include(song => song.SharedUsers)
+                .Include(song => song.SharedGroups)
+                .Include(song => song.SharedOrganisations)
                 .AsQueryable()
-                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser)
+                .Where(SongExtension.ReadAccessToSong(user))
+                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
-                .Take(searchCommand?.MaxNumberOfSongs ?? 1000)
-                .AsQueryable()
+                .Take(searchCommand.MaxNumberOfSongs)
                 .ToArrayAsync(cancellationToken);
         }
 
@@ -246,12 +148,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public static class IQueryableExtension
     {
-        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser)
+        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser, bool includeAll)
         {
             return songs
                 .Where(song =>
-                    IsSongIncludedInTags(song, currentUser, includedOrganisationIdArray, includedGroupIdArray, includeSharedWithUser)
-                    && IsSongIncludedInSearchFilter(song, searchText, arrangerId));
+                    (   (EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
+                        || EF.Functions.Like(song.Arranger.Name, $"%{searchText.Trim()}%"))
+                        && (arrangerId == null || song.ArrangerId == arrangerId)
+                    )
+                    &&
+                    (
+                        includeAll
+                        ||
+                        (
+                            (includeSharedWithUser && song.SharedUsers.Any(sharedSong => sharedSong.UserId == currentUser.Id))
+                            || song.SharedOrganisations.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
+                            || song.SharedGroups.Any(group => includedGroupIdArray.Contains(group.GroupId))
+                        )
+                    )
+                    );
         }
 
         public static IQueryable<Song> OrderQueryable(this IQueryable<Song> songs, string fieldToOrderBy, bool isDescendingSort)
@@ -268,39 +183,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                                   ? songs.OrderByDescending(song => song.UpdatedOn)
                                   : songs.OrderBy(song => song.UpdatedOn),
             };
-        }
-
-        private static bool IsSongIncludedInTags(Song song, User user, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser)
-        {
-            return ((includeSharedWithUser && IsSongSharedWithUser(song, user)) ||
-                    IsSongSharedWithOrganisation(song, includedOrganisationIdArray) ||
-                    IsSongSharedWithGroup(song, includedGroupIdArray));
-        }
-
-        private static bool IsSongSharedWithUser(Song song, User user)
-        {
-            return song.SharedUsers.Any(sharedSong => sharedSong.UserId == user.Id);
-        }
-
-        private static bool IsSongSharedWithOrganisation(Song song, int[] organisationIds)
-        {
-            return song.SharedOrganisations.Any(organisation => organisationIds.Contains(organisation.OrganisationId));
-        }
-
-        private static bool IsSongSharedWithGroup(Song song, int[] groupIds)
-        {
-            return song.SharedGroups.Any(group => groupIds.Contains(group.GroupId));
-        }
-
-        private static bool IsSongIncludedInSearchFilter(Song song, string searchText, int? arrangerId)
-        {
-            return IsSongContainingSearchText(song, searchText) && (arrangerId == null || song.ArrangerId == arrangerId);
-        }
-
-        private static bool IsSongContainingSearchText(Song song, string searchText)
-        {
-            searchText = $"%{searchText.Trim()}%";
-            return EF.Functions.Like(song.Title, searchText) || EF.Functions.Like(song.Arranger.Name, searchText);
         }
     }
 }

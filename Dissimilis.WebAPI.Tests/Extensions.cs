@@ -229,7 +229,8 @@ namespace Dissimilis.WebAPI.xUnit
             {
                 Title = "Testuser",
                 OrderBy = "date",
-                OrderDescending = true
+                OrderDescending = true,
+                IncludeAll = true,
             };
         }
     }
