@@ -227,6 +227,30 @@ namespace Dissimilis.WebAPI.Extensions.Models
             "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"
         };
 
+        private static Dictionary<string, string[]> AllChordOptions { get; set; } = GenerateAllChordOptions();
+
+        private static Dictionary<string, string[]> GenerateAllChordOptions()
+        {
+            Dictionary<string, string[]> chordOptions = new();
+
+            foreach (var rootNote in _allNotes)
+            {
+                foreach (var chordFormula in ChordFormulas)
+                {
+                    string chordPattern = chordFormula[2].Split(" ")[0];
+                    chordPattern = chordPattern == "M" ? "" : chordPattern;
+
+                    string[] intervalNames = chordFormula[0].Split(" ")
+                        .Select(interval => IntervalNames[Int64.Parse(interval.Substring(0, interval.Length - 1)) - 1])
+                        .ToArray();
+
+                    chordOptions[rootNote + chordPattern] = intervalNames;
+                }
+            }
+
+            return chordOptions;
+        }
+
         private static (string, string) GetRootNoteAndChordPattern(string chordName)
         {
             string rootNote;
@@ -283,25 +307,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static Dictionary<string, string[]> GetAllChordOptions()
         {
-            Dictionary<string, string[]> chordOptions = new();
-
-            foreach (var rootNote in _allNotes)
-            {
-                foreach (var chordFormula in ChordFormulas)
-                {
-                    string chordPattern = chordFormula[2].Split(" ")[0];
-                    chordPattern = chordPattern == "M" ? "" : chordPattern;
-
-                    string[] intervalNames = chordFormula[0].Split(" ")
-                        .Select(interval => IntervalNames[Int64.Parse(interval.Substring(0, interval.Length - 1)) - 1])
-                        .ToArray();
-
-                    chordOptions[rootNote + chordPattern] = intervalNames;
-                }
-            }
-
-            return chordOptions;
+            return new Dictionary<string, string[]>(AllChordOptions);
         }
+
+        
 
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
