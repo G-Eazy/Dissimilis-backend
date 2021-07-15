@@ -236,15 +236,15 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         }
 
-        public static Song Clone(this Song song, string title = null)
+        public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
             {
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
                 Speed = song.Speed,
+                ArrangerId = arrangerId,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
