@@ -113,6 +113,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task RestoreSong(Song song, CancellationToken cancellationToken)
+        {
+            song.Deleted = false;
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<Song[]> GetSongSearchList(SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
 
