@@ -19,7 +19,7 @@ namespace Dissimilis.DbContext.Models.Song
         public User CreatedBy { get; set; }
 
         [Required]
-        public DateTimeOffset CreatedOn { get; set; }
+        public DateTimeOffset CreatedOn { get; set; } = DateTimeOffset.Now;
         
         [Required]
         public string SongObjectJSON { get; set; }

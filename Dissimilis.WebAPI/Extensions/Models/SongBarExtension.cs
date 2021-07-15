@@ -145,18 +145,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songBar;
         }
 
-        public static List<SongBar> GetSongBarsFromJson(JToken barJsonArr, SongVoice voice)
+        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice)
         {
             List<SongBar> newBars = new List<SongBar>();
-            foreach (var barJSON in barJsonArr)
+            foreach (var barDto in barDtos)
             {
-                BarDto barDto = BarDto.JsonToBarDto(barJSON);
                 SongBar bar = voice.SongBars.SingleOrDefault(b => b.Position == barDto.Position);
                 if (bar == null)
                     bar = BarDto.ConvertToSongBar(barDto);
 
-                var noteJsonArr = barJSON["Chords"];
-                bar.Notes = SongNoteExtension.GetSongNotesFromJson(noteJsonArr, bar);
+                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar);
                 newBars.Add(bar);
             }
             return newBars;

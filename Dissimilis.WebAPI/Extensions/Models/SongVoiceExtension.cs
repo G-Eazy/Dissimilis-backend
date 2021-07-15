@@ -29,18 +29,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
         }
 
 
-        public static List<SongVoice> GetSongVoicesFromJson(Song song, SongSnapshot snapshot, JArray voiceJsonArr)
+        public static List<SongVoice> GetSongVoicesFromDto(Song song, SongSnapshot snapshot, SongVoiceDto[] voiceDtos)
         {
             List<SongVoice> voices = new List<SongVoice>();
-            foreach (var voiceJSON in voiceJsonArr)
+            foreach (var voiceDto in voiceDtos)
             {
-                SongVoiceDto voiceDto = SongVoiceDto.JsonToSongVoiceDto(voiceJSON);
                 SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
                 if (voice == null)
                     voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById);
 
-                var barJsonArr = voiceJSON["Bars"];
-                voice.SongBars = SongBarExtension.GetSongBarsFromJson(barJsonArr, voice);
+                voice.SongBars = SongBarExtension.GetSongBarsFromDto(voiceDto.Bars, voice);
                 voices.Add(voice);
             }
             return voices;

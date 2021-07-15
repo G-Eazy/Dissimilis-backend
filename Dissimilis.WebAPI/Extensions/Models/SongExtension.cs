@@ -265,26 +265,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static void Undo(this Song song)
         {
+            if (song.Snapshots.Count == 0)
+                throw new NotFoundException("No more snapshots to pop...");
+
             SongSnapshot snapshot = song.PopSnapshot(true);
-            SongSnapshotDto snapshotDto;
+            Console.WriteLine(snapshot.SongObjectJSON);
+            SongByIdDto deserialisedSong = Newtonsoft.Json.JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
 
-            try
-            {
-                snapshotDto = Newtonsoft.Json.JsonConvert.DeserializeObject<SongSnapshotDto>(snapshot.SongObjectJSON);
-            }
-            catch(NullReferenceException e)
-            {
-                throw new NullReferenceException("No more snapshots to pop...");
-            }
-
-            JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
-            JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();
+            /*JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
+            JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();*/
 
             // Construct new song from snapshot
-            song.Title = deserialisedSong["Title"].Value<string>();
+            song.Title = deserialisedSong.Title;
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
-            song.Voices = SongVoiceExtension.GetSongVoicesFromJson(song, snapshot, voiceJSONs);
+            song.Voices = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
         }
 
         /// <summary>
@@ -294,15 +289,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
-            var s = new SongByIdDto(song);
-            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(new {
-                Title = s.Title,
-                Voices = s.Voices
-            });
+            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(new SongByIdDto(song));
+            Console.WriteLine(JSONsnapshot);
 
             SongSnapshot snapshot = new SongSnapshot()
             {
-                SongId = s.SongId,
+                SongId = song.Id,
                 CreatedById = user.Id,
                 CreatedOn = DateTimeOffset.Now,
                 SongObjectJSON = JSONsnapshot

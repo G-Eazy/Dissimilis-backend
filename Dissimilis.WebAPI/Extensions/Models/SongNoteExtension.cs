@@ -294,12 +294,11 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songNote;
         }
 
-        public static List<SongNote> GetSongNotesFromJson(JToken noteJsonArr, SongBar bar)
+        public static List<SongNote> GetSongNotesFromDto(NoteDto[] noteDtos, SongBar bar)
         {
             List<SongNote> newNotes = new List<SongNote>();
-            foreach (var noteJSON in noteJsonArr)
+            foreach (var noteDto in noteDtos)
             {
-                NoteDto noteDto = NoteDto.JsonToNoteDto(noteJSON);
                 bool emptyNote = noteDto.Notes[0] == "Z";
                 if (emptyNote)
                 {
