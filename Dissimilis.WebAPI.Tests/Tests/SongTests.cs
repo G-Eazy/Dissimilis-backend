@@ -66,14 +66,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
         [Fact]
-        public async Task TestRightPermissionOnSongs()
-        {
-
-        }
-
-
-
-        [Fact]
         public async Task TestGetSongsFromMyLibrary()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
