@@ -74,7 +74,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
         {
             var songs = await Context.Songs
-                .Where(s => s.CreatedById == userId || s.ArrangerId == userId)
+                .Where(s => (s.CreatedById == userId || s.ArrangerId == userId) && !s.Deleted)
                 .ToArrayAsync(cancellationToken);
             
             return songs;
@@ -109,7 +109,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task DeleteSong(Song song, CancellationToken cancellationToken)
         {
-            var song = await GetSongById(song.Id, cancellationToken);
             song.Deleted = true;
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -119,6 +118,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var query = Context.Songs
                 .Include(s => s.Arranger)
+                .Where(s => !s.Deleted)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCommand.Title))
