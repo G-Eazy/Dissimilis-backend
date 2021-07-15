@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +17,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         private readonly TestServer _testServer;
         public HttpClient Client { get; }
         public static int CurrentUserId = GetDefaultTestUser().Id;
+        public static int TestSongId = GetDefaultTestSong().Id;
 
         public TestServerFixture()
         {
@@ -154,6 +157,74 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new GroupUser()
                 {
                     Role = DbContext.Models.Enums.Role.Member,
+                },
+            };
+        }
+
+        public static Song GetDefaultTestSong()
+        {
+            return new Song()
+            {
+                Title = "Default test song",
+                Numerator = 4,
+                Denominator = 4,
+            };
+        }
+
+        public static SongVoice GetDefaultTestSongVoice()
+        {
+            return new SongVoice()
+            {
+                VoiceName = "Sheet",
+                IsMainVoice = true,
+                VoiceNumber = 1,
+            };
+        }
+
+        public static SongBar[] GetDefaultTestSongBars()
+        {
+            return new SongBar[]
+            {
+                new SongBar()
+                {
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 1,
+                },
+                new SongBar()
+                {
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 2,
+                }
+            };
+        }
+
+        public static List<SongNote> GetDefaultTestSongNotes()
+        {
+            return new List<SongNote>()
+            {
+                new SongNote()
+                {
+                    Position = 0,
+                    Length = 1,
+                    ChordName = "D",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("D")),
+                },
+                new SongNote()
+                {
+                    Position = 1,
+                    Length = 1,
+                    ChordName = "F#m",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("F#m")),
+                },new SongNote()
+                {
+                    Position = 2,
+                    Length = 2,
+                    ChordName = "Gmaj7",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("Gmaj7")),
                 },
             };
         }

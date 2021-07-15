@@ -24,6 +24,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             SeedTestOrganisation();
 
             _dbContext.SaveChanges();
+
+            SeedTestSong();
+
+            _dbContext.SaveChanges();
         }
 
         private static void SeedTestUser()
@@ -85,6 +89,49 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 _dbContext.SaveChanges();
 
             }
+        }
+
+        private static void SeedTestSong()
+        {
+            var song = TestServerFixture.GetDefaultTestSong();
+            var songVoice = TestServerFixture.GetDefaultTestSongVoice();
+            var songBars = TestServerFixture.GetDefaultTestSongBars();
+            var songNotes = TestServerFixture.GetDefaultTestSongNotes();
+
+            var songOwner = _dbContext.Users.SingleOrDefault(user =>
+                user.Id == TestServerFixture.CurrentUserId);
+
+            song.Arranger = songOwner;
+            song.ArrangerId = songOwner.Id;
+
+            _dbContext.Songs.Add(song);
+            _dbContext.SaveChanges();
+
+            songVoice.Song = song;
+            songVoice.SongId = song.Id;
+
+            _dbContext.SongVoices.Add(songVoice);
+            _dbContext.SaveChanges();
+
+            foreach (var songBar in songBars)
+            {
+                songBar.SongVoice = songVoice;
+                songBar.SongVoiceId = songVoice.Id;
+
+                _dbContext.SongBars.Add(songBar);
+                _dbContext.SaveChanges();
+            }
+
+            foreach (var songNote in songNotes)
+            {
+                songNote.SongBar = songBars[0];
+                songNote.BarId = songBars[0].Id;
+
+                _dbContext.SongNotes.Add(songNote);
+                _dbContext.SaveChanges();
+            }
+
+            TestServerFixture.TestSongId = song.Id;
         }
 
     }
