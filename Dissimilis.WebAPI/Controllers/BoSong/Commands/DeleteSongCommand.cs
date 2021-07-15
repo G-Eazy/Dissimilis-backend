@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -41,6 +40,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             }
 
             await _songRepository.DeleteSong(song, cancellationToken);
+            song.SetUpdated(currentUser);
 
             return null;
         }

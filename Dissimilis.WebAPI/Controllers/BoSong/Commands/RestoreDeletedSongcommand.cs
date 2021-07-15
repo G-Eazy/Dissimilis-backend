@@ -1,7 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
@@ -36,6 +34,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             await _songRepository.RestoreSong(song, cancellationToken);
+            song.SetUpdated(currentUser);
 
             return new UpdatedSongCommandDto(song);
         }

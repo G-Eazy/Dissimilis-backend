@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 using Dissimilis.DbContext.Models;
+using Dissimilis.WebAPI.Extensions.Interfaces;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -84,6 +86,44 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             await Context.Songs.AddAsync(song, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Method to be used to find songs that are marked as deleted, should not be used to look up songs to edit.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<Song[]> GetMyDeletedSongs(User user)
+        {
+            var songs = Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
+                .Where(s => s.ArrangerId == user.Id && s.Deleted);
+
+            if (songs == null || songs.ToArray().Length == 0)
+            {
+                throw new NotFoundException($"User has no deleted songs from the last 30 days");
+            }
+
+            return songs.ToArray();
+        }
+
+        public async Task RemoveDeletedSongsOlderThanDays(User user, int nDays)
+        {
+            var oldestAllowedDate = DateTimeOffset.Now.AddDays(-nDays);
+
+            var songs = Context.Songs
+                .Include(s => s.Arranger)
+                .Include(s => s.CreatedBy)
+                .Include(s => s.UpdatedBy)
+                .Where(s => s.ArrangerId == user.Id && s.Deleted);
+
+            foreach(var song in songs)
+            {
+                if (song.UpdatedOn < oldestAllowedDate)
+                    Context.Songs.Remove(song);
+            }
         }
 
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
