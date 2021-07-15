@@ -16,8 +16,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <summary>
         /// Return true if the given user have readpermission on the song in the expression
         /// </summary>
-        /// <param name="groups"> The groups to check for</param>
-        /// <param name="orgs"> the organisation to check for</param>
         /// <param name="user"> The user to chek for</param>
         /// <returns> true if readpermission</returns>
         public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
@@ -29,7 +27,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             //include if user is systemAdmin
             || user.IsSystemAdmin
             //include only songs shared with you by userSharing
-            || song.SharedUsers.Any(shared => shared.UserId == user.Id);
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
         }
 
 
@@ -260,15 +258,15 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         }
 
-        public static Song Clone(this Song song, string title = null)
+        public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
             {
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
                 Speed = song.Speed,
+                ArrangerId = arrangerId,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()

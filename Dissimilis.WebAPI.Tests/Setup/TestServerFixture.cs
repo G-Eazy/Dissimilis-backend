@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +17,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         private readonly TestServer _testServer;
         public HttpClient Client { get; }
         public static int CurrentUserId = GetDefaultTestUser().Id;
+        public static int TestSongId = GetDefaultTestSong().Id;
 
         public TestServerFixture()
         {
@@ -73,7 +76,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public void ChangeCurrentUserId(int newCurrentUserId)
+        public static void ChangeCurrentUserId(int newCurrentUserId)
         {
             TestServerFixture.CurrentUserId = newCurrentUserId;
         }
@@ -86,21 +89,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static List<Organisation> GetSupplementOrganisations()
+        public static Organisation GetSupplementOrganisation()
         {
-            return new List<Organisation>(){
-                new Organisation()
-                {
-                    Name = "Spain"
-                },
-                new Organisation()
-                {
+            return new Organisation(){
                     Name = "Guatamala"
-                },
-                new Organisation()
-                {
-                    Name = "France"
-                }
             };
         }
 
@@ -129,6 +121,33 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Role = DbContext.Models.Enums.Role.Member,
                 },
             };
+        }
+
+        public static List<SongSharedOrganisation> GetDefaultSongSharedOrganisations()
+        {
+            return new List<SongSharedOrganisation>()
+            {
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+                new SongSharedOrganisation() { },
+            };
+        }
+
+        public static List<SongSharedGroup> GetDefaultSongSharedGroups()
+        {
+            return new List<SongSharedGroup>()
+            {
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+                new SongSharedGroup() { },
+            };
+        }
+
+        public static SongSharedUser GetDefaultSongSharedUser()
+        {
+            return new SongSharedUser() { };
         }
 
         public static List<Group> GetTestGroups()
@@ -172,6 +191,106 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new GroupUser()
                 {
                     Role = DbContext.Models.Enums.Role.Member,
+                },
+            };
+        }
+
+        public static Song GetDefaultTestSong()
+        {
+            return new Song()
+            {
+                Title = "Default test song",
+                Numerator = 4,
+                Denominator = 4,
+            };
+        }
+
+        public static List<Song> GetSupplementTestSongs()
+        {
+            return new List<Song>()
+            {
+                new Song()
+                {
+                    Title = "Supplement test song 1",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 2",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 3",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+                new Song()
+                {
+                    Title = "Supplement test song 4",
+                    Numerator = 4,
+                    Denominator = 4,
+                },
+            };
+        }
+
+
+        public static SongVoice GetDefaultTestSongVoice()
+        {
+            return new SongVoice()
+            {
+                VoiceName = "Main",
+                IsMainVoice = true,
+                VoiceNumber = 1,
+            };
+        }
+
+        public static SongBar[] GetDefaultTestSongBars()
+        {
+            return new SongBar[]
+            {
+                new SongBar()
+                {
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 1,
+                },
+                new SongBar()
+                {
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 2,
+                }
+            };
+        }
+
+        public static List<SongNote> GetDefaultTestSongNotes()
+        {
+            return new List<SongNote>()
+            {
+                new SongNote()
+                {
+                    Position = 0,
+                    Length = 1,
+                    ChordName = "D",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("D")),
+                },
+                new SongNote()
+                {
+                    Position = 1,
+                    Length = 1,
+                    ChordName = "F#m",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("F#m")),
+                },new SongNote()
+                {
+                    Position = 2,
+                    Length = 2,
+                    ChordName = "Gmaj7",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("Gmaj7")),
                 },
             };
         }

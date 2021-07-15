@@ -1,4 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+﻿ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -36,9 +36,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
-            var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
-
             var currentUser = _authService.GetVerifiedCurrentUser();
+            var duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
             duplicatedSong.SetUpdated(currentUser.Id);
             await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 

@@ -37,10 +37,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
             // Do we have to get the fullsong to transpose
             var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
-            var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
+            var currentUser = _authService.GetVerifiedCurrentUser();
+            var duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
             duplicatedSong = duplicatedSong.Transpose(request.Command.Transpose);
-
-            duplicatedSong.SetUpdated(_authService.GetVerifiedCurrentUser());
+            duplicatedSong.SetUpdated(currentUser);
             await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
