@@ -23,7 +23,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return (song => song.ProtectionLevel == ProtectionLevels.Public
             //include songs created by you
             || song.ArrangerId == user.Id
-            || song.CreatedById == user.Id
+            
             //include if user is systemAdmin
             || user.IsSystemAdmin
             //include only songs shared with you by userSharing
