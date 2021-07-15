@@ -2,6 +2,7 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 

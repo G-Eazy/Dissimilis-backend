@@ -1,14 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoGroup;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoUser;
-using Dissimilis.WebAPI.Extensions;
+using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -31,10 +29,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
     public class ShareSongGroupCommandHandler : INotificationHandler<ShareSongGroupCommand>
     {
         private readonly SongRepository _songRepository;
-        private readonly OrganisationRepository _groupRepository;
+        private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
 
-        public ShareSongGroupCommandHandler(SongRepository songRepository, OrganisationRepository groupRepository, IAuthService IAuthService)
+        public ShareSongGroupCommandHandler(SongRepository songRepository, GroupRepository groupRepository, IAuthService IAuthService)
         {
             _songRepository = songRepository;
             _groupRepository = groupRepository;

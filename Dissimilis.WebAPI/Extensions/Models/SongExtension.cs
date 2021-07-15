@@ -29,7 +29,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             //include if user is systemAdmin
             || user.IsSystemAdmin
             //include only songs shared with you by userSharing
-            || song.SharedUsers.Any(shared => shared.UserId == user.Id);
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
         }
 
 
