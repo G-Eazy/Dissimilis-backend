@@ -48,6 +48,11 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)
             {
