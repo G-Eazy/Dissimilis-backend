@@ -109,7 +109,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task DeleteSong(Song song, CancellationToken cancellationToken)
         {
-            Context.Songs.Remove(song);
+            var song = await GetSongById(song.Id, cancellationToken);
+            song.Deleted = true;
             await Context.SaveChangesAsync(cancellationToken);
         }
 
