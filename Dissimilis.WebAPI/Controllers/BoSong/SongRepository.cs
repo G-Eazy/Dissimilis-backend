@@ -93,23 +93,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<Song[]> GetMyDeletedSongs(User user)
+        public async Task<Song[]> GetMyDeletedSongs(User user, CancellationToken cancellationToken)
         {
+            await RemoveDeletedSongsOlderThanDays(user, 30, cancellationToken);
             var songs = Context.Songs
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .Where(s => s.ArrangerId == user.Id && s.Deleted);
+                .Where(s => s.ArrangerId == user.Id && s.Deleted)
+                .ToArray();
 
             if (songs == null || songs.ToArray().Length == 0)
             {
                 throw new NotFoundException($"User has no deleted songs from the last 30 days");
             }
 
-            return songs.ToArray();
+            return songs;
         }
 
-        public async Task RemoveDeletedSongsOlderThanDays(User user, int nDays)
+        public async Task RemoveDeletedSongsOlderThanDays(User user, int nDays, CancellationToken cancellationToken)
         {
             var oldestAllowedDate = DateTimeOffset.Now.AddDays(-nDays);
 
@@ -117,13 +119,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .Where(s => s.ArrangerId == user.Id && s.Deleted);
+                .Where(s => s.ArrangerId == user.Id && s.Deleted)
+                .ToArray();
 
-            foreach(var song in songs)
+            foreach (var song in songs)
             {
                 if (song.UpdatedOn < oldestAllowedDate)
                     Context.Songs.Remove(song);
             }
+            await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
@@ -147,9 +151,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteSong(Song song, CancellationToken cancellationToken)
+        public async Task DeleteSong(User user, Song song, CancellationToken cancellationToken)
         {
             song.Deleted = true;
+            await RemoveDeletedSongsOlderThanDays(user, 30, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
 

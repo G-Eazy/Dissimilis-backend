@@ -188,5 +188,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok(result);
         }
 
+        [HttpPatch("{songId:int}/restore")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RestoreSong(int songId)
+        {
+            var item = await _mediator.Send(new RestoreDeletedSongCommand(songId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
+        }
+
     }
 }

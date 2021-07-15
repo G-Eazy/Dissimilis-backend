@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 throw new UnauthorizedAccessException();
             }
 
-            await _songRepository.DeleteSong(song, cancellationToken);
+            await _songRepository.DeleteSong(currentUser, song, cancellationToken);
             song.SetUpdated(currentUser);
 
             return null;
