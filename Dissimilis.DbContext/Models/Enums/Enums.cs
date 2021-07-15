@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Dissimilis.DbContext.Models.Enums
 {

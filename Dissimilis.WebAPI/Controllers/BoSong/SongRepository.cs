@@ -94,7 +94,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
@@ -207,6 +207,30 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .ToArrayAsync(cancellationToken);
 
             return result;
+        }
+
+        public async Task CreateSongShareUser(Song song, User user)
+        {
+            var songSharedUser = new SongSharedUser()
+            {
+                UserId = user.Id,
+                SongId = song.Id
+            };
+            await Context.SongSharedUser.AddAsync(songSharedUser);
+            await Context.SaveChangesAsync();
+        }
+        public async Task<SongSharedUser> GetSongSharedUser(int songId, int userId)
+        {
+            return await Context.SongSharedUser.SingleOrDefaultAsync(x => x.SongId == songId && x.UserId == userId);
+        }
+
+        public async Task<SongSharedGroup> GetSongSharedGroup(int songId, int groupId)
+        {
+            return await Context.SongSharedGroups.SingleOrDefaultAsync(x => x.SongId == songId && x.GroupId == groupId);
+        }
+        public async Task<SongSharedOrganisation> GetSongSharedOrganisation(int songId, int organisationId)
+        {
+            return await Context.SongSharedOrganisations.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
         }
 
         /// <summary>

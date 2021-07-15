@@ -5,6 +5,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -186,6 +187,46 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var result = await _mediator.Send(new QuerySongById(item.SongId));
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// share song with users, all the given users get editpermission
+        /// </summary>
+        [HttpPost("{songId:int}/shareSong/User")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongUser(int songId, [FromBody] ShareSongDto command)
+        {
+            await _mediator.Publish(new ShareSongUserCommand(songId, command));
+            return Ok();
+        }
+
+        /// <summary>
+        /// Add tag song with groups
+        /// </summary>
+        [HttpPost("{songId:int}/AddTag/Group")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongGroup(int songId, [FromBody] ShareSongDto command)
+        {
+            await _mediator.Publish(new ShareSongGroupCommand(songId, command));
+
+            return Ok();
+        }
+        /// <summary>
+        /// Add tag with organisations
+        /// </summary>
+        [HttpPost("{songId:int}/AddTag/Organisation")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] ShareSongDto command)
+        {
+            await _mediator.Publish(new ShareSongOrganisationCommand(songId, command));
+
+            return Ok();
         }
 
     }

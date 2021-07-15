@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
@@ -22,6 +24,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public int? Speed { get; set; }
 
+        public ProtectionLevels? ProtectionLevel { get; set; }
+
         public int? DegreeOfDifficulty { get; set; }
 
         public string Composer { get; set; }
@@ -36,6 +40,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             UpdatedOn = song.UpdatedOn;
             UpdatedBy = song.UpdatedBy?.Name;
             Numerator = song.Numerator;
+            ProtectionLevel = song.ProtectionLevel;
             Denominator = song.Denominator;
             Speed = song.Speed;
             DegreeOfDifficulty = song.DegreeOfDifficulty;

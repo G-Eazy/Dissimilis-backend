@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
@@ -40,6 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                 Numerator = request.Command.Numerator,
                 Denominator = request.Command.Denominator,
                 ArrangerId = currentUser.Id,
+                ProtectionLevel = ProtectionLevels.Private
             };
 
             song.SetCreated(currentUser.Id);
