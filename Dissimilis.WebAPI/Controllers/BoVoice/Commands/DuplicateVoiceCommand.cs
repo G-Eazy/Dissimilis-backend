@@ -44,22 +44,28 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<UpdatedCommandDto> Handle(DuplicateVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
+            var currentUser = _authService.GetVerifiedCurrentUser();
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            var user = _authService.GetVerifiedCurrentUser();
-
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             if (string.IsNullOrEmpty(request.Command.VoiceName))
             {
                 throw new Exception("Voicename can't be a empty string");
             }
 
-            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, user, null, song.Voices.Max(v => v.VoiceNumber));
+            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
+            var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, currentUser, null, song.Voices.Max(v => v.VoiceNumber));
             song.Voices.Add(duplicatedVoice);
 
             try

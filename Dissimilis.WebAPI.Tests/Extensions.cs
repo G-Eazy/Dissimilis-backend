@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;

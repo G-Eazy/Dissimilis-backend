@@ -6,9 +6,12 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Dissimilis.DbContext.Models;
+using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.DbContext.Models.Enums;
 using System;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -112,12 +115,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Song[]> GetSongSearchList(SearchQueryDto searchCommand, CancellationToken cancellationToken)
+        public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-
             var query = Context.Songs
                 .Include(s => s.Arranger)
-                .AsQueryable();
+                .Include(s => s.SharedGroups)
+                .ThenInclude(sg => sg.Group)
+                .AsQueryable()
+                .Where(
+                SongExtension.ReadAccessToSong(user)
+                );
+
 
             if (!string.IsNullOrEmpty(searchCommand.Title))
             {
@@ -125,6 +133,37 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 query = query
                     .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
                     .AsQueryable();
+            }
+            //returns only the songs shared with you that you have write permission on
+            if (searchCommand?.SharedByUser == true)
+            {
+                query = query.Where(s => !s.SharedUsers.All(shared => shared.UserId != user.Id)).AsQueryable();
+            }
+            //if you only want to filter on groups 
+            if( searchCommand.OrgId != null && searchCommand.GroupId == null)
+            {
+                query = query.Where(song =>
+                song.SharedOrganisations.Any(org =>
+                searchCommand.OrgId.Contains(org.OrganisationId))).AsQueryable();
+            }
+            //if you only want to filter on organisations
+            else if (searchCommand.GroupId != null && searchCommand.OrgId == null)
+            {
+                query = query.Where(song =>
+                song.SharedGroups.Any(group =>
+                searchCommand.GroupId.Contains(group.GroupId))).AsQueryable();
+            }
+
+            //handles the case if you want one to se one organisation and a group not within that organisation
+            else if( searchCommand.GroupId != null && searchCommand.OrgId != null)
+            {
+                query = query.Where(song => (
+                song.SharedGroups.Any(group =>
+                searchCommand.GroupId.Contains(group.GroupId)) ||
+
+                song.SharedOrganisations.Any(org =>
+                searchCommand.OrgId.Contains(org.OrganisationId)))
+                ).AsQueryable();
             }
 
             if (searchCommand.ArrangerId != null)
@@ -168,6 +207,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .ToArrayAsync(cancellationToken);
 
             return result;
+        }
+
+        /// <summary>
+        /// Checks if the specified user har writing access to the specified song.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<bool> HasWriteAccess(Song song, User user)
+        {
+            return song.ArrangerId == user.Id
+                || await Context.SongSharedUser.AnyAsync(songSharedUser =>
+                        songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
         }
     }
 }

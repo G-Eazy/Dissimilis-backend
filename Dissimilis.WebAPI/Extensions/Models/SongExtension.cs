@@ -1,6 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Dissimilis.Core.Collections;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -9,6 +13,26 @@ namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class SongExtension
     {
+        /// <summary>
+        /// Return true if the given user have readpermission on the song in the expression
+        /// </summary>
+        /// <param name="groups"> The groups to check for</param>
+        /// <param name="orgs"> the organisation to check for</param>
+        /// <param name="user"> The user to chek for</param>
+        /// <returns> true if readpermission</returns>
+        public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
+        {
+            return (song => song.ProtectionLevel == ProtectionLevels.Public
+            //include songs created by you
+            || song.ArrangerId == user.Id
+            || song.CreatedById == user.Id
+            //include if user is systemAdmin
+            || user.IsSystemAdmin
+            //include only songs shared with you by userSharing
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id);
+        }
+
+
         /// <summary>
         /// Get max bar positions for a song
         /// </summary>

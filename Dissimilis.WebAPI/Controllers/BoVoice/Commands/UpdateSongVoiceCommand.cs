@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -26,16 +28,26 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
     public class UpdateSongVoiceCommandHandler : IRequestHandler<UpdateSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly VoiceRepository _voiceRepository;
-        private readonly IAuthService _IAuthService;
+        private readonly SongRepository _songRepository;
+        private readonly IAuthService _authService;
 
-        public UpdateSongVoiceCommandHandler(VoiceRepository voiceRepository, IAuthService IAuthService)
+        public UpdateSongVoiceCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService)
         {
             _voiceRepository = voiceRepository;
-            _IAuthService = IAuthService;
+            _songRepository = songRepository;
+            _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongVoiceCommand request, CancellationToken cancellationToken)
         {
+            var currentUser = _authService.GetVerifiedCurrentUser();
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
             {
@@ -44,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             songVoice.VoiceNumber = request.Command?.VoiceNumber ?? songVoice.VoiceNumber;
             songVoice.VoiceName = request.Command?.VoiceName ?? songVoice.VoiceName;
-            songVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
             
             await _voiceRepository.UpdateAsync(cancellationToken);
 

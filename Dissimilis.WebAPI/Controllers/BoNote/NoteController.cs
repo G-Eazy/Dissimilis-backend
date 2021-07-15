@@ -40,7 +40,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int chordId, [FromBody] UpdateNoteDto command)
         {
-            await _mediator.Send(new UpdateSongNoteCommand(chordId, command));
+            await _mediator.Send(new UpdateSongNoteCommand(songId, chordId, command));
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
