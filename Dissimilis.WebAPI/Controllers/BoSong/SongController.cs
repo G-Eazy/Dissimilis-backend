@@ -29,7 +29,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> MyLibrary()
         {
-            var result = await _mediator.Send(new QuerySongToLibrary());
+            var result = await _mediator.Send(new QuerySongToLibrary(false));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Songs created by or arranged by user that are deleted
+        /// </summary>
+        [HttpGet("mylibrary/deleted")]
+        [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> MyDeletedLibrary()
+        {
+            var result = await _mediator.Send(new QuerySongToLibrary(true));
             return Ok(result);
         }
 
