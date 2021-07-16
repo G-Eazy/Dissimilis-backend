@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -202,6 +203,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 Title = "Default test song",
                 Numerator = 4,
                 Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
             };
         }
 
@@ -214,25 +216,33 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Title = "Supplement test song 1",
                     Numerator = 4,
                     Denominator = 4,
-                },
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
                 new Song()
                 {
                     Title = "Supplement test song 2",
                     Numerator = 4,
                     Denominator = 4,
-                },
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
                 new Song()
                 {
                     Title = "Supplement test song 3",
                     Numerator = 4,
                     Denominator = 4,
-                },
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
                 new Song()
                 {
                     Title = "Supplement test song 4",
                     Numerator = 4,
                     Denominator = 4,
-                },
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
             };
         }
 

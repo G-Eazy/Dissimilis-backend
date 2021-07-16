@@ -115,10 +115,9 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     normalOrgUser.Organisation = organisation;
                     normalOrgUser.OrganisationId = organisation.Id;
                     user.Organisations.Add(normalOrgUser);
-                    organisation.Users.Add(orgUser);
+                    organisation.Users.Add(normalOrgUser);
+                    _dbContext.SaveChanges();
                 }
-
-
 
             }
         }
@@ -161,10 +160,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 //Create three groups with adminUsers
                 var groups = TestServerFixture.GetTestGroups();
 
-                var org = _dbContext.Organisations.SingleOrDefault(org =>
+                var defOrg = _dbContext.Organisations.SingleOrDefault(org =>
                 org.Name == TestServerFixture.GetDefaultTestOrganisation().Name);
                 
-                var org2 = _dbContext.Organisations.SingleOrDefault(org =>
+                var suppOrg = _dbContext.Organisations.SingleOrDefault(org =>
                 org.Name == TestServerFixture.GetSupplementOrganisation().Name);
                 
                 var adminUser = _dbContext.Users.SingleOrDefault(user =>
@@ -177,10 +176,9 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     if (i < 2)
                     {
                         //add the two first groups to main org
-                        groups[i].Organisation = org;
-                        groups[i].OrganisationId = org.Id;
+                        groups[i].Organisation = defOrg;
+                        groups[i].OrganisationId = defOrg.Id;
                         _dbContext.Groups.Add(groups[i]);
-                        org.Groups.Add(groups[i]);
                         _dbContext.SaveChanges();
                         if (i == 0)
                         {
@@ -198,19 +196,18 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     }
                     else
                     {
-                        //add one of the groups to org2 and the otherUser to org2
-                        groups[i].Organisation = org2;
-                        groups[i].OrganisationId = org2.Id;
+                        //add one of the groups to suppOrg and the otherUser to suppOrg
+                        groups[i].Organisation = suppOrg;
+                        groups[i].OrganisationId = suppOrg.Id;
                         _dbContext.Groups.Add(groups[i]);
-                        org2.Groups.Add(groups[i]);
                         _dbContext.SaveChanges();
                         var OrgUser = TestServerFixture.GetSupplementedTestOrganisationUsers().First();
                         OrgUser.User = otherUsers[i-1];
                         OrgUser.UserId = otherUsers[i - 1].Id;
-                        OrgUser.Organisation = org2;
-                        OrgUser.OrganisationId = org2.Id;
+                        OrgUser.Organisation = suppOrg;
+                        OrgUser.OrganisationId = suppOrg.Id;
                         otherUsers[i-1].Organisations.Add(OrgUser);
-                        org2.Users.Add(OrgUser);
+                        suppOrg.Users.Add(OrgUser);
                         _dbContext.SaveChanges();
                     }
                     if (i != 0)
@@ -243,10 +240,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 var normalOrgUser = TestServerFixture.GetSupplementedTestOrganisationUsers().First();
                 normalOrgUser.User = adminUser;
                 normalOrgUser.UserId = adminUser.Id;
-                normalOrgUser.Organisation = org2;
-                normalOrgUser.OrganisationId = org2.Id;
+                normalOrgUser.Organisation = suppOrg;
+                normalOrgUser.OrganisationId = suppOrg.Id;
                 adminUser.Organisations.Add(normalOrgUser);
-                org2.Users.Add(normalOrgUser);
+                suppOrg.Users.Add(normalOrgUser);
                 _dbContext.SaveChanges();
                 
             }
@@ -255,7 +252,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         private static void SeedTestSupplementSongs()
         {
             var songsCreated = _dbContext.Songs.Count();
-            if (songsCreated > 1)
+            if (songsCreated < 2)
             {
                 var songOwners = _dbContext.Users.Where(user => user.Id != TestServerFixture.CurrentUserId).ToArray();
                 var songs = TestServerFixture.GetSupplementTestSongs();
@@ -351,6 +348,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 defOrg.SharedSongs.Add(shareSongsOrg[3]);
                 songs[2].SharedOrganisations.Add(shareSongsOrg[3]);
                 _dbContext.SaveChanges();
+                var soedfsngsCreated = _dbContext.Songs;
             }
         }
 

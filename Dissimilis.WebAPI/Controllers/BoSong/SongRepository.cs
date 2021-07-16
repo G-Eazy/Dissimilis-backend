@@ -78,7 +78,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
         {
             var songs = await Context.Songs
-                .Where(s => s.CreatedById == userId || s.ArrangerId == userId)
+                .Where(s => s.ArrangerId == userId)
                 .ToArrayAsync(cancellationToken);
             
             return songs;
