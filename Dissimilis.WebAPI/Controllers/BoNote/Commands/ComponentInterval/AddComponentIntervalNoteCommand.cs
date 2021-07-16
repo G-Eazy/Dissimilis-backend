@@ -70,6 +70,8 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                     Position = request.Command.NotePosition,
                     Length = request.Command.Length,
                 };
+
+                songBar.Notes.Add(songNote);
             }
 
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
