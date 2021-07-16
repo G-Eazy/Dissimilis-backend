@@ -38,12 +38,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public string SongPublicSuppOrg = "Supplement test song 4";
         public string DefaultSongDefOrg = "Default test song";
 
-        public static void ChangeToUserWithAdmin()
+        internal static void ChangeToUserWithAdmin()
         {
             TestServerFixture.ChangeCurrentUserId(1);
         }
 
-        public static void ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg()
+        internal static void ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg()
         {
             TestServerFixture.ChangeCurrentUserId(3);
         }
@@ -86,7 +86,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
             var CountAfter = await mediator.Send(new QuerySongToLibrary());
-            CountAfter.Count().ShouldBe(CountBefore.Count());
+            CountAfter.Length.ShouldBe(CountBefore.Length);
             ChangeToUserWithAdmin();
         }
 
@@ -138,7 +138,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
             songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
             songDtos.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeFalse();
-            songDtos.Count().ShouldBe(1);
+            songDtos.Length.ShouldBe(1);
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
             songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
             songDtos.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
-            songDtos.Count().ShouldBe(2);
+            songDtos.Length.ShouldBe(2);
 
         }
 
@@ -174,7 +174,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
             filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
             filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
-            filteredSongs.Count().ShouldBe(2);
+            filteredSongs.Length.ShouldBe(2);
         }
 
         [Fact]
@@ -192,7 +192,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
             filteredSongs.Any(s => s.Title.Equals(SongPublicGroup1DefOrg)).ShouldBeFalse();
             filteredSongs.Any(s => s.Title.Equals(SongPublicDefOrg)).ShouldBeFalse();
-            filteredSongs.Count().ShouldBe(2);
+            filteredSongs.Length.ShouldBe(2);
 
         }
         [Fact]
@@ -209,7 +209,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeFalse();
             filteredSongs.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeTrue();
             filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-            filteredSongs.Count().ShouldBe(4);
+            filteredSongs.Length.ShouldBe(4);
         }
 
         [Fact]
