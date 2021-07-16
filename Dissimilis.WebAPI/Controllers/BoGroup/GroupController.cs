@@ -1,6 +1,7 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoGroup.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
