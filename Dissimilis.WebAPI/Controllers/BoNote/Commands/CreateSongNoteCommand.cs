@@ -54,7 +54,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
             await using (var transaction = await _NoteRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
-                var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+                var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
                 var songBar = await _BarRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 

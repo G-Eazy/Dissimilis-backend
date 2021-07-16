@@ -45,7 +45,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             await using var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);

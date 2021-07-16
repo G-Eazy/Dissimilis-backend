@@ -28,6 +28,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         
         public string Creator { get; set; }
         public string UpdatedBy { get; set; }
+        
+        public SongByIdDto() { }
+        
         public SongByIdDto(Song song)
         {
             SongId = song.Id;

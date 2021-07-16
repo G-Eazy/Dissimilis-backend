@@ -49,15 +49,14 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             SongBar songBar = null;
             await using (var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
-                var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
-                song.PerformSnapshot(currentUser);
-
+                var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
                 var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
                 if (voice == null)
                 {
-                    throw new NotFoundException($"Voice with Id {voice.Id} not fond");
+                    throw new NotFoundException($"Voice with Id {voice.Id} not found");
                 }
+                song.PerformSnapshot(currentUser);
 
                 songBar = new SongBar()
                 {

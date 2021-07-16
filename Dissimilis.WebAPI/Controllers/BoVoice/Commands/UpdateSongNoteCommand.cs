@@ -43,7 +43,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
@@ -52,6 +51,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             note.Length = request.Command.Length;
             note.Position = request.Command.Position;

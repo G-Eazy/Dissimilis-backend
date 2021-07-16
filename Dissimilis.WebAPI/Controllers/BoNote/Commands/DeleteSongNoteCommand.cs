@@ -44,8 +44,6 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongNoteCommand request, CancellationToken cancellationToken)
         {
-            //var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
-
             var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
             var songNote = bar.Notes.FirstOrDefault(songNote => songNote.Id == request.SongChordId);
@@ -54,7 +52,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
-            var song = bar.SongVoice.Song;
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             bar.Notes.Remove(songNote);

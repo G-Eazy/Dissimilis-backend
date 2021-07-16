@@ -41,9 +41,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         }
         public async Task<UpdatedCommandDto> Handle(RemoveComponentIntervalCommand request, CancellationToken cancellationToken)
         {
-            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var user = _authService.GetVerifiedCurrentUser();
-            song.PerformSnapshot(user);
 
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)
@@ -52,7 +51,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             }
 
             await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
+            song.PerformSnapshot(user);
             songVoice.RemoveComponentInterval(request.Command.IntervalPosition);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
             try

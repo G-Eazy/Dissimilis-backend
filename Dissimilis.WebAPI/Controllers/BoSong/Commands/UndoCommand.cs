@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Services;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -36,11 +36,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<UpdatedSongCommandDto> Handle(UndoCommand request, CancellationToken cancellationToken)
         {
             await using var transaction = await _repository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
+            //undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             var undoFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             undoFromSong.Undo();
-            undoFromSong.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
+            //await _repository.UpdateAsync(cancellationToken);
             try
             {
                 await _repository.UpdateAsync(cancellationToken);

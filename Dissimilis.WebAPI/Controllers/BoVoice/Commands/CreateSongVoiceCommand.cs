@@ -46,8 +46,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
             await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(currentUser);
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
             if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
             {
@@ -57,6 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new ValidationException("VoiceName not defined");
             }
+            song.PerformSnapshot(currentUser);
 
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;

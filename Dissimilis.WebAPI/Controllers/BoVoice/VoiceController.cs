@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteSongVoice(int songId, int voiceId)
         {
-            var item = await _mediator.Send(new DeleteSongVoiceCommand(songId, voiceId));
+            var item = await _mediator.Send(new DeleteSongVoiceCommand(songId, voiceId, _mediator));
             return Ok(item);
         }
 

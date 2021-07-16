@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
         {
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
 
             song.PerformSnapshot(currentUser);

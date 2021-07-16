@@ -45,9 +45,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             await using var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
-            song.PerformSnapshot(currentUser);
-
+            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
 
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)
@@ -60,6 +58,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             {
                 throw new NotFoundException($"Bar with Id {request.BarId} was not found");
             }
+            song.PerformSnapshot(currentUser);
 
             song.RemoveSongBarFromAllVoices(bar.Position);
             song.SetUpdatedOverAll(currentUser.Id);
