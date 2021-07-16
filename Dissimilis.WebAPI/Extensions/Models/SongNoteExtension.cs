@@ -310,15 +310,18 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return new Dictionary<string, string[]>(AllChordOptions);
         }
 
-        
+        public static (int startPos, int endPos) GetNotePositionRange(this SongNote songNote)
+        {
+            int startPosition = songNote.Position;
+            int endPosition = startPosition + songNote.Length - 1;
+            return (startPosition, endPosition);
+        }
 
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
-            if (songNote.ChordName == null)
-            {
-                throw new ValidationException("A note needs to be a chord to have component intervals removed.");
-            }
+            if (songNote.ChordName == null) throw new ValidationException("A note needs to be a chord to have component intervals removed.");
+
             if (updatedNoteValues.Length > intervalPosition)
             {
                 updatedNoteValues[intervalPosition] = "X";

@@ -4,8 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
@@ -18,16 +20,14 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
     {
         public int SongId { get; }
         public int SongVoiceId { get; set; }
-        public int SongBarId { get; set; }
-        public int SongNoteId { get; set; }
+        public int SongBarPosition { get; set; }
         public AddComponentIntervalNoteDto Command { get; }
 
-        public AddComponentIntervalNoteCommand(int songId, int songVoiceId, int songBarId, int songNoteId, AddComponentIntervalNoteDto command)
+        public AddComponentIntervalNoteCommand(int songId, int songVoiceId, int songBarPosition, AddComponentIntervalNoteDto command)
         {
             SongId = songId;
             SongVoiceId = songVoiceId;
-            SongBarId = songBarId;
-            SongNoteId = songNoteId;
+            SongBarPosition = songBarPosition;
             Command = command;
         }
     }
@@ -47,25 +47,29 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _songRepository.HasWriteAccess(song, currentUser)) throw new UnauthorizedAccessException();
 
             var songVoice = song.Voices.SingleOrDefault(voice => voice.Id == request.SongVoiceId);
-            if (songVoice == null)
-            {
-                throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
-            }
-            var songBar = songVoice.SongBars.SingleOrDefault(bar => bar.Id == request.SongBarId);
-            if (songBar == null)
-            {
-                throw new NotFoundException($"Bar with id {request.SongBarId} not found");
-            }
-            var songNote = songBar.Notes.SingleOrDefault(note => note.Id == request.SongNoteId);
+            if (songVoice == null) throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
+
+            var songBar = songVoice.SongBars.SingleOrDefault(bar => bar.Position == request.SongBarPosition);
+            if (songBar == null) throw new NotFoundException($"Bar with position {request.SongBarPosition} not found");
+
+            var songNote = songBar.Notes.SingleOrDefault(note => note.Position == request.Command.NotePosition);
             if (songNote == null)
             {
-                throw new NotFoundException($"Note with id {request.SongNoteId} not found");
+                if (songBar.Notes.Any(note => {
+                    var (startPos, endPos) = note.GetNotePositionRange();
+                    return startPos >= request.Command.NotePosition && request.Command.NotePosition >= endPos;}))
+                { throw new ValidationException("Note number already in use"); }
+
+                songNote = new SongNote()
+                {
+                    ChordName = request.Command.ChordName,
+                    NoteValues = String.Join("|", Enumerable.Repeat("X", SongNoteExtension.GetNoteValuesFromChordName(request.Command.ChordName).Count)),
+                    Position = request.Command.NotePosition,
+                    Length = request.Command.Length,
+                };
             }
 
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
@@ -82,7 +86,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                 throw new ValidationException("Transaction error, aborting operation. Please try again.");
             }
 
-            return new UpdatedCommandDto(songVoice);
+            return new UpdatedCommandDto(songBar);
         }
     }
 }
