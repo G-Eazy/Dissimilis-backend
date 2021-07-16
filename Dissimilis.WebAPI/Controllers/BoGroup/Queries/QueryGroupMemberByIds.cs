@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoGroup
+namespace Dissimilis.WebAPI.Controllers.BoGroup.Queries
 {
     public class QueryGroupMemberByIds : IRequest<QueryMemberByIdsDto>
     {
