@@ -13,6 +13,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public int Denominator { get; set; }
 
         public string ArrangerName { get; set; }
+        public string ArrangerEmail { get; set; }
 
         public DateTimeOffset? UpdatedOn { get; set; }
 
@@ -25,12 +26,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         public string Composer { get; set; }
 
         public string Creator { get; set; }
+        public string CreatorEmail { get; set; }
         public string UpdatedBy { get; set; }
         public SongMetadataDto(Song song)
         {
             SongId = song.Id;
             Title = song.Title;
             ArrangerName = song.Arranger?.Name;
+            ArrangerEmail = song.Arranger?.Email;
             UpdatedOn = song.UpdatedOn;
             UpdatedBy = song.UpdatedBy?.Name;
             Numerator = song.Numerator;
@@ -40,6 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             SongNotes = song.SongNotes;
             Composer = song.Composer;
             Creator = song.CreatedBy?.Name;
+            CreatorEmail = song.CreatedBy?.Email;
         }
     }
 }

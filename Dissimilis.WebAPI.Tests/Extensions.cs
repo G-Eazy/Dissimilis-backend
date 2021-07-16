@@ -233,5 +233,42 @@ namespace Dissimilis.WebAPI.xUnit
                 IncludeAll = true,
             };
         }
+        internal static SearchQueryDto AllSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeAll = true,
+            };
+
+        }
+        internal static SearchQueryDto SharedWithUserSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                IncludeAll =false,
+                OrderDescending = true,
+                IncludeSharedWithUser = true
+            };
+
+        }
+
+        internal static SearchQueryDto GroupOrgSearchQueryDto(int[] groups, int[] orgs)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeAll = false,
+                IncludedGroupIdArray = groups,
+                IncludedOrganisationIdArray = orgs
+            };
+
+        }
     }
 }

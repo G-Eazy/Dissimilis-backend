@@ -105,10 +105,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
                         var originalNote = songBar.Notes
                             .Where(note =>
                                 {
-                                    int originalNoteStartPosition = note.Position;
-                                    int originalNoteEndPosition = note.Position + note.Length - 1;
-
-                                    return originalNoteStartPosition <= srcNote.Position && srcNote.Position <= originalNoteEndPosition;
+                                    var (startPos, endPos) = note.GetNotePositionRange();
+                                    return startPos <= srcNote.Position && srcNote.Position <= endPos;
                                 })
                             .SingleOrDefault();
                         if (originalNote != null)
