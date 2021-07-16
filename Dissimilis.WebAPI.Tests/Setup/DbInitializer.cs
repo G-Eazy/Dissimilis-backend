@@ -1,4 +1,5 @@
 ﻿using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using System;
@@ -92,12 +93,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     user.Id == TestServerFixture.CurrentUserId);
 
                 //Create the organisation user with admin role, and add to db.
-                var orgUser = TestServerFixture.GetDefaultTestOrganisationUser();
-                orgUser.User = adminUser;
-                orgUser.Organisation = organisation;
-                orgUser.UserId = adminUser.Id;
-                orgUser.OrganisationId = organisation.Id;
-
+                var orgUser = new OrganisationUser()
+                {
+                    Role = Role.Admin,
+                    User = adminUser,
+                    Organisation = organisation,
+                    UserId = adminUser.Id,
+                    OrganisationId = organisation.Id,
+            };
                 adminUser.Organisations.Add(orgUser);
                 organisation.Users.Add(orgUser);
 
@@ -109,17 +112,17 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 //adding all the other users to the "main" organisation
                 foreach (var user in otherUsers)
                 {
-                    var normalOrgUser = TestServerFixture.GetSupplementedTestOrganisationUsers().First();
-                    normalOrgUser.User = user;
-                    normalOrgUser.UserId = user.Id;
-                    normalOrgUser.Organisation = organisation;
-                    normalOrgUser.OrganisationId = organisation.Id;
+                    var normalOrgUser = new OrganisationUser()
+                    {
+                        Role = Role.Member,
+                        User = user,
+                        UserId = user.Id,
+                        Organisation = organisation,
+                        OrganisationId = organisation.Id,
+                    };
                     user.Organisations.Add(normalOrgUser);
                     organisation.Users.Add(orgUser);
                 }
-
-
-
             }
         }
         private static void SeedTestSupplementOrganisation()
@@ -138,12 +141,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 var adminUser = _dbContext.Users.Where(user => user.Id != TestServerFixture.CurrentUserId).First();
 
                 //Create the organisation user with admin role, and add to db.
-                var orgUser = TestServerFixture.GetDefaultTestOrganisationUser();
-                orgUser.User = adminUser;
-                orgUser.Organisation = organisation2;
-                orgUser.UserId = adminUser.Id;
-                orgUser.OrganisationId = organisation2.Id;
-
+                var orgUser = new OrganisationUser()
+                {
+                    Role = Role.Admin,
+                    User = adminUser,
+                    Organisation = organisation2,
+                    UserId = adminUser.Id,
+                    OrganisationId = organisation2.Id,
+            };
                 adminUser.Organisations.Add(orgUser);
                 organisation2.Users.Add(orgUser);
 
@@ -185,11 +190,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                         if (i == 0)
                         {
                             //add the adminUser as admin in the first group
-                            var groupUserCurrent = TestServerFixture.GetDefaultTestGroupUser();
-                            groupUserCurrent.User = adminUser;
-                            groupUserCurrent.UserId = adminUser.Id;
-                            groupUserCurrent.Group = groups[i];
-                            groupUserCurrent.GroupId = groups[i].Id;
+                            var groupUserCurrent = new GroupUser()
+                            {
+                                Role = Role.Admin,
+                                User = adminUser,
+                                UserId = adminUser.Id,
+                                Group = groups[i],
+                                GroupId = groups[i].Id,
+                            };
                             adminUser.Groups.Add(groupUserCurrent);
                             groups[i].Users.Add(groupUserCurrent);
                             _dbContext.SaveChanges();
@@ -204,11 +212,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                         _dbContext.Groups.Add(groups[i]);
                         org2.Groups.Add(groups[i]);
                         _dbContext.SaveChanges();
-                        var OrgUser = TestServerFixture.GetSupplementedTestOrganisationUsers().First();
-                        OrgUser.User = otherUsers[i-1];
-                        OrgUser.UserId = otherUsers[i - 1].Id;
-                        OrgUser.Organisation = org2;
-                        OrgUser.OrganisationId = org2.Id;
+                        var OrgUser = new OrganisationUser()
+                        {
+                            Role = Role.Member,
+                            User = otherUsers[i - 1],
+                            UserId = otherUsers[i - 1].Id,
+                            Organisation = org2,
+                            OrganisationId = org2.Id,
+                        };
                         otherUsers[i-1].Organisations.Add(OrgUser);
                         org2.Users.Add(OrgUser);
                         _dbContext.SaveChanges();
@@ -216,11 +227,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     if (i != 0)
                     {
                         //add the other normal testusers as admins in the two last groups and to the org
-                        var groupUser = TestServerFixture.GetDefaultTestGroupUser();
-                        groupUser.User = otherUsers[i-1];
-                        groupUser.UserId = otherUsers[i-1].Id;
-                        groupUser.Group = groups[i];
-                        groupUser.GroupId = groups[i].Id;
+                        var groupUser = new GroupUser()
+                        {
+                            Role = Role.Admin,
+                            User = otherUsers[i - 1],
+                            UserId = otherUsers[i - 1].Id,
+                            Group = groups[i],
+                            GroupId = groups[i].Id,
+                    };
                         otherUsers[i-1].Groups.Add(groupUser);
                         groups[i].Users.Add(groupUser);
                     }
@@ -230,21 +244,27 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 _dbContext.SaveChanges();
 
                 //add currentUser as member to OtherGroup and org
-                var normalUser = TestServerFixture.GetSupplementedTestGroupUsers().First();
-                normalUser.User = adminUser;
-                normalUser.UserId = adminUser.Id;
-                normalUser.Group = groups[2];
-                normalUser.GroupId = groups[2].Id;
+                var normalUser = new GroupUser()
+                {
+                    Role = Role.Member,
+                    User = adminUser,
+                    UserId = adminUser.Id,
+                    Group = groups[2],
+                    GroupId = groups[2].Id,
+                };
                 adminUser.Groups.Add(normalUser);
                 groups[2].Users.Add(normalUser);
                 _dbContext.SaveChanges();
 
 
-                var normalOrgUser = TestServerFixture.GetSupplementedTestOrganisationUsers().First();
-                normalOrgUser.User = adminUser;
-                normalOrgUser.UserId = adminUser.Id;
-                normalOrgUser.Organisation = org2;
-                normalOrgUser.OrganisationId = org2.Id;
+                var normalOrgUser = new OrganisationUser()
+                {
+                    Role = Role.Member,
+                    User = adminUser,
+                    UserId = adminUser.Id,
+                    Organisation = org2,
+                    OrganisationId = org2.Id,
+            };
                 adminUser.Organisations.Add(normalOrgUser);
                 org2.Users.Add(normalOrgUser);
                 _dbContext.SaveChanges();
@@ -259,8 +279,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 var songOwners = _dbContext.Users.Where(user => user.Id != TestServerFixture.CurrentUserId).ToArray();
                 var songs = TestServerFixture.GetSupplementTestSongs();
-                var shareSongsOrg = TestServerFixture.GetDefaultSongSharedOrganisations();
-                var shareSongsGroup = TestServerFixture.GetDefaultSongSharedGroups();
                 var defOrg = _dbContext.Organisations.Where(org => 
                 org.Name == TestServerFixture.GetDefaultTestOrganisation().Name).SingleOrDefault();
                 var suppOrg = _dbContext.Organisations.Where(org => 
@@ -301,55 +319,74 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
                 //add two songs to suppOrg and 2 songs to defOrg
                 //add song 0 to group 2 and supporg
-                shareSongsGroup[0].Group = groups[2];
-                shareSongsGroup[0].GroupId = groups[2].Id;
-                shareSongsGroup[0].Song = songs[0];
-                shareSongsGroup[0].SongId = songs[0].Id;
-                groups[2].SharedSongs.Add(shareSongsGroup[0]);
-                songs[0].SharedGroups.Add(shareSongsGroup[0]);
+
+                var shareSongGroupFirst = new SongSharedGroup()
+                {
+                    Group = groups[2],
+                    GroupId = groups[2].Id,
+                    Song = songs[0],
+                    SongId = songs[0].Id,
+                };
+                groups[2].SharedSongs.Add(shareSongGroupFirst);
+                songs[0].SharedGroups.Add(shareSongGroupFirst);
                 _dbContext.SaveChanges();
 
-                shareSongsOrg[0].Organisation = suppOrg;
-                shareSongsOrg[0].OrganisationId = suppOrg.Id;
-                shareSongsOrg[0].Song = songs[0];
-                shareSongsOrg[0].SongId = songs[0].Id;
-                suppOrg.SharedSongs.Add(shareSongsOrg[0]);
-                songs[0].SharedOrganisations.Add(shareSongsOrg[0]);
+                var shareSongOrgFirst = new SongSharedOrganisation()
+                {
+                    Organisation = suppOrg,
+                    OrganisationId = suppOrg.Id,
+                    Song = songs[0],
+                    SongId = songs[0].Id,
+                };
+                suppOrg.SharedSongs.Add(shareSongOrgFirst);
+                songs[0].SharedOrganisations.Add(shareSongOrgFirst);
                 _dbContext.SaveChanges();
 
                 //add song 3 only to suppOrg
-                shareSongsOrg[1].Organisation = suppOrg;
-                shareSongsOrg[1].OrganisationId = suppOrg.Id;
-                shareSongsOrg[1].Song = songs[3];
-                shareSongsOrg[1].SongId = songs[3].Id;
-                suppOrg.SharedSongs.Add(shareSongsOrg[1]);
-                songs[3].SharedOrganisations.Add(shareSongsOrg[1]);
+                var shareSongOrgSecond = new SongSharedOrganisation()
+                {
+                    Organisation = suppOrg,
+                    OrganisationId = suppOrg.Id,
+                    Song = songs[3],
+                    SongId = songs[3].Id,
+                };
+                suppOrg.SharedSongs.Add(shareSongOrgSecond);
+                songs[3].SharedOrganisations.Add(shareSongOrgSecond);
                 _dbContext.SaveChanges();
 
                 //add song 1 to group 0 and defOrg
-                shareSongsGroup[1].Group = groups[0];
-                shareSongsGroup[1].GroupId = groups[0].Id;
-                shareSongsGroup[1].Song = songs[1];
-                shareSongsGroup[1].SongId = songs[1].Id;
-                groups[0].SharedSongs.Add(shareSongsGroup[1]);
-                songs[1].SharedGroups.Add(shareSongsGroup[1]);
+                var shareSongGroupSecond = new SongSharedGroup()
+                {
+                    Group = groups[0],
+                    GroupId = groups[0].Id,
+                    Song = songs[1],
+                    SongId = songs[1].Id,
+                };
+                groups[0].SharedSongs.Add(shareSongGroupSecond);
+                songs[1].SharedGroups.Add(shareSongGroupSecond);
                 _dbContext.SaveChanges();
 
-                shareSongsOrg[2].Organisation = defOrg;
-                shareSongsOrg[2].OrganisationId = defOrg.Id;
-                shareSongsOrg[2].Song = songs[1];
-                shareSongsOrg[2].SongId = songs[1].Id;
-                defOrg.SharedSongs.Add(shareSongsOrg[2]);
-                songs[1].SharedOrganisations.Add(shareSongsOrg[2]);
+                var shareSongOrgThird = new SongSharedOrganisation()
+                {
+                    Organisation = defOrg,
+                    OrganisationId = defOrg.Id,
+                    Song = songs[1],
+                    SongId = songs[1].Id,
+                };
+                defOrg.SharedSongs.Add(shareSongOrgThird);
+                songs[1].SharedOrganisations.Add(shareSongOrgThird);
                 _dbContext.SaveChanges();
 
                 //add song 2 only to defOrg
-                shareSongsOrg[3].Organisation = defOrg;
-                shareSongsOrg[3].OrganisationId = defOrg.Id;
-                shareSongsOrg[3].Song = songs[2];
-                shareSongsOrg[3].SongId = songs[2].Id;
-                defOrg.SharedSongs.Add(shareSongsOrg[3]);
-                songs[2].SharedOrganisations.Add(shareSongsOrg[3]);
+                var shareSongOrgFourth = new SongSharedOrganisation()
+                {
+                    Organisation = defOrg,
+                    OrganisationId = defOrg.Id,
+                    Song = songs[2],
+                    SongId = songs[2].Id,
+                };
+                defOrg.SharedSongs.Add(shareSongOrgFourth);
+                songs[2].SharedOrganisations.Add(shareSongOrgFourth);
                 _dbContext.SaveChanges();
             }
         }
@@ -404,11 +441,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
             TestServerFixture.TestSongId = song.Id;
 
-            var shareSongOrg = TestServerFixture.GetDefaultSongSharedOrganisations().First();
-            shareSongOrg.Organisation = defOrg;
-            shareSongOrg.OrganisationId = defOrg.Id;
-            shareSongOrg.Song = song;
-            shareSongOrg.SongId = song.Id;
+            var shareSongOrg = new SongSharedOrganisation()
+            {
+                Organisation = defOrg,
+                OrganisationId = defOrg.Id,
+                Song = song,
+                SongId = song.Id,
+            };
             defOrg.SharedSongs.Add(shareSongOrg);
             song.SharedOrganisations.Add(shareSongOrg);
             _dbContext.SaveChanges();

@@ -21,12 +21,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
         public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
         {
             return (song => song.ProtectionLevel == ProtectionLevels.Public
-            //include songs created by you
             || song.ArrangerId == user.Id
-            
-            //include if user is systemAdmin
             || user.IsSystemAdmin
-            //include only songs shared with you by userSharing
             || song.SharedUsers.Any(shared => shared.UserId == user.Id));
         }
 

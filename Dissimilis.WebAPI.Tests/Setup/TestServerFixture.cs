@@ -96,59 +96,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static OrganisationUser GetDefaultTestOrganisationUser()
-        {
-            return new OrganisationUser()
-            {
-                Role = DbContext.Models.Enums.Role.Admin,
-            };
-        }
-
-        public static List<OrganisationUser> GetSupplementedTestOrganisationUsers()
-        {
-            return new List<OrganisationUser>()
-            {
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-            };
-        }
-
-        public static List<SongSharedOrganisation> GetDefaultSongSharedOrganisations()
-        {
-            return new List<SongSharedOrganisation>()
-            {
-                new SongSharedOrganisation() { },
-                new SongSharedOrganisation() { },
-                new SongSharedOrganisation() { },
-                new SongSharedOrganisation() { },
-            };
-        }
-
-        public static List<SongSharedGroup> GetDefaultSongSharedGroups()
-        {
-            return new List<SongSharedGroup>()
-            {
-                new SongSharedGroup() { },
-                new SongSharedGroup() { },
-                new SongSharedGroup() { },
-                new SongSharedGroup() { },
-            };
-        }
-
-        public static SongSharedUser GetDefaultSongSharedUser()
-        {
-            return new SongSharedUser() { };
-        }
 
         public static List<Group> GetTestGroups()
         {
@@ -164,33 +111,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },new Group()
                 {
                     Name = "Dissimilis Trondheim",
-                },
-            };
-        }
-
-        public static GroupUser GetDefaultTestGroupUser()
-        {
-            return new GroupUser()
-            {
-                Role = DbContext.Models.Enums.Role.Admin,
-            };
-        }
-
-        public static List<GroupUser> GetSupplementedTestGroupUsers()
-        {
-            return new List<GroupUser>()
-            {
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
                 },
             };
         }
