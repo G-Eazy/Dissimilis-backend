@@ -152,7 +152,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             return songs
                 .Where(song =>
-                    (   (EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
+                    (   (searchText == null
+                        || EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
                         || EF.Functions.Like(song.Arranger.Name, $"%{searchText.Trim()}%"))
                         && (arrangerId == null || song.ArrangerId == arrangerId)
                     )
