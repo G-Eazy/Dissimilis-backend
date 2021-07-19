@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         [Fact]
         public async Task TestCreateOrganisationCommand()
         {
-
+            return;
         }
     }
 }

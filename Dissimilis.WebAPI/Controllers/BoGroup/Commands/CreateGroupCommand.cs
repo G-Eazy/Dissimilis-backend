@@ -46,7 +46,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
                     request.Command.Description,
                     currentUser.Id
                 );
-            await _groupRepository.SaveGroupAsync(group, cancellationToken);
+            if (!await _groupRepository.CheckPermission(request.Command.OrganisationId, currentUser, "add", cancellationToken))
+                throw new System.UnauthorizedAccessException($"User does not have permission to create group in organisation");
+
+                await _groupRepository.SaveGroupAsync(group, cancellationToken);
 
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
             var adminGroupUser = new GroupUser(group.Id, adminUser.Id, Role.Admin);

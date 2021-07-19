@@ -45,6 +45,10 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     request.Command.PhoneNumber,
                     currentUser.Id
                 );
+            if (!_organisationRepository.CheckPermission(currentUser, "add", cancellationToken))
+                throw new System.UnauthorizedAccessException($"User does not have permission to create organisation");
+
+
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
