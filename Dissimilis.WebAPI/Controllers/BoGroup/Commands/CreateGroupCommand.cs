@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             await _groupRepository.SaveGroupAsync(group, cancellationToken);
 
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminGroupUser = new GroupUser(group, adminUser, Role.Admin);
+            var adminGroupUser = new GroupUser(group.Id, adminUser.Id, Role.Admin);
             group.Users.Add(adminGroupUser);
             await _groupRepository.UpdateAsync(cancellationToken);
 

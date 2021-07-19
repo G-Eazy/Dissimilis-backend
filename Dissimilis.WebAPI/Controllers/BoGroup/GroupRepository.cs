@@ -32,14 +32,15 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         public async Task<Group> GetGroupById(int groupId, CancellationToken cancellationToken)
         {
             var group = await Context.Groups
+                .Include(g => g.Organisation)
                 .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
 
             if (group == null)
                 throw new NotFoundException($"Organisation with Id {groupId} not found");
 
             await Context.GroupUsers
-                .Include(g => g.User)
-                .Where(g => g.GroupId == groupId)
+                .Include(gu => gu.User)
+                .Where(gu => gu.GroupId == groupId)
                 .LoadAsync(cancellationToken);
 
             return group;

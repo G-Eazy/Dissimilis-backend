@@ -25,10 +25,10 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         public Role Role { get; set; }
 
-        public GroupUser(Group group, User user, Role role)
+        public GroupUser(int groupId, int userId, Role role)
         {
-            Group = group;
-            User = user;
+            GroupId = groupId;
+            UserId = userId;
             Role = role;
         }
     }

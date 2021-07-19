@@ -1,4 +1,6 @@
-﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+﻿using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         {
             var item = await _mediator.Send(new CreateOrganisationCommand(command));
             var result = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            return Created($"{result.OrganisationId}", result);
+            return Created($"{result.Id}", result);
         }
     }
 }

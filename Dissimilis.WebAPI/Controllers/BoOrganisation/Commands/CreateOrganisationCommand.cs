@@ -42,12 +42,13 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     request.Command.Address,
                     request.Command.EmailAddress,
                     request.Command.Description,
+                    request.Command.PhoneNumber,
                     currentUser.Id
                 );
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminOrgUser = new OrganisationUser(organisation, adminUser, Role.Admin);
+            var adminOrgUser = new OrganisationUser(organisation.Id, adminUser.Id, Role.Admin);
             organisation.Users.Add(adminOrgUser);
             await _organisationRepository.UpdateAsync(cancellationToken);
 

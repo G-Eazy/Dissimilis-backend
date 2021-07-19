@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
+﻿using Dissimilis.WebAPI.Controllers.Bogroup.Query;
+using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using MediatR;
@@ -26,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// Create group
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(OrganisationByIdDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto command)
         {
