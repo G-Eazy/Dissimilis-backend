@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
-            if(song.ArrangerId != currentUser.Id)
+            if(! await _songRepository.HasWriteAccess(song, currentUser))
             {
                 throw new UnauthorizedAccessException();
             }

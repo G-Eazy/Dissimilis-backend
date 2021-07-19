@@ -31,22 +31,26 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
     {
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
-        private readonly IAuthService _IAuthService;
+        private readonly IAuthService _authService;
 
-        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService)
+        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;
-            _IAuthService = IAuthService;
+            _authService = authService;
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _IAuthService.GetVerifiedCurrentUser();
-
             await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
+            var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
             {

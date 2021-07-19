@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class SongNoteExtension
     {
-        public static List<string> AllNotes = new List<string>
+        private static List<string> _allNotes = new List<string>
         {
             "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "H"
         };
@@ -90,7 +90,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         //Each element in the list is an array on the format [pattern, name, abbreviations].
         //The pattern can be used together with the interval mapper to construct a chord based on its root tone and
         //interval values. For further explanation please see Wikibooks source article provided as a link above.
-        public static List<string[]> ChordFormulas = new List<string[]> {
+        private static List<string[]> ChordFormulas = new List<string[]> {
             new string[] {"1P 3M 5P", "major", "M ^ "},
             new string[] {"1P 3M 5P 7M", "major seventh", "maj7 Δ ma7 M7 Maj7 ^7"},
             new string[] {"1P 3M 5P 7M 9M", "major ninth", "maj9 Δ9 ^9"},
@@ -220,54 +220,108 @@ namespace Dissimilis.WebAPI.Extensions.Models
             new string[] {"1P 5P 7m 9m 11P", "", "11b9"}
         };
 
-        public static List<string> GetNoteValuesFromChordName(string ChordName)
+        //The names of all intervals that a chords may consist of.
+        private static string[] IntervalNames = new string[]
+        {
+            "Root", "Second", "Third", "Forth", "Fifth", "Sixth", "Seventh", "Octave",
+            "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"
+        };
+
+        private static Dictionary<string, string[]> AllChordOptions { get; set; } = GenerateAllChordOptions();
+
+        private static Dictionary<string, string[]> GenerateAllChordOptions()
+        {
+            Dictionary<string, string[]> chordOptions = new();
+
+            foreach (var rootNote in _allNotes)
+            {
+                foreach (var chordFormula in ChordFormulas)
+                {
+                    string chordPattern = chordFormula[2].Split(" ")[0];
+                    chordPattern = chordPattern == "M" ? "" : chordPattern;
+
+                    string[] intervalNames = chordFormula[0].Split(" ")
+                        .Select(interval => IntervalNames[Int64.Parse(interval.Substring(0, interval.Length - 1)) - 1])
+                        .ToArray();
+
+                    chordOptions[rootNote + chordPattern] = intervalNames;
+                }
+            }
+
+            return chordOptions;
+        }
+
+        private static (string, string) GetRootNoteAndChordPattern(string chordName)
         {
             string rootNote;
             string chordPattern;
-            if (ChordName.Length == 1)
+            if (chordName.Length == 1)
             {
-                rootNote = ChordName.Substring(0, 1);
+                rootNote = chordName.Substring(0, 1);
                 chordPattern = "M";
             }
-            else if (ChordName[1] == '#')
+            else if (chordName[1] == '#')
             {
-                rootNote = ChordName.Substring(0, 2);
-                if (ChordName.Length == 2)
+                rootNote = chordName.Substring(0, 2);
+                if (chordName.Length == 2)
                 {
                     chordPattern = "M";
                 }
                 else
                 {
-                    chordPattern = ChordName[2..];
+                    chordPattern = chordName[2..];
                 }
-            } else
+            }
+            else
             {
-                rootNote = ChordName.Substring(0, 1);
-                chordPattern = ChordName[1..];
+                rootNote = chordName.Substring(0, 1);
+                chordPattern = chordName[1..];
             }
 
-            int startIndex = AllNotes.IndexOf(rootNote);
+            return (rootNote, chordPattern);
+        }
+
+        public static List<string> GetNoteValuesFromChordName(string chordName)
+        {
+            var (rootNote, chordPattern) = GetRootNoteAndChordPattern(chordName);
+
+            int startIndex = _allNotes.IndexOf(rootNote);
             string[] intervalCodes = ChordFormulas
                 .Where(formula => formula[2].Split(" ").Contains(chordPattern))
                 .Select(formula => formula[0].Split(" "))
                 .SingleOrDefault();
             
-            List<string> noteValues = new List<string>();
+            List<string> noteValues = new();
 
             foreach (string intervalCode in intervalCodes)
             {
-                noteValues.Add(AllNotes[(startIndex + IntervalMapping[intervalCode]) % AllNotes.Count]);
+                noteValues.Add(_allNotes[(startIndex + IntervalMapping[intervalCode]) % _allNotes.Count]);
             }
             return noteValues;
+        }
+
+        public static List<string> GetAllSingleNoteOptions()
+        {
+            return new List<string>(_allNotes);
+        }
+
+        public static Dictionary<string, string[]> GetAllChordOptions()
+        {
+            return new Dictionary<string, string[]>(AllChordOptions);
+        }
+
+        public static (int startPos, int endPos) GetNotePositionRange(this SongNote songNote)
+        {
+            int startPosition = songNote.Position;
+            int endPosition = startPosition + songNote.Length - 1;
+            return (startPosition, endPosition);
         }
 
         public static SongNote RemoveComponentInterval(this SongNote songNote, int intervalPosition)
         {
             var updatedNoteValues = songNote.GetNoteValues();
-            if (songNote.ChordName == null)
-            {
-                throw new ValidationException("A note needs to be a chord to have component intervals removed.");
-            }
+            if (songNote.ChordName == null) throw new ValidationException("A note needs to be a chord to have component intervals removed.");
+
             if (updatedNoteValues.Length > intervalPosition)
             {
                 updatedNoteValues[intervalPosition] = "X";
@@ -293,43 +347,20 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         public static SongNote Transpose(this SongNote songNote, int transposeValue)
         {
-            string rootNote;
-            string chordPattern;
             if (songNote.ChordName == null)
             {
-                int newNoteIndex = (AllNotes.IndexOf(songNote.GetNoteValues()[0]) + transposeValue) % AllNotes.Count;
+                int newNoteIndex = (_allNotes.IndexOf(songNote.GetNoteValues()[0]) + transposeValue) % _allNotes.Count;
                 string[] tranposedNotes = new string[]
                 {
-                    AllNotes[newNoteIndex < 0 ? newNoteIndex + AllNotes.Count : newNoteIndex]
+                    _allNotes[newNoteIndex < 0 ? newNoteIndex + _allNotes.Count : newNoteIndex]
                 };
                 songNote.SetNoteValues(tranposedNotes);
             }
             else
             {
-                if (songNote.ChordName.Length == 1)
-                {
-                    rootNote = songNote.ChordName.Substring(0, 1);
-                    chordPattern = "M";
-                }
-                else if (songNote.ChordName[1] == '#')
-                {
-                    rootNote = songNote.ChordName.Substring(0, 2);
-                    if (songNote.ChordName.Length == 2)
-                    {
-                        chordPattern = "M";
-                    }
-                    else
-                    {
-                        chordPattern = songNote.ChordName[2..];
-                    }
-                }
-                else
-                {
-                    rootNote = songNote.ChordName.Substring(0, 1);
-                    chordPattern = songNote.ChordName[1..];
-                }
-                int tranposedRootNoteIndex = (AllNotes.IndexOf(rootNote) + transposeValue) % AllNotes.Count;
-                string transposedRootNote = AllNotes[tranposedRootNoteIndex < 0 ? tranposedRootNoteIndex + AllNotes.Count : tranposedRootNoteIndex];
+                var (rootNote, chordPattern) = GetRootNoteAndChordPattern(songNote.ChordName);
+                int tranposedRootNoteIndex = (_allNotes.IndexOf(rootNote) + transposeValue) % _allNotes.Count;
+                string transposedRootNote = _allNotes[tranposedRootNoteIndex < 0 ? tranposedRootNoteIndex + _allNotes.Count : tranposedRootNoteIndex];
                 string transposedChordPattern = chordPattern == "M" ? "" : chordPattern;
 
                 songNote.ChordName = transposedRootNote + transposedChordPattern;
