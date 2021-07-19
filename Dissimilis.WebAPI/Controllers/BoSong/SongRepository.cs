@@ -119,6 +119,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.SharedUsers)
                 .Include(song => song.SharedGroups)
                 .Include(song => song.SharedOrganisations)
+                .AsSplitQuery()
                 .AsQueryable()
                 .Where(SongExtension.ReadAccessToSong(user))
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
@@ -170,7 +171,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             return songs
                 .Where(song =>
-                    (   (EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
+                    (   (searchText == null
+                        || EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
                         || EF.Functions.Like(song.Arranger.Name, $"%{searchText.Trim()}%"))
                         && (arrangerId == null || song.ArrangerId == arrangerId)
                     )
