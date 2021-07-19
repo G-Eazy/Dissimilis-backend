@@ -1,6 +1,7 @@
 ﻿using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,17 +52,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return groupUserToDelete;
         }
 
-        internal async Task<GroupUser> SetUserAdminAsync(int userId, int groupId, CancellationToken cancellationToken)
+        internal async Task<GroupUser> ChangeUserRoleAsync(int userId, int groupId, Role newRole, CancellationToken cancellationToken)
         {
-            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken) ?? await AddUserToGroupAsync(userId, groupId, cancellationToken);
-            groupUser.Role = Role.Admin;
-            return groupUser;
-        }
+            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken);
+            if (groupUser == null) throw new NotFoundException($"User with id {userId} is not a in the group with id {groupId}");
 
-        internal async Task<GroupUser> SetUserMemberAsync(int userId, int groupId, CancellationToken cancellationToken)
-        {
-            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken) ?? await AddUserToGroupAsync(userId, groupId, cancellationToken);
-            groupUser.Role = Role.Member;
+            groupUser.Role = newRole;
             return groupUser;
         }
     }
