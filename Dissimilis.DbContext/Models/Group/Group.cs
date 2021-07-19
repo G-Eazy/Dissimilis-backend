@@ -54,17 +54,24 @@ namespace Dissimilis.DbContext.Models
         public Group() { }
 
         /// <summary>
-        /// Constructor for User
+        /// Constructor with params
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="adminUser"></param>
         /// <param name="organisationId"></param>
-        public Group(GroupUser adminUser, int organisationId, string name)
+        /// <param name="address"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        public Group(string name, int organisationId, string address, string phoneNumber, string email, string description, int createdById)
         {
             Name = name;
-            Users.Add(adminUser);
             OrganisationId = organisationId;
-           
+            Address = address;
+            PhoneNumber = phoneNumber;
+            EmailAddress = email;
+            Description = description;
+            CreatedOn = DateTimeOffset.Now;
+            CreatedById = createdById;
         }
     }
 }

@@ -24,5 +24,12 @@ namespace Dissimilis.DbContext.Models
         ///predefined roles; admin and instructor
         /// </summary>
         public Role Role { get; set; }
+
+        public GroupUser(Group group, User user, Role role)
+        {
+            Group = group;
+            User = user;
+            Role = role;
+        }
     }
 }

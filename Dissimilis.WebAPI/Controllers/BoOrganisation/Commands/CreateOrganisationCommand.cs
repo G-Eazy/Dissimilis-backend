@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     request.Command.Address,
                     request.Command.EmailAddress,
                     request.Command.Description,
-                    currentUser
+                    currentUser.Id
                 );
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 

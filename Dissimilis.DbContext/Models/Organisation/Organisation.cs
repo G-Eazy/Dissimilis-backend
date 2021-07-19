@@ -53,17 +53,20 @@ namespace Dissimilis.DbContext.Models
         public Organisation() { }
 
         /// <summary>
-        /// Constructor that takes a name of the organisation
+        /// Constructor with params
         /// </summary>
         /// <param name="name"></param>
-        /// <param adminUser="adminUser"></param>
-        public Organisation(string name, string address, string email, string description, User createdBy)
+        /// <param name="address"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        /// <param name="createdById"></param>
+        public Organisation(string name, string address, string email, string description, int createdById)
         {
             Name = name;
             Address = address;
             EmailAddress = email;
             Description = description;
-            CreatedBy = createdBy;
+            CreatedById = createdById;
             CreatedOn = DateTimeOffset.Now;
         }
     }
