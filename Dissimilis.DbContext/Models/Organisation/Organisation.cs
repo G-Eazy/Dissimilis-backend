@@ -28,6 +28,7 @@ namespace Dissimilis.DbContext.Models
         public string? Address { get; set; }
         public string? EmailAddress { get; set; }
         public string? Description { get; set; }
+        public string PhoneNumber { get; set; }
         
         /// <summary>
         /// The users in the organisation with their roles
@@ -60,12 +61,13 @@ namespace Dissimilis.DbContext.Models
         /// <param name="email"></param>
         /// <param name="description"></param>
         /// <param name="createdById"></param>
-        public Organisation(string name, string address, string email, string description, int createdById)
+        public Organisation(string name, string address, string email, string description, string phoneNumber, int createdById)
         {
             Name = name;
             Address = address;
             EmailAddress = email;
             Description = description;
+            PhoneNumber = phoneNumber; 
             CreatedById = createdById;
             CreatedOn = DateTimeOffset.Now;
         }
