@@ -6,17 +6,17 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
 {
-    public class QueryGroupById : IRequest<GroupByIdDto>
+    public class QueryOrganisationById : IRequest<GroupByIdDto>
     {
         public int GroupId { get; }
 
-        public QueryGroupById(int groupId)
+        public QueryOrganisationById(int groupId)
         {
             GroupId = groupId;
         }
     }
 
-    public class QuerygroupByIdHandler : IRequestHandler<QueryGroupById, GroupByIdDto>
+    public class QuerygroupByIdHandler : IRequestHandler<QueryOrganisationById, GroupByIdDto>
     {
         private readonly GroupRepository _groupRepository;
 
@@ -25,9 +25,9 @@ namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
             _groupRepository = repository;
         }
 
-        public async Task<GroupByIdDto> Handle(QueryGroupById request, CancellationToken cancellationToken)
+        public async Task<GroupByIdDto> Handle(QueryOrganisationById request, CancellationToken cancellationToken)
         {
-            var result = await _groupRepository.GetGroupById(request.groupId, cancellationToken);
+            var result = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
 
             return new GroupByIdDto(result);
         }
