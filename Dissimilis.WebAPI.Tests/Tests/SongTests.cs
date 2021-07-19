@@ -11,6 +11,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
@@ -223,6 +224,27 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
+        [Fact]
+        public async Task TestShareSongWithUser()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var testSong = await mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            testSong.ProtectionLevel = ProtectionLevels.Private;
+
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+            var AllSongs = await mediator.Send(new QuerySongToLibrary());
+            AllSongs.Any(song => song.SongId == testSong.SongId).ShouldBeFalse();
+
+            //await mediator.Send(new ShareSongUserCommand(testSong.SongId, 3));
+            //var AllSongs = await mediator.Send(new QuerySongToLibrary());
+            //AllSongs.Any(song => song.SongId == testSong.SongId).ShouldBeTrue();
+
+            ChangeToUserWithAdmin();
+
+        }
+
+
 
         [Fact]
         public async Task TestNewSongSave()

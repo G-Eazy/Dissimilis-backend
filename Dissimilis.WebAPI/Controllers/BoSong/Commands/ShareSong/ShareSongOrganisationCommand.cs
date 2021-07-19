@@ -10,23 +10,24 @@ using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Extensions;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class ShareSongOrganisationCommand : INotification
+    public class ShareSongOrganisationCommand : IRequest<UpdatedSongCommandDto>
     {
         public int SongId { get; }
-        public ShareSongDto Command { get; }
+        public int OrganisationId { get; }
 
-
-        public ShareSongOrganisationCommand(int songId, ShareSongDto command)
+        public ShareSongOrganisationCommand(int songId, int organisationId)
         {
             SongId = songId;
-            Command = command;
+            OrganisationId = organisationId;
         }
+
     }
 
-    public class ShareSongOrganisationCommandHandler : INotificationHandler<ShareSongOrganisationCommand>
+    public class ShareSongOrganisationCommandHandler : IRequestHandler<ShareSongOrganisationCommand, UpdatedSongCommandDto>
     {
         private readonly SongRepository _songRepository;
         private readonly OrganisationRepository _organisationRepository;
@@ -39,7 +40,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task Handle(ShareSongOrganisationCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedSongCommandDto> Handle(ShareSongOrganisationCommand request, CancellationToken cancellationToken)
         {
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
@@ -48,12 +49,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
             }
-            foreach( var organisation in request.Command.ShareSongIds)
-            {
-                var organisationToAdd = await _organisationRepository.GetOrganisationById(organisation, cancellationToken);
+                var organisationToAdd = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
                 var isShared = await _songRepository.GetSongSharedOrganisation(song.Id, organisationToAdd.Id);
 
-                if (!currentUser.GetAllOrganisationIds().Contains(organisation))
+                if (!currentUser.GetAllOrganisationIds().Contains(organisationToAdd.Id) && !currentUser.IsSystemAdmin)
                 {
                     throw new Exception("Can only tag a song with organisations you are in");
                 }
@@ -70,11 +69,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
                 };
                 organisationToAdd.SharedSongs.Add(songSharedOrganisation);
                 song.SharedOrganisations.Add(songSharedOrganisation);
-            }
             try
             {
                 await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
+                return new UpdatedSongCommandDto(song);
             }
             catch (Exception e)
             {

@@ -8,12 +8,7 @@ using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Extensions.Models;
-using Dissimilis.DbContext.Models.Enums;
 using System;
-using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
-using Dissimilis.DbContext.Models;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -144,6 +139,29 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 || await Context.SongSharedUser.AnyAsync(songSharedUser =>
                         songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
         }
+        public async Task CreateSongShareUser(Song song, User user)
+        {
+            var songSharedUser = new SongSharedUser()
+            {
+                UserId = user.Id,
+                SongId = song.Id
+            };
+            await Context.SongSharedUser.AddAsync(songSharedUser);
+            await Context.SaveChangesAsync();
+        }
+        public async Task<SongSharedUser> GetSongSharedUser(int songId, int userId)
+        {
+            return await Context.SongSharedUser.SingleOrDefaultAsync(x => x.SongId == songId && x.UserId == userId);
+        }
+
+        public async Task<SongSharedGroup> GetSongSharedGroup(int songId, int groupId)
+        {
+            return await Context.SongSharedGroups.SingleOrDefaultAsync(x => x.SongId == songId && x.GroupId == groupId);
+        }
+        public async Task<SongSharedOrganisation> GetSongSharedOrganisation(int songId, int organisationId)
+        {
+            return await Context.SongSharedOrganisations.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
+        }
     }
 
     public static class IQueryableExtension
@@ -185,28 +203,5 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             };
         }
 
-        public async Task CreateSongShareUser(Song song, User user)
-        {
-            var songSharedUser = new SongSharedUser()
-            {
-                UserId = user.Id,
-                SongId = song.Id
-            };
-            await Context.SongSharedUser.AddAsync(songSharedUser);
-            await Context.SaveChangesAsync();
-        }
-        public async Task<SongSharedUser> GetSongSharedUser(int songId, int userId)
-        {
-            return await Context.SongSharedUser.SingleOrDefaultAsync(x => x.SongId == songId && x.UserId == userId);
-        }
-
-        public async Task<SongSharedGroup> GetSongSharedGroup(int songId, int groupId)
-        {
-            return await Context.SongSharedGroups.SingleOrDefaultAsync(x => x.SongId == songId && x.GroupId == groupId);
-        }
-        public async Task<SongSharedOrganisation> GetSongSharedOrganisation(int songId, int organisationId)
-        {
-            return await Context.SongSharedOrganisations.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
-        }
     }
 }
