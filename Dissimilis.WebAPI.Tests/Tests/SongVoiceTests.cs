@@ -77,13 +77,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             note1Update1.Position.ShouldBe(6, "Position of note1Update1 should be 6");
             note1Update1.Length.ShouldBe(2, "Length of note1Update1 should be 2");
 
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 7, length: 1)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 5, length: 3)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 4, length: 4)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 3, length: 5)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 2, length: 6)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 1, length: 7)));
-            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, voice.SongVoiceId, bar.BarId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 0, length: 8)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 7, length: 1)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 5, length: 3)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 4, length: 4)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 3, length: 5)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 2, length: 6)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 1, length: 7)));
+            await mediator.Send(new UpdateSongNoteCommand(songDto.SongId, note1Post.SongChordId, GetUpdateNoteDto(note1Update1, position: 0, length: 8)));
         }
 
         [Fact]

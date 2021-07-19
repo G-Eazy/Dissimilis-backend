@@ -24,10 +24,20 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
                 .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
                 .SingleOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
-            if (bar == null)
-            {
-                throw new NotFoundException($"Bar with ID {barId} not found.");
-            }
+            if (bar == null) throw new NotFoundException($"Bar with ID {barId} not found.");
+
+            return bar;
+        }
+
+        public async Task<SongBar> GetSongBarByPosition(int songId, int songVoiceId, int position, CancellationToken cancellationToken)
+        {
+            var bar = await Context.SongBars
+                .Include(bar => bar.SongVoice.Song)
+                .Include(bar => bar.Notes)
+                .Where(bar => bar.SongVoice.SongId == songId && bar.SongVoiceId == songVoiceId)
+                .SingleOrDefaultAsync(bar => bar.Position == position, cancellationToken);
+
+            if (bar == null) throw new NotFoundException($"Bar with position {position} not found.");
 
             return bar;
         }

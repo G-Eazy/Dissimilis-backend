@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
@@ -33,25 +34,35 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
     public class CreateSongNoteCommandHandler : IRequestHandler<CreateSongNoteCommand, UpdatedCommandDto>
     {
-        private readonly NoteRepository _NoteRepository;
-        private readonly BarRepository _BarRepository;
+        private readonly NoteRepository _noteRepository;
+        private readonly BarRepository _barRepository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
 
-        public CreateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, IAuthService authService)
+        public CreateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService authService)
         {
-            _NoteRepository = noteRepository;
-            _BarRepository = barRepository;
+            _noteRepository = noteRepository;
+            _barRepository = barRepository;
+            _songRepository = songRepository;
             _IAuthService = authService;
     }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongNoteCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+
             SongNote songNote;
 
-            await using (var transaction = await _NoteRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
+            await using (var transaction = await _noteRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
             {
-                var songBar = await _BarRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+                var songBar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
                 if (songBar.Notes.Any(n => n.Position == request.Command.Position))
                 {
@@ -79,7 +90,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
                 try
                 {
-                    await _NoteRepository.UpdateAsync(cancellationToken);
+                    await _noteRepository.UpdateAsync(cancellationToken);
                     await transaction.CommitAsync(cancellationToken);
                 }
                 catch (Exception e)

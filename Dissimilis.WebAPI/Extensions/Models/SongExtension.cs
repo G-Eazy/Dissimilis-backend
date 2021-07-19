@@ -1,6 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Dissimilis.Core.Collections;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -9,6 +13,20 @@ namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class SongExtension
     {
+        /// <summary>
+        /// Return true if the given user have readpermission on the song in the expression
+        /// </summary>
+        /// <param name="user"> The user to chek for</param>
+        /// <returns> true if readpermission</returns>
+        public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
+        {
+            return (song => song.ProtectionLevel == ProtectionLevels.Public
+            || song.ArrangerId == user.Id
+            || user.IsSystemAdmin
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
+        }
+
+
         /// <summary>
         /// Get max bar positions for a song
         /// </summary>
@@ -236,15 +254,15 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         }
 
-        public static Song Clone(this Song song, string title = null)
+        public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
             {
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
                 Speed = song.Speed,
+                ArrangerId = arrangerId,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
