@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut
 {
-    public class OrganisationByIdDto
+    public class GroupByIdDto
     {
         public string Name { get; set; }
         public int OrganisationId { get; set; }
@@ -20,7 +20,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut
 
         public UserDto[] admins { get; set; }
 
-        public OrganisationByIdDto(Group group)
+        public GroupByIdDto(Group group)
         {
             Name = group.Name;
             OrganisationId = group.OrganisationId;
