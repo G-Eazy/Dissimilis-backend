@@ -11,6 +11,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Extensions;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {

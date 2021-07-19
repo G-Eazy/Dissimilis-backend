@@ -10,6 +10,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Extensions;
+using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

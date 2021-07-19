@@ -3,7 +3,7 @@ using Dissimilis.DbContext.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Extensions
+namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class UserExtension
     {
