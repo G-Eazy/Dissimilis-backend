@@ -57,11 +57,14 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         /// <param name="name"></param>
         /// <param adminUser="adminUser"></param>
-        public Organisation(string name, OrganisationUser adminUser)
+        public Organisation(string name, string address, string email, string description, User createdBy)
         {
             Name = name;
-            Users.Add(adminUser);
-            
+            Address = address;
+            EmailAddress = email;
+            Description = description;
+            CreatedBy = createdBy;
+            CreatedOn = DateTimeOffset.Now;
         }
     }
 }

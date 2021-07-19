@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType(typeof(OrganisationByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateOrganisation([FromBody] CreateOrganisationDto command)
         {
