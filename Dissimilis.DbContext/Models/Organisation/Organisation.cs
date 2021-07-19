@@ -24,7 +24,7 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(100)]
         [Required]
         public string Name { get; set; }
-
+        
         /// <summary>
         /// The users in the organisation with their roles
         /// </summary>
@@ -41,7 +41,7 @@ namespace Dissimilis.DbContext.Models
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
-        public DateTimeOffset? CreatedOn { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; } = DateTimeOffset.Now;
 
         /// <summary>
         /// Empty constructor 
