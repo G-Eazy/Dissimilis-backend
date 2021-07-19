@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -34,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
 
-            return new UpdatedOrganisationCommandDto(Organisation);
+            return new UpdatedOrganisationCommandDto(organisation);
         }
     }
 }

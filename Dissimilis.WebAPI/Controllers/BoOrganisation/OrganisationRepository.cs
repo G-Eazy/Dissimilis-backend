@@ -1,0 +1,25 @@
+﻿using Dissimilis.DbContext;
+using Dissimilis.DbContext.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Dissimilis.WebAPI.Controllers.BoOrganisation
+{
+    public class OrganisationRepository
+    {
+        internal DissimilisDbContext Context;
+        public OrganisationRepository(DissimilisDbContext context)
+        {
+            Context = context;
+        }
+
+        public async Task SaveOrganisationAsync(Organisation organisation, CancellationToken cancellationToken)
+        {
+            await Context.Organisations.AddAsync(organisation, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+    }
+}
