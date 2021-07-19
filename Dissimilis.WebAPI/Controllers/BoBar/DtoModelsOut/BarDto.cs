@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
             };
         }
 
-        public static SongBar ConvertToSongBar(BarDto barDto)
+        public static SongBar ConvertToSongBar(BarDto barDto, SongVoice voice)
         {
             return new SongBar()
             {
@@ -63,7 +63,8 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
                 RepAfter = barDto.RepAfter,
                 House = barDto.House,
                 SongVoiceId = barDto.SongVoiceId,
-                Notes = new List<SongNote>()
+                Notes = new List<SongNote>(),
+                SongVoice = voice
             };
         }
     }

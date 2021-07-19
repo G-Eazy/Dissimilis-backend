@@ -294,7 +294,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songNote;
         }
 
-        public static List<SongNote> GetSongNotesFromDto(NoteDto[] noteDtos, SongBar bar)
+        public static List<SongNote> GetSongNotesFromDto(NoteDto[] noteDtos, SongBar bar, List<SongNote> removeNotes)
         {
             List<SongNote> newNotes = new List<SongNote>();
             foreach (var noteDto in noteDtos)
@@ -305,7 +305,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
                     {
                         var noteToBeRemoved = bar.Notes.SingleOrDefault(n => n.Position == i);
-                        bar.Notes.Remove(noteToBeRemoved);
+                        removeNotes.Add(noteToBeRemoved);
                     }
                 }
                 else

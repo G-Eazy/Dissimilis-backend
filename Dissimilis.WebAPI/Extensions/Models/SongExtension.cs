@@ -9,6 +9,11 @@ using System;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Dissimilis.DbContext;
+using Dissimilis.WebAPI.Controllers.BoSong;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -69,6 +74,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             foreach (var songVoice in song.Voices)
             {
+                Console.WriteLine(songVoice.VoiceName);
                 songVoice.SetSongVoiceUpdated(userId);
             }
             song.SetUpdated(userId);
@@ -263,7 +269,73 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return song;
         }
 
-        public static void Undo(this Song song)
+        public static void RemoveElementsFromOldSong(this Song song, SongVoiceDto[] deserialisedVoices)
+        {
+            var voices = song.Voices;
+            foreach(var voice in voices)
+            {
+                var foundVoice = deserialisedVoices.SingleOrDefault(v => v.SongVoiceId == voice.Id);
+                if (foundVoice == null)
+                {
+                    song.Voices.Remove(voice);
+                    continue;
+                }
+                BarDto[] deserialisedBars = foundVoice.Bars;
+                foreach(var bar in voice.SongBars)
+                {
+                    var foundBar = deserialisedBars.SingleOrDefault(b => b.BarId == bar.Id);
+                    if (foundBar == null)
+                    {
+                        voice.SongBars.Remove(bar);
+                        continue;
+                    }
+                    NoteDto[] deserialisedNotes = foundBar.Chords;
+                    foreach(var noteDto in deserialisedNotes)
+                    {
+                        bool emptyNote = noteDto.Notes[0] == "Z";
+                        if (emptyNote)
+                        {
+                            for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
+                            {
+                                var noteToBeRemoved = bar.Notes.SingleOrDefault(n => n.Position == i);
+                                if (noteToBeRemoved != null)
+                                    bar.Notes.Remove(noteToBeRemoved);
+                            }
+                        }
+                    }
+                    foreach (var note in bar.Notes)
+                    {
+                        var foundNote = deserialisedNotes.SingleOrDefault(n => n.ChordId == note.Id);
+                        if (foundNote == null)
+                            bar.Notes.Remove(note);
+                    }
+                }
+            }
+        }
+
+        public static void AddSnapshotValues(this Song song, SongByIdDto deserialisedSong, User updatedBy)
+        {
+            song.Title = deserialisedSong.Title;
+            song.UpdatedBy = updatedBy;
+            song.UpdatedOn = DateTimeOffset.Now;
+            foreach(var voiceDto in deserialisedSong.Voices)
+            {
+                SongVoice voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, updatedBy.Id, song);
+                foreach(var barDto in voiceDto.Bars)
+                {
+                    SongBar bar = BarDto.ConvertToSongBar(barDto, voice);
+                    foreach(var noteDto in barDto.Chords)
+                    {
+                        if (noteDto.Notes[0] != "Z")
+                            bar.Notes.Add(NoteDto.ConvertToSongNote(noteDto, bar));
+                    }
+                    voice.SongBars.Add(bar);
+                }
+                song.Voices.Add(voice);
+            }
+        }
+
+        public static (Song, List<SongNote>) GetUndoneSong(this Song song)
         {
             if (song.Snapshots.Count == 0)
                 throw new NotFoundException("No more snapshots to pop...");
@@ -271,15 +343,28 @@ namespace Dissimilis.WebAPI.Extensions.Models
             SongSnapshot snapshot = song.PopSnapshot(true);
             Console.WriteLine(snapshot.SongObjectJSON);
             SongByIdDto deserialisedSong = Newtonsoft.Json.JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
-
+            
+            Song undoneSong = new Song() { };
+            List<SongNote> removeNotes;
+            undoneSong.Title = deserialisedSong.Title;
+            undoneSong.UpdatedBy = snapshot.CreatedBy;
+            undoneSong.UpdatedOn = DateTimeOffset.Now;
+            (undoneSong.Voices, removeNotes) = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
+            
             /*JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();*/
 
             // Construct new song from snapshot
-            song.Title = deserialisedSong.Title;
+            /*song.Title = deserialisedSong.Title;
             song.UpdatedBy = snapshot.CreatedBy;
             song.UpdatedOn = DateTimeOffset.Now;
             song.Voices = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
+
+            Console.WriteLine("voices left");
+            foreach (var voice in song.Voices) Console.WriteLine("voice");
+            Console.WriteLine("/////////////////////////////");*/
+
+            return (undoneSong, removeNotes);
         }
 
         /// <summary>

@@ -145,16 +145,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songBar;
         }
 
-        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice)
+        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice, List<SongNote> removeNotes)
         {
             List<SongBar> newBars = new List<SongBar>();
             foreach (var barDto in barDtos)
             {
                 SongBar bar = voice.SongBars.SingleOrDefault(b => b.Position == barDto.Position);
-                if (bar == null)
-                    bar = BarDto.ConvertToSongBar(barDto);
+                if (bar == null) 
+                    bar = BarDto.ConvertToSongBar(barDto, voice);
 
-                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar);
+                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar, removeNotes);
                 newBars.Add(bar);
             }
             return newBars;

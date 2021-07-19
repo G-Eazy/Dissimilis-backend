@@ -49,18 +49,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
             };
         }
 
-        public static SongVoice ConvertToSongVoice( SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById)
+        public static SongVoice ConvertToSongVoice(SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById, Song song)
         {
-            return new SongVoice()
-            {
-                Id = voiceDto.SongVoiceId,
-                VoiceName = voiceDto.VoiceName,
-                VoiceNumber = voiceDto.PartNumber,
-                IsMainVoice = voiceDto.IsMain,
-                UpdatedById = updatedById,
-                UpdatedOn = updatedOn,
-                SongId = voiceDto.SongId
-            };
+            SongVoice voice = new SongVoice(voiceDto.SongId, 0, voiceDto.PartNumber, voiceDto.VoiceName);
+            voice.Song = song;
+            voice.Id = voiceDto.SongVoiceId;
+            voice.IsMainVoice = voiceDto.IsMain;
+            voice.UpdatedById = updatedById;
+            voice.UpdatedOn = updatedOn;
+
+
+            return voice;
         }
     }
 }
