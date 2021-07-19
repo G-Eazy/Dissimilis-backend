@@ -124,6 +124,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.SharedUsers)
                 .Include(song => song.SharedGroups)
                 .Include(song => song.SharedOrganisations)
+                .AsSplitQuery()
                 .AsQueryable()
                 .Where(SongExtension.ReadAccessToSong(user))
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
