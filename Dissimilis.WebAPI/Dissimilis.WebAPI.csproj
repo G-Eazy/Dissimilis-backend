@@ -58,8 +58,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\BoGroup\DtoModelsIn\" />
-    <Folder Include="Controllers\BoOrganisation\DtoModelsIn\" />
     <Folder Include="Controllers\BoUser\Commands\" />
     <Folder Include="Controllers\BoUser\DtoModelsIn\" />
     <Folder Include="Exceptions\" />
