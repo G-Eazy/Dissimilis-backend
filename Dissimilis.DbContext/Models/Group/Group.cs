@@ -23,6 +23,11 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        public string? Address { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? EmailAddress { get; set; }
+        public string? Description { get; set; }
+
         /// <summary>
         /// The different users and their roles in the group
         /// </summary>
