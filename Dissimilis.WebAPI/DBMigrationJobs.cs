@@ -109,5 +109,16 @@ namespace Dissimilis.DbContext
             toChange.ForEach(instrument => instrument.Name = instrument.DefinedInstrument?.GetDescription());
             Context.SaveChanges();
         }
+
+        public static void UpdateAllSongsDeletedStatus(DissimilisDbContext Context)
+        {
+            var allSongs = Context.Songs;
+            foreach(var song in allSongs)
+            {
+                if (song.Deleted == null)
+                    song.Deleted = false;
+            }
+            Context.SaveChanges();
+        }
     }
 }
