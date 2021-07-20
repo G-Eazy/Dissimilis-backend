@@ -162,7 +162,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
             songDtos.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
             songDtos.Length.ShouldBe(2);
-
         }
 
         [Fact]
@@ -248,6 +247,28 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 ProtectionLevel = ProtectionLevels.Public
             }));
         }
+        [Fact]
+        public async Task TestRemoveShareSongUser()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
+            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
+            {ProtectionLevel = ProtectionLevels.Private}));
+            await mediator.Send(new ShareSongUserCommand(DefaultTestSong.SongId, 3));
+
+            await mediator.Send(new RemoveShareSongUserCommand(DefaultTestSong.SongId, 3));
+
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+            var AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
+            AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeFalse();
+            ChangeToUserWithAdmin();
+            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
+            {
+                ProtectionLevel = ProtectionLevels.Public
+            }));
+        }
+
         [Fact]
         public async Task TestUpdateSongToPrivate()
         {

@@ -204,7 +204,23 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Add tag song with groups
+        /// share write permission with user
+        /// </summary>
+        [HttpDelete("{songId:int}/shareSong/User/{userId:int}")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveSharedSongUser(int songId, int userId)
+        {
+            var item = await _mediator.Send(new RemoveShareSongUserCommand(songId, userId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
+        }
+
+
+
+        /// <summary>
+        /// Add tag with groups on song
         /// </summary>
         [HttpPost("{songId:int}/AddTag/Group/{groupId:int}")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
@@ -217,7 +233,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok(result);
         }
         /// <summary>
-        /// Add tag with organisations
+        /// Add tag with organisations on song
         /// </summary>
         [HttpPost("{songId:int}/AddTag/Organisation/{organisationId:int}")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]

@@ -85,6 +85,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task DeleteSongSharedUser(SongSharedUser sharedSongUser, CancellationToken cancellationToken)
+        {
+            Context.SongSharedUser.Remove(sharedSongUser);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<Song> GetSongByIdForUpdate(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
