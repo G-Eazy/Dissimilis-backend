@@ -16,6 +16,7 @@ using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -76,6 +77,18 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             };
         }
 
+        public UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Name = "test",
+                Address = "address123",
+                EmailAddress = "email@address.no",
+                Description = "maybe",
+                PhoneNumber = "12345678"
+            };
+        }
+
         [Fact]
         public async Task TestCreateGroupPermissions()
         {
@@ -85,13 +98,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             // Should be allowed
             var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(4, org.Id, SuppUser1.UserId)));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
-            group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+            group1.Name.ShouldBeEquivalentTo("TestGroup4", "Group creation failed");
 
             // Should be allowed, since SuppUser1 is admin of org
             TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
             var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(5, org.Id, SuppUser1.UserId)));
             var group2 = await _mediator.Send(new QueryGroupById(item2.GroupId));
-            group2.Name.ShouldBeEquivalentTo("TestGroup2", "Group creation failed");
+            group2.Name.ShouldBeEquivalentTo("TestGroup5", "Group creation failed");
 
 
             // Should throw exception, since SuppUser2 is neither sysadmin or orgadmin
@@ -109,5 +122,22 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             users.Length.ShouldBeGreaterThan(0, "Did not get all users");
         }
 
+        [Fact]
+        public async Task TestUpdateGroup()
+        {
+            OrganisationByIdDto org = await CreateOrganisation(10, SuppUser1.UserId);
+            var item = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(10, org.Id, SuppUser1.UserId)));
+            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
+
+            var updateDto = GetUpdateGroupAndOrganisationDto();
+            var updateItem = await _mediator.Send(new UpdateGroupCommand(group.GroupId, updateDto));
+            var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
+
+            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
+            updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
+            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.EmailAddress, "Email was not updated");
+            updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
+            updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
     }
 }

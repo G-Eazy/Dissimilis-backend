@@ -12,6 +12,7 @@ using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -36,6 +37,18 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             return await _mediator.Send(new QueryAll());
         }
 
+        public UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Name = "test",
+                Address = "address123",
+                EmailAddress = "email@address.no",
+                Description = "maybe",
+                PhoneNumber = "12345678"
+            };
+        }
+
         [Fact]
         public async Task TestCreateOrganisationPermissionHandling()
         {
@@ -55,7 +68,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            org.Name.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
+            org.Name.ShouldBeEquivalentTo("TestOrg3", "Creation of organisation failed");
 
             //Change user and provoke exception
             TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
@@ -107,6 +120,32 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var users = await _mediator.Send(new QueryUsersInOrganisation(1));
             users.Length.ShouldBeGreaterThan(0, "Did not get all users");
+        }
+
+        [Fact]
+        public async Task TestUpdateOrganisation()
+        {
+            CreateOrganisationDto orgDto = new CreateOrganisationDto()
+            {
+                Name = "TestOrg4",
+                Address = "TestAdress1",
+                EmailAddress = "TestOrg1@test.com",
+                Description = "TestDesc1",
+                PhoneNumber = "12345678",
+                FirstAdminId = AdminUser.UserId
+            };
+            var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
+            var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
+
+            var updateDto = GetUpdateGroupAndOrganisationDto();
+            var updateItem = await _mediator.Send(new UpdateOrganisationCommand(org.Id, updateDto));
+            var updatedOrg = await _mediator.Send(new QueryOrganisationById(updateItem.OrganisationId));
+
+            updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
+            updatedOrg.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
+            updatedOrg.EmailAddress.ShouldBeEquivalentTo(updateDto.EmailAddress, "Email was not updated");
+            updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
+            updatedOrg.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
         }
     }
 }
