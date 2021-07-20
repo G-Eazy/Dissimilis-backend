@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +18,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         private readonly TestServer _testServer;
         public HttpClient Client { get; }
         public static int CurrentUserId = GetDefaultTestUser().Id;
+        public static int TestSongId = GetDefaultTestSong().Id;
 
         public TestServerFixture()
         {
@@ -73,7 +77,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public void ChangeCurrentUserId(int newCurrentUserId)
+        public static void ChangeCurrentUserId(int newCurrentUserId)
         {
             TestServerFixture.CurrentUserId = newCurrentUserId;
         }
@@ -86,50 +90,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static List<Organisation> GetSupplementOrganisations()
+        public static Organisation GetSupplementOrganisation()
         {
-            return new List<Organisation>(){
-                new Organisation()
-                {
-                    Name = "Spain"
-                },
-                new Organisation()
-                {
+            return new Organisation(){
                     Name = "Guatamala"
-                },
-                new Organisation()
-                {
-                    Name = "France"
-                }
             };
         }
 
-        public static OrganisationUser GetDefaultTestOrganisationUser()
-        {
-            return new OrganisationUser()
-            {
-                Role = DbContext.Models.Enums.Role.Admin,
-            };
-        }
-
-        public static List<OrganisationUser> GetSupplementedTestOrganisationUsers()
-        {
-            return new List<OrganisationUser>()
-            {
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-            };
-        }
 
         public static List<Group> GetTestGroups()
         {
@@ -149,29 +116,111 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static GroupUser GetDefaultTestGroupUser()
+        public static Song GetDefaultTestSong()
         {
-            return new GroupUser()
+            return new Song()
             {
-                Role = DbContext.Models.Enums.Role.Admin,
+                Title = "Default test song",
+                Numerator = 4,
+                Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
             };
         }
 
-        public static List<GroupUser> GetSupplementedTestGroupUsers()
+        public static List<Song> GetSupplementTestSongs()
         {
-            return new List<GroupUser>()
+            return new List<Song>()
             {
-                new GroupUser()
+                new Song()
                 {
-                    Role = DbContext.Models.Enums.Role.Member,
+                    Title = "Supplement test song 1",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 2",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 3",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 4",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+            };
+        }
+
+
+        public static SongVoice GetDefaultTestSongVoice()
+        {
+            return new SongVoice()
+            {
+                VoiceName = "Main",
+                IsMainVoice = true,
+                VoiceNumber = 1,
+            };
+        }
+
+        public static SongBar[] GetDefaultTestSongBars()
+        {
+            return new SongBar[]
+            {
+                new SongBar()
+                {
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 1,
                 },
-                new GroupUser()
+                new SongBar()
                 {
-                    Role = DbContext.Models.Enums.Role.Member,
+                    House = null,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 2,
+                }
+            };
+        }
+
+        public static List<SongNote> GetDefaultTestSongNotes()
+        {
+            return new List<SongNote>()
+            {
+                new SongNote()
+                {
+                    Position = 0,
+                    Length = 1,
+                    ChordName = "D",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("D")),
                 },
-                new GroupUser()
+                new SongNote()
                 {
-                    Role = DbContext.Models.Enums.Role.Member,
+                    Position = 1,
+                    Length = 1,
+                    ChordName = "F#m",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("F#m")),
+                },new SongNote()
+                {
+                    Position = 2,
+                    Length = 2,
+                    ChordName = "Gmaj7",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("Gmaj7")),
                 },
             };
         }

@@ -190,43 +190,44 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// share song with users, all the given users get editpermission
+        /// share write permission with user
         /// </summary>
-        [HttpPost("{songId:int}/shareSong/User")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [HttpPost("{songId:int}/shareSong/User/{userId:int}")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongUser(int songId, [FromBody] ShareSongDto command)
+        public async Task<IActionResult> ShareSongUser(int songId, int userId)
         {
-            await _mediator.Publish(new ShareSongUserCommand(songId, command));
-            return Ok();
+            var item = await _mediator.Send(new ShareSongUserCommand(songId, userId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
         }
 
         /// <summary>
         /// Add tag song with groups
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Group")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [HttpPost("{songId:int}/AddTag/group{groupId:int}")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongGroup(int songId, [FromBody] ShareSongDto command)
+        public async Task<IActionResult> ShareSongGroup(int songId, int groupId)
         {
-            await _mediator.Publish(new ShareSongGroupCommand(songId, command));
-
-            return Ok();
+            var item = await _mediator.Send(new ShareSongGroupCommand(songId, groupId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
         }
         /// <summary>
         /// Add tag with organisations
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Organisation")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [HttpPost("{songId:int}/AddTag/organisation/{organisationId:int}")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] ShareSongDto command)
+        public async Task<IActionResult> ShareSongOrganisation(int songId,int organisationId)
         {
-            await _mediator.Publish(new ShareSongOrganisationCommand(songId, command));
-
-            return Ok();
+            var item = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
         }
 
     }

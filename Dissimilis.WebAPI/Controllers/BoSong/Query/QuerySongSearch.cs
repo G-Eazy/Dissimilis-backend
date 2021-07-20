@@ -33,10 +33,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         public async Task<SongIndexDto[]> Handle(QuerySongSearch request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            if(currentUser == null)
-            {
-                throw new System.Exception("Could not retrive the current user, try again");
-            }
+            
             var result = await _repository.GetSongSearchList(currentUser, request.Command, cancellationToken);
 
             return result.Select(s => new SongIndexDto(s)).ToArray();

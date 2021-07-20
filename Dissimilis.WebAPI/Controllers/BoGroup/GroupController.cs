@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// get all groups in a given organisation filtered
         /// </summary>
-        [HttpGet("/organisation/{organisationId:int}/groups?filter={filterBy:string}")]
+        [HttpGet("organisation/{organisationId:int}/filter={filterBy:string}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, string filterBy)
@@ -33,7 +33,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// get all groups filtered
         /// </summary>
-        [HttpGet("/groups?filter={filterBy:string}")]
+        [HttpGet("filter={filterBy:string}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetGroups(string filterBy)

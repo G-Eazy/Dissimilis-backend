@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -12,20 +13,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class ShareSongUserCommand : INotification
+    public class ShareSongUserCommand : IRequest<UpdatedSongCommandDto>
     {
         public int SongId { get; }
-        public ShareSongDto Command { get; }
 
+        public int UserId { get; }
 
-        public ShareSongUserCommand(int songId, ShareSongDto command)
+        public ShareSongUserCommand(int songId, int userId)
         {
             SongId = songId;
-            Command = command;
+            UserId = userId;
         }
     }
 
-    public class ShareSongUserCommandHandler : INotificationHandler<ShareSongUserCommand>
+    public class ShareSongUserCommandHandler : IRequestHandler<ShareSongUserCommand, UpdatedSongCommandDto>
     {
         private readonly SongRepository _songRepository;
         private readonly UserRepository _userRepository;
@@ -38,21 +39,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task Handle(ShareSongUserCommand notification, CancellationToken cancellationToken)
+        public async Task<UpdatedSongCommandDto> Handle(ShareSongUserCommand request, CancellationToken cancellationToken)
         {
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var song = await _songRepository.GetSongByIdForUpdate(notification.SongId, cancellationToken);
+            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
             if(song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
             }
-            foreach( var user in notification.Command.ShareSongIds)
-            {
-                var userToAdd = await _userRepository.GetUserById(user, cancellationToken);
+                var userToAdd = await _userRepository.GetUserById(request.UserId, cancellationToken);
                 var isShared = await _songRepository.GetSongSharedUser(song.Id, userToAdd.Id);
                 
-                if(isShared != null || user == currentUser.Id)
+                if(isShared != null || request.UserId == currentUser.Id)
                 {
                     throw new Exception("User already added to song");
                 }
@@ -64,19 +63,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
                 };
                 userToAdd.SongsShared.Add(songSharedUser);
                 song.SharedUsers.Add(songSharedUser);
-            }
             try
             {
                 await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
+                return new UpdatedSongCommandDto(song);
             }
             catch (Exception e)
             {
                 await transaction.RollbackAsync(cancellationToken);
                 throw new ValidationException("Transaction error, aborting operation. Please try again.");
             }
-
-
         }
     }
 }

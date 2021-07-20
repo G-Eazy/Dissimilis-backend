@@ -73,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
         {
             var songs = await Context.Songs
-                .Where(s => s.CreatedById == userId || s.ArrangerId == userId)
+                .Where(s => s.ArrangerId == userId)
                 .ToArrayAsync(cancellationToken);
             
             return songs;
@@ -114,98 +114,32 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-            var query = Context.Songs
-                .Include(s => s.Arranger)
-                .Include(s => s.SharedGroups)
-                .ThenInclude(sg => sg.Group)
+            return await Context.Songs
+                .Include(song => song.Arranger)
+                .Include(song => song.SharedUsers)
+                .Include(song => song.SharedGroups)
+                .Include(song => song.SharedOrganisations)
+                .AsSplitQuery()
                 .AsQueryable()
-                .Where(
-                SongExtension.ReadAccessToSong(user)
-                );
-
-
-            if (!string.IsNullOrEmpty(searchCommand.Title))
-            {
-                var textSearch = $"%{searchCommand.Title.Trim()}%";
-                query = query
-                    .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
-                    .AsQueryable();
-            }
-            //returns only the songs shared with you that you have write permission on
-            if (searchCommand?.SharedByUser == true)
-            {
-                query = query.Where(s => !s.SharedUsers.All(shared => shared.UserId != user.Id)).AsQueryable();
-            }
-            //if you only want to filter on groups 
-            if( searchCommand.OrgId != null && searchCommand.GroupId == null)
-            {
-                query = query.Where(song =>
-                song.SharedOrganisations.Any(org =>
-                searchCommand.OrgId.Contains(org.OrganisationId))).AsQueryable();
-            }
-            //if you only want to filter on organisations
-            else if (searchCommand.GroupId != null && searchCommand.OrgId == null)
-            {
-                query = query.Where(song =>
-                song.SharedGroups.Any(group =>
-                searchCommand.GroupId.Contains(group.GroupId))).AsQueryable();
-            }
-
-            //handles the case if you want one to se one organisation and a group not within that organisation
-            else if( searchCommand.GroupId != null && searchCommand.OrgId != null)
-            {
-                query = query.Where(song => (
-                song.SharedGroups.Any(group =>
-                searchCommand.GroupId.Contains(group.GroupId)) ||
-
-                song.SharedOrganisations.Any(org =>
-                searchCommand.OrgId.Contains(org.OrganisationId)))
-                ).AsQueryable();
-            }
-
-            if (searchCommand.ArrangerId != null)
-            {
-                query = query
-                    .Where(s => s.ArrangerId == searchCommand.ArrangerId)
-                    .AsQueryable();
-            }
-
-            if (searchCommand.OrderBy == "song")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else if (searchCommand.OrderBy == "user")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else
-            {
-                query = searchCommand.OrderDescending ? 
-                    query.OrderByDescending(s => s.UpdatedOn) :
-                    query.OrderBy(s => s.UpdatedOn);
-            }
-
-            if (searchCommand.Num != null)
-            {
-                query = query
-                    .Take(searchCommand.Num.Value)
-                    .AsQueryable();
-            }
-
-            var result = await query
+                .Where(SongExtension.ReadAccessToSong(user))
+                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
+                .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
+                .Take(searchCommand.MaxNumberOfSongs)
                 .ToArrayAsync(cancellationToken);
-
-            return result;
         }
 
+        /// <summary>
+        /// Checks if the specified user has writing access to the specified song.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<bool> HasWriteAccess(Song song, User user)
+        {
+            return song.ArrangerId == user.Id
+                || await Context.SongSharedUser.AnyAsync(songSharedUser =>
+                        songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
+        }
         public async Task CreateSongShareUser(Song song, User user)
         {
             var songSharedUser = new SongSharedUser()
@@ -229,18 +163,47 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             return await Context.SongSharedOrganisations.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
         }
+    }
 
-        /// <summary>
-        /// Checks if the specified user har writing access to the specified song.
-        /// </summary>
-        /// <param name="song"></param>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public async Task<bool> HasWriteAccess(Song song, User user)
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser, bool includeAll)
         {
-            return song.ArrangerId == user.Id
-                || await Context.SongSharedUser.AnyAsync(songSharedUser =>
-                        songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
+            return songs
+                .Where(song =>
+                    (   (searchText == null
+                        || EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
+                        || EF.Functions.Like(song.Arranger.Name, $"%{searchText.Trim()}%"))
+                        && (arrangerId == null || song.ArrangerId == arrangerId)
+                    )
+                    &&
+                    (
+                        includeAll
+                        ||
+                        (
+                            (includeSharedWithUser && song.SharedUsers.Any(sharedSong => sharedSong.UserId == currentUser.Id))
+                            || song.SharedOrganisations.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
+                            || song.SharedGroups.Any(group => includedGroupIdArray.Contains(group.GroupId))
+                        )
+                    )
+                    );
         }
+
+        public static IQueryable<Song> OrderQueryable(this IQueryable<Song> songs, string fieldToOrderBy, bool isDescendingSort)
+        {
+            return fieldToOrderBy switch
+            {
+                "song" => isDescendingSort
+                                       ? songs.OrderByDescending(song => song.Title).ThenByDescending(song => song.UpdatedOn)
+                                       : songs.OrderBy(song => song.Title).ThenBy(song => song.UpdatedOn),
+                "user" => isDescendingSort
+                                        ? songs.OrderByDescending(song => song.Arranger.Name).ThenByDescending(song => song.UpdatedOn)
+                                        : songs.OrderBy(song => song.Arranger.Name).ThenBy(song => song.UpdatedOn),
+                _ => isDescendingSort
+                                  ? songs.OrderByDescending(song => song.UpdatedOn)
+                                  : songs.OrderBy(song => song.UpdatedOn),
+            };
+        }
+
     }
 }

@@ -6,10 +6,12 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.Commands;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
@@ -29,6 +31,22 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
         public SongTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
+        }
+
+        public string SongPrivateGroup3SuppOrg = "Supplement test song 1";
+        public string SongPublicGroup1DefOrg = "Supplement test song 2";
+        public string SongPublicDefOrg = "Supplement test song 3";
+        public string SongPublicSuppOrg = "Supplement test song 4";
+        public string DefaultSongDefOrg = "Default test song";
+
+        internal static void ChangeToUserWithAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(1);
+        }
+
+        internal static void ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg()
+        {
+            TestServerFixture.ChangeCurrentUserId(3);
         }
 
         [Fact]
@@ -52,6 +70,28 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
+        public async Task TestMyLibaryShowRightSongs() 
+        {
+            //user 3 is the songOwner of SongPublicGroup1DefOrg
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+            var CountBefore = await mediator.Send(new QuerySongToLibrary());
+            ChangeToUserWithAdmin();
+
+            var AllSongs = await mediator.Send(new QuerySongSearch(AllSearchQueryDto()));
+            
+            var SongToDuplicateAndTranspose = AllSongs.Where(s => s.Title.Equals(SongPublicGroup1DefOrg.ToString())).FirstOrDefault();
+
+            var duplicate = await mediator.Send(new DuplicateSongCommand(SongToDuplicateAndTranspose.SongId, new DuplicateSongDto() { Title = "DupTestSong2"}));
+            var transpose = await mediator.Send(new CreateTransposedSongCommand(SongToDuplicateAndTranspose.SongId, new TransposeSongDto() { Title = "TransposeTestSong2", Transpose = -2}));
+
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+            var CountAfter = await mediator.Send(new QuerySongToLibrary());
+            CountAfter.Length.ShouldBe(CountBefore.Length);
+            ChangeToUserWithAdmin();
+        }
+
+        [Fact]
         public async Task TestSearchForSongs()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
@@ -65,7 +105,113 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
+        [Fact]
+        public async Task TestSearchDoesNotGivePrivateSong()
+        {
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
 
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var searchQueryDto = AllSearchQueryDto();
+            var privateSongTitle = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            privateSongTitle.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeFalse();
+            ChangeToUserWithAdmin();
+        }
+
+        [Fact]
+        public async Task TestSearchAllSongsAsSysAdmin()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var searchQueryDto = AllSearchQueryDto();
+            var PrivateSongTitle = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            PrivateSongTitle.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestSearchFilterWhenGroupSpecified()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            int[] groupWithOneSong = { 3 };
+            int[] orgs = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithOneSong, orgs);
+            var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+            songDtos.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeFalse();
+            songDtos.Length.ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task TestSearchFilterWhenOrganisationsSpecifiedDefOrg()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            int[] defOrg = { 1};
+            int[] groups = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(groups, defOrg);
+            var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeFalse();
+            songDtos.Count().ShouldBe(3);
+
+            int[] suppOrg = { 2 };
+            searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
+            songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+            songDtos.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
+            songDtos.Length.ShouldBe(2);
+
+        }
+
+        [Fact]
+        public async Task TestSearchFilterWhenOrganisationsSpecifiedSuppOrg()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            int[] groups = Array.Empty<int>();
+            int[] suppOrg = { 2 };
+
+            var searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
+            var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+            filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
+            filteredSongs.Length.ShouldBe(2);
+        }
+
+        [Fact]
+        public async Task TestSearchFilterGroupsAndOrganisationsSameOrg()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            int[] suppOrg = { 2 };
+            int[] groups = { 3 };
+            
+            var searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
+            var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            
+            filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+            filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
+            filteredSongs.Any(s => s.Title.Equals(SongPublicGroup1DefOrg)).ShouldBeFalse();
+            filteredSongs.Any(s => s.Title.Equals(SongPublicDefOrg)).ShouldBeFalse();
+            filteredSongs.Length.ShouldBe(2);
+
+        }
+        [Fact]
+            public async Task TestSearchFilterGroupsAndOrganisationsDifferentOrg()
+            {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            
+            int[] groups = { 3 };
+            int[] defOrg = { 1 };
+
+            var searchQueryDto = GroupOrgSearchQueryDto(groups, defOrg);
+            var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            
+            filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeFalse();
+            filteredSongs.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeTrue();
+            filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
+            filteredSongs.Length.ShouldBe(4);
+        }
 
         [Fact]
         public async Task TestGetSongsFromMyLibrary()
@@ -78,6 +224,27 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
+        [Fact]
+        public async Task TestShareSongWithUser()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            var testSong = await mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            testSong.ProtectionLevel = ProtectionLevels.Private;
+
+            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+            var AllSongs = await mediator.Send(new QuerySongToLibrary());
+            AllSongs.Any(song => song.SongId == testSong.SongId).ShouldBeFalse();
+
+            //await mediator.Send(new ShareSongUserCommand(testSong.SongId, 3));
+            //var AllSongs = await mediator.Send(new QuerySongToLibrary());
+            //AllSongs.Any(song => song.SongId == testSong.SongId).ShouldBeTrue();
+
+            ChangeToUserWithAdmin();
+
+        }
+
+
 
         [Fact]
         public async Task TestNewSongSave()

@@ -19,7 +19,6 @@ namespace Dissimilis.WebAPI.Repositories
         /// Create a new country entry based on the name
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<Country> CreateCountryAsync(string name)
         {
@@ -41,7 +40,6 @@ namespace Dissimilis.WebAPI.Repositories
         /// if metadata is null, use default country "Norway"
         /// </summary>
         /// <param name="metaData"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
         public async Task<Country> CreateOrFindCountryAsync(OrganizationMetadata metaData)
         {
