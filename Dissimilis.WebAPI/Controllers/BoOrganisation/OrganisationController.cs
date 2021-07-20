@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 {
-        [Route("api/organisation")]
+        [Route("api/organisations")]
         [ApiController]
         public class OrganisationController : Controller
         {
@@ -22,10 +22,10 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             /// <summary>
             /// get all organisations filtered
             /// </summary>
-            [HttpGet("filter={filterBy}")]
+            [HttpGet("{filterBy}")]
             [ProducesResponseType(typeof(OrganisationIndexDto[]), (int)HttpStatusCode.OK)]
             [ProducesResponseType((int)HttpStatusCode.NotFound)]
-            public async Task<IActionResult> GetOrganisations(int organisationId, string filterBy)
+            public async Task<IActionResult> GetOrganisations(int organisationId, [FromQuery] string filterBy)
             {
                 var result = await _mediator.Send(new QueryGetOrganisations(filterBy));
                 return Ok(result);

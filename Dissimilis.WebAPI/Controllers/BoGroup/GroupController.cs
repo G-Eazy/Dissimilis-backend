@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
-    [Route("api/group")]
+    [Route("api/organisations")]
     [ApiController]
     public class GroupController : Controller
     {
@@ -21,10 +21,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// get all groups in a given organisation filtered
         /// </summary>
-        [HttpGet("organisation/{organisationId:int}/filter={filterBy}")]
+        [HttpGet("{organisationId:int}/groups{filterBy}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, string filterBy)
+        public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, [FromQuery] string filterBy)
         {
             var result = await _mediator.Send(new QueryGetGroups(filterBy, organisationId));
             return Ok(result);
@@ -33,10 +33,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// get all groups filtered
         /// </summary>
-        [HttpGet("filter={filterBy}")]
+        [HttpGet("groups{filterBy}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetGroups(string filterBy)
+        public async Task<IActionResult> GetGroups([FromQuery] string filterBy)
         {
             var result = await _mediator.Send(new QueryGetGroups(filterBy, null));
             return Ok(result);
