@@ -62,7 +62,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
         private async Task<(SongByIdDto song, SongVoiceDto voice, BarDto barWithNotes, BarDto barWithoutNotes, NoteDto[] notes)> GetTestSong()
         {
-            var songByIdDto = await _mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            var songByIdDto = await _mediator.Send(new QuerySongById(1));
             var songVoice = songByIdDto.Voices.FirstOrDefault();
             var songBarWithNotes = songVoice.Bars.FirstOrDefault(bar => bar.Position == 1);
             var songBarWithoutNotes = songVoice.Bars.FirstOrDefault(bar => bar.Position == 2);

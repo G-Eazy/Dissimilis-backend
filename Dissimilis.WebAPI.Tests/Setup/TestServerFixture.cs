@@ -17,8 +17,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
     {
         private readonly TestServer _testServer;
         public HttpClient Client { get; }
-        public static int CurrentUserId = GetDefaultTestUser().Id;
-        public static int TestSongId = GetDefaultTestSong().Id;
+        public static int CurrentUserId;
 
         public TestServerFixture()
         {
@@ -45,34 +44,60 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             _testServer.Dispose();
         }
 
-        public static User GetDefaultTestUser()
-        {
-            return new User()
-            {
-                Name = "Testuser",
-                Email = "test@test.no",
-                IsSystemAdmin = true,
-            };
-        }
-
-        public static List<User> GetSupplementedTestUsers()
+        public static List<User> GetTestUsers()
         {
             return new List<User>()
             {
                 new User()
                 {
-                    Name = "SupUser1",
-                    Email = "supUser1@test.no",
+                    Name = "SysAdminUser",
+                    Email = "SysAdmin@Norway.no",
+                    IsSystemAdmin = true,
                 },
                 new User()
                 {
-                    Name = "SupUser2",
-                    Email = "supUser2@test.no",
+                    Name = "OrgAdminNorwayUser",
+                    Email = "Admin@Norway.no",
                 },
                 new User()
                 {
-                    Name = "SupUser3",
-                    Email = "supUser3@test.no",
+                    Name = "GroupAdminSandvikaUser",
+                    Email = "Admin@Sandvika_Norway.no",
+                },
+                new User()
+                {
+                    Name = "GroupAdminSandvikaUser",
+                    Email = "Admin@Bergen_Norway.no",
+                },
+                new User()
+                {
+                    Name = "GroupAdminSandvikaUser",
+                    Email = "Admin@Trondheim_Norway.no",
+                },
+                new User()
+                {
+                    Name = "OrgAdminGuatamalaUser",
+                    Email = "Admin@Guatamala.no",
+                },
+                new User()
+                {
+                    Name = "Justin Bieber fan",
+                    Email = "Justin_Bieber_fan@Norway.no",
+                },
+                new User()
+                {
+                    Name = "Edvard Grieg fan",
+                    Email = "Edvard_Grieg_fan@Sandvika_Norway.no",
+                },
+                new User()
+                {
+                    Name = "Deep Purple fan",
+                    Email = "Deep_Purple_fan@Trondheim_Norway.no",
+                },
+                new User()
+                {
+                    Name = "Rammstein fan",
+                    Email = "Rammstein_fan@Norway.no",
                 }
             };
         }
@@ -82,21 +107,20 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             TestServerFixture.CurrentUserId = newCurrentUserId;
         }
 
-        public static Organisation GetDefaultTestOrganisation()
+        public static List<Organisation> GetTestOrganisations()
         {
-            return new Organisation()
+            return new List<Organisation>()
             {
-                Name = "Norway",
-            };
-        }
-
-        public static Organisation GetSupplementOrganisation()
-        {
-            return new Organisation(){
+                new Organisation()
+                {
+                    Name = "Norway"
+                },
+                new Organisation()
+                {
                     Name = "Guatamala"
+                },
             };
         }
-
 
         public static List<Group> GetTestGroups()
         {
@@ -104,80 +128,100 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 new Group()
                 {
-                    Name = "Dissimilis Sandvika",
+                    Name = "Sandvika_Norway",
                 },
                 new Group()
                 {
-                    Name = "Dissimilis Bergen",
-                },new Group()
+                    Name = "Bergen_Norway",
+                },
+                new Group()
                 {
-                    Name = "Dissimilis Trondheim",
+                    Name = "Trondheim_Norway",
                 },
             };
         }
 
-        public static Song GetDefaultTestSong()
-        {
-            return new Song()
-            {
-                Title = "Default test song",
-                Numerator = 4,
-                Denominator = 4,
-                ProtectionLevel = ProtectionLevels.Public
-            };
-        }
-
-        public static List<Song> GetSupplementTestSongs()
+        public static List<Song> GetTestSongs()
         {
             return new List<Song>()
             {
                 new Song()
                 {
-                    Title = "Supplement test song 1",
+                    Title = "Lisa gikk til skolen",
                     Numerator = 4,
                     Denominator = 4,
-                ProtectionLevel = ProtectionLevels.Public
-
-    },
+                    ProtectionLevel = ProtectionLevels.Public
+                },
                 new Song()
                 {
-                    Title = "Supplement test song 2",
+                    Title = "Smoke on the water",
+                    Composer = "Deep_Purple",
                     Numerator = 4,
                     Denominator = 4,
-                ProtectionLevel = ProtectionLevels.Public
-
-    },
+                    ProtectionLevel = ProtectionLevels.Private
+                },
                 new Song()
                 {
-                    Title = "Supplement test song 3",
+                    Title = "Speed King",
+                    Composer = "Deep_Purple",
                     Numerator = 4,
                     Denominator = 4,
-                ProtectionLevel = ProtectionLevels.Public
-
-    },
+                    ProtectionLevel = ProtectionLevels.Public
+                },
                 new Song()
                 {
-                    Title = "Supplement test song 4",
+                    Title = "Du hast",
+                    Composer = "Rammstein",
                     Numerator = 4,
                     Denominator = 4,
-                ProtectionLevel = ProtectionLevels.Public
-
-    },
+                    ProtectionLevel = ProtectionLevels.Private
+                },
+                new Song()
+                {
+                    Title = "Baby",
+                    Composer = "Justin_Bieber",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Private
+                },
+                new Song()
+                {
+                    Title = "Dovregubbens hall",
+                    Composer = "Edvard_Grieg",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Public
+                },
             };
         }
 
 
-        public static SongVoice GetDefaultTestSongVoice()
+        public static List<SongVoice> GetTestSongVoices()
         {
-            return new SongVoice()
+            return new List<SongVoice>()
             {
-                VoiceName = "Main",
-                IsMainVoice = true,
-                VoiceNumber = 1,
+                new SongVoice()
+                {
+                    VoiceName = "Main",
+                    IsMainVoice = true,
+                    VoiceNumber = 1,
+                },
+                new SongVoice()
+                {
+                    VoiceName = "First voice",
+                    IsMainVoice = false,
+                    VoiceNumber = 2,
+                },
+                new SongVoice()
+                {
+                    VoiceName = "Second voice",
+                    IsMainVoice = false,
+                    VoiceNumber = 3,
+                },
             };
         }
 
-        public static SongBar[] GetDefaultTestSongBars()
+        public static SongBar[] GetTestSongBars()
         {
             return new SongBar[]
             {
@@ -194,11 +238,25 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     RepAfter = false,
                     RepBefore = false,
                     Position = 2,
+                },
+                new SongBar()
+                {
+                    House = 1,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 1,
+                },
+                new SongBar()
+                {
+                    House = 1,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 2,
                 }
             };
         }
 
-        public static List<SongNote> GetDefaultTestSongNotes()
+        public static List<SongNote> GetTestSongNotes()
         {
             return new List<SongNote>()
             {
@@ -215,12 +273,20 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Length = 1,
                     ChordName = "F#m",
                     NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("F#m")),
-                },new SongNote()
+                },
+                new SongNote()
                 {
                     Position = 2,
                     Length = 2,
-                    ChordName = "Gmaj7",
-                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("Gmaj7")),
+                    ChordName = "D#13",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("D#13")),
+                },
+                new SongNote()
+                {
+                    Position = 3,
+                    Length = 2,
+                    ChordName = "A",
+                    NoteValues = String.Join("|", SongNoteExtension.GetNoteValuesFromChordName("A")),
                 },
             };
         }
