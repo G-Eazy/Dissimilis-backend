@@ -54,8 +54,8 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                 throw new NotFoundException($"Organisation with Id {organisationId} not found");
 
             await Context.OrganisationUsers
-                .Include(o => o.User)
-                .Where(o => o.OrganisationId == organisationId)
+                .Include(ou => ou.User)
+                .Where(ou => ou.OrganisationId == organisationId)
                 .LoadAsync(cancellationToken);
 
             return organisation;

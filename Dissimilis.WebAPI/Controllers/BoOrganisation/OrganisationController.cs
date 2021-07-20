@@ -32,5 +32,15 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             var result = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
             return Created($"{result.Id}", result);
         }
+
+        [HttpGet("{organisationId:int}")]
+        [ProducesResponseType(typeof(OrganisationByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetOrganisationById(int organisationId)
+        {
+            var organisation = await _mediator.Send(new QueryOrganisationById(organisationId));
+            return Ok(organisation);
+        }
+
     }
 }

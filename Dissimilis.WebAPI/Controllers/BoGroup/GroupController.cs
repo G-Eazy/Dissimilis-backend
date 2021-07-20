@@ -36,5 +36,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
             return Created($"{result.GroupId}", result);
         }
+
+        [HttpGet("{groupId:int}")]
+        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetGroupById(int groupId)
+        {
+            var group = await _mediator.Send(new QueryGroupById(groupId));
+            return Ok(group);
+        }
     }
 }
