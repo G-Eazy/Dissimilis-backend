@@ -1,5 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
+﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +19,26 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         }
 
         /// <summary>
-        /// getGroups
+        /// get all groups in a given organisation filtered
         /// </summary>
-        [HttpGet("getGroups")]
+        [HttpGet("/Organisation/{organisationId:int}/groups?filter={filterBy:string}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetGroups([FromBody] GetGroupsQueryDto command)
+        public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, string filterBy)
         {
-            var result = await _mediator.Send(new QueryGetGroups(command));
+            var result = await _mediator.Send(new QueryGetGroups(filterBy, organisationId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get all groups filtered
+        /// </summary>
+        [HttpGet("/groups?filter={filterBy:string}")]
+        [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetGroups(string filterBy)
+        {
+            var result = await _mediator.Send(new QueryGetGroups(filterBy, null));
             return Ok(result);
         }
     }

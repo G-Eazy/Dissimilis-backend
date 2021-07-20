@@ -30,25 +30,33 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return group;
         }
 
-        public async Task<Group[]> GetGroups(bool OnlyMyGroups, bool OnlyAdmins, int? OrganisationId, User user, CancellationToken cancellationToken)
+        public async Task<Group[]> GetGroups(int? organisationId, string filterBy, User user, CancellationToken cancellationToken)
         {
-            var query = context.Groups.AsQueryable();
-            if (OnlyMyGroups || OnlyAdmins)
+            var query = context.Groups
+                .Include(x => x.Users)
+                .AsQueryable();
+
+            if (organisationId != null)
             {
-                var userGroups = user.GetAllGroupIds();
-                query = query.Where(g => userGroups.Contains(g.Id)).AsQueryable();
-                if (OnlyAdmins)
-                {
-                    query = query.Where(g => g.Users.Any(u => u.UserId == user.Id && u.Role == Role.Admin));
-                }
+                query.Where(g => g.OrganisationId == organisationId).AsQueryable();
             }
-            else if(OrganisationId != null)
-            {
-                query = query.Where(g => g.OrganisationId == OrganisationId);
-            }
+            query = query.FilterGroups(filterBy, user).AsQueryable();
+
             var result = await query
                 .ToArrayAsync(cancellationToken);
             return result;
         }
     }
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Group> FilterGroups(this IQueryable<Group> groups, string filterBy, User user)
+        {
+            return filterBy switch
+            {
+                "Admin" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+                "Member" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                _ => groups
+            };
+        }
+    } 
 }

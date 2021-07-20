@@ -11,11 +11,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
     public class QueryGetGroups : IRequest<GroupIndexDto[]>
     {
-        public GetGroupsQueryDto Command { get; }
+        public string FilterBy { get; }
+        public int? OrganisationId { get; }
 
-        public QueryGetGroups(GetGroupsQueryDto command)
+        public QueryGetGroups(string filterBy, int? organisationId)
         {
-            Command = command;
+            OrganisationId = organisationId;
+            FilterBy = filterBy;
         }
     }
 
@@ -33,8 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         public async Task<GroupIndexDto[]> Handle(QueryGetGroups request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var result = await _repository.GetGroups(request.Command.OnlyMyGroups, request.Command.MyAdminGroups,
-                request.Command.OrganisationId, currentUser, cancellationToken);
+            var result = await _repository.GetGroups(request.OrganisationId, request.FilterBy, currentUser, cancellationToken);
 
             return result.Select(group => new GroupIndexDto(group)).ToArray();
         }
