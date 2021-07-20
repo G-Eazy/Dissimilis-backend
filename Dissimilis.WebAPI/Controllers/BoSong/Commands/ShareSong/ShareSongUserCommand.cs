@@ -44,25 +44,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
-            if(song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
+            if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
             }
-                var userToAdd = await _userRepository.GetUserById(request.UserId, cancellationToken);
-                var isShared = await _songRepository.GetSongSharedUser(song.Id, userToAdd.Id);
-                
-                if(isShared != null || request.UserId == currentUser.Id)
-                {
-                    throw new Exception("User already added to song");
-                }
-                
-                var songSharedUser = new SongSharedUser()
-                {
-                    UserId = userToAdd.Id,
-                    SongId = song.Id
-                };
-                userToAdd.SongsShared.Add(songSharedUser);
-                song.SharedUsers.Add(songSharedUser);
+            var userToAdd = await _userRepository.GetUserById(request.UserId, cancellationToken);
+            var isShared = await _songRepository.GetSongSharedUser(song.Id, userToAdd.Id);
+
+            if (isShared != null || request.UserId == currentUser.Id)
+            {
+                throw new Exception("User already added to song");
+            }
+
+            var songSharedUser = new SongSharedUser()
+            {
+                UserId = userToAdd.Id,
+                SongId = song.Id
+            };
+            userToAdd.SongsShared.Add(songSharedUser);
+            song.SharedUsers.Add(songSharedUser);
             try
             {
                 await _songRepository.UpdateAsync(cancellationToken);

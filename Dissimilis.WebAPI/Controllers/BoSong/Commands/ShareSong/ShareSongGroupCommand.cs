@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
     {
         public int SongId { get; }
 
-        public int GroupId {get;}    
+        public int GroupId { get; }
 
         public ShareSongGroupCommand(int songId, int groupId)
         {

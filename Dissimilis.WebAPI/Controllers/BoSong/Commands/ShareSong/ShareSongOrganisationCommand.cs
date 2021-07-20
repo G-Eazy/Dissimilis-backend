@@ -46,30 +46,30 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
-            if(song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
+            if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
             }
-                var organisationToAdd = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
-                var isShared = await _songRepository.GetSongSharedOrganisation(song.Id, organisationToAdd.Id);
+            var organisationToAdd = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+            var isShared = await _songRepository.GetSongSharedOrganisation(song.Id, organisationToAdd.Id);
 
-                if (!currentUser.GetAllOrganisationIds().Contains(organisationToAdd.Id) && !currentUser.IsSystemAdmin)
-                {
-                    throw new Exception("Can only tag a song with organisations you are in");
-                }
+            if (!currentUser.GetAllOrganisationIds().Contains(organisationToAdd.Id) && !currentUser.IsSystemAdmin)
+            {
+                throw new Exception("Can only tag a song with organisations you are in");
+            }
 
-                if (isShared != null)
-                {
-                    throw new Exception("Organisation already added to song");
-                }
-                
-                var songSharedOrganisation = new SongSharedOrganisation()
-                {
-                    OrganisationId = organisationToAdd.Id,
-                    SongId = song.Id
-                };
-                organisationToAdd.SharedSongs.Add(songSharedOrganisation);
-                song.SharedOrganisations.Add(songSharedOrganisation);
+            if (isShared != null)
+            {
+                throw new Exception("Organisation already added to song");
+            }
+
+            var songSharedOrganisation = new SongSharedOrganisation()
+            {
+                OrganisationId = organisationToAdd.Id,
+                SongId = song.Id
+            };
+            organisationToAdd.SharedSongs.Add(songSharedOrganisation);
+            song.SharedOrganisations.Add(songSharedOrganisation);
             try
             {
                 await _songRepository.UpdateAsync(cancellationToken);

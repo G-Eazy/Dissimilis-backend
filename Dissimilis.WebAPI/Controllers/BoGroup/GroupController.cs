@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
-    public class OrganisationController
+    public class GroupController
     {
     }
 }
