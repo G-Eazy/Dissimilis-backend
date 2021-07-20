@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             [ProducesResponseType((int)HttpStatusCode.NotFound)]
             public async Task<IActionResult> GetOrganisations(int organisationId, string filterBy)
             {
-                var result = await _mediator.Send(new QueryGetOrganisations(filterBy, organisationId));
+                var result = await _mediator.Send(new QueryGetOrganisations(filterBy));
                 return Ok(result);
             }
         }

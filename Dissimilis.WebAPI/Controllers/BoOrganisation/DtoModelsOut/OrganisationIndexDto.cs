@@ -15,7 +15,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
                 OrganisationName = organisation.Name;
                 CreatedOn = organisation.CreatedOn;
             }
-        }
     }
-
 }
+
