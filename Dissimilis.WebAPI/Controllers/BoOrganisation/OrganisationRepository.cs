@@ -1,5 +1,6 @@
 ﻿using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,18 +32,29 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 
         /// <summary>
         /// Method to determine if user har permission to do desired operation with organisation object
-        /// Just checks whether user is system admin for now to add organisation.
-        /// Can be extended later.
         /// </summary>
-        /// <param name="organisation"></param>
+        /// <param name="organisationId"></param>
         /// <param name="user"></param>
         /// <param name="operation"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public bool CheckPermission(User user, string operation, CancellationToken cancellationToken)
+        public async Task<bool> CheckPermission(Organisation organisation, User user, string operation, CancellationToken cancellationToken)
         {
             if (user.IsSystemAdmin)
                 return true;
-            return false;
+            
+            bool hasPermission = false;
+            var orgAdmin = await Context.OrganisationUsers
+                .SingleOrDefaultAsync(
+                        ou =>
+                        ou.UserId == user.Id
+                        && ou.OrganisationId == organisation.Id
+                        && ou.Role == Role.Admin
+                     );
+            if (orgAdmin != null)
+                hasPermission = true;
+
+            return hasPermission;
         }
 
         public async Task<Organisation> GetOrganisationById(int organisationId, CancellationToken cancellationToken)

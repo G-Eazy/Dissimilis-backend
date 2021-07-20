@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
-                Name = "TestOrg1",
+                Name = "TestOrg3",
                 Address = "TestAdress1",
                 EmailAddress = "TestOrg1@test.com",
                 Description = "TestDesc1",

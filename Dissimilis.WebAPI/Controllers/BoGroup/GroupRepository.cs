@@ -27,29 +27,50 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
         /// <summary>
         /// Method to determine if user har permission to do desired operation with group object
-        /// Can be extended later to fit operations other than "add"
         /// </summary>
-        /// <param name="organisationId"></param>
+        /// <param name="group"></param>
         /// <param name="user"></param>
         /// <param name="operation"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> CheckPermission(int organisationId, User user, string operation, CancellationToken cancellationToken)
+        public async Task<bool> CheckPermission(Group group, User user, string operation, CancellationToken cancellationToken)
         {
-            if (user.IsSystemAdmin) 
+            if (user.IsSystemAdmin)
                 return true;
 
             bool hasPermission = false;
-            if (operation == "add")
-            {
-                var res = await Context.OrganisationUsers
-                    .SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisationId);
 
-                if (res != null)
-                {
-                    if (res.Role == Role.Admin)
+            var orgAdmin = await Context.OrganisationUsers
+                    .SingleOrDefaultAsync(
+                        ou =>
+                        ou.UserId == user.Id
+                        && ou.OrganisationId == group.OrganisationId
+                        && ou.Role == Role.Admin
+                     );
+
+            switch(operation)
+            {
+                case "add": 
+                    if(orgAdmin != null)
                         hasPermission = true;
-                }
+                    break;
+
+                case "modify":
+                    var groupAdmin = await Context.GroupUsers
+                        .SingleOrDefaultAsync(
+                            gu =>
+                            gu.UserId == user.Id
+                            && gu.GroupId == group.Id
+                            && gu.Role == Role.Admin
+                        );
+                    if (groupAdmin != null)
+                        hasPermission = true;
+                    break;
+
+                default:
+                    break;
             }
+            
             return hasPermission;
         }
 

@@ -10,30 +10,30 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 {
-    public class CreateOrganisationCommand : IRequest<UpdatedOrganisationCommandDto>
+    public class UpdateOrganisationCommand : IRequest<UpdatedOrganisationCommandDto>
     {
-        public CreateOrganisationDto Command { get; }
+        public UpdateOrganisationDto Command { get; }
 
-        public CreateOrganisationCommand(CreateOrganisationDto command)
+        public UpdateOrganisationCommand(UpdateOrganisationDto command)
         {
             Command = command;
         }
     }
 
-    public class CreateOrganisationCommandHandler : IRequestHandler<CreateOrganisationCommand, UpdatedOrganisationCommandDto>
+    public class UpdateOrganisationCommandHandler : IRequestHandler<UpdateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
         private readonly UserRepository _userRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public CreateOrganisationCommandHandler(UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
+        public UpdateOrganisationCommandHandler(UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
         {
             _userRepository = userRepository;
             _organisationRepository = organisationRepository;
             _authService = authService;
         }
 
-        public async Task<UpdatedOrganisationCommandDto> Handle(CreateOrganisationCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedOrganisationCommandDto> Handle(UpdateOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var organisation = new Organisation
@@ -45,8 +45,8 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     request.Command.PhoneNumber,
                     currentUser.Id
                 );
-            if (! await _organisationRepository.CheckPermission(organisation, currentUser, "add", cancellationToken))
-                throw new System.UnauthorizedAccessException($"User does not have permission to create organisation");
+            if (!await _organisationRepository.CheckPermission(organisation, currentUser, "add", cancellationToken))
+                throw new System.UnauthorizedAccessException($"User does not have permission to Update organisation");
 
 
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);

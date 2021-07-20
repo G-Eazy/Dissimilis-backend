@@ -80,23 +80,23 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task TestCreateGroupPermissions()
         {
             TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
+            OrganisationByIdDto org = await CreateOrganisation(3, SuppUser1.UserId);
 
             // Should be allowed
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
+            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(4, org.Id, SuppUser1.UserId)));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
 
             // Should be allowed, since SuppUser1 is admin of org
             TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
-            var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId)));
+            var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(5, org.Id, SuppUser1.UserId)));
             var group2 = await _mediator.Send(new QueryGroupById(item2.GroupId));
             group2.Name.ShouldBeEquivalentTo("TestGroup2", "Group creation failed");
 
 
             // Should throw exception, since SuppUser2 is neither sysadmin or orgadmin
             TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId))));
+            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(6, org.Id, SuppUser1.UserId))));
             exception.Message.ShouldBeEquivalentTo("User does not have permission to create group in organisation", "Correct exception was not thrown");
         }
 
@@ -104,7 +104,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task TestGetAllUsersInGroup()
         {
             OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
+            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(4, org.Id, SuppUser1.UserId)));
             var users = await _mediator.Send(new QueryUsersInGroup(1));
             users.Length.ShouldBeGreaterThan(0, "Did not get all users");
         }
