@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoOrganisation;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
 using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.Boorganisation.Query
