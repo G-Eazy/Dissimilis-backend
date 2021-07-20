@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             {
                 Name = "TestOrg1",
                 Address = "TestAdress1",
-                EmailAddress = "TestOrg1@test.com",
+                Email = "TestOrg1@test.com",
                 Description = "TestDesc1",
                 PhoneNumber = "12345678",
                 FirstAdminId = AdminUser.UserId
@@ -77,7 +77,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             {
                 Name = name,
                 Address = address,
-                EmailAddress = email,
+                Email = email,
                 Description = desc,
                 PhoneNumber = phone,
                 FirstAdminId = AdminUser.UserId

@@ -35,12 +35,12 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
         public async Task<UpdatedOrganisationCommandDto> Handle(CreateOrganisationCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUser();
+            var currentUser = await _userRepository.GetUserById(_authService.GetVerifiedCurrentUser().Id, cancellationToken);
             var organisation = new Organisation
                 (
                     request.Command.Name,
                     request.Command.Address,
-                    request.Command.EmailAddress,
+                    request.Command.Email,
                     request.Command.Description,
                     request.Command.PhoneNumber,
                     currentUser.Id
@@ -54,7 +54,9 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
             var adminOrgUser = new OrganisationUser(organisation.Id, adminUser.Id, Role.Admin);
             organisation.Users.Add(adminOrgUser);
+            currentUser.Organisations.Add(adminOrgUser);
             await _organisationRepository.UpdateAsync(cancellationToken);
+            await _userRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedOrganisationCommandDto(organisation);
         }

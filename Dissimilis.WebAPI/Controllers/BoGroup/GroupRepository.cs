@@ -65,7 +65,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
                 .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
 
             if (group == null)
-                throw new NotFoundException($"Organisation with Id {groupId} not found");
+                throw new NotFoundException($"Group with Id {groupId} not found");
 
             await Context.GroupUsers
                 .Include(gu => gu.User)

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    [Migration("20210720083319_GroupAndOrgMigration")]
-    partial class GroupAndOrgMigration
+    [Migration("20210720144624_FixGroupAndOrganisationCreationMigration")]
+    partial class FixGroupAndOrganisationCreationMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

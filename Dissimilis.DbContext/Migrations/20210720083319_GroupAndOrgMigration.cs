@@ -17,7 +17,7 @@ namespace Dissimilis.DbContext.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Organisations",
                 type: "nvarchar(100)",
                 maxLength: 100,
@@ -57,7 +57,7 @@ namespace Dissimilis.DbContext.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Groups",
                 type: "nvarchar(100)",
                 maxLength: 100,
@@ -100,7 +100,7 @@ namespace Dissimilis.DbContext.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Organisations",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -140,7 +140,7 @@ namespace Dissimilis.DbContext.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Groups",
                 type: "nvarchar(max)",
                 nullable: true,

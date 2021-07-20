@@ -35,14 +35,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
         public async Task<UpdatedGroupCommandDto> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
         {
-            var currentUser = _authService.GetVerifiedCurrentUser();
+            var currentUser = await _userRepository.GetUserById(_authService.GetVerifiedCurrentUser().Id, cancellationToken);
             var group = new Group
                 (
                     request.Command.Name,
                     request.Command.OrganisationId,
                     request.Command.Address,
                     request.Command.PhoneNumber,
-                    request.Command.EmailAddress,
+                    request.Command.Email,
                     request.Command.Description,
                     currentUser.Id
                 );
@@ -54,7 +54,9 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
             var adminGroupUser = new GroupUser(group.Id, adminUser.Id, Role.Admin);
             group.Users.Add(adminGroupUser);
+            currentUser.Groups.Add(adminGroupUser);
             await _groupRepository.UpdateAsync(cancellationToken);
+            await _userRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedGroupCommandDto(group);
         }

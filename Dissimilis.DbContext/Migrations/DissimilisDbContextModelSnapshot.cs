@@ -60,7 +60,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<string>("EmailAddress")
+                    b.Property<string>("Email")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -147,7 +147,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<string>("EmailAddress")
+                    b.Property<string>("Email")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 

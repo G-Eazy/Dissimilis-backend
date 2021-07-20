@@ -32,7 +32,7 @@ namespace Dissimilis.DbContext.Models
         public string? PhoneNumber { get; set; }
 
         [MaxLength(100)]
-        public string? EmailAddress { get; set; }
+        public string? Email { get; set; }
 
         [MaxLength(300)]
         public string? Description { get; set; }
@@ -72,7 +72,7 @@ namespace Dissimilis.DbContext.Models
         {
             Name = name;
             Address = address;
-            EmailAddress = email;
+            Email = email;
             Description = description;
             PhoneNumber = phoneNumber; 
             CreatedById = createdById;
