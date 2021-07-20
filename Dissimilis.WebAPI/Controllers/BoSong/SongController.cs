@@ -206,7 +206,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Add tag song with groups
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Group({groupId:int}")]
+        [HttpPost("{songId:int}/AddTag/Group/{groupId:int}")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -219,16 +219,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Add tag with organisations
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Organisation/organisationId:int}")]
+        [HttpPost("{songId:int}/AddTag/Organisation/{organisationId:int}")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongOrganisation(int songId,int organisationId)
+        public async Task<IActionResult> ShareSongOrganisation(int songId, int organisationId)
         {
             var item = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
             var result = await _mediator.Send(new QuerySongById(item.SongId));
             return Ok(result);
         }
-
     }
 }
