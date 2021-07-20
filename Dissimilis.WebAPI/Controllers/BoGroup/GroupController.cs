@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
-    [Route("api/Group")]
+    [Route("api/group")]
     [ApiController]
     public class GroupController : Controller
     {
@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// get all groups in a given organisation filtered
         /// </summary>
-        [HttpGet("/Organisation/{organisationId:int}/groups?filter={filterBy:string}")]
+        [HttpGet("/organisation/{organisationId:int}/groups?filter={filterBy:string}")]
         [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, string filterBy)

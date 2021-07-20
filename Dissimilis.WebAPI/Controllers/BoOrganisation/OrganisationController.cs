@@ -1,4 +1,5 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 {
-        [Route("api/Organisation")]
+        [Route("api/organisation")]
         [ApiController]
         public class OrganisationController : Controller
         {
