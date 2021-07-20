@@ -53,8 +53,8 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         {
             return filterBy switch
             {
-                "Admin" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
-                "Member" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                "ADMIN" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+                "MEMBER" => groups.Where(g => g.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
                 _ => groups
             };
         }

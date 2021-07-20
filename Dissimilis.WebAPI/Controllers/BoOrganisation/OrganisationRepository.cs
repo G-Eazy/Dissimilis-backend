@@ -44,17 +44,17 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         {
             return filterBy switch
             {
-                "Admin" => organisations.Where(o => 
+                "ADMIN" => organisations.Where(o => 
                 o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
 
-                "GroupAdmin" => organisations
+                "GROUPADMIN" => organisations
                 .Include(x => x.Groups)
                 .ThenInclude(x => x.Users)
                 .Where(o =>
                 o.Groups.Any(g => g.Users.Any(u =>
                 u.UserId == user.Id && u.Role == Role.Admin))).AsQueryable(),
 
-                "Member" => organisations.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                "MEMBER" => organisations.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
                 _ => organisations,
             };
         }
