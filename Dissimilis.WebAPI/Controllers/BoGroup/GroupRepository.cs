@@ -43,9 +43,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             {
                 var res = await Context.OrganisationUsers
                     .SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisationId);
-                var role = res.Role;
-                if (role == Role.Admin)
-                    hasPermission = true;
+
+                if (res != null)
+                {
+                    if (res.Role == Role.Admin)
+                        hasPermission = true;
+                }
             }
             return hasPermission;
         }
