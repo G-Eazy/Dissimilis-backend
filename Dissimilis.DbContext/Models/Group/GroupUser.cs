@@ -25,6 +25,8 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         public Role Role { get; set; }
 
+        public GroupUser() { }
+
         public GroupUser(int groupId, int userId, Role role)
         {
             GroupId = groupId;

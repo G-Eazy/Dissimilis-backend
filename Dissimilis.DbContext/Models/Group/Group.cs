@@ -23,9 +23,16 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        [MaxLength(100)]
         public string? Address { get; set; }
+        
+        [MaxLength(20)]
         public string? PhoneNumber { get; set; }
+
+        [MaxLength(100)]
         public string? EmailAddress { get; set; }
+
+        [MaxLength(300)]
         public string? Description { get; set; }
 
         /// <summary>

@@ -25,11 +25,18 @@ namespace Dissimilis.DbContext.Models
         [Required]
         public string Name { get; set; }
 
+        [MaxLength(100)]
         public string? Address { get; set; }
+
+        [MaxLength(20)]
+        public string? PhoneNumber { get; set; }
+
+        [MaxLength(100)]
         public string? EmailAddress { get; set; }
+
+        [MaxLength(300)]
         public string? Description { get; set; }
-        public string PhoneNumber { get; set; }
-        
+
         /// <summary>
         /// The users in the organisation with their roles
         /// </summary>
