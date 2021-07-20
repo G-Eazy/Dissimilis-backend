@@ -231,7 +231,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
             await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto() {
                 ProtectionLevel = ProtectionLevels.Private }));
 
@@ -248,13 +248,31 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 ProtectionLevel = ProtectionLevels.Public
             }));
         }
+        [Fact]
+        public async Task TestUpdateSongToPrivate()
+        {
+            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+            await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
+            {
+                ProtectionLevel = ProtectionLevels.Private
+            }));
+
+            var defaultTestSong = await mediator.Send(new QuerySongById(1));
+            defaultTestSong.ProtectionLevel.ShouldBe(ProtectionLevels.Private);
+            await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
+            {
+                ProtectionLevel = ProtectionLevels.Public
+            }));
+        }
+
 
         [Fact]
         public async Task TestAddGroupTag()
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
 
             await mediator.Send(new ShareSongGroupCommand(DefaultTestSong.SongId, 2));
 
@@ -270,7 +288,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(TestServerFixture.TestSongId));
+            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
 
             await mediator.Send(new ShareSongOrganisationCommand(DefaultTestSong.SongId, 2));
 
