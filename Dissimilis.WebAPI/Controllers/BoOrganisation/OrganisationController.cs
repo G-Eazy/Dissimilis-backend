@@ -2,6 +2,8 @@
 using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -40,6 +42,15 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         {
             var organisation = await _mediator.Send(new QueryOrganisationById(organisationId));
             return Ok(organisation);
+        }
+
+        [HttpGet("{organisationId:int}/users")]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetUsersInOrganisation(int organisationId)
+        {
+            var users = await _mediator.Send(new QueryUsersInOrganisation(organisationId));
+            return Ok(users);
         }
 
     }
