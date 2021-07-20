@@ -22,13 +22,11 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class UpdateOrganisationCommandHandler : IRequestHandler<UpdateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
-        private readonly UserRepository _userRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public UpdateOrganisationCommandHandler(UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
+        public UpdateOrganisationCommandHandler(OrganisationRepository organisationRepository, IAuthService authService)
         {
-            _userRepository = userRepository;
             _organisationRepository = organisationRepository;
             _authService = authService;
         }
@@ -42,11 +40,11 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             if (!hasPermission)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update organisation");
 
-            organisation.Name = request.Command.Name;
-            organisation.Address = request.Command.Address;
-            organisation.EmailAddress = request.Command.EmailAddress;
-            organisation.Description = request.Command.Description;
-            organisation.PhoneNumber = request.Command.PhoneNumber;
+            organisation.Name = request.Command?.Name ?? organisation.Name;
+            organisation.Address = request.Command?.Address ?? organisation.Address;
+            organisation.EmailAddress = request.Command?.EmailAddress ?? organisation.EmailAddress;
+            organisation.Description = request.Command?.Description ?? organisation.Description;
+            organisation.PhoneNumber = request.Command?.PhoneNumber ?? organisation.PhoneNumber;
 
             await _organisationRepository.UpdateAsync(cancellationToken);
 

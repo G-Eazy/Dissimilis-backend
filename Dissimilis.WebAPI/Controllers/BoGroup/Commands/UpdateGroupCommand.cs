@@ -22,13 +22,11 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class UpdateGroupCommandHandler : IRequestHandler<UpdateGroupCommand, UpdatedGroupCommandDto>
     {
-        private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public UpdateGroupCommandHandler(UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
+        public UpdateGroupCommandHandler(GroupRepository groupRepository, IAuthService authService)
         {
-            _userRepository = userRepository;
             _groupRepository = groupRepository;
             _authService = authService;
         }
@@ -42,11 +40,11 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             if (!hasPermission)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update Group");
 
-            group.Name = request.Command.Name;
-            group.Address = request.Command.Address;
-            group.EmailAddress = request.Command.EmailAddress;
-            group.Description = request.Command.Description;
-            group.PhoneNumber = request.Command.PhoneNumber;
+            group.Name = request.Command?.Name ?? group.Name;
+            group.Address = request.Command?.Address ?? group.Address;
+            group.EmailAddress = request.Command?.EmailAddress ?? group.EmailAddress;
+            group.Description = request.Command?.Description ?? group.Description;
+            group.PhoneNumber = request.Command?.PhoneNumber ?? group.PhoneNumber;
 
             await _groupRepository.UpdateAsync(cancellationToken);
 

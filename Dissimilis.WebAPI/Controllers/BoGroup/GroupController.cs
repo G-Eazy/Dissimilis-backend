@@ -4,6 +4,7 @@ using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -55,6 +56,17 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         {
             var users = await _mediator.Send(new QueryUsersInGroup(groupId));
             return Ok(users);
+        }
+
+        [HttpPatch("{groupId:int}")]
+        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> UpdateGroup(int groupId, [FromBody] UpdateGroupAndOrganisationDto command)
+        {
+            var item = await _mediator.Send(new UpdateGroupCommand(groupId, command));
+            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
+            return Ok(group);
         }
     }
 }
