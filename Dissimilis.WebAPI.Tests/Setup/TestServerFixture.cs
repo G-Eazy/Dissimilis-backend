@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -76,7 +77,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public void ChangeCurrentUserId(int newCurrentUserId)
+        public static void ChangeCurrentUserId(int newCurrentUserId)
         {
             TestServerFixture.CurrentUserId = newCurrentUserId;
         }
@@ -89,32 +90,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static OrganisationUser GetDefaultTestOrganisationUser()
+        public static Organisation GetSupplementOrganisation()
         {
-            return new OrganisationUser()
-            {
-                Role = DbContext.Models.Enums.Role.Admin,
+            return new Organisation(){
+                    Name = "Guatamala"
             };
         }
 
-        public static List<OrganisationUser> GetSupplementedTestOrganisationUsers()
-        {
-            return new List<OrganisationUser>()
-            {
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new OrganisationUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-            };
-        }
 
         public static List<Group> GetTestGroups()
         {
@@ -134,33 +116,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             };
         }
 
-        public static GroupUser GetDefaultTestGroupUser()
-        {
-            return new GroupUser()
-            {
-                Role = DbContext.Models.Enums.Role.Admin,
-            };
-        }
-
-        public static List<GroupUser> GetSupplementedTestGroupUsers()
-        {
-            return new List<GroupUser>()
-            {
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-                new GroupUser()
-                {
-                    Role = DbContext.Models.Enums.Role.Member,
-                },
-            };
-        }
-
         public static Song GetDefaultTestSong()
         {
             return new Song()
@@ -168,14 +123,55 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 Title = "Default test song",
                 Numerator = 4,
                 Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
             };
         }
+
+        public static List<Song> GetSupplementTestSongs()
+        {
+            return new List<Song>()
+            {
+                new Song()
+                {
+                    Title = "Supplement test song 1",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 2",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 3",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+                new Song()
+                {
+                    Title = "Supplement test song 4",
+                    Numerator = 4,
+                    Denominator = 4,
+                ProtectionLevel = ProtectionLevels.Public
+
+    },
+            };
+        }
+
 
         public static SongVoice GetDefaultTestSongVoice()
         {
             return new SongVoice()
             {
-                VoiceName = "Sheet",
+                VoiceName = "Main",
                 IsMainVoice = true,
                 VoiceNumber = 1,
             };

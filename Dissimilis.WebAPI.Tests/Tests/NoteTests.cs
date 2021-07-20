@@ -98,12 +98,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 "Note number already in use");
 
             //Verify that a user without writeaccess is not able to create data.
-            _testServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
+            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
 
             Should.Throw<UnauthorizedAccessException>(() =>
                 _mediator.Send(new CreateSongNoteCommand(TestSong.SongId, TestSongVoice.SongVoiceId, TestSongBarWithoutNotes.BarId, CreateNoteDto(3, 1, "C"))));
 
-            _testServerFixture.ChangeCurrentUserId(AdminUser.UserId);
+            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
         }
 
         [Fact]
@@ -128,12 +128,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             thirdNote.ChordName.ShouldBe("F#m", $"Failed for chord F#m with position 2.");
 
             //Verify that a user without write access is not able to change data.
-            _testServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
+            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
 
             Should.Throw<UnauthorizedAccessException>(() =>
                 _mediator.Send(new UpdateSongNoteCommand(TestSong.SongId, firstNoteUpdated.SongChordId, new UpdateNoteDto() { ChordName = "G" })));
 
-            _testServerFixture.ChangeCurrentUserId(AdminUser.UserId);
+            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
         }
 
         [Fact]
@@ -147,12 +147,12 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 _mediator.Send(new QuerySongNoteById(updatedSongNote.SongChordId)));
 
             //Verify that a user without write access is note able to delete data.
-            _testServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
+            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
 
             Should.Throw<UnauthorizedAccessException>(() =>
                 _mediator.Send(new DeleteSongNoteCommand(TestSong.SongId, TestSongVoice.SongVoiceId, TestSongBarWithNotes.BarId, TestSongNotes[1].ChordId ?? 1)));
 
-            _testServerFixture.ChangeCurrentUserId(AdminUser.UserId);
+            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
         }
     }
 }

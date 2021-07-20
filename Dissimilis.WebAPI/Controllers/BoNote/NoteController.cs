@@ -1,6 +1,7 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoBar.Query;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
+using Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using MediatR;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote
 {
-    [Route("api/song/{songId:int}/voice/{voiceId:int}/bar/{barId:int}/note")]
+    [Route("api/song/{songId:int}/voice/{voiceId:int}")]
     [ApiController]
     public class NoteController : Controller
     {
@@ -24,7 +25,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         /// <summary>
         /// Create note
         /// </summary>
-        [HttpPost]
+        [HttpPost("bar/{barId:int}/note")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateNote(int songId, int voiceId, int barId, [FromBody] CreateNoteDto command)
         {
@@ -36,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         /// <summary>
         /// Update note
         /// </summary>
-        [HttpPatch("{chordId:int}/")]
+        [HttpPatch("bar/{barId:int}/note/{chordId:int}/")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateNote(int songId, int voiceId, int barId, int chordId, [FromBody] UpdateNoteDto command)
         {
@@ -48,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         /// <summary>
         /// Delete note
         /// </summary>
-        [HttpDelete("{chordId:int}/")]
+        [HttpDelete("bar/{barId:int}/note/{chordId:int}/")]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteNote(int songId, int voiceId, int barId, int chordId)
         {
@@ -56,7 +57,34 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
             var result = await _mediator.Send(new QueryBarById(songId, voiceId, barId));
             return Ok(result);
         }
+
+        /// <summary>
+        /// Add a single component interval to a chord. Creates the chord if none are present at the given position.
+        /// </summary>
+        [HttpPost("bar/{barPosition:int}/note/addComponentInterval")]
+        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> AddComponentInterval(int songId, int voiceId, int barPosition, [FromBody] AddComponentIntervalNoteDto command)
+        {
+            var item = await _mediator.Send(new AddComponentIntervalNoteCommand(songId, voiceId, barPosition, command));
+            var result = await _mediator.Send(new QueryBarById(songId, voiceId, item.SongBarId));
+            return Created($"{item.SongChordId}", result);
+        }
+
+        /// <summary>
+        /// Removes a single component interval to a chord.
+        /// </summary>
+        [HttpPost("bar/{barPosition:int}/note/removeComponentInterval")]
+        [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> RemoveComponentInterval(int songId, int voiceId, int barPosition, [FromBody] RemoveComponentIntervalNoteDto command)
+        {
+            var item = await _mediator.Send(new RemoveComponentIntervalNoteCommand(songId, voiceId, barPosition, command));
+            var result = await _mediator.Send(new QueryBarById(songId, voiceId, item.SongBarId));
+            return Created($"{item.SongChordId}", result);
+        }
+
     }
+
+
 
     [Route("api/note")]
     [ApiController]

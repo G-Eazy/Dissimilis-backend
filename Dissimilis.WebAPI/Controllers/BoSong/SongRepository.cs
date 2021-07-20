@@ -6,10 +6,14 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Dissimilis.DbContext.Models;
+using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.DbContext.Models.Enums;
 using System;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 using Dissimilis.DbContext.Models;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 
 
@@ -164,7 +168,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Song[]> GetSongSearchList(SearchQueryDto searchCommand, CancellationToken cancellationToken)
+        public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
 
             var query = Context.Songs
@@ -219,12 +223,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var result = await query
                 .ToArrayAsync(cancellationToken);
-
-            return result;
         }
 
         /// <summary>
-        /// Checks if the specified user har writing access to the specified song.
+        /// Checks if the specified user has writing access to the specified song.
         /// </summary>
         /// <param name="song"></param>
         /// <param name="user"></param>
@@ -234,6 +236,47 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return song.ArrangerId == user.Id
                 || await Context.SongSharedUser.AnyAsync(songSharedUser =>
                         songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
+        }
+    }
+
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser, bool includeAll)
+        {
+            return songs
+                .Where(song =>
+                    (   (searchText == null
+                        || EF.Functions.Like(song.Title, $"%{searchText.Trim()}%")
+                        || EF.Functions.Like(song.Arranger.Name, $"%{searchText.Trim()}%"))
+                        && (arrangerId == null || song.ArrangerId == arrangerId)
+                    )
+                    &&
+                    (
+                        includeAll
+                        ||
+                        (
+                            (includeSharedWithUser && song.SharedUsers.Any(sharedSong => sharedSong.UserId == currentUser.Id))
+                            || song.SharedOrganisations.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
+                            || song.SharedGroups.Any(group => includedGroupIdArray.Contains(group.GroupId))
+                        )
+                    )
+                    );
+        }
+
+        public static IQueryable<Song> OrderQueryable(this IQueryable<Song> songs, string fieldToOrderBy, bool isDescendingSort)
+        {
+            return fieldToOrderBy switch
+            {
+                "song" => isDescendingSort
+                                       ? songs.OrderByDescending(song => song.Title).ThenByDescending(song => song.UpdatedOn)
+                                       : songs.OrderBy(song => song.Title).ThenBy(song => song.UpdatedOn),
+                "user" => isDescendingSort
+                                        ? songs.OrderByDescending(song => song.Arranger.Name).ThenByDescending(song => song.UpdatedOn)
+                                        : songs.OrderBy(song => song.Arranger.Name).ThenBy(song => song.UpdatedOn),
+                _ => isDescendingSort
+                                  ? songs.OrderByDescending(song => song.UpdatedOn)
+                                  : songs.OrderBy(song => song.UpdatedOn),
+            };
         }
     }
 }
