@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
             if (organisationId != null)
             {
-                query.Where(g => g.OrganisationId == organisationId).AsQueryable();
+                query = query.Where(g => g.OrganisationId == organisationId).AsQueryable();
             }
             query = query.FilterGroups(filterBy, user).AsQueryable();
 
