@@ -42,10 +42,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
                 Name = "TestOrg1",
-                Address = "TestAdress1",
-                EmailAddress = "TestOrg1@test.com",
-                Description = "TestDesc1",
-                PhoneNumber = "12345678",
                 FirstAdminId = AdminUser.UserId
             };
 
@@ -66,28 +62,17 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task TestCreateOrganisationCommand()
         {
             string name = "TestOrg2";
-            string address = "TestAdress2";
-            string email = "TestOrg2@test.com";
-            string desc = "TestDesc2";
-            string phone = "12345672";
 
             TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
 
             var item = await _mediator.Send(new CreateOrganisationCommand(new CreateOrganisationDto()
             {
                 Name = name,
-                Address = address,
-                EmailAddress = email,
-                Description = desc,
-                PhoneNumber = phone,
                 FirstAdminId = AdminUser.UserId
             }));
             var result = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
 
             result.Name.ShouldBeEquivalentTo(name, "Organisation creation failed");
-            result.Address.ShouldBe(address, "Organisation creation failed");
-            result.Description.ShouldBe(desc, "Organisation creation failed");
-            result.PhoneNumber.ShouldBe(phone, "Organisation creation failed");
             result.admins[0].UserId.ShouldBe(AdminUser.UserId, "Organisation creation failed");
         }
     }

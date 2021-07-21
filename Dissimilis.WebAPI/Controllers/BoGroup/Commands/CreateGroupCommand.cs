@@ -40,10 +40,6 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
                 (
                     request.Command.Name,
                     request.Command.OrganisationId,
-                    request.Command.Address,
-                    request.Command.PhoneNumber,
-                    request.Command.EmailAddress,
-                    request.Command.Description,
                     currentUser.Id
                 );
             if (!await _groupRepository.CheckPermission(request.Command.OrganisationId, currentUser, "add", cancellationToken))

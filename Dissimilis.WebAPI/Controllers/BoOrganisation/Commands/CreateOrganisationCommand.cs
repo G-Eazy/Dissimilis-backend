@@ -39,10 +39,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             var organisation = new Organisation
                 (
                     request.Command.Name,
-                    request.Command.Address,
-                    request.Command.EmailAddress,
-                    request.Command.Description,
-                    request.Command.PhoneNumber,
                     currentUser.Id
                 );
             if (!_organisationRepository.CheckPermission(currentUser, "add", cancellationToken))

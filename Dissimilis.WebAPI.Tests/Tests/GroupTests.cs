@@ -50,10 +50,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
                 Name = $"TestOrg{orgNumber}",
-                Address = $"TestAdress{orgNumber}",
-                EmailAddress = $"TestOrg1@test.com{orgNumber}",
-                Description = $"TestDesc1{orgNumber}",
-                PhoneNumber = $"1234567{orgNumber}",
                 FirstAdminId = adminId
             };
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
@@ -67,10 +63,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             {
                 Name = $"TestGroup{groupNumber}",
                 OrganisationId = orgId,
-                Address = $"TestAdress{groupNumber}",
-                EmailAddress = $"TestOrg1@test.com{groupNumber}",
-                Description = $"TestDesc1{groupNumber}",
-                PhoneNumber = $"1234567{groupNumber}",
                 FirstAdminId = adminId
             };
         }
