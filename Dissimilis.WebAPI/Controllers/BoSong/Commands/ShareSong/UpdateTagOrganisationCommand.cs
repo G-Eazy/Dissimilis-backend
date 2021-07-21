@@ -46,7 +46,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         public async Task<ShortOrganisationOrGroupDto[]> Handle(UpdateTagOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
             if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");

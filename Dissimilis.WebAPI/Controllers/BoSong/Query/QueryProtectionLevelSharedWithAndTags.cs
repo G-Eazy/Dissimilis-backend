@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 
         public async Task<ProtectionLevelSharedWithAndTagsDto> Handle(QueryProtectionLevelSharedWithAndTags request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetFullSongById(request.SongId, cancellationToken);
+            var result = await _repository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
 
             return new ProtectionLevelSharedWithAndTagsDto(result);
         }

@@ -42,9 +42,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 
         public async Task<ShortUserDto[]> Handle(ShareSongUserCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
             if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
@@ -58,17 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             }
 
             await _songRepository.CreateAndAddSongShareUser(song, userToAdd);
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-                return song.SharedUsers.Select(s => new ShortUserDto(s.User)).ToArray();
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            return song.SharedUsers.Select(s => new ShortUserDto(s.User)).ToArray();
         }
     }
 }

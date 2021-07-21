@@ -24,7 +24,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
-                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
@@ -43,14 +43,33 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             return song;
         }
+        public async Task<Song> GetSongWithTagsSharedUsers(int songId, CancellationToken cancellationToken)
+        {
+            var song = await Context.Songs
+                .Include(s => s.SharedUsers)
+                .ThenInclude(u => u.User)
+                .Include(s => s.SharedOrganisations)
+                .ThenInclude(o => o.Organisation)
+                .Include(s => s.SharedGroups)
+                .ThenInclude(g => g.Group)
+                .AsSplitQuery()
+                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
-        public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with Id {songId} not found");
+            }
+            return song;
+        }
+
+
+            public async Task<Song> GetFullSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
+                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
