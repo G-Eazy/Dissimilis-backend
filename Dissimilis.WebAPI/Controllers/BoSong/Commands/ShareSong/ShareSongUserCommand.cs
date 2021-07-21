@@ -56,13 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
                 throw new Exception("User already added to song");
             }
 
-            var songSharedUser = new SongSharedUser()
-            {
-                UserId = userToAdd.Id,
-                SongId = song.Id
-            };
-            userToAdd.SongsShared.Add(songSharedUser);
-            song.SharedUsers.Add(songSharedUser);
+            await _songRepository.CreateAndAddSongShareUser(song, userToAdd);
             try
             {
                 await _songRepository.UpdateAsync(cancellationToken);

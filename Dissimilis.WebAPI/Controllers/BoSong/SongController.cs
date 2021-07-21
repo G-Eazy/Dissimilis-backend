@@ -219,53 +219,28 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
 
-
         /// <summary>
-        /// Add grouptag on song
+        /// Update grouptags for a given song
         /// </summary>
-        [HttpPost("{songId:int}/Tag/Group/{groupId:int}")]
-        [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
+        [HttpPatch("{songId:int}/Tag/Group")]
+        [ProducesResponseType(typeof(ShortOrganisationOrGroupDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> AddTagGroup(int songId, int groupId)
+        public async Task<IActionResult> RemoveTagGroup(int songId,[FromBody] UpdateTagsDto Ids)
         {
-            var result = await _mediator.Send(new ShareSongGroupCommand(songId, groupId));
+            var result = await _mediator.Send(new UpdateTagGroupCommand(songId, Ids.TagIds));
             return Ok(result);
         }
         /// <summary>
-        /// remove grouptag on song
+        /// Update organisationtags for a given song
         /// </summary>
-        [HttpDelete("{songId:int}/Tag/Group/{groupId:int}")]
-        [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
+        [HttpPatch("{songId:int}/Tag/Organisation")]
+        [ProducesResponseType(typeof(ShortOrganisationOrGroupDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> RemoveTagGroup(int songId, int groupId)
+        public async Task<IActionResult> RemoveTagOrganisation(int songId,[FromBody] UpdateTagsDto Ids)
         {
-            var result = await _mediator.Send(new RemoveTagGroupCommand(songId, groupId));
-            return Ok(result);
-        }
-        /// <summary>
-        /// Add organisationtag on song
-        /// </summary>
-        [HttpPost("{songId:int}/Tag/Organisation/{organisationId:int}")]
-        [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> AddTagOrganisation(int songId, int organisationId)
-        {
-            var result = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
-            return Ok(result);
-        }
-        /// <summary>
-        /// Remove on organisationtag on song
-        /// </summary>
-        [HttpDelete("{songId:int}/Tag/Organisation/{organisationId:int}")]
-        [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> RemoveTagOrganisation(int songId, int organisationId)
-        {
-            var result = await _mediator.Send(new RemoveTagOrganisationCommand(songId, organisationId));
+            var result = await _mediator.Send(new UpdateTagOrganisationCommand(songId, Ids.TagIds));
             return Ok(result);
         }
 

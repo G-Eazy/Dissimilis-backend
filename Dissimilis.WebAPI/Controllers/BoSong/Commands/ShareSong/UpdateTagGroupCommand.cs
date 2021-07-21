@@ -17,20 +17,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class RemoveTagGroupCommand : IRequest<SongTagGroupDto>
+    public class UpdateTagGroupCommand : IRequest<ShortOrganisationOrGroupDto[]>
     {
         public int SongId { get; }
 
-        public int GroupId { get; }
+        public int[] GroupIds { get; }
 
-        public RemoveTagGroupCommand(int songId, int groupId)
+        public UpdateTagGroupCommand(int songId, int[] groupIds)
         {
             SongId = songId;
-            GroupId = groupId;
+            GroupIds = groupIds;
         }
     }
 
-    public class RemoveTagGroupCommandHandler : IRequestHandler<RemoveTagGroupCommand, SongTagGroupDto>
+    public class RemoveTagGroupCommandHandler : IRequestHandler<UpdateTagGroupCommand, ShortOrganisationOrGroupDto[]>
     {
         private readonly SongRepository _songRepository;
         private readonly OrganisationRepository _groupRepository;
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task<SongTagGroupDto> Handle(RemoveTagGroupCommand request, CancellationToken cancellationToken)
+        public async Task<ShortOrganisationOrGroupDto[]> Handle(UpdateTagGroupCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
@@ -51,23 +51,23 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 throw new UnauthorizedAccessException("You dont have permission to edit this song");
             }
-            var groupToRemove = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
-            var GroupTag = await _songRepository.GetSongSharedGroup(song.Id, groupToRemove.Id);
-            if (!currentUser.GetAllGroupIds().Contains(groupToRemove.Id) && !currentUser.IsSystemAdmin)
+            if (!request.GroupIds.All(x => currentUser.GetAllGroupIds().Contains(x)) && !currentUser.IsSystemAdmin)
             {
                 throw new Exception("You need to be in the group you want to remove");
             }
-            if (GroupTag == null)
+            foreach (var groupId in request.GroupIds)
             {
-                throw new Exception($"Song not tagged with group {request.GroupId}");
+                var groupToUpdate = await _groupRepository.GetGroupById(groupId, cancellationToken);
+
+                var GroupTag = await _songRepository.GetSongSharedGroup(song.Id, groupToUpdate.Id);
+                if(GroupTag == null)
+                {
+                    await _songRepository.CreateAndAddGroupTag(song, groupToUpdate);
+                }
             }
-
-            groupToRemove.SharedSongs.Remove(GroupTag);
-            song.SharedGroups.Remove(GroupTag);
-            await _songRepository.DeleteGroupTag(GroupTag, cancellationToken);
-
+            await _songRepository.RemoveRedundantGroupTags(request.GroupIds, song, cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
-            return new SongTagGroupDto(song);
+            return song.SharedGroups.Select(x => new ShortOrganisationOrGroupDto(x.Group)).ToArray();
         }
     }
 }
