@@ -37,8 +37,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
 
         public async Task<UpdatedSongCommandDto> Handle(DeleteBarsCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
             song.DeleteBars(request.Command.FromPosition, request.Command.DeleteLength);
@@ -46,17 +44,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _songRepository.UpdateAsync(cancellationToken);
-
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
 
             return new UpdatedSongCommandDto(song);
         }
