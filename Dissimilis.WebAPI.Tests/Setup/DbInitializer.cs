@@ -10,30 +10,34 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 {
     public class DbInitializer
     {
+        private static readonly object _lock = new();
         private static DissimilisDbContext _dbContext;
 
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            _dbContext = (DissimilisDbContext)serviceProvider.GetService(typeof(DissimilisDbContext));
-            _dbContext.Database.EnsureCreated();
+            lock (_lock)
+            {
+                _dbContext = (DissimilisDbContext)serviceProvider.GetService(typeof(DissimilisDbContext));
+                _dbContext.Database.EnsureDeleted();
+                _dbContext.Database.EnsureCreated();
 
-            //Important that these commands run in this order, don't change the order because of dependencies
-            SeedTestUsers();
+                //Important that these commands run in this order, don't change the order because of dependencies
+                SeedTestUsers();
 
-            _dbContext.SaveChanges();
+                _dbContext.SaveChanges();
 
-            SeedTestOrganisations();
+                SeedTestOrganisations();
 
-            _dbContext.SaveChanges();
+                _dbContext.SaveChanges();
 
-            SeedTestGroups();
+                SeedTestGroups();
 
-            _dbContext.SaveChanges();
+                _dbContext.SaveChanges();
 
-            SeedTestSongs();
+                SeedTestSongs();
 
-            _dbContext.SaveChanges();
-
+                _dbContext.SaveChanges();
+            }
         }
 
         private static void SeedTestUser(User userToAdd)
@@ -55,8 +59,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 SeedTestUser(userToAdd);
             }
-            TestServerFixture.CurrentUserId = _dbContext.Users
-                .SingleOrDefault(user => user.Email == "SysAdmin@Norway.no").Id;
         }
 
         private static void SeedTestOrganisations()
@@ -193,11 +195,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             var bars = TestServerFixture.GetTestSongBars();
             foreach (var bar in bars)
             {
-                SeedTestBar(bar, voice);
+                SeedTestBar(bar, voice, bar.Position % 2 == 0);
             }
         }
 
-        private static void SeedTestBar(SongBar bar, SongVoice voice)
+        private static void SeedTestBar(SongBar bar, SongVoice voice, bool includeNotes)
         {
             bar.SongVoice = voice;
             bar.SongVoiceId = voice.Id;
@@ -205,10 +207,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             _dbContext.SongBars.Add(bar);
             _dbContext.SaveChanges();
 
-            var notes = TestServerFixture.GetTestSongNotes();
-            foreach (var note in notes)
+            if (includeNotes)
             {
-                SeedTestNote(note, bar);
+                var notes = TestServerFixture.GetTestSongNotes();
+                foreach (var note in notes)
+                {
+                    SeedTestNote(note, bar);
+                }
             }
         }
 

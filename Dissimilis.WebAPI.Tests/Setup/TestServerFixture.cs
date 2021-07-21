@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Net.Http;
+using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
@@ -10,6 +12,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.xUnit.Setup
 {
@@ -36,6 +40,17 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         internal IServiceProvider GetServiceProvider()
         {
             return _testServer.Host.Services;
+        }
+
+        public DbConnection GetDbConnection()
+        {
+            var connection = GetContext().Database.GetDbConnection();
+            return connection;
+        }
+
+        public DissimilisDbContext GetContext()
+        {
+            return GetServiceProvider().GetService<DissimilisDbContext>();
         }
 
         public void Dispose()
@@ -77,7 +92,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new User()
                 {
                     Name = "OrgAdminGuatamalaUser",
-                    Email = "Admin@Guatamala.no",
+                    Email = "Admin@Guatemala.no",
                 },
                 new User()
                 {
@@ -98,6 +113,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Rammstein fan",
                     Email = "Rammstein_fan@Norway.no",
+                },
+                new User()
+                {
+                    Name = "User with no songs",
+                    Email = "NoSongs@Norway.no",
                 }
             };
         }
@@ -117,7 +137,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new Organisation()
                 {
-                    Name = "Guatamala"
+                    Name = "Guatemala"
                 },
             };
         }
@@ -230,20 +250,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     House = null,
                     RepAfter = false,
                     RepBefore = false,
-                    Position = 1,
+                    Position = 0,
                 },
                 new SongBar()
                 {
                     House = null,
                     RepAfter = false,
                     RepBefore = false,
-                    Position = 2,
-                },
-                new SongBar()
-                {
-                    House = 1,
-                    RepAfter = false,
-                    RepBefore = false,
                     Position = 1,
                 },
                 new SongBar()
@@ -252,6 +265,13 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     RepAfter = false,
                     RepBefore = false,
                     Position = 2,
+                },
+                new SongBar()
+                {
+                    House = 1,
+                    RepAfter = false,
+                    RepBefore = false,
+                    Position = 3,
                 }
             };
         }
