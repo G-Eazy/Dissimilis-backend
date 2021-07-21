@@ -22,12 +22,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class CreateOrganisationCommandHandler : IRequestHandler<CreateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
+        private readonly PermissionChecker _permissionChecker;
         private readonly UserRepository _userRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public CreateOrganisationCommandHandler(UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
+        public CreateOrganisationCommandHandler(PermissionChecker permissionChecker, UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
         {
+            _permissionChecker = permissionChecker;
             _userRepository = userRepository;
             _organisationRepository = organisationRepository;
             _authService = authService;
@@ -41,9 +43,10 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     request.Command.Name,
                     currentUser.Id
                 );
-            if (!_organisationRepository.CheckPermission(currentUser, "add", cancellationToken))
-                throw new System.UnauthorizedAccessException($"User does not have permission to create organisation");
 
+            bool isAllowed = await _permissionChecker.CheckPermission(organisation, currentUser, Operation.Create, cancellationToken);
+            if (!isAllowed)
+                throw new System.UnauthorizedAccessException($"User does not have permission to create organisation");
 
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 

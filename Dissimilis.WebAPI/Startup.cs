@@ -71,6 +71,7 @@ namespace Dissimilis.WebAPI
             ConfigureDatabase(services);
 
             services.AddServices<Startup>();
+            services.AddServices<PermissionChecker>();
 
 
             services.AddMediatR(Assembly.GetExecutingAssembly());
