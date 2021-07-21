@@ -68,24 +68,30 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestCreateGroupPermissions()
+        public async Task CreateGroupWithSysAdminShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
             OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
 
-            // Should be allowed
             var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+        }
 
+        [Fact]
+        public async Task CreateGroupWithOrgAdminShouldSucceed() {
             // Should be allowed, since SuppUser1 is admin of org
+            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
             TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
             var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId)));
             var group2 = await _mediator.Send(new QueryGroupById(item2.GroupId));
             group2.Name.ShouldBeEquivalentTo("TestGroup2", "Group creation failed");
+        }
 
-
-            // Should throw exception, since SuppUser2 is neither sysadmin or orgadmin
+        [Fact]
+        public async Task CreateGroupWithoutAdminShouldFail() {
+            // Should throw exception, since SuppUser2 is not sysadmin or orgadmin
+            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
             TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
             var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId))));
             exception.Message.ShouldBeEquivalentTo("User does not have permission to create group in organisation", "Correct exception was not thrown");
