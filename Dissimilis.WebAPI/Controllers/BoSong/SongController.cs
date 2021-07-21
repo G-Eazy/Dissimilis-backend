@@ -223,7 +223,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Add grouptag on song
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Group/{groupId:int}")]
+        [HttpPost("{songId:int}/Tag/Group/{groupId:int}")]
         [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -235,7 +235,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// remove grouptag on song
         /// </summary>
-        [HttpDelete("{songId:int}/AddTag/Group/{groupId:int}")]
+        [HttpDelete("{songId:int}/Tag/Group/{groupId:int}")]
         [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -247,7 +247,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Add organisationtag on song
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Organisation/{organisationId:int}")]
+        [HttpPost("{songId:int}/Tag/Organisation/{organisationId:int}")]
         [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -259,7 +259,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// Remove on organisationtag on song
         /// </summary>
-        [HttpDelete("{songId:int}/AddTag/Organisation/{organisationId:int}")]
+        [HttpDelete("{songId:int}/Tag/Organisation/{organisationId:int}")]
         [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
