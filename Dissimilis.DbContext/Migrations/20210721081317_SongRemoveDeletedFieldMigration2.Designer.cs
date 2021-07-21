@@ -4,14 +4,16 @@ using Dissimilis.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    partial class DissimilisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210721081317_SongRemoveDeletedFieldMigration2")]
+    partial class SongRemoveDeletedFieldMigration2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,9 +180,6 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Property<int?>("DegreeOfDifficulty")
                         .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("Deleted")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Denominator")
                         .HasColumnType("int");
