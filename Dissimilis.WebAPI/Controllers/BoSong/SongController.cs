@@ -270,15 +270,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// get shared users and group/organisaton tags
+        /// get shared users, group/organisaton tags, public/private on a given song
         /// </summary>
-        [HttpGet("{songId:int}/getSharedWithAndTags")]
-        [ProducesResponseType(typeof(SharedWithAndTagsDto), (int)HttpStatusCode.OK)]
+        [HttpGet("{songId:int}/getProtectionLevelSharedWithAndTags")]
+        [ProducesResponseType(typeof(ProtectionLevelSharedWithAndTagsDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetTagOrganisation( int songId)
+        public async Task<IActionResult> GetTagOrganisation(int songId)
         {
-            var result = await _mediator.Send(new QuerySharedWithAndTags(songId));
+            var result = await _mediator.Send(new QueryProtectionLevelSharedWithAndTags(songId));
             return Ok(result);
         }
 
