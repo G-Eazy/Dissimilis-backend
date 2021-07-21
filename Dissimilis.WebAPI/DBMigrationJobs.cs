@@ -115,8 +115,7 @@ namespace Dissimilis.DbContext
             var allSongs = Context.Songs;
             foreach(var song in allSongs)
             {
-                if (song.Deleted == null)
-                    song.Deleted = false;
+                //song.Deleted = null;
             }
             Context.SaveChanges();
         }

@@ -7,14 +7,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
-using Dissimilis.WebAPI.Extensions.Models;
-using Dissimilis.DbContext.Models.Enums;
 using System;
-using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
-using Dissimilis.DbContext.Models;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using Dissimilis.WebAPI.Extensions.Interfaces;
 
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
@@ -80,7 +73,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
         {
             var songs = await Context.Songs
-                .Where(s => (s.CreatedById == userId || s.ArrangerId == userId) && !s.Deleted)
+                .Where(s => (s.CreatedById == userId || s.ArrangerId == userId) && s.Deleted == null)
                 .ToArrayAsync(cancellationToken);
             
             return songs;
@@ -92,19 +85,20 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Method to be used to find songs that are marked as deleted, should not be used to look up songs to edit.
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public async Task<Song[]> GetMyDeletedSongs(User user, CancellationToken cancellationToken)
         {
+
+            // RemoveDeletedSongOlderThanDays should be made into a background job at a later date!!!
             await RemoveDeletedSongsOlderThanDays(user, 30, cancellationToken);
             var songs = Context.Songs
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .Where(s => s.ArrangerId == user.Id && s.Deleted)
+                .Where(s => s.ArrangerId == user.Id && s.Deleted != null)
                 .ToArray();
 
             if (songs == null || songs.ToArray().Length == 0)
@@ -115,22 +109,26 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return songs;
         }
 
+        /// <summary>
+        /// Method to be used to find songs that are marked as deleted, should not be used to look up songs to edit.
+        /// 
+        /// ******************************************************************
+        /// 
+        ///     THIS METHOD SHOULD BE MADE INTO A BACKGROUND JOB LATER
+        /// 
+        /// ******************************************************************
+        /// 
         public async Task RemoveDeletedSongsOlderThanDays(User user, int nDays, CancellationToken cancellationToken)
         {
             var oldestAllowedDate = DateTimeOffset.Now.AddDays(-nDays);
 
             var songs = Context.Songs
-                .Include(s => s.Arranger)
-                .Include(s => s.CreatedBy)
-                .Include(s => s.UpdatedBy)
-                .Where(s => s.ArrangerId == user.Id && s.Deleted)
+                .Where(s => s.ArrangerId == user.Id && s.Deleted < oldestAllowedDate)
                 .ToArray();
 
             foreach (var song in songs)
-            {
-                if (song.UpdatedOn < oldestAllowedDate)
-                    Context.Songs.Remove(song);
-            }
+                Context.Songs.Remove(song);
+            
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -157,14 +155,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task DeleteSong(User user, Song song, CancellationToken cancellationToken)
         {
-            song.Deleted = true;
+            song.Deleted = DateTimeOffset.Now;
+
+            /* 
+             * ******************************************************************
+            
+                Add RemoveDeletedSongsOlderThanDays() as background job later!!!
+
+            * *******************************************************************
+            */
             await RemoveDeletedSongsOlderThanDays(user, 30, cancellationToken);
+
+
             await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task RestoreSong(Song song, CancellationToken cancellationToken)
         {
-            song.Deleted = false;
+            song.Deleted = null;
             await Context.SaveChangesAsync(cancellationToken);
         }
 
@@ -173,7 +181,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
             var query = Context.Songs
                 .Include(s => s.Arranger)
-                .Where(s => !s.Deleted)
+                .Where(s => s.Deleted == null)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchCommand.Title))
@@ -214,15 +222,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                     query.OrderBy(s => s.UpdatedOn);
             }
 
-            if (searchCommand.Num != null)
+            if (searchCommand.MaxNumberOfSongs != 0)
             {
                 query = query
-                    .Take(searchCommand.Num.Value)
+                    .Take(searchCommand.MaxNumberOfSongs)
                     .AsQueryable();
             }
 
             var result = await query
                 .ToArrayAsync(cancellationToken);
+
+            return result;
         }
 
         /// <summary>

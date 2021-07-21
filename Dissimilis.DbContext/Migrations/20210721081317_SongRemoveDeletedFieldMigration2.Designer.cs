@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dissimilis.DbContext.Migrations
 {
     [DbContext(typeof(DissimilisDbContext))]
-    [Migration("20210715105858_AddDeeletedBoolMigration")]
-    partial class AddDeeletedBoolMigration
+    [Migration("20210721081317_SongRemoveDeletedFieldMigration2")]
+    partial class SongRemoveDeletedFieldMigration2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -180,9 +180,6 @@ namespace Dissimilis.DbContext.Migrations
 
                     b.Property<int?>("DegreeOfDifficulty")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Denominator")
                         .HasColumnType("int");

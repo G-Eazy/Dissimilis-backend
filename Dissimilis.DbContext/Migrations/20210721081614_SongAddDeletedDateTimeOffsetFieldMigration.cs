@@ -1,17 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Dissimilis.DbContext.Migrations
 {
-    public partial class AddDeeletedBoolMigration : Migration
+    public partial class SongAddDeletedDateTimeOffsetFieldMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
+            migrationBuilder.AddColumn<DateTimeOffset>(
                 name: "Deleted",
                 table: "Songs",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+                type: "datetimeoffset",
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
