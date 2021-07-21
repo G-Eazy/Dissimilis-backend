@@ -205,7 +205,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// share write permission with user
+        /// remove write permission with user
         /// </summary>
         [HttpDelete("{songId:int}/shareSong/User/{userId:int}")]
         [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
@@ -221,29 +221,64 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
 
         /// <summary>
-        /// Add tag with groups on song
+        /// Add grouptag on song
         /// </summary>
         [HttpPost("{songId:int}/AddTag/Group/{groupId:int}")]
-        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongGroup(int songId, int groupId)
+        public async Task<IActionResult> AddTagGroup(int songId, int groupId)
         {
-            var item = await _mediator.Send(new ShareSongGroupCommand(songId, groupId));
-            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            var result = await _mediator.Send(new ShareSongGroupCommand(songId, groupId));
             return Ok(result);
         }
         /// <summary>
-        /// Add tag with organisations on song
+        /// remove grouptag on song
         /// </summary>
-        [HttpPost("{songId:int}/AddTag/Organisation/{organisationId:int}")]
-        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [HttpDelete("{songId:int}/AddTag/Group/{groupId:int}")]
+        [ProducesResponseType(typeof(SongTagGroupDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongOrganisation(int songId, int organisationId)
+        public async Task<IActionResult> RemoveTagGroup(int songId, int groupId)
         {
-            var item = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
-            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            var result = await _mediator.Send(new RemoveTagGroupCommand(songId, groupId));
+            return Ok(result);
+        }
+        /// <summary>
+        /// Add organisationtag on song
+        /// </summary>
+        [HttpPost("{songId:int}/AddTag/Organisation/{organisationId:int}")]
+        [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> AddTagOrganisation(int songId, int organisationId)
+        {
+            var result = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
+            return Ok(result);
+        }
+        /// <summary>
+        /// Remove on organisationtag on song
+        /// </summary>
+        [HttpDelete("{songId:int}/AddTag/Organisation/{organisationId:int}")]
+        [ProducesResponseType(typeof(SongTagOrganisationDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveTagOrganisation(int songId, int organisationId)
+        {
+            var result = await _mediator.Send(new RemoveTagOrganisationCommand(songId, organisationId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get shared users and group/organisaton tags
+        /// </summary>
+        [HttpGet("{songId:int}/getSharedWithAndTags")]
+        [ProducesResponseType(typeof(SharedWithAndTagsDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetTagOrganisation( int songId)
+        {
+            var result = await _mediator.Send(new QuerySharedWithAndTags(songId));
             return Ok(result);
         }
 

@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class ShareSongGroupCommand : IRequest<UpdatedSongCommandDto>
+    public class ShareSongGroupCommand : IRequest<SongTagGroupDto>
     {
         public int SongId { get; }
 
@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         }
     }
 
-    public class ShareSongGroupCommandHandler : IRequestHandler<ShareSongGroupCommand, UpdatedSongCommandDto>
+    public class ShareSongGroupCommandHandler : IRequestHandler<ShareSongGroupCommand, SongTagGroupDto>
     {
         private readonly SongRepository _songRepository;
         private readonly OrganisationRepository _groupRepository;
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task<UpdatedSongCommandDto> Handle(ShareSongGroupCommand request, CancellationToken cancellationToken)
+        public async Task<SongTagGroupDto> Handle(ShareSongGroupCommand request, CancellationToken cancellationToken)
         {
             await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
@@ -74,7 +74,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 await _songRepository.UpdateAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
-                return new UpdatedSongCommandDto(song);
+                return new SongTagGroupDto(song);
             }
             catch (Exception e)
             {
