@@ -139,19 +139,25 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 || await Context.SongSharedUser.AnyAsync(songSharedUser =>
                         songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
         }
-        public async Task DeleteSongSharedUser(SongSharedUser sharedSongUser, CancellationToken cancellationToken)
+        public async Task DeleteSongSharedUser(Song song, User user, SongSharedUser sharedSongUser, CancellationToken cancellationToken)
         {
+            user.SongsShared.Remove(sharedSongUser);
+            song.SharedUsers.Remove(sharedSongUser);
             Context.SongSharedUser.Remove(sharedSongUser);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteGroupTag(SongSharedGroup groupTag, CancellationToken cancellationToken)
+        public async Task DeleteGroupTag(Song song, Group group, SongSharedGroup groupTag, CancellationToken cancellationToken)
         {
+            group.SharedSongs.Remove(groupTag);
+            song.SharedGroups.Remove(groupTag);
             Context.SongSharedGroups.Remove(groupTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
-        public async Task DeleteOrganisationTag(SongSharedOrganisation organisationTag, CancellationToken cancellationToken)
+        public async Task DeleteOrganisationTag(Song song, Organisation organisation, SongSharedOrganisation organisationTag, CancellationToken cancellationToken)
         {
+            organisation.SharedSongs.Remove(organisationTag);
+            song.SharedOrganisations.Remove(organisationTag);
             Context.SongSharedOrganisations.Remove(organisationTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -185,14 +191,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Where(x => x.SongId == song.Id && !groupIds.Contains(x.GroupId)).ToArray();
             foreach(var tag in groupTagsRemove)
             {
-                var groupToRemoveTag = Context.Groups.SingleOrDefault(x => x.Id == tag.GroupId);
-                if(groupToRemoveTag == null)
+                var groupToRemove = Context.Groups.SingleOrDefault(x => x.Id == tag.GroupId);
+                if(groupToRemove == null)
                 {
                     throw new Exception($"Could not fint group with Id: {tag.GroupId}");
                 };
-                groupToRemoveTag.SharedSongs.Remove(tag);
-                song.SharedGroups.Remove(tag);
-                await DeleteGroupTag(tag, cancellationToken);
+                await DeleteGroupTag(song, groupToRemove, tag, cancellationToken);
             }
         }
         public async Task RemoveRedundantOrganisationTags(int[] organisationIds, Song song, CancellationToken cancellationToken)
@@ -201,14 +205,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Where(x => x.SongId == song.Id && !organisationIds.Contains(x.OrganisationId)).ToArray();
             foreach (var tag in organisationTagsRemove)
             {
-                var organisationToRemoveTag = Context.Organisations.SingleOrDefault(x => x.Id == tag.OrganisationId);
-                if (organisationToRemoveTag == null)
+                var organisationToRemove = Context.Organisations.SingleOrDefault(x => x.Id == tag.OrganisationId);
+                if (organisationToRemove == null)
                 {
                     throw new Exception($"Could not fint organisation with Id: {tag.OrganisationId}");
                 };
-                organisationToRemoveTag.SharedSongs.Remove(tag);
-                song.SharedOrganisations.Remove(tag);
-                await DeleteOrganisationTag(tag, cancellationToken);
+                await DeleteOrganisationTag(song, organisationToRemove, tag, cancellationToken);
             }
         }
         public async Task CreateAndAddOrganisationTag(Song song, Organisation organisation)

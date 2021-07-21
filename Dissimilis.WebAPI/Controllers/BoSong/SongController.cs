@@ -191,30 +191,28 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// share write permission with user
+        /// share write permission with given user
         /// </summary>
         [HttpPost("{songId:int}/shareSong/User/{userId:int}")]
-        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShortUserDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ShareSongUser(int songId, int userId)
         {
-            var item = await _mediator.Send(new ShareSongUserCommand(songId, userId));
-            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            var result = await _mediator.Send(new ShareSongUserCommand(songId, userId));
             return Ok(result);
         }
 
         /// <summary>
-        /// remove write permission with user
+        /// remove write permission for given user
         /// </summary>
         [HttpDelete("{songId:int}/shareSong/User/{userId:int}")]
-        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShortUserDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RemoveSharedSongUser(int songId, int userId)
         {
-            var item = await _mediator.Send(new RemoveShareSongUserCommand(songId, userId));
-            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            var result = await _mediator.Send(new RemoveShareSongUserCommand(songId, userId));
             return Ok(result);
         }
 

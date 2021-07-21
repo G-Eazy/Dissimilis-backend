@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models;
@@ -13,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class RemoveShareSongUserCommand : IRequest<UpdatedSongCommandDto>
+    public class RemoveShareSongUserCommand : IRequest<ShortUserDto[]>
     {
         public int SongId { get; }
 
@@ -26,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         }
     }
 
-    public class RemoveShareSongUserCommandHandler : IRequestHandler<RemoveShareSongUserCommand, UpdatedSongCommandDto>
+    public class RemoveShareSongUserCommandHandler : IRequestHandler<RemoveShareSongUserCommand, ShortUserDto[]>
     {
         private readonly SongRepository _songRepository;
         private readonly UserRepository _userRepository;
@@ -39,9 +40,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task<UpdatedSongCommandDto> Handle(RemoveShareSongUserCommand request, CancellationToken cancellationToken)
+        public async Task<ShortUserDto[]> Handle(RemoveShareSongUserCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
             if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
@@ -58,18 +58,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             
             userToAdd.SongsShared.Remove(SharedSongUser);
             song.SharedUsers.Remove(SharedSongUser);
-            await _songRepository.DeleteSongSharedUser(SharedSongUser, cancellationToken);
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-                return new UpdatedSongCommandDto(song);
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _songRepository.DeleteSongSharedUser(song, userToAdd, SharedSongUser, cancellationToken);
+            return song.SharedUsers.Select(s => new ShortUserDto(s.User)).ToArray();
         }
     }
 }
