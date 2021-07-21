@@ -14,11 +14,11 @@ namespace Dissimilis.DbContext.Migrations
                 nullable: true);
         }
 
-        /*protected override void Down(MigrationBuilder migrationBuilder)
+        protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
                 name: "Deleted",
                 table: "Songs");
-        }*/
+        }
     }
 }
