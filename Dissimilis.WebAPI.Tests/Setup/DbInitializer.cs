@@ -93,9 +93,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             var orgUser = new OrganisationUser()
             {
                 Role = role,
-                User = userToAdd,
                 UserId = userToAdd.Id,
-                Organisation = organisation,
                 OrganisationId = organisation.Id,
             };
             organisation.Users.Add(orgUser);
@@ -123,7 +121,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
                 string orgName = group.Name.Split("_")[1];
                 var organisation = _dbContext.Organisations.SingleOrDefault(dbOrg => dbOrg.Name == orgName);
-                group.Organisation = organisation;
                 group.OrganisationId = organisation.Id;
 
                 _dbContext.Groups.Add(group);
@@ -144,9 +141,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             var groupUser = new GroupUser()
             {
                 Role = role,
-                User = userToAdd,
                 UserId = userToAdd.Id,
-                Group = group,
                 GroupId = group.Id,
             };
             group.Users.Add(groupUser);
@@ -171,8 +166,8 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
         private static void SeedTestSong(Song song, User arranger)
         {
-            song.Arranger = arranger;
             song.ArrangerId = arranger.Id;
+            song.CreatedById = arranger.Id;
 
             _dbContext.Songs.Add(song);
             _dbContext.SaveChanges();
