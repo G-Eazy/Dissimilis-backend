@@ -16,11 +16,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public ProtectionLevelSharedWithAndTagsDto(Song song)
         {
+            SongId = song.Id;
+            ProtectionLevel = song.ProtectionLevel.GetDescription();
             OrganisationTags = song.SharedOrganisations.Select(x => new ShortOrganisationOrGroupDto(x.Organisation));
             GroupTags = song.SharedGroups.Select(x => new ShortOrganisationOrGroupDto(x.Group));
             SharedWithUsers = song.SharedUsers.Select(x => new ShortUserDto(x.User));
-            SongId = song.Id;
-            ProtectionLevel = song.ProtectionLevel.GetDescription();
         }
     }
 
