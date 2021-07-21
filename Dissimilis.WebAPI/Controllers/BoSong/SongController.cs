@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
@@ -243,6 +244,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             var item = await _mediator.Send(new ShareSongOrganisationCommand(songId, organisationId));
             var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
+        }
+
+        ///<summary>
+        /// set public or private
+        /// </summary>
+        [HttpPost("{songId:int}/changeProtectionLevel")]
+        [ProducesResponseType(typeof(ProtectionLevelSongDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] UpdateProtectionLevelDto protectionLevel)
+        {
+            var result = await _mediator.Send(new ChangeProtectionLevelSongCommand(protectionLevel, songId));
             return Ok(result);
         }
     }

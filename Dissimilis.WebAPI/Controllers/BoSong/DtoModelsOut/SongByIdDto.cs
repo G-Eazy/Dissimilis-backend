@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 
         public int? Speed { get; set; }
 
-        public ProtectionLevels? ProtectionLevel { get; set; }
+        public string ProtectionLevel { get; set; }
 
         public int? DegreeOfDifficulty { get; set; }
 
@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             UpdatedOn = song.UpdatedOn;
             UpdatedBy = song.UpdatedBy?.Name;
             Numerator = song.Numerator;
-            ProtectionLevel = song.ProtectionLevel;
+            ProtectionLevel = song.ProtectionLevel.GetDescription();
             Denominator = song.Denominator;
             Speed = song.Speed;
             DegreeOfDifficulty = song.DegreeOfDifficulty;

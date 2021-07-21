@@ -21,7 +21,5 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
         public string SongNotes { get; set; }
 
         public string Composer { get; set; }
-
-        public ProtectionLevels? ProtectionLevel { get; set; }
     }
 }
