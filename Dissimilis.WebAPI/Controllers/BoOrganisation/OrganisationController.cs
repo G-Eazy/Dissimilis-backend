@@ -22,10 +22,10 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             /// <summary>
             /// get all organisations filtered
             /// </summary>
-            [HttpGet("{filterBy}")]
+            [HttpGet("filter")]
             [ProducesResponseType(typeof(OrganisationIndexDto[]), (int)HttpStatusCode.OK)]
             [ProducesResponseType((int)HttpStatusCode.NotFound)]
-            public async Task<IActionResult> GetOrganisations(int organisationId, [FromQuery] string filterBy)
+            public async Task<IActionResult> GetOrganisations([FromQuery] string filterBy)
             {
                 var result = await _mediator.Send(new QueryGetOrganisations(filterBy));
                 return Ok(result);
