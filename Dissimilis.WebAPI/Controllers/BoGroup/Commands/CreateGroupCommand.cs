@@ -22,12 +22,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, UpdatedGroupCommandDto>
     {
+        private readonly IPermissionChecker _permissionChecker;
         private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public CreateGroupCommandHandler(UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
+        public CreateGroupCommandHandler(IPermissionChecker permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
         {
+            _permissionChecker = permissionChecker;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
             _authService = authService;
@@ -42,7 +44,8 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
                     request.Command.OrganisationId,
                     currentUser.Id
                 );
-            if (!await _groupRepository.CheckPermission(request.Command.OrganisationId, currentUser, "add", cancellationToken))
+            bool isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Create, cancellationToken);
+            if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to create group in organisation");
 
                 await _groupRepository.SaveGroupAsync(group, cancellationToken);

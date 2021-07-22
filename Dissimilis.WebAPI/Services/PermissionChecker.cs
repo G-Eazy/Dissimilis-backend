@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Services
 {
-    public class PermissionChecker
+    public class PermissionChecker : IPermissionChecker
     {
         private readonly DissimilisDbContext _dbContext;
 
