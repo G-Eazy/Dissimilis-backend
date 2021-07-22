@@ -27,6 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.Bousers.Query
 
         public async Task<UserDto[]> Handle(QueryUsersInGroup request, CancellationToken cancellationToken)
         {
+            // Todo: Regulate access to commands pertaining to fetching of users and / or groups/orgs.
             var Group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
             var users = Group.Users
                 .Select(ou => new UserDto(ou.User))
