@@ -48,10 +48,9 @@ namespace Dissimilis.WebAPI.Services
             if (organisation.Id != null)
                 orgAdmin = await GetOrgAdminIfExists(organisation, user, cancellationToken);
 
-            if (orgAdmin != null)
+            if (orgAdmin != null && (op == Operation.Create || op != Operation.Delete))
             {
-                if (op != Operation.Create && op != Operation.Delete)
-                    isAllowed = true;
+                isAllowed = true;
             }
 
             return isAllowed;
@@ -117,24 +116,12 @@ namespace Dissimilis.WebAPI.Services
             if (group.Id != null)
                 groupAdmin = await GetGroupAdminIfExists(group, user, cancellationToken);
 
-            if(groupAdmin != null)
+            if(groupAdmin != null && (op == Operation.Create || op != Operation.Delete))
             {
-                if (op == Operation.Create || op != Operation.Delete)
-                    isAllowed = true;
+                isAllowed = true;
             }
 
             return isAllowed;
-        }
-
-        /// <summary>
-        /// Might be removed later. Could be useful to explicitly check for create permissions on an org.
-        /// Might be unnecessary...
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public bool CheckCreateOrganisationPermission(User user)
-        {
-            return user.IsSystemAdmin;
         }
     }
 }
