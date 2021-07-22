@@ -9,6 +9,7 @@ using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using System;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
@@ -34,13 +35,15 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService)
+        public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _noteRepository = noteRepository;
             _barRepository = barRepository;
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongNoteCommand request, CancellationToken cancellationToken)
@@ -48,10 +51,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             var bar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 

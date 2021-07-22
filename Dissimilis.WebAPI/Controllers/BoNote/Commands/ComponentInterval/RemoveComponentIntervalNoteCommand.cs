@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
 {
@@ -35,17 +36,22 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
     {
         private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
-        public RemoveComponentIntervalNoteCommandHandler(SongRepository songRepository, AuthService IAuthService)
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+
+        public RemoveComponentIntervalNoteCommandHandler(SongRepository songRepository, AuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
+
         }
         public async Task<UpdatedCommandDto> Handle(RemoveComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser)) throw new UnauthorizedAccessException();
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+            
 
             var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");

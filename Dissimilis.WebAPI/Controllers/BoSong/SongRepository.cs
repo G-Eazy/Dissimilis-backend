@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Extensions.Models;
 using System;
-
+using Dissimilis.WebAPI.Services;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -208,6 +208,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
+            var permissionCheckerService = new PermissionCheckerService(Context);
+
             return await Context.Songs
                 .Include(song => song.Arranger)
                 .Include(song => song.SharedUsers)
@@ -215,25 +217,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.OrganisationTags)
                 .AsSplitQuery()
                 .AsQueryable()
-                .Where(SongExtension.ReadAccessToSong(user))
+                .Where(SongExtension.ReadAccessToSong(user, permissionCheckerService, cancellationToken))
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
                 .Take(searchCommand.MaxNumberOfSongs)
                 .ToArrayAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Checks if the specified user has writing access to the specified song.
-        /// </summary>
-        /// <param name="song"></param>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public async Task<bool> HasWriteAccess(Song song, User user)
-        {
-            return song.ArrangerId == user.Id
-                || await Context.SongSharedUser.AnyAsync(songSharedUser =>
-                        songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
-        }
         public async Task DeleteSongSharedUser(Song song, User user, SongSharedUser sharedSongUser, CancellationToken cancellationToken)
         {
             Context.SongSharedUser.Remove(sharedSongUser);

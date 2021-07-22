@@ -27,11 +27,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateSongCommandHandler(SongRepository songRepository, IAuthService IAuthService)
+        public UpdateSongCommandHandler(SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
@@ -39,10 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
-            if (! await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             song.Title = request.Command?.Title ?? song.Title;
             song.Composer = request.Command?.Composer ?? song.Composer;

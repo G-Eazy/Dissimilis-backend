@@ -38,13 +38,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             if (organisation == null)
             {
                 throw new NotFoundException($"Organisation with Id {organisationId} not found");
+            }
 
-            await Context.OrganisationUsers
-                .Include(ou => ou.User)
-                .Where(ou => ou.OrganisationId == organisationId)
-                .LoadAsync(cancellationToken);
+                await Context.OrganisationUsers
+                    .Include(ou => ou.User)
+                    .Where(ou => ou.OrganisationId == organisationId)
+                    .LoadAsync(cancellationToken);
 
-            return organisation;
+                return organisation;
         }
     }
 }

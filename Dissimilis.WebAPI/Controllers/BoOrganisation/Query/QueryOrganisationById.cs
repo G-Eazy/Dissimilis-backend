@@ -22,11 +22,11 @@ namespace Dissimilis.WebAPI.Controllers.Boorganisation.Query
 
     public class QueryOrganisationByIdHandler : IRequestHandler<QueryOrganisationById, OrganisationByIdDto>
     {
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly _IPermissionCheckerService _permissionChecker;
         private readonly IAuthService _authService;
         private readonly OrganisationRepository _organisationRepository;
 
-        public QueryOrganisationByIdHandler(IPermissionCheckerService permissionChecker, OrganisationRepository repository, IAuthService authService)
+        public QueryOrganisationByIdHandler(_IPermissionCheckerService permissionChecker, OrganisationRepository repository, IAuthService authService)
         {
             _permissionChecker = permissionChecker;
             _authService = authService;

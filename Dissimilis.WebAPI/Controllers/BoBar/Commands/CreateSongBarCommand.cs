@@ -13,6 +13,7 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {
@@ -35,12 +36,14 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService)
+        public CreateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _barRepository = barRepository;
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongBarCommand request, CancellationToken cancellationToken)
@@ -51,10 +54,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             {
                 var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-                if (!await _songRepository.HasWriteAccess(song, currentUser))
-                {
-                    throw new UnauthorizedAccessException();
-                }
+                if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))throw new UnauthorizedAccessException();
 
                 var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
                 if (voice == null)

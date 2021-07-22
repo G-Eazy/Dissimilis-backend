@@ -39,13 +39,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             if (group == null)
             {
                 throw new NotFoundException($"Group with Id {groupId} not found");
+            }
 
-            await Context.GroupUsers
-                .Include(gu => gu.User)
-                .Where(gu => gu.GroupId == groupId)
-                .LoadAsync(cancellationToken);
+                await Context.GroupUsers
+                    .Include(gu => gu.User)
+                    .Where(gu => gu.GroupId == groupId)
+                    .LoadAsync(cancellationToken);
 
-            return group;
-        }
+                return group;
+            }       
     }
 }

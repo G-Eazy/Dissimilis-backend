@@ -22,12 +22,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, UpdatedGroupCommandDto>
     {
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly _IPermissionCheckerService _permissionChecker;
         private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public CreateGroupCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
+        public CreateGroupCommandHandler(_IPermissionCheckerService permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
         {
             _permissionChecker = permissionChecker;
             _userRepository = userRepository;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
@@ -31,12 +32,14 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
         private readonly NoteRepository _noteRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, SongRepository songRepository, IAuthService IAuthService)
+        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _noteRepository = noteRepository;
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongNoteCommand request, CancellationToken cancellationToken)
@@ -44,10 +47,8 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+
 
             var songNote = await _noteRepository.GetSongNoteById(request.SongChordId, cancellationToken);
 

@@ -40,7 +40,11 @@ namespace Dissimilis.DbContext.Models.Enums
         Kick = 40,
 
         [Description("Get")]
-        Get = 50
+        Get = 50,
+
+        [Description("Restore")]
+        Restore = 60
+
     }
 
     public enum DefinedInstruments
