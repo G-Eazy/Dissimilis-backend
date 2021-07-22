@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            var songDtos = await _mediator.Send(new QuerySongToLibrary());
+            var songDtos = await _mediator.Send(new QuerySongToLibrary(false));
 
             songDtos.Length.ShouldBe(2);
 
