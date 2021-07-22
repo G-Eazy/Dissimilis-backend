@@ -22,12 +22,12 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class CreateOrganisationCommandHandler : IRequestHandler<CreateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
-        private readonly IPermissionChecker _permissionChecker;
+        private readonly IPermissionCheckerService _permissionChecker;
         private readonly UserRepository _userRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public CreateOrganisationCommandHandler(IPermissionChecker permissionChecker, UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
+        public CreateOrganisationCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
         {
             _permissionChecker = permissionChecker;
             _userRepository = userRepository;

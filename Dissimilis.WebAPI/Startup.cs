@@ -78,7 +78,6 @@ namespace Dissimilis.WebAPI
 
             services.AddTransient<DissimilisDbContextFactory>();
             AddAuthService(services);
-            AddPermissionService(services);
 
             services.AddControllers();
             services.AddSwaggerGen(SwaggerConfiguration.SetSwaggerGenOptions);
@@ -175,11 +174,6 @@ namespace Dissimilis.WebAPI
         public virtual void AddAuthService(IServiceCollection services)
         {
             services.AddScoped<IAuthService, AuthService>();
-        }
-
-        public virtual void AddPermissionService(IServiceCollection services)
-        {
-            services.AddScoped<IPermissionChecker, PermissionChecker>();
         }
 
         public virtual void Migrate(DissimilisDbContext context)

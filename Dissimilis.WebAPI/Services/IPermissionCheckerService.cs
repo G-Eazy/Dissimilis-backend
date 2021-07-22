@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Services
 {
-    public interface IPermissionChecker
+    public interface IPermissionCheckerService
     {
         Task<bool> CheckPermission(Organisation org, User user, Operation op, CancellationToken c);
         Task<bool> CheckPermission(Group group, User user, Operation op, CancellationToken c);

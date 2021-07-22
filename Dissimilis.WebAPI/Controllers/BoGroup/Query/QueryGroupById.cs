@@ -21,11 +21,11 @@ namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
 
     public class QueryGroupByIdHandler : IRequestHandler<QueryGroupById, GroupByIdDto>
     {
-        private readonly IPermissionChecker _permissionChecker;
+        private readonly IPermissionCheckerService _permissionChecker;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
 
-        public QueryGroupByIdHandler(IPermissionChecker permissionChecker, GroupRepository repository, IAuthService authService)
+        public QueryGroupByIdHandler(IPermissionCheckerService permissionChecker, GroupRepository repository, IAuthService authService)
         {
             _permissionChecker = permissionChecker;
             _groupRepository = repository;
