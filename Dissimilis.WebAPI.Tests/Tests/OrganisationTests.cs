@@ -20,23 +20,11 @@ namespace Dissimilis.WebAPI.xUnit.Tests
     [CollectionDefinition("Serial", DisableParallelization = true)]
     public class OrganisationTests : BaseTestClass
     {
-        private readonly IMediator _mediator;
-        private UserDto AdminUser;
-        private UserDto SuppUser1;
 
         public OrganisationTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
-            _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-            var users = GetAllUsers().Result;
-            AdminUser = users.SingleOrDefault(user => user.Email == "test@test.no");
-            SuppUser1 = users.SingleOrDefault(user => user.Email == "supUser1@test.no");
         }
-
-        private async Task<UserDto[]> GetAllUsers()
-        {
-            return await _mediator.Send(new QueryAll());
-        }
-
+        
         public UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
         {
             return new UpdateGroupAndOrganisationDto()
@@ -50,72 +38,64 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestCreateOrganisationPermissionHandling()
+        public async Task CreateOrganisationAsSysAdminShouldSucceed()
         {
-
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
-                Name = "TestOrg11234",
-                FirstAdminId = AdminUser.UserId
+                Name = "TestOrg1",
+                FirstAdminId = NorwayAdminUser.Id
             };
-
-            // Creating org as sysadmin should be fine, but noone else should be able to
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
 
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            org.Name.ShouldBeEquivalentTo("TestOrg11234", "Creation of organisation failed");
+            org.Name.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
+        }
 
+        [Fact]
+        public async Task CreateOrganisationAsOrgAdminShouldFail()
+        {
             //Change user and provoke exception
-            TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+            CreateOrganisationDto orgDto = new CreateOrganisationDto()
+            {
+                Name = "TestOrg2",
+                FirstAdminId = GuatemalaAdminUser.Id
+            };
+
             var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateOrganisationCommand(orgDto)));
             exception.Message.ShouldBeEquivalentTo("User does not have permission to create organisation", "Error did not match");
         }
 
         [Fact]
-        public async Task TestCreateOrganisationCommand()
+        public async Task CreateOrganisationAsGroupAdminShouldFail()
         {
-            string name = "TestOrg2";
-
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-
-            var item = await _mediator.Send(new CreateOrganisationCommand(new CreateOrganisationDto()
+            //Change user and provoke exception
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+            CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
-                Name = name,
-                FirstAdminId = AdminUser.UserId
-            }));
-            var result = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
+                Name = "TestOrg3",
+                FirstAdminId = GuatemalaAdminUser.Id
+            };
 
-            result.Name.ShouldBeEquivalentTo(name, "Organisation creation failed");
-            result.admins[0].UserId.ShouldBe(AdminUser.UserId, "Organisation creation failed");
+            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateOrganisationCommand(orgDto)));
+            exception.Message.ShouldBeEquivalentTo("User does not have permission to create organisation", "Error did not match");
         }
 
         [Fact]
-        public async Task TestGetAllUsersInOrganisation()
+        public async Task TestGetAllUsersInOrganisationAsSysAdminShouldSucceed()
         {
-            CreateOrganisationDto orgDto = new CreateOrganisationDto()
-            {
-                Name = "TestOrg1",
-                FirstAdminId = AdminUser.UserId
-            };
-            await _mediator.Send(new CreateOrganisationCommand(orgDto));
-            var users = await _mediator.Send(new QueryUsersInOrganisation(1));
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var users = await _mediator.Send(new QueryUsersInOrganisation(NorwayOrganisation.Id));
             users.Length.ShouldBeGreaterThan(0, "Did not get all users");
         }
 
         [Fact]
-        public async Task TestUpdateOrganisation()
+        public async Task TestUpdateOrganisationAsSysAdminShouldSucceed()
         {
-            CreateOrganisationDto orgDto = new CreateOrganisationDto()
-            {
-                Name = "TestOrg4",
-                FirstAdminId = AdminUser.UserId
-            };
-            var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
-            var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateOrganisationCommand(org.Id, updateDto));
+            var updateItem = await _mediator.Send(new UpdateOrganisationCommand(NorwayOrganisation.Id, updateDto));
             var updatedOrg = await _mediator.Send(new QueryOrganisationById(updateItem.OrganisationId));
 
             updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
