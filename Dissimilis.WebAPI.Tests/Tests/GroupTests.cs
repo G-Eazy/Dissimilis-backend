@@ -15,6 +15,7 @@ using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
+using Dissimilis.WebAPI.Controllers.Bousers.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -103,6 +104,15 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
             var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId))));
             exception.Message.ShouldBeEquivalentTo("User does not have permission to create group in organisation", "Correct exception was not thrown");
+        }
+
+        [Fact]
+        public async Task TestGetAllUsersInGroup()
+        {
+            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
+            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
+            var users = await _mediator.Send(new QueryUsersInGroup(1));
+            users.Length.ShouldBeGreaterThan(0, "Did not get all users");
         }
 
     }
