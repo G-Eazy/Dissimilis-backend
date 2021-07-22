@@ -1,19 +1,13 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoGroup;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser;
-using Dissimilis.WebAPI.Extensions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
@@ -67,7 +61,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             }
             await _songRepository.RemoveRedundantGroupTags(request.GroupIds, song, cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
-            return song.SharedGroups.Select(x => new ShortGroupDto(x.Group)).ToArray();
+            return song.GroupTags.Select(x => new ShortGroupDto(x.Group)).ToArray();
         }
     }
 }

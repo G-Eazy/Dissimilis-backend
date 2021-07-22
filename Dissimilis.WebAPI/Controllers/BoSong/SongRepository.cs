@@ -58,12 +58,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Where(su => su.SongId == song.Id)
                 .LoadAsync(cancellationToken);
 
-            await Context.SongSharedGroups
+            await Context.SongGroupTags
                 .Include(su => su.Group)
                 .Where(su => su.SongId == song.Id)
                 .LoadAsync(cancellationToken);
 
-            await Context.SongSharedOrganisations
+            await Context.SongOrganisationTags
                 .Include(su => su.Organisation)
                 .Where(su => su.SongId == song.Id)
                 .LoadAsync(cancellationToken);
@@ -144,8 +144,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return await Context.Songs
                 .Include(song => song.Arranger)
                 .Include(song => song.SharedUsers)
-                .Include(song => song.SharedGroups)
-                .Include(song => song.SharedOrganisations)
+                .Include(song => song.GroupTags)
+                .Include(song => song.OrganisationTags)
                 .AsSplitQuery()
                 .AsQueryable()
                 .Where(SongExtension.ReadAccessToSong(user))
@@ -173,14 +173,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteGroupTag(Song song, Group group, SongSharedGroup groupTag, CancellationToken cancellationToken)
+        public async Task DeleteGroupTag(Song song, Group group, SongGroupTag groupTag, CancellationToken cancellationToken)
         {
-            Context.SongSharedGroups.Remove(groupTag);
+            Context.SongGroupTags.Remove(groupTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
-        public async Task DeleteOrganisationTag(Song song, Organisation organisation, SongSharedOrganisation organisationTag, CancellationToken cancellationToken)
+        public async Task DeleteOrganisationTag(Song song, Organisation organisation, SongOrganisationTag organisationTag, CancellationToken cancellationToken)
         {
-            Context.SongSharedOrganisations.Remove(organisationTag);
+            Context.SongOrganisationTags.Remove(organisationTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
         public async Task CreateAndAddSongShareUser(Song song, User user)
@@ -196,17 +196,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
         public async Task CreateAndAddGroupTag(Song song, Group group)
         {
-            var groupTag = new SongSharedGroup()
+            var groupTag = new SongGroupTag()
             {
                 GroupId = group.Id,
                 SongId = song.Id
             };
-            await Context.SongSharedGroups.AddAsync(groupTag);
+            await Context.SongGroupTags.AddAsync(groupTag);
             await Context.SaveChangesAsync();
         }
         public async Task RemoveRedundantGroupTags(int[] groupIds, Song song, CancellationToken cancellationToken)
         {
-            var groupTagsRemove = Context.SongSharedGroups
+            var groupTagsRemove = Context.SongGroupTags
                 .Where(x => x.SongId == song.Id && !groupIds.Contains(x.GroupId)).ToArray();
             foreach(var tag in groupTagsRemove)
             {
@@ -220,7 +220,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
         public async Task RemoveRedundantOrganisationTags(int[] organisationIds, Song song, CancellationToken cancellationToken)
         {
-            var organisationTagsRemove = Context.SongSharedOrganisations
+            var organisationTagsRemove = Context.SongOrganisationTags
                 .Where(x => x.SongId == song.Id && !organisationIds.Contains(x.OrganisationId)).ToArray();
             foreach (var tag in organisationTagsRemove)
             {
@@ -234,12 +234,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
         public async Task CreateAndAddOrganisationTag(Song song, Organisation organisation)
         {
-            var organisationTag = new SongSharedOrganisation()
+            var organisationTag = new SongOrganisationTag()
             {
                 OrganisationId = organisation.Id,
                 SongId = song.Id
             };
-            await Context.SongSharedOrganisations.AddAsync(organisationTag);
+            await Context.SongOrganisationTags.AddAsync(organisationTag);
             await Context.SaveChangesAsync();
         }
         public async Task<SongSharedUser> GetSongSharedUser(int songId, int userId)
@@ -247,13 +247,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return await Context.SongSharedUser.SingleOrDefaultAsync(x => x.SongId == songId && x.UserId == userId);
         }
 
-        public async Task<SongSharedGroup> GetSongSharedGroup(int songId, int groupId)
+        public async Task<SongGroupTag> GetSongSharedGroup(int songId, int groupId)
         {
-            return await Context.SongSharedGroups.SingleOrDefaultAsync(x => x.SongId == songId && x.GroupId == groupId);
+            return await Context.SongGroupTags.SingleOrDefaultAsync(x => x.SongId == songId && x.GroupId == groupId);
         }
-        public async Task<SongSharedOrganisation> GetSongSharedOrganisation(int songId, int organisationId)
+        public async Task<SongOrganisationTag> GetSongSharedOrganisation(int songId, int organisationId)
         {
-            return await Context.SongSharedOrganisations.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
+            return await Context.SongOrganisationTags.SingleOrDefaultAsync(x => x.SongId == songId && x.OrganisationId == organisationId);
         }
     }
 
@@ -274,8 +274,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                         ||
                         (
                             (includeSharedWithUser && song.SharedUsers.Any(sharedSong => sharedSong.UserId == currentUser.Id))
-                            || song.SharedOrganisations.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
-                            || song.SharedGroups.Any(group => includedGroupIdArray.Contains(group.GroupId))
+                            || song.OrganisationTags.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
+                            || song.GroupTags.Any(group => includedGroupIdArray.Contains(group.GroupId))
                         )
                     )
                     );

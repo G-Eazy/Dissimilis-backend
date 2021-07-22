@@ -37,7 +37,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// List of all shared songs in this organisation
         /// </summary>
-        public ICollection<SongSharedOrganisation> SharedSongs { get; set; } = new List<SongSharedOrganisation>();
+        public ICollection<SongOrganisationTag> SharedSongs { get; set; } = new List<SongOrganisationTag>();
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }

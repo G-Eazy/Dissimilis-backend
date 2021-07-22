@@ -225,100 +225,100 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
-        [Fact]
-        public async Task TestShareSongWithUser()
-        {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        //[Fact]
+        //public async Task TestShareSongWithUser()
+        //{
+        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
-            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto() {
-                ProtectionLevel = ProtectionLevels.Private }));
+        //    var DefaultTestSong = await mediator.Send(new QuerySongById(1));
+        //    await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto() {
+        //        ProtectionLevel = ProtectionLevels.Private }));
 
-            await mediator.Send(new ShareSongUserCommand(DefaultTestSong.SongId, 3));
-            var AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
+        //    await mediator.Send(new ShareSongUserCommand(DefaultTestSong.SongId, 3));
+        //    var AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
 
-            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+        //    ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
 
-            AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
-            AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
-            ChangeToUserWithAdmin();
-            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
-            {
-                ProtectionLevel = ProtectionLevels.Public
-            }));
-        }
-        [Fact]
-        public async Task TestRemoveShareSongUser()
-        {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        //    AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
+        //    AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
+        //    ChangeToUserWithAdmin();
+        //    await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
+        //    {
+        //        ProtectionLevel = ProtectionLevels.Public
+        //    }));
+        //}
+        //[Fact]
+        //public async Task TestRemoveShareSongUser()
+        //{
+        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
-            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
-            {ProtectionLevel = ProtectionLevels.Private}));
-            await mediator.Send(new ShareSongUserCommand(DefaultTestSong.SongId, 3));
+        //    var DefaultTestSong = await mediator.Send(new QuerySongById(1));
+        //    await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
+        //    {ProtectionLevel = ProtectionLevels.Private}));
+        //    await mediator.Send(new ShareSongUserCommand(DefaultTestSong.SongId, 3));
 
-            await mediator.Send(new RemoveShareSongUserCommand(DefaultTestSong.SongId, 3));
+        //    await mediator.Send(new RemoveShareSongUserCommand(DefaultTestSong.SongId, 3));
 
-            ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
-            var AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
-            AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeFalse();
-            ChangeToUserWithAdmin();
-            await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
-            {
-                ProtectionLevel = ProtectionLevels.Public
-            }));
-        }
+        //    ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
+        //    var AllSongs = await mediator.Send(new QuerySongSearch(SharedWithUserSearchQueryDto()));
+        //    AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeFalse();
+        //    ChangeToUserWithAdmin();
+        //    await mediator.Send(new UpdateSongCommand(DefaultTestSong.SongId, new UpdateSongDto()
+        //    {
+        //        ProtectionLevel = ProtectionLevels.Public
+        //    }));
+        //}
 
-        [Fact]
-        public async Task TestUpdateSongToPrivate()
-        {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        //[Fact]
+        //public async Task TestUpdateSongToPrivate()
+        //{
+        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
-            {
-                ProtectionLevel = ProtectionLevels.Private
-            }));
+        //    await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
+        //    {
+        //        ProtectionLevel = ProtectionLevels.Private
+        //    }));
 
-            var defaultTestSong = await mediator.Send(new QuerySongById(1));
-            defaultTestSong.ProtectionLevel.ShouldBe(ProtectionLevels.Private);
-            await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
-            {
-                ProtectionLevel = ProtectionLevels.Public
-            }));
-        }
+        //    var defaultTestSong = await mediator.Send(new QuerySongById(1));
+        //    defaultTestSong.ProtectionLevel.ShouldBe(ProtectionLevels.Private);
+        //    await mediator.Send(new UpdateSongCommand(1, new UpdateSongDto()
+        //    {
+        //        ProtectionLevel = ProtectionLevels.Public
+        //    }));
+        //}
 
 
-        [Fact]
-        public async Task TestAddGroupTag()
-        {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        //[Fact]
+        //public async Task TestAddGroupTag()
+        //{
+        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
+        //    var DefaultTestSong = await mediator.Send(new QuerySongById(1));
 
-            await mediator.Send(new ShareSongGroupCommand(DefaultTestSong.SongId, 2));
+        //    await mediator.Send(new ShareSongGroupCommand(DefaultTestSong.SongId, 2));
 
-            int[] groups = { 2 };
-            int[] orgs = Array.Empty<int>();
-            var AllSongs = await mediator.Send(new QuerySongSearch(GroupOrgSearchQueryDto(groups, orgs)));
+        //    int[] groups = { 2 };
+        //    int[] orgs = Array.Empty<int>();
+        //    var AllSongs = await mediator.Send(new QuerySongSearch(GroupOrgSearchQueryDto(groups, orgs)));
 
-            AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
-        }
+        //    AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
+        //}
 
-        [Fact]
-        public async Task TestAddOrganisationTag()
-        {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        //[Fact]
+        //public async Task TestAddOrganisationTag()
+        //{
+        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var DefaultTestSong = await mediator.Send(new QuerySongById(1));
+        //    var DefaultTestSong = await mediator.Send(new QuerySongById(1));
 
-            await mediator.Send(new ShareSongOrganisationCommand(DefaultTestSong.SongId, 2));
+        //    await mediator.Send(new ShareSongOrganisationCommand(DefaultTestSong.SongId, 2));
 
-            int[] orgs = { 2 };
-            int[] groups = Array.Empty<int>();
-            var AllSongs = await mediator.Send(new QuerySongSearch(GroupOrgSearchQueryDto(groups, orgs)));
+        //    int[] orgs = { 2 };
+        //    int[] groups = Array.Empty<int>();
+        //    var AllSongs = await mediator.Send(new QuerySongSearch(GroupOrgSearchQueryDto(groups, orgs)));
 
-            AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
-        }
+        //    AllSongs.Any(song => song.SongId == DefaultTestSong.SongId).ShouldBeTrue();
+        //}
 
         [Fact]
         public async Task TestNewSongSave()

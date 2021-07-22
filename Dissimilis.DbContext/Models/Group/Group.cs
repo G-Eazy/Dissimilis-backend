@@ -31,7 +31,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// List of all shared songs in this group
         /// </summary>
-        public ICollection<SongSharedGroup> SharedSongs { get; set; } = new List<SongSharedGroup>();
+        public ICollection<SongGroupTag> SharedSongs { get; set; } = new List<SongGroupTag>();
 
         /// <summary>
         /// this groups organisation
