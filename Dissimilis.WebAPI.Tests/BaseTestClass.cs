@@ -44,13 +44,6 @@ namespace Dissimilis.WebAPI.xUnit
         public BaseTestClass(TestServerFixture testServerFixture)
         {
             _testServerFixture = testServerFixture;
-            if (_testServerFixture.GetContext().Database.CurrentTransaction != null)
-            {
-                _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
-            }
-            var connection = _testServerFixture.GetDbConnection();
-            var transaction = connection.BeginTransaction();
-            _testServerFixture.GetContext().Database.UseTransaction(transaction);
 
             _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 

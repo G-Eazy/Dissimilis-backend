@@ -67,10 +67,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             Should.Throw<UnauthorizedAccessException>(() =>
                 _mediator.Send(new CreateSongNoteCommand(SmokeOnTheWaterSong.Id, voice.Id, bar.Id, CreateNoteDto(3, 1, "C"))));
-
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
 
         [Fact]
@@ -116,40 +112,63 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             Should.Throw<UnauthorizedAccessException>(() =>
                 _mediator.Send(new UpdateSongNoteCommand(SmokeOnTheWaterSong.Id, firstNoteUpdated.SongChordId, new UpdateNoteDto() { ChordName = "G" })));
-
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
 
         [Fact]
         public async Task TestDeleteSongNoteCommand()
         {
-            var voice = SmokeOnTheWaterSong.Voices.FirstOrDefault();
-            var bar = voice.SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
+            //Fetch notes to use for tests
+            var voice = SmokeOnTheWaterSong
+                .Voices.FirstOrDefault();
+            var bar = voice
+                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
             var notes = bar
-                .Notes.Take(3).ToArray();
+                .Notes.Take(2).ToArray();
 
-            var firstNote = notes[0];
-            var secondNote = notes[1];
+            var noteToDeleteWithPermittedUser = notes[0];
+            var noteToDeleteWithUnpermittedUser = notes[1];
 
+            //Test edgecases
+            await TestDeleteNoteWhenCurrentUserIsArrangerShouldDelete(SmokeOnTheWaterSong.Id, voice.Id, bar.Id, noteToDeleteWithPermittedUser.Id);
+
+            await TestDeleteNoteWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(SmokeOnTheWaterSong.Id, voice.Id, bar.Id, noteToDeleteWithUnpermittedUser.Id);
+        }
+
+        private async Task TestDeleteNoteWhenCurrentUserIsArrangerShouldDelete(int songId, int voiceId, int barId, int noteId)
+        {
+            //Change current user to arranger of song.
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
-            //Execute command to test.
-            var updatedSongNote = await _mediator.Send(new DeleteSongNoteCommand(SmokeOnTheWaterSong.Id, voice.Id, bar.Id, firstNote.Id));
 
-            //Try fetch deleted data and verify that it is indeed deleted.
-            Should.Throw<NotFoundException>(() =>
-                _mediator.Send(new QuerySongNoteById(firstNote.Id)));
+            //Execute command for deleting note.
+            var updatedSongNote = await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, noteId));
 
-            //Verify that a user without write access is note able to delete data.
+            //Fetch song and verify that note is deleted from database.
+            UpdateAllSongs();
+
+            SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.Id == voiceId)
+                .SongBars.SingleOrDefault(bar => bar.Id == barId)
+                .Notes.Any(note => note.Id == noteId)
+                .ShouldBeFalse();
+        }
+
+        private async Task TestDeleteNoteWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(int songId, int voiceId, int barId, int noteId)
+        {
+            //Change user to one without write access.
             TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
 
-            Should.Throw<UnauthorizedAccessException>(() =>
-                _mediator.Send(new DeleteSongNoteCommand(SmokeOnTheWaterSong.Id, voice.Id, bar.Id, secondNote.Id)));
+            //Verify that correct exception is thrown.
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new DeleteSongNoteCommand(songId, voiceId, barId, noteId)));
 
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            //Fetch song and verify that note is still in database.
+            UpdateAllSongs();
 
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
+            SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.Id == voiceId)
+                .SongBars.SingleOrDefault(bar => bar.Id == barId)
+                .Notes.Any(note => note.Id == noteId)
+                .ShouldBeTrue();
         }
     }
 }

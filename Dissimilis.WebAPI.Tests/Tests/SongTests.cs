@@ -38,8 +38,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             songDtos.Any(song => song.SongId == SmokeOnTheWaterSong.Id).ShouldBeTrue();     
             songDtos.Any(song => song.SongId == SpeedKingSong.Id).ShouldBeTrue();
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
 
         [Fact]
@@ -58,8 +56,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos.Any(song => song.SongId == LisaGikkTilSkolenSong.Id).ShouldBeTrue();
             songDtos.Any(song => song.SongId == SpeedKingSong.Id).ShouldBeTrue();
             songDtos.Any(song => song.SongId == DovregubbensHallSong.Id).ShouldBeTrue();
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
         [Fact]
         public async Task TestSearchForAllSongsAsRegularUserDoesNotGivePrivateSongs()
@@ -77,8 +73,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos.Any(song => song.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
             songDtos.Any(song => song.SongId == DuHastSong.Id).ShouldBeFalse();
             songDtos.Any(song => song.SongId == BabySong.Id).ShouldBeFalse();
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
 
         //[Fact]
@@ -263,8 +257,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             //    secondBarAfterCopy.CheckBarEqualTo(fifthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 2 against 5 after copy");
 
             //}
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
-
         }
 
         [Fact]
@@ -288,8 +280,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .SingleOrDefault(voice => voice.VoiceName == "Main")
                 .SongBars.SingleOrDefault(bar => bar.Position == 2)
                 .Id.ShouldBe(barToMove.Id);
-
-            _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         }
     }
 }
