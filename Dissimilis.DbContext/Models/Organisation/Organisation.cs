@@ -53,11 +53,9 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         /// <param name="name"></param>
         /// <param adminUser="adminUser"></param>
-        public Organisation(string name, OrganisationUser adminUser)
+        public Organisation(string name)
         {
-            Name = name;
-            Users.Add(adminUser);
-            
+            Name = name;            
         }
     }
 }

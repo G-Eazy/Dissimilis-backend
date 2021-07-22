@@ -55,9 +55,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             {
                 throw new Exception($"Song witd id: {request.SongId} is not shared with user with id: {request.UserId}");
             }
-            
-            userToAdd.SongsShared.Remove(SharedSongUser);
-            song.SharedUsers.Remove(SharedSongUser);
             await _songRepository.DeleteSongSharedUser(song, userToAdd, SharedSongUser, cancellationToken);
             return song.SharedUsers.Select(s => new ShortUserDto(s.User)).ToArray();
         }

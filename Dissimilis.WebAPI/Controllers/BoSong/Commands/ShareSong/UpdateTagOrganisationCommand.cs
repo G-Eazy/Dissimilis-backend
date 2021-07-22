@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 {
-    public class UpdateTagOrganisationCommand : IRequest<ShortOrganisationOrGroupDto[]>
+    public class UpdateTagOrganisationCommand : IRequest<ShortOrganisationDto[]>
     {
         public int SongId { get; }
 
@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         }
     }
 
-    public class RemoveTagOrganisationCommandHandler : IRequestHandler<UpdateTagOrganisationCommand, ShortOrganisationOrGroupDto[]>
+    public class RemoveTagOrganisationCommandHandler : IRequestHandler<UpdateTagOrganisationCommand, ShortOrganisationDto[]>
     {
         private readonly SongRepository _songRepository;
         private readonly OrganisationRepository _organisationRepository;
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             _IAuthService = IAuthService;
         }
 
-        public async Task<ShortOrganisationOrGroupDto[]> Handle(UpdateTagOrganisationCommand request, CancellationToken cancellationToken)
+        public async Task<ShortOrganisationDto[]> Handle(UpdateTagOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
@@ -67,7 +67,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             }
             await _songRepository.RemoveRedundantOrganisationTags(request.OrganisationIds, song, cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
-            return song.SharedOrganisations.Select(x => new ShortOrganisationOrGroupDto(x.Organisation)).ToArray();
+            return song.SharedOrganisations.Select(x => new ShortOrganisationDto(x.Organisation)).ToArray();
         }
     }
 }

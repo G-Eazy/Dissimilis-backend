@@ -54,10 +54,9 @@ namespace Dissimilis.DbContext.Models
         /// <param name="name"></param>
         /// <param name="adminUser"></param>
         /// <param name="organisationId"></param>
-        public Group(GroupUser adminUser, int organisationId, string name)
+        public Group( int organisationId, string name)
         {
             Name = name;
-            Users.Add(adminUser);
             OrganisationId = organisationId;
            
         }

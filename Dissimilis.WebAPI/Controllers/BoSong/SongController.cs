@@ -221,7 +221,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// Update grouptags for a given song
         /// </summary>
         [HttpPatch("{songId:int}/Tag/Group")]
-        [ProducesResponseType(typeof(ShortOrganisationOrGroupDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShortGroupDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RemoveTagGroup(int songId,[FromBody] UpdateTagsDto Ids)
@@ -233,7 +233,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// Update organisationtags for a given song
         /// </summary>
         [HttpPatch("{songId:int}/Tag/Organisation")]
-        [ProducesResponseType(typeof(ShortOrganisationOrGroupDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShortOrganisationDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RemoveTagOrganisation(int songId,[FromBody] UpdateTagsDto Ids)

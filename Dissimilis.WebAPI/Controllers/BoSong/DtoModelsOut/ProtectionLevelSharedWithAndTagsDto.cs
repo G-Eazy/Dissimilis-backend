@@ -8,8 +8,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {
     public class ProtectionLevelSharedWithAndTagsDto
     {
-        public IEnumerable<ShortOrganisationOrGroupDto> OrganisationTags { get; set; }
-        public IEnumerable<ShortOrganisationOrGroupDto> GroupTags { get; set; }
+        public IEnumerable<ShortOrganisationDto> OrganisationTags { get; set; }
+        public IEnumerable<ShortGroupDto> GroupTags { get; set; }
         public IEnumerable<ShortUserDto> SharedWithUsers { get; set; }
         public int SongId { get; set; }
         public string ProtectionLevel { get; set; }
@@ -18,38 +18,49 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         {
             SongId = song.Id;
             ProtectionLevel = song.ProtectionLevel.GetDescription();
-            OrganisationTags = song.SharedOrganisations.Select(x => new ShortOrganisationOrGroupDto(x.Organisation));
-            GroupTags = song.SharedGroups.Select(x => new ShortOrganisationOrGroupDto(x.Group));
+            OrganisationTags = song.SharedOrganisations.Select(x => new ShortOrganisationDto(x.Organisation));
+            GroupTags = song.SharedGroups.Select(x => new ShortGroupDto(x.Group));
             SharedWithUsers = song.SharedUsers.Select(x => new ShortUserDto(x.User));
         }
     }
 
-    public class ShortOrganisationOrGroupDto
+    public class ShortOrganisationDto
     {
-        public int Id { get; set; }
+        public int OrganisationId { get; set; }
         public string Name { get; set; }
 
-        public ShortOrganisationOrGroupDto(Group group)
+        public ShortOrganisationDto(Group group)
         {
-            Id = group.Id;
+            OrganisationId = group.Id;
             Name = group.Name;
         }
-        public ShortOrganisationOrGroupDto(Organisation organisation)
+        public ShortOrganisationDto(Organisation organisation)
         {
-            Id = organisation.Id;
+            OrganisationId = organisation.Id;
             Name = organisation.Name;
+        }
+    }
+    public class ShortGroupDto
+    {
+        public int GroupId { get; set; }
+        public string Name { get; set; }
+
+        public ShortGroupDto(Group group)
+        {
+            GroupId = group.Id;
+            Name = group.Name;
         }
     }
 
     public class ShortUserDto
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
 
         public ShortUserDto(User user)
         {
-            Id = user.Id;
+            UserId = user.Id;
             Name = user.Name;
             Email = user.Email;
         }

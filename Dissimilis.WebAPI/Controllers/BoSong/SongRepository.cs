@@ -69,7 +69,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(s => s.Arranger)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.UpdatedBy)
-                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
+                .FirstOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
@@ -160,23 +160,17 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
         public async Task DeleteSongSharedUser(Song song, User user, SongSharedUser sharedSongUser, CancellationToken cancellationToken)
         {
-            user.SongsShared.Remove(sharedSongUser);
-            song.SharedUsers.Remove(sharedSongUser);
             Context.SongSharedUser.Remove(sharedSongUser);
             await Context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteGroupTag(Song song, Group group, SongSharedGroup groupTag, CancellationToken cancellationToken)
         {
-            group.SharedSongs.Remove(groupTag);
-            song.SharedGroups.Remove(groupTag);
             Context.SongSharedGroups.Remove(groupTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
         public async Task DeleteOrganisationTag(Song song, Organisation organisation, SongSharedOrganisation organisationTag, CancellationToken cancellationToken)
         {
-            organisation.SharedSongs.Remove(organisationTag);
-            song.SharedOrganisations.Remove(organisationTag);
             Context.SongSharedOrganisations.Remove(organisationTag);
             await Context.SaveChangesAsync(cancellationToken);
         }
@@ -188,9 +182,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 SongId = song.Id
             };
             await Context.SongSharedUser.AddAsync(songSharedUser);
-            song.SharedUsers.Add(songSharedUser);
-            user.SongsShared.Add(songSharedUser);
             await Context.SaveChangesAsync();
+            
         }
         public async Task CreateAndAddGroupTag(Song song, Group group)
         {
@@ -200,8 +193,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 SongId = song.Id
             };
             await Context.SongSharedGroups.AddAsync(groupTag);
-            song.SharedGroups.Add(groupTag);
-            group.SharedSongs.Add(groupTag);
             await Context.SaveChangesAsync();
         }
         public async Task RemoveRedundantGroupTags(int[] groupIds, Song song, CancellationToken cancellationToken)
@@ -240,8 +231,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 SongId = song.Id
             };
             await Context.SongSharedOrganisations.AddAsync(organisationTag);
-            song.SharedOrganisations.Add(organisationTag);
-            organisation.SharedSongs.Add(organisationTag);
             await Context.SaveChangesAsync();
         }
         public async Task<SongSharedUser> GetSongSharedUser(int songId, int userId)
