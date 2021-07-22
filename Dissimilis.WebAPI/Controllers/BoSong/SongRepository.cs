@@ -8,7 +8,7 @@ using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models;
 using System;
-
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -178,61 +178,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-
-            var query = Context.Songs
-                .Include(s => s.Arranger)
-                .Where(s => s.Deleted == null)
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchCommand.Title))
-            {
-                var textSearch = $"%{searchCommand.Title.Trim()}%";
-                query = query
-                    .Where(s => EF.Functions.Like(s.Title, textSearch) || EF.Functions.Like(s.Arranger.Name, textSearch))
-                    .AsQueryable();
-            }
-
-            if (searchCommand.ArrangerId != null)
-            {
-                query = query
-                    .Where(s => s.ArrangerId == searchCommand.ArrangerId)
-                    .AsQueryable();
-            }
-
-            if (searchCommand.OrderBy == "song")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Title)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else if (searchCommand.OrderBy == "user")
-            {
-                query = searchCommand.OrderDescending ?
-                    query.OrderBy(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn) :
-                    query.OrderByDescending(s => s.Arranger.Name)
-                    .ThenByDescending(s => s.UpdatedOn);
-            }
-            else
-            {
-                query = searchCommand.OrderDescending ? 
-                    query.OrderByDescending(s => s.UpdatedOn) :
-                    query.OrderBy(s => s.UpdatedOn);
-            }
-
-            if (searchCommand.MaxNumberOfSongs != 0)
-            {
-                query = query
-                    .Take(searchCommand.MaxNumberOfSongs)
-                    .AsQueryable();
-            }
-
-            var result = await query
+            return await Context.Songs
+                .Include(song => song.Arranger)
+                .Include(song => song.SharedUsers)
+                .Include(song => song.SharedGroups)
+                .Include(song => song.SharedOrganisations)
+                .AsSplitQuery()
+                .AsQueryable()
+                .Where(SongExtension.ReadAccessToSong(user))
+                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
+                .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
+                .Take(searchCommand.MaxNumberOfSongs)
                 .ToArrayAsync(cancellationToken);
-
-            return result;
         }
 
         /// <summary>
