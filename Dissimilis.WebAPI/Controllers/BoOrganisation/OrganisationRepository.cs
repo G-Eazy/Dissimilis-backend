@@ -29,21 +29,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Method to determine if user har permission to do desired operation with organisation object
-        /// Just checks whether user is system admin for now to add organisation.
-        /// Can be extended later.
-        /// </summary>
-        /// <param name="organisation"></param>
-        /// <param name="user"></param>
-        /// <param name="operation"></param>
-        /// <returns></returns>
-        public bool CheckPermission(User user, string operation, CancellationToken cancellationToken)
-        {
-            if (user.IsSystemAdmin)
-                return true;
-            return false;
-        }
 
         public async Task<Organisation> GetOrganisationById(int organisationId, CancellationToken cancellationToken)
         {
