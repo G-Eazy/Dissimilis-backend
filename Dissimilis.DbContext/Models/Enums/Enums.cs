@@ -22,6 +22,27 @@ namespace Dissimilis.DbContext.Models.Enums
         Public = 20
     }
 
+    public enum Operation
+    {
+        [Description("Create")]
+        Create = 0,
+
+        [Description("Modify")]
+        Modify = 10,
+
+        [Description("Delete")]
+        Delete = 20,
+
+        [Description("Invite")]
+        Invite = 30,
+
+        [Description("Kick")]
+        Kick = 40,
+
+        [Description("Get")]
+        Get = 50
+    }
+
     public enum DefinedInstruments
     {
         [Description("Accordion")]

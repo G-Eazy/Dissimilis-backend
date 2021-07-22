@@ -10,24 +10,24 @@ using MediatR;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 {
-    public class CreateGroupCommand : IRequest<UpdatedGroupCommandDto>
+    public class DeleteGroupCommand : IRequest<UpdatedGroupCommandDto>
     {
-        public CreateGroupDto Command { get; }
+        public int GroupId { get; set; }
 
-        public CreateGroupCommand(CreateGroupDto command)
+        public DeleteGroupCommand(int groupId)
         {
-            Command = command;
+            GroupId = groupId;
         }
     }
 
-    public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, UpdatedGroupCommandDto>
+    public class DeleteGroupCommandHandler : IRequestHandler<DeleteGroupCommand, UpdatedGroupCommandDto>
     {
         private readonly IPermissionCheckerService _permissionChecker;
         private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public CreateGroupCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
+        public DeleteGroupCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
         {
             _permissionChecker = permissionChecker;
             _userRepository = userRepository;
@@ -35,18 +35,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             _authService = authService;
         }
 
-        public async Task<UpdatedGroupCommandDto> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
+        public async Task<UpdatedGroupCommandDto> Handle(DeleteGroupCommand request, CancellationToken cancellationToken)
         {
             var currentUser = await _userRepository.GetUserById(_authService.GetVerifiedCurrentUser().Id, cancellationToken);
-            var group = new Group
-                (
-                    request.Command.Name,
-                    request.Command.OrganisationId,
-                    currentUser.Id
-                );
-            bool isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Create, cancellationToken);
+            var group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
+            bool isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Delete, cancellationToken);
             if (!isAllowed)
-                throw new System.UnauthorizedAccessException($"User does not have permission to create group in organisation");
+                throw new System.UnauthorizedAccessException($"User does not have permission to Delete group in organisation");
 
                 await _groupRepository.SaveGroupAsync(group, cancellationToken);
 

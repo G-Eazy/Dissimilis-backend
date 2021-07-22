@@ -77,7 +77,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             //user 3 is the songOwner of SongPublicGroup1DefOrg
             var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
             ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
-            var CountBefore = await mediator.Send(new QuerySongToLibrary());
+            var CountBefore = await mediator.Send(new QuerySongToLibrary(false));
             ChangeToUserWithAdmin();
 
             var AllSongs = await mediator.Send(new QuerySongSearch(AllSearchQueryDto()));
@@ -88,7 +88,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var transpose = await mediator.Send(new CreateTransposedSongCommand(SongToDuplicateAndTranspose.SongId, new TransposeSongDto() { Title = "TransposeTestSong2", Transpose = -2}));
 
             ChangeToNormalUserOwnerOfSongPublicGroup1DefOrg();
-            var CountAfter = await mediator.Send(new QuerySongToLibrary());
+            var CountAfter = await mediator.Send(new QuerySongToLibrary(false));
             CountAfter.Length.ShouldBe(CountBefore.Length);
             ChangeToUserWithAdmin();
         }
@@ -221,7 +221,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var createSongDto = CreateSongDto(4, 4);
             var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
-            var songDtos = await mediator.Send(new QuerySongToLibrary());
+            var songDtos = await mediator.Send(new QuerySongToLibrary(false));
 
             songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
         }
