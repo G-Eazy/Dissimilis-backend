@@ -66,7 +66,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 highestBarNumber++;
                 while (songVoice.SongBars.Count < maxBarCount)
                 {
-                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToArray();
+                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToList();
                 }
 
                 songVoice.SortBars();
@@ -230,7 +230,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="masterVoice"></param>
         public static void SyncVoicesFrom(this Song song, SongVoice masterVoice)
         {
-            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToArray();
+            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToList();
             if (!otherVoices.Any())
             {
                 return;
@@ -243,8 +243,8 @@ namespace Dissimilis.WebAPI.Extensions.Models
             {
                 foreach (var otherVoice in otherVoices)
                 {
-                    var masterBar = masterVoice.SongBars.ToArray()[i];
-                    var slaveBar = otherVoice.SongBars.ToArray()[i];
+                    var masterBar = masterVoice.SongBars.ToList()[i];
+                    var slaveBar = otherVoice.SongBars.ToList()[i];
 
                     slaveBar.House = masterBar.House;
                     slaveBar.RepAfter = masterBar.RepAfter;

@@ -83,10 +83,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
                 Name = "TestOrg1",
-                Address = "TestAdress1",
-                EmailAddress = "TestOrg1@test.com",
-                Description = "TestDesc1",
-                PhoneNumber = "12345678",
                 FirstAdminId = AdminUser.UserId
             };
             await _mediator.Send(new CreateOrganisationCommand(orgDto));
