@@ -30,6 +30,7 @@ namespace Dissimilis.DbContext.Models.Song
         [MaxLength(500)]
         public string Title { get; set; }
 
+        public DateTimeOffset? Deleted { get; set; }
 
         /// <summary>
         /// The composer of the song

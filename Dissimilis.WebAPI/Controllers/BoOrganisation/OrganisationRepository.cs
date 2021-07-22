@@ -2,6 +2,9 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,21 +12,53 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 {
     public class OrganisationRepository
     {
-        internal readonly DissimilisDbContext context;
-
+        internal DissimilisDbContext Context;
         public OrganisationRepository(DissimilisDbContext context)
         {
-            this.context = context;
+            Context = context;
+        }
+
+        public async Task SaveOrganisationAsync(Organisation organisation, CancellationToken cancellationToken)
+        {
+            await Context.Organisations.AddAsync(organisation, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken)
+        {
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Method to determine if user har permission to do desired operation with organisation object
+        /// Just checks whether user is system admin for now to add organisation.
+        /// Can be extended later.
+        /// </summary>
+        /// <param name="organisation"></param>
+        /// <param name="user"></param>
+        /// <param name="operation"></param>
+        /// <returns></returns>
+        public bool CheckPermission(User user, string operation, CancellationToken cancellationToken)
+        {
+            if (user.IsSystemAdmin)
+                return true;
+            return false;
         }
 
         public async Task<Organisation> GetOrganisationById(int organisationId, CancellationToken cancellationToken)
         {
-            var organisation = await context.Organisations.SingleOrDefaultAsync(o => o.Id == organisationId, cancellationToken);
+            var organisation = await Context.Organisations
+                .SingleOrDefaultAsync(o => o.Id == organisationId, cancellationToken);
 
             if (organisation == null)
             {
                 throw new NotFoundException($"Organisation with Id {organisationId} not found");
-            }
+
+            await Context.OrganisationUsers
+                .Include(o => o.User)
+                .Where(o => o.OrganisationId == organisationId)
+                .LoadAsync(cancellationToken);
+
             return organisation;
         }
     }

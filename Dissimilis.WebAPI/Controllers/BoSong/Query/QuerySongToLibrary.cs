@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+﻿using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using System.Linq;
@@ -7,7 +8,15 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
-    public class QuerySongToLibrary : IRequest<SongIndexDto[]> { }
+    public class QuerySongToLibrary : IRequest<SongIndexDto[]> 
+    { 
+        public bool GetDeleted { get; }
+
+        public QuerySongToLibrary(bool getDeleted = false)
+        {
+            GetDeleted = getDeleted;
+        }
+    }
 
     public class QuerySongToLibraryHandler : IRequestHandler<QuerySongToLibrary, SongIndexDto[]>
     {
@@ -27,7 +36,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
             if (user == null)
                 return null;
 
-            var result = await _repository.GetAllSongsInMyLibrary(user.Id, cancellationToken);
+            Song[] result = null;
+
+            if (!request.GetDeleted)
+                result = await _repository.GetAllSongsInMyLibrary(user.Id, cancellationToken);
+            else
+                result = await _repository.GetMyDeletedSongs(user, cancellationToken);
 
             return result.Select(s => new SongIndexDto(s)).ToArray();
         }

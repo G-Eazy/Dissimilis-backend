@@ -115,5 +115,15 @@ namespace Dissimilis.DbContext
             allSongsWithoutPLevel.ForEach(song => song.ProtectionLevel = ProtectionLevels.Public);
             Context.SaveChanges();
         }
+
+        public static void UpdateAllSongsDeletedStatus(DissimilisDbContext Context)
+        {
+            var allSongs = Context.Songs;
+            foreach(var song in allSongs)
+            {
+                //song.Deleted = null;
+            }
+            Context.SaveChanges();
+        }
     }
 }

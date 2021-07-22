@@ -27,10 +27,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
     public class RemoveTagGroupCommandHandler : IRequestHandler<UpdateTagGroupCommand, ShortGroupDto[]>
     {
         private readonly SongRepository _songRepository;
-        private readonly OrganisationRepository _groupRepository;
+        private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
 
-        public RemoveTagGroupCommandHandler(SongRepository songRepository, OrganisationRepository groupRepository, IAuthService IAuthService)
+        public RemoveTagGroupCommandHandler(SongRepository songRepository, GroupRepository groupRepository, IAuthService IAuthService)
         {
             _songRepository = songRepository;
             _groupRepository = groupRepository;
