@@ -41,9 +41,9 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             return new UpdateGroupAndOrganisationDto()
             {
-                Name = "test",
+                Name = "test12345",
                 Address = "address123",
-                EmailAddress = "email@address.no",
+                Email = "yeet",
                 Description = "maybe",
                 PhoneNumber = "12345678"
             };
@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
-                Name = "TestOrg1",
+                Name = "TestOrg11234",
                 FirstAdminId = AdminUser.UserId
             };
 
@@ -64,7 +64,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            org.Name.ShouldBeEquivalentTo("TestOrg3", "Creation of organisation failed");
+            org.Name.ShouldBeEquivalentTo("TestOrg11234", "Creation of organisation failed");
 
             //Change user and provoke exception
             TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
@@ -96,10 +96,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
                 Name = "TestOrg1",
-                Address = "TestAdress1",
-                EmailAddress = "TestOrg1@test.com",
-                Description = "TestDesc1",
-                PhoneNumber = "12345678",
                 FirstAdminId = AdminUser.UserId
             };
             await _mediator.Send(new CreateOrganisationCommand(orgDto));
@@ -113,10 +109,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
             {
                 Name = "TestOrg4",
-                Address = "TestAdress1",
-                EmailAddress = "TestOrg1@test.com",
-                Description = "TestDesc1",
-                PhoneNumber = "12345678",
                 FirstAdminId = AdminUser.UserId
             };
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
@@ -128,7 +120,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
             updatedOrg.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedOrg.EmailAddress.ShouldBeEquivalentTo(updateDto.EmailAddress, "Email was not updated");
+            updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedOrg.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
         }

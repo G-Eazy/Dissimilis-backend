@@ -50,12 +50,9 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
                 await _groupRepository.SaveGroupAsync(group, cancellationToken);
 
-            var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminGroupUser = new GroupUser(group.Id, adminUser.Id, Role.Admin);
-            group.Users.Add(adminGroupUser);
-            currentUser.Groups.Add(adminGroupUser);
-            await _groupRepository.UpdateAsync(cancellationToken);
-            await _userRepository.UpdateAsync(cancellationToken);
+            //var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
+            var adminGroupUser = new GroupUser(group.Id, request.Command.FirstAdminId, Role.Admin);
+            await _groupRepository.SaveGroupUserAsync(adminGroupUser, cancellationToken);
 
             return new UpdatedGroupCommandDto(group);
         }

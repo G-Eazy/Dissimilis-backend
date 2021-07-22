@@ -25,6 +25,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task SaveGroupUserAsync(GroupUser groupUser, CancellationToken cancellationToken)
+        {
+            await Context.GroupUsers.AddAsync(groupUser, cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
             await Context.SaveChangesAsync(cancellationToken);

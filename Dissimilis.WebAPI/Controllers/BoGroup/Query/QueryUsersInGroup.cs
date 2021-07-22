@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using MediatR;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoGroup;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Controllers.Bousers.Query
+namespace Dissimilis.WebAPI.Controllers.BoGroup.Query
 {
     public class QueryUsersInGroup : IRequest<UserDto[]>{ 
         

@@ -21,7 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut
         {
             Name = organisation.Name;
             OrganisationName = organisation.Name;
-            EmailAddress = organisation.EmailAddress;
+            Email = organisation.Email;
             Id = organisation.Id;
             Address = organisation.Address;
             PhoneNumber = organisation.PhoneNumber;

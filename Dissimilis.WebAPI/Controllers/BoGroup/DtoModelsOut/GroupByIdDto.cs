@@ -26,7 +26,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut
             Name = group.Name;
             OrganisationId = group.OrganisationId;
             OrganisationName = group.Organisation.Name;
-            EmailAddress = group.EmailAddress;
+            EmailAddress = group.Email;
             GroupId = group.Id;
             Address = group.Address;
             PhoneNumber = group.PhoneNumber;

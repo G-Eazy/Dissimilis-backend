@@ -65,9 +65,12 @@ namespace Dissimilis.WebAPI.Services
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<OrganisationUser> GetOrgAdminIfExists(Organisation organisation, User user, CancellationToken cancellationToken)
-        { 
-            var orgUser = await _dbContext.OrganisationUsers
-                .SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisation.Id && ou.Role == Role.Admin);
+        {
+            var orgUser = await _dbContext.OrganisationUsers.SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisation.Id && ou.Role == Role.Admin);
+            //string usersString = "";
+            //foreach (var userr in orgUser) usersString += ($"\n{userr.UserId} - {userr.Role}");
+            //throw new NotFoundException($"OrgId was {organisation.Id}\nOrgName was {organisation.Name}\nCreated by {organisation.CreatedBy.Name}, with ID: {organisation.CreatedBy.Id}\nLength of orgusers was {orgUser.Count}\nRequested admin user was {user.Name}, with ID: {user.Id}\nActual users were: {usersString}");
+
             return orgUser;
         }
 
@@ -116,7 +119,7 @@ namespace Dissimilis.WebAPI.Services
             if (group.Id != 0)
                 groupAdmin = await GetGroupAdminIfExists(group, user, cancellationToken);
 
-            if(groupAdmin != null && (op == Operation.Create || op != Operation.Delete))
+            if(groupAdmin != null && (op != Operation.Create || op != Operation.Delete))
                 isAllowed = true;
 
             return isAllowed;

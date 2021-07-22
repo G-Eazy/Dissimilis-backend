@@ -2,14 +2,11 @@
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
