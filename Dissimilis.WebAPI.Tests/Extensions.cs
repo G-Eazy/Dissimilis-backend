@@ -17,9 +17,6 @@ namespace Dissimilis.WebAPI.xUnit
 {
     internal static class Extensions
     {
-
-        internal const string DefaultTestSongTitle = "TestSong";
-
         internal static void CheckSongVoiceIntegrity(SongByIdDto songDto, string stepDescription)
         {
             var refVoice = songDto.Voices.FirstOrDefault();
@@ -79,7 +76,7 @@ namespace Dissimilis.WebAPI.xUnit
             }
         }
 
-        internal static CreateSongDto CreateSongDto(int numerator = 4, int denominator = 4, string title = DefaultTestSongTitle)
+        internal static CreateSongDto CreateSongDto(string title, int numerator = 4, int denominator = 4)
         {
             return new CreateSongDto()
             {
