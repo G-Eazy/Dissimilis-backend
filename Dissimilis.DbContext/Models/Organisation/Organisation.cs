@@ -32,7 +32,7 @@ namespace Dissimilis.DbContext.Models
         public string? PhoneNumber { get; set; }
 
         [MaxLength(100)]
-        public string? EmailAddress { get; set; }
+        public string? Email { get; set; }
 
         [MaxLength(300)]
         public string? Description { get; set; }
@@ -68,13 +68,9 @@ namespace Dissimilis.DbContext.Models
         /// <param name="email"></param>
         /// <param name="description"></param>
         /// <param name="createdById"></param>
-        public Organisation(string name, string address, string email, string description, string phoneNumber, int createdById)
+        public Organisation(string name, int createdById)
         {
             Name = name;
-            Address = address;
-            EmailAddress = email;
-            Description = description;
-            PhoneNumber = phoneNumber; 
             CreatedById = createdById;
             CreatedOn = DateTimeOffset.Now;
         }

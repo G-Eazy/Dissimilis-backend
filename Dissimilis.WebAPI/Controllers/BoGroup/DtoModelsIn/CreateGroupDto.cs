@@ -1,13 +1,15 @@
-﻿namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn
 {
     public class CreateGroupDto
     {
+        [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
+        [Required]
         public int OrganisationId { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public string EmailAddress { get; set; }
-        public string Description { get; set; }
+        [Required]
         public int FirstAdminId { get; set; }
     }
 }

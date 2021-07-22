@@ -19,7 +19,7 @@ namespace Dissimilis.DbContext.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Organisations",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -43,7 +43,7 @@ namespace Dissimilis.DbContext.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Groups",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -66,7 +66,7 @@ namespace Dissimilis.DbContext.Migrations
                 table: "Organisations");
 
             migrationBuilder.DropColumn(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Organisations");
 
             migrationBuilder.DropColumn(
@@ -82,7 +82,7 @@ namespace Dissimilis.DbContext.Migrations
                 table: "Groups");
 
             migrationBuilder.DropColumn(
-                name: "EmailAddress",
+                name: "Email",
                 table: "Groups");
 
             migrationBuilder.DropColumn(

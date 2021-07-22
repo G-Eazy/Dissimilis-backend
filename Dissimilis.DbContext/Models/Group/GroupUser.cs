@@ -1,4 +1,5 @@
 ﻿using Dissimilis.DbContext.Models.Enums;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.DbContext.Models

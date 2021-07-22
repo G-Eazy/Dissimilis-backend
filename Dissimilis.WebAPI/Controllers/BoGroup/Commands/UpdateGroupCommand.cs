@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -22,11 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class UpdateGroupCommandHandler : IRequestHandler<UpdateGroupCommand, UpdatedGroupCommandDto>
     {
+        private readonly IPermissionCheckerService _permissionChecker;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public UpdateGroupCommandHandler(GroupRepository groupRepository, IAuthService authService)
+        public UpdateGroupCommandHandler(IPermissionCheckerService permissionChecker, GroupRepository groupRepository, IAuthService authService)
         {
+            _permissionChecker = permissionChecker;
             _groupRepository = groupRepository;
             _authService = authService;
         }
@@ -35,14 +37,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
-            var hasPermission = await _groupRepository.CheckPermission(group, currentUser, "modify", cancellationToken);
+            var isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
 
-            if (!hasPermission)
+            if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update Group");
 
             group.Name = request.Command?.Name ?? group.Name;
             group.Address = request.Command?.Address ?? group.Address;
-            group.EmailAddress = request.Command?.EmailAddress ?? group.EmailAddress;
+            group.Email = request.Command?.Email ?? group.Email;
             group.Description = request.Command?.Description ?? group.Description;
             group.PhoneNumber = request.Command?.PhoneNumber ?? group.PhoneNumber;
 

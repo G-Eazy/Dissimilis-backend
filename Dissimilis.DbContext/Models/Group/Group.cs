@@ -30,7 +30,7 @@ namespace Dissimilis.DbContext.Models
         public string? PhoneNumber { get; set; }
 
         [MaxLength(100)]
-        public string? EmailAddress { get; set; }
+        public string? Email { get; set; }
 
         [MaxLength(300)]
         public string? Description { get; set; }
@@ -69,14 +69,10 @@ namespace Dissimilis.DbContext.Models
         /// <param name="phoneNumber"></param>
         /// <param name="email"></param>
         /// <param name="description"></param>
-        public Group(string name, int organisationId, string address, string phoneNumber, string email, string description, int createdById)
+        public Group(string name, int organisationId, int createdById)
         {
             Name = name;
             OrganisationId = organisationId;
-            Address = address;
-            PhoneNumber = phoneNumber;
-            EmailAddress = email;
-            Description = description;
             CreatedOn = DateTimeOffset.Now;
             CreatedById = createdById;
         }

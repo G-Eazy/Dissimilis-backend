@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -22,11 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class UpdateOrganisationCommandHandler : IRequestHandler<UpdateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
+        private readonly IPermissionCheckerService _permissionChecker;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public UpdateOrganisationCommandHandler(OrganisationRepository organisationRepository, IAuthService authService)
+        public UpdateOrganisationCommandHandler(IPermissionCheckerService permissionChecker, OrganisationRepository organisationRepository, IAuthService authService)
         {
+            _permissionChecker = permissionChecker;
             _organisationRepository = organisationRepository;
             _authService = authService;
         }
@@ -35,14 +37,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
-            var hasPermission = await _organisationRepository.CheckPermission(organisation, currentUser, "modify", cancellationToken);
+            var isAllowed = await _permissionChecker.CheckPermission(organisation, currentUser, Operation.Modify, cancellationToken);
 
-            if (!hasPermission)
+            if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update organisation");
 
             organisation.Name = request.Command?.Name ?? organisation.Name;
             organisation.Address = request.Command?.Address ?? organisation.Address;
-            organisation.EmailAddress = request.Command?.EmailAddress ?? organisation.EmailAddress;
+            organisation.Email = request.Command?.Email ?? organisation.Email;
             organisation.Description = request.Command?.Description ?? organisation.Description;
             organisation.PhoneNumber = request.Command?.PhoneNumber ?? organisation.PhoneNumber;
 

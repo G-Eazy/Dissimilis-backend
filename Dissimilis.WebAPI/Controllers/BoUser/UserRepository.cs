@@ -144,5 +144,10 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 GroupAdmin = groupAdmin
             };
         }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken)
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
