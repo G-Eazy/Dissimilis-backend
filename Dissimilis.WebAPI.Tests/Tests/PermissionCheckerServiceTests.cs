@@ -59,7 +59,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task CreateOrgAsGroupAdminShouldReturnFalse()
         {
             Organisation org = new Organisation("testOrg69", NorwayAdminUser.Id);
-            var allowed = await _permissionChecker.CheckPermission(org, TrondheimAdminUser, Operation.Create, c);
+            var allowed = await _permissionChecker.CheckPermission(org, BergenAdminUser, Operation.Create, c);
             Assert.False(allowed);
         }
 
@@ -96,7 +96,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task UpdateOrgAsGroupAdminShouldReturnFalse()
         {
             var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, TrondheimAdminUser, Operation.Modify, c);
-            Assert.False(allowed);
+            Assert.False(allowed, $"TrondheimAdminUser is role: {BergenAdminUser.Organisations.ElementAt(0).Role}"); ;
         }
 
         [Fact]
