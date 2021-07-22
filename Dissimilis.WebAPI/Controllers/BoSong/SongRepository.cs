@@ -46,19 +46,28 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<Song> GetSongWithTagsSharedUsers(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
-                .Include(s => s.SharedUsers)
-                .ThenInclude(u => u.User)
-                .Include(s => s.SharedOrganisations)
-                .ThenInclude(o => o.Organisation)
-                .Include(s => s.SharedGroups)
-                .ThenInclude(g => g.Group)
-                .AsSplitQuery()
                 .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
 
             if (song == null)
             {
                 throw new NotFoundException($"Song with Id {songId} not found");
             }
+
+            await Context.SongSharedUser
+                .Include(su => su.User)
+                .Where(su => su.SongId == song.Id)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongSharedGroups
+                .Include(su => su.Group)
+                .Where(su => su.SongId == song.Id)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongSharedOrganisations
+                .Include(su => su.Organisation)
+                .Where(su => su.SongId == song.Id)
+                .LoadAsync(cancellationToken);
+
             return song;
         }
 
