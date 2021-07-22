@@ -11,6 +11,7 @@ using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.Bousers.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -74,6 +75,23 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             result.Name.ShouldBeEquivalentTo(name, "Organisation creation failed");
             result.admins[0].UserId.ShouldBe(AdminUser.UserId, "Organisation creation failed");
+        }
+
+        [Fact]
+        public async Task TestGetAllUsersInOrganisation()
+        {
+            CreateOrganisationDto orgDto = new CreateOrganisationDto()
+            {
+                Name = "TestOrg1",
+                Address = "TestAdress1",
+                EmailAddress = "TestOrg1@test.com",
+                Description = "TestDesc1",
+                PhoneNumber = "12345678",
+                FirstAdminId = AdminUser.UserId
+            };
+            await _mediator.Send(new CreateOrganisationCommand(orgDto));
+            var users = await _mediator.Send(new QueryUsersInOrganisation(1));
+            users.Length.ShouldBeGreaterThan(0, "Did not get all users");
         }
     }
 }
