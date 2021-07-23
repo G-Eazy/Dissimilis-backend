@@ -17,6 +17,18 @@ namespace Dissimilis.WebAPI.Extensions.Models
     public static class SongExtension
     {
         /// <summary>
+        /// Return true if the given user have readpermission on the song in the expression
+        /// </summary>
+        /// <param name="user"> The user to chek for</param>
+        /// <returns> true if readpermission</returns>
+        public static Expression<Func<Song, bool>> ReadAccessToSong(User user)
+        {
+            return (song => song.ProtectionLevel == ProtectionLevels.Public
+            || song.ArrangerId == user.Id
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
+        }
+
+        /// <summary>
         /// Get max bar positions for a song
         /// </summary>
         /// <param name="song"></param>

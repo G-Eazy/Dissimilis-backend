@@ -219,6 +219,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.OrganisationTags)
                 .AsSplitQuery()
                 .AsQueryable()
+                .Where(SongExtension.ReadAccessToSong(user))
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
                 .Take(searchCommand.MaxNumberOfSongs)

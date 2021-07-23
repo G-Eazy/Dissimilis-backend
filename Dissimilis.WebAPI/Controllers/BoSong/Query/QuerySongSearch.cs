@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
@@ -39,13 +40,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
             var currentUser = _authService.GetVerifiedCurrentUser();
 
             var result = await _repository.GetSongSearchList(currentUser, request.Command, cancellationToken);
-            foreach (var song in result)
-            {
-                if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Get, cancellationToken))
-                {
-                    result.Remove(song);
-                }
-            }
             return result.Select(s => new SongIndexDto(s)).ToArray();
         }
     }
