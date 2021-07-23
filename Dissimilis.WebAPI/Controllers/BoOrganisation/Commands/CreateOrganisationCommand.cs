@@ -50,12 +50,8 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 
-            var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminOrgUser = new OrganisationUser(organisation.Id, adminUser.Id, Role.Admin);
-            organisation.Users.Add(adminOrgUser);
-            currentUser.Organisations.Add(adminOrgUser);
-            await _organisationRepository.UpdateAsync(cancellationToken);
-            await _userRepository.UpdateAsync(cancellationToken);
+            var adminOrgUser = new OrganisationUser(organisation.Id, request.Command.FirstAdminId, Role.Admin);
+            await _organisationRepository.SaveOrgUserAsync(adminOrgUser, cancellationToken);
 
             return new UpdatedOrganisationCommandDto(organisation);
         }
