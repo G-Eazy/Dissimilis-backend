@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
         public async Task<GroupByIdDto> Handle(QueryGroupById request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
+            var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
 
             if (group == null)
                 throw new NotFoundException($"Group with Id {request.GroupId} not found");

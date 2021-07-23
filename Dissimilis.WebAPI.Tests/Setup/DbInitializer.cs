@@ -82,7 +82,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 var usersToAdd = _dbContext.Users.Where(dbUser => dbUser.Email.Contains(orgEmailDomain));
                 foreach (var user in usersToAdd)
                 {
-                    var role = user.Email.Split("@")[0] == "Admin" ? Role.Admin : Role.Member;
+                    var role = user.Email.Split("@")[0] == "OrgAdmin" ? Role.Admin : Role.Member;
                     AddMemberToOrganisation(organisation, user, role);
                 }
             }
@@ -127,7 +127,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 var usersToAdd = _dbContext.Users.Where(dbUser => dbUser.Email.Contains(groupEmailDomain));
                 foreach (var user in usersToAdd)
                 {
-                    var role = user.Email.Split("@")[0] == "Admin" ? Role.Admin : Role.Member;
+                    var role = user.Email.Split("@")[0] == "GroupAdmin" ? Role.Admin : Role.Member;
                     AddMemberToGroup(group, user, role);
                 }
             }
