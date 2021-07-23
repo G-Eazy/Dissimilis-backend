@@ -87,57 +87,30 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task CreateGroupWithSysAdminShouldSucceed()
+        public async Task CreateGroupShouldSucceed()
         {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(123, SuppUser1.UserId);
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
 
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
+            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, NorwayOrganisation.Id, TrondheimAdminUser.Id)));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
         }
 
         [Fact]
-        public async Task CreateGroupWithOrgAdminShouldSucceed() {
-            // Should be allowed, since SuppUser1 is admin of org
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
-            TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
-            var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(5, org.Id, SuppUser2.UserId)));
-            var group2 = await _mediator.Send(new QueryGroupById(item2.GroupId));
-            group2.Name.ShouldBeEquivalentTo("TestGroup5", "Group creation failed");
-        }
-
-        [Fact]
-        public async Task CreateGroupWithoutAdminShouldFail() {
-            // Should throw exception, since SuppUser2 is not sysadmin or orgadmin
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(2, SuppUser1.UserId);
-            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(6, org.Id, SuppUser1.UserId))));
-            exception.Message.ShouldBeEquivalentTo("User does not have permission to create group in organisation", "Correct exception was not thrown");
-        }
-
-        [Fact]
-        public async Task TestGetAllUsersInGroup()
+        public async Task TestGetUsersInGroup()
         {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(3, SuppUser1.UserId);
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(4, org.Id, SuppUser1.UserId)));
-            var users = await _mediator.Send(new QueryUsersInGroup(1));
-            users.Length.ShouldBeGreaterThan(0, "Did not get all users");
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var users = await _mediator.Send(new QueryUsersInGroup(TrondheimGroup.Id));
+            users.Length.ShouldBeGreaterThan(0, "Did not all users");
         }
 
         [Fact]
-        public async Task UpdateGroupAsSysadminShouldSucceed()
+        public async Task UpdateGroupShouldSucceed()
         {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(4, SuppUser1.UserId);
-            var item = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(10, org.Id, SuppUser1.UserId)));
-            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
 
             var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateGroupCommand(group.GroupId, updateDto));
+            var updateItem = await _mediator.Send(new UpdateGroupCommand(TrondheimGroup.Id, updateDto));
             var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
 
             updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
@@ -145,60 +118,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
-        }
-
-        [Fact]
-        public async Task UpdateGroupAsOrgAdminShouldSucceed()
-        {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(5, SuppUser1.UserId);
-            TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
-            var item = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(11, org.Id, SuppUser1.UserId)));
-            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
-
-            var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateGroupCommand(group.GroupId, updateDto));
-            var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
-
-            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
-            updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
-            updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
-            updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
-        }
-
-        [Fact]
-        public async Task UpdateGroupAsGroupAdminShouldSucceed()
-        {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(6, SuppUser1.UserId);
-            var item = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(12, org.Id, SuppUser2.UserId)));
-            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
-
-            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
-            var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateGroupCommand(group.GroupId, updateDto));
-            var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
-
-            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
-            updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
-            updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
-            updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
-        }
-
-        [Fact]
-        public async Task UpdateGroupAsGroupMemberShouldFail()
-        {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(7, SuppUser1.UserId);
-            var item = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(13, org.Id, SuppUser2.UserId)));
-            var group = await _mediator.Send(new QueryGroupById(item.GroupId));
-
-            TestServerFixture.ChangeCurrentUserId(SuppUser3.UserId);
-            var updateDto = GetUpdateGroupAndOrganisationDto();
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new UpdateGroupCommand(group.GroupId, updateDto)));
-            exception.Message.ShouldBeEquivalentTo("User does not have permission to Update Group", "Correct exception was not thrown");
         }
     }
 }

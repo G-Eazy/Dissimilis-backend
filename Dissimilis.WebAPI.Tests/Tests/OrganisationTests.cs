@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task CreateOrganisationAsSysAdminShouldSucceed()
+        public async Task CreateOrganisationShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             CreateOrganisationDto orgDto = new CreateOrganisationDto()
@@ -52,38 +52,9 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             org.Name.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
         }
 
-        [Fact]
-        public async Task CreateOrganisationAsOrgAdminShouldFail()
-        {
-            //Change user and provoke exception
-            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
-            CreateOrganisationDto orgDto = new CreateOrganisationDto()
-            {
-                Name = "TestOrg2",
-                FirstAdminId = GuatemalaAdminUser.Id
-            };
-
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateOrganisationCommand(orgDto)));
-            exception.Message.ShouldBeEquivalentTo("User does not have permission to create organisation", "Error did not match");
-        }
 
         [Fact]
-        public async Task CreateOrganisationAsGroupAdminShouldFail()
-        {
-            //Change user and provoke exception
-            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
-            CreateOrganisationDto orgDto = new CreateOrganisationDto()
-            {
-                Name = "TestOrg3",
-                FirstAdminId = GuatemalaAdminUser.Id
-            };
-
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateOrganisationCommand(orgDto)));
-            exception.Message.ShouldBeEquivalentTo("User does not have permission to create organisation", "Error did not match");
-        }
-
-        [Fact]
-        public async Task TestGetAllUsersInOrganisationAsSysAdminShouldSucceed()
+        public async Task GetUsersInOrganisationShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             var users = await _mediator.Send(new QueryUsersInOrganisation(NorwayOrganisation.Id));
@@ -91,11 +62,11 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestUpdateOrganisationAsSysAdminShouldSucceed()
+        public async Task UpdateOrganisationShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateOrganisationCommand(NorwayOrganisation.Id, updateDto));
+            var updateItem = await _mediator.Send(new UpdateOrganisationCommand(GuatemalaOrganisation.Id, updateDto));
             var updatedOrg = await _mediator.Send(new QueryOrganisationById(updateItem.OrganisationId));
 
             updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");

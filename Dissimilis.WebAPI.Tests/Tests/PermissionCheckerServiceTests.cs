@@ -1,19 +1,7 @@
 ﻿using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
-using Shouldly;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
-using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
-using Dissimilis.WebAPI.Services;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using System.Threading;
@@ -39,6 +27,9 @@ namespace Dissimilis.WebAPI.xUnit.Tests
          * ***********************************************
          */ 
 
+
+        // Create
+
         [Fact]
         public async Task CreateOrgAsSysAdminShouldReturnTrue()
         {
@@ -59,7 +50,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task CreateOrgAsGroupAdminShouldReturnFalse()
         {
             Organisation org = new Organisation("testOrg69", NorwayAdminUser.Id);
-            var allowed = await _permissionChecker.CheckPermission(org, BergenAdminUser, Operation.Create, c);
+            var allowed = await _permissionChecker.CheckPermission(org, TrondheimAdminUser, Operation.Create, c);
             Assert.False(allowed);
         }
 
@@ -70,6 +61,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var allowed = await _permissionChecker.CheckPermission(org, DeepPurpleFanUser, Operation.Create, c);
             Assert.False(allowed);
         }
+
+        // Update
 
         [Fact]
         public async Task UpdateOrgAsSysAdminShouldReturnTrue()
@@ -106,11 +99,64 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             Assert.False(allowed);
         }
 
+        // Delete
+
         [Fact]
         public async Task DeleteOrgAsSysAdminShouldReturnTrue()
         {
             var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, SysAdminUser, Operation.Delete, c);
             Assert.True(allowed);
+        }
+
+        [Fact]
+        public async Task DeleteOrgAsOrgAdminShouldReturnFalse()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, NorwayAdminUser, Operation.Delete, c);
+            Assert.False(allowed);
+        }
+
+        [Fact]
+        public async Task DeleteOrgAsGroupAdminShouldReturnFalse()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, TrondheimAdminUser, Operation.Delete, c);
+            Assert.False(allowed);
+        }
+
+        [Fact]
+        public async Task DeleteOrgAsOrgMemberShouldReturnFalse()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, DeepPurpleFanUser, Operation.Delete, c);
+            Assert.False(allowed);
+        }
+
+        // Get
+
+        [Fact]
+        public async Task GetOrgAsSysAdminShouldReturnTrue()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, SysAdminUser, Operation.Get, c);
+            Assert.True(allowed);
+        }
+
+        [Fact]
+        public async Task GetOrgAsOrgAdminShouldReturnTrue()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, NorwayAdminUser, Operation.Get, c);
+            Assert.True(allowed);
+        }
+
+        [Fact]
+        public async Task GetOrgAsGroupAdminShouldReturnFalse()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, TrondheimAdminUser, Operation.Get, c);
+            Assert.False(allowed);
+        }
+
+        [Fact]
+        public async Task GetOrgAsOrgMemberShouldReturnFalse()
+        {
+            var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, DeepPurpleFanUser, Operation.Get, c);
+            Assert.False(allowed);
         }
 
         /*
