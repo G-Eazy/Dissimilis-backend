@@ -29,7 +29,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// Create group
         /// </summary>
-        [HttpPost]
+        [HttpPost("group")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto command)

@@ -11,12 +11,12 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
 {
     public class QueryGetOrganisations : IRequest<OrganisationIndexDto[]>
     {
-        public string FilterBy { get; }
+        public string FilterByRole { get; }
         public int? OrganisationId { get; }
 
-        public QueryGetOrganisations(string filterBy)
+        public QueryGetOrganisations(string filterByRole)
         {
-            FilterBy = filterBy;
+            FilterByRole = filterByRole;
         }
     }
 
@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
         public async Task<OrganisationIndexDto[]> Handle(QueryGetOrganisations request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var result = await _repository.GetOrganisations(request.FilterBy, currentUser, cancellationToken);
+            var result = await _repository.GetOrganisations(request.FilterByRole, currentUser, cancellationToken);
 
             return result.Select(organisation => new OrganisationIndexDto(organisation)).ToArray();
         }
