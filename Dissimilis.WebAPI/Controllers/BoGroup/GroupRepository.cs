@@ -3,8 +3,6 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +11,8 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
     public class GroupRepository
     {
-        internal DissimilisDbContext Context;
+        internal readonly DissimilisDbContext Context;
+        
         public GroupRepository(DissimilisDbContext context)
         {
             Context = context;
@@ -22,7 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         public async Task SaveGroupAsync(Group group, CancellationToken cancellationToken)
         {
             await Context.Groups.AddAsync(group, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(CancellationToken cancellationToken)
@@ -30,7 +29,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Group> GetGroupById(int groupId, CancellationToken cancellationToken)
+        public async Task<Group> GetGroupByIdAsync(int groupId, CancellationToken cancellationToken)
         {
             var group = await Context.Groups
                 .Include(g => g.Organisation)
@@ -45,6 +44,44 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
                 .LoadAsync(cancellationToken);
 
             return group;
+        }
+        internal async Task<GroupUser> GetGroupUserAsync(int userId, int groupId, CancellationToken cancellationToken)
+        {
+            return await Context.GroupUsers.FindAsync(userId, groupId);
+        }
+
+        internal async Task<bool> CheckUserAdminAsync(int userId, int groupId, CancellationToken cancellationToken)
+        {
+            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken);
+            return groupUser?.Role == Role.Admin;
+        }
+
+        internal async Task<bool> IsUserLastAdmin(int userId, int groupId, CancellationToken cancellationToken)
+        {
+            return await CheckUserAdminAsync(userId, groupId, cancellationToken)
+                    && !CheckIfAnotherGroupAdminExists(userId, groupId);
+        }
+
+        internal bool CheckIfAnotherGroupAdminExists(int userId, int groupId)
+        {
+            return Context.GroupUsers.Any(groupUser =>
+                groupUser.GroupId == groupId
+                && groupUser.UserId != userId
+                && groupUser.Role == Role.Admin);
+        }
+
+        internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, Role role, CancellationToken cancellationToken)
+        {
+            var groupUser = await Context.GroupUsers.AddAsync(new GroupUser() { GroupId = groupId, UserId = userId, Role = role }, cancellationToken);
+
+            return groupUser.Entity;
+        }
+
+        internal async Task<GroupUser> RemoveUserFromGroupAsync(int userId, int groupId, CancellationToken cancellationToken)
+        {
+            var groupUserToDelete = await GetGroupUserAsync(userId, groupId, cancellationToken);
+            Context.GroupUsers.Remove(groupUserToDelete);
+            return groupUserToDelete;
         }
     }
 }

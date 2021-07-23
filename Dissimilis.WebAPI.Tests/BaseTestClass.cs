@@ -25,6 +25,7 @@ namespace Dissimilis.WebAPI.xUnit
         internal User EdvardGriegFanUser;
         internal User JustinBieberFanUser;
         internal User RammsteinFanUser;
+        internal User U2FanUser;
         internal User NoSongsUser;
 
         internal Song LisaGikkTilSkolenSong;
@@ -66,6 +67,7 @@ namespace Dissimilis.WebAPI.xUnit
             EdvardGriegFanUser = users.SingleOrDefault(user => user.Email == "Edvard_Grieg_fan@Sandvika_Norway.no");
             JustinBieberFanUser = users.SingleOrDefault(user => user.Email == "Justin_Bieber_fan@Norway.no");
             RammsteinFanUser = users.SingleOrDefault(user => user.Email == "Rammstein_fan@Norway.no");
+            U2FanUser = users.SingleOrDefault(user => user.Email == "U2_fan@Sandvika_Norway.no");
             NoSongsUser = users.SingleOrDefault(user => user.Email == "NoSongs@Norway.no");
         }
 

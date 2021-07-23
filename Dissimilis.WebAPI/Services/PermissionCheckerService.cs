@@ -39,51 +39,48 @@ namespace Dissimilis.WebAPI.Services
         /// <returns></returns>
         public async Task<bool> CheckPermission(Organisation organisation, User user, Operation op, CancellationToken cancellationToken)
         {
-            if (user.IsSystemAdmin)
-                return true;
-
-            bool isAllowed = false;
-
-            OrganisationUser orgAdmin = null;
-            if (organisation.Id != null)
-                orgAdmin = await GetOrgAdminIfExists(organisation, user, cancellationToken);
-
-            if (orgAdmin != null && (op == Operation.Create || op != Operation.Delete))
-            {
-                isAllowed = true;
-            }
-
-            return isAllowed;
+            return user.IsSystemAdmin
+                    || (await IsOrganisationAdmin(organisation.Id, user.Id, cancellationToken)
+                        && op != Operation.Delete
+                        && op != Operation.Create);
         }
 
         /// <summary>
         /// Helper method to fetch a user from an organisations admins if specified user is an admin in said org.
         /// Returns null if user is not.
         /// </summary>
-        /// <param name="organisation"></param>
-        /// <param name="user"></param>
+        /// <param name="organisationId"></param>
+        /// <param name="userId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<OrganisationUser> GetOrgAdminIfExists(Organisation organisation, User user, CancellationToken cancellationToken)
+        private async Task<bool> IsOrganisationAdmin(int organisationId, int userId, CancellationToken cancellationToken)
         { 
-            var orgUser = await _dbContext.OrganisationUsers
-                .SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisation.Id && ou.Role == Role.Admin);
-            return orgUser;
+            return await _dbContext
+                .OrganisationUsers
+                .AnyAsync(ou =>
+                    ou.UserId == userId
+                    && ou.OrganisationId == organisationId
+                    && ou.Role == Role.Admin
+                    , cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Helper method to fetch a user from a groups admins if specified user is an admin in said group.
         /// Returns null if user is not.
         /// </summary>
-        /// <param name="group"></param>
-        /// <param name="user"></param>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<GroupUser> GetGroupAdminIfExists(Group group, User user, CancellationToken cancellationToken)
+        private async Task<bool> IsGroupAdmin(int groupId, int userId, CancellationToken cancellationToken)
         {
-            var groupUser = await _dbContext.GroupUsers
-                .SingleOrDefaultAsync(gu => gu.UserId == user.Id && gu.GroupId == group.Id && gu.Role == Role.Admin);
-            return groupUser;
+            return await _dbContext
+                .GroupUsers
+                .AnyAsync(gu =>
+                    gu.UserId == userId
+                    && gu.GroupId == groupId
+                    && gu.Role == Role.Admin
+                    , cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -102,26 +99,11 @@ namespace Dissimilis.WebAPI.Services
         /// <returns></returns>
         public async Task<bool> CheckPermission(Group group, User user, Operation op, CancellationToken cancellationToken)
         {
-            if (user.IsSystemAdmin)
-                return true;
-
-            var parentOrganisation = await _dbContext.Organisations
-                .SingleOrDefaultAsync(o => o.Id == group.OrganisationId);
-            var orgAdmin = await GetOrgAdminIfExists(parentOrganisation, user, cancellationToken);
-            if (orgAdmin != null)
-                return true;
-
-            bool isAllowed = false;
-            GroupUser groupAdmin = null;
-            if (group.Id != null)
-                groupAdmin = await GetGroupAdminIfExists(group, user, cancellationToken);
-
-            if(groupAdmin != null && (op == Operation.Create || op != Operation.Delete))
-            {
-                isAllowed = true;
-            }
-
-            return isAllowed;
+            return user.IsSystemAdmin
+                    || await IsOrganisationAdmin(group.OrganisationId, user.Id, cancellationToken)
+                    || (await IsGroupAdmin(group.Id, user.Id, cancellationToken)
+                        && op != Operation.Delete
+                        && op != Operation.Create);
         }
     }
 }

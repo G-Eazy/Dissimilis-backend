@@ -81,12 +81,12 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
-                    Name = "GroupAdminSandvikaUser",
+                    Name = "GroupAdminBergenUser",
                     Email = "GroupAdmin@Bergen_Norway.no",
                 },
                 new User()
                 {
-                    Name = "GroupAdminSandvikaUser",
+                    Name = "GroupAdminTrondheimUser",
                     Email = "GroupAdmin@Trondheim_Norway.no",
                 },
                 new User()
@@ -113,6 +113,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Rammstein fan",
                     Email = "Rammstein_fan@Norway.no",
+                },
+                new User()
+                {
+                    Name = "U2 fan",
+                    Email = "U2_fan@Sandvika_Norway.no",
                 },
                 new User()
                 {
