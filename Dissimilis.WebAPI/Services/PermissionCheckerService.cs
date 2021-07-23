@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Dissimilis.DbContext.Models.Enums;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Services
 {
@@ -39,50 +40,10 @@ namespace Dissimilis.WebAPI.Services
         /// <returns></returns>
         public async Task<bool> CheckPermission(Organisation organisation, User user, Operation op, CancellationToken cancellationToken)
         {
-            if (user.IsSystemAdmin)
-                return true;
-
-            bool isAllowed = false;
-
-            OrganisationUser orgAdmin = null;
-            if (organisation.Id != 0)
-                orgAdmin = await GetOrgAdminIfExists(organisation, user, cancellationToken);
-
-            if (orgAdmin != null && (op == Operation.Create || op != Operation.Delete))
-            {
-                isAllowed = true;
-            }
-
-            return isAllowed;
-        }
-
-        /// <summary>
-        /// Helper method to fetch a user from an organisations admins if specified user is an admin in said org.
-        /// Returns null if user is not.
-        /// </summary>
-        /// <param name="organisation"></param>
-        /// <param name="user"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<OrganisationUser> GetOrgAdminIfExists(Organisation organisation, User user, CancellationToken cancellationToken)
-        {
-            var orgUser = await _dbContext.OrganisationUsers.SingleOrDefaultAsync(ou => ou.UserId == user.Id && ou.OrganisationId == organisation.Id && ou.Role == Role.Admin);
-            return orgUser;
-        }
-
-        /// <summary>
-        /// Helper method to fetch a user from a groups admins if specified user is an admin in said group.
-        /// Returns null if user is not.
-        /// </summary>
-        /// <param name="group"></param>
-        /// <param name="user"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<GroupUser> GetGroupAdminIfExists(Group group, User user, CancellationToken cancellationToken)
-        {
-            var groupUser = await _dbContext.GroupUsers
-                .SingleOrDefaultAsync(gu => gu.UserId == user.Id && gu.GroupId == group.Id && gu.Role == Role.Admin);
-            return groupUser;
+            return user.IsSystemAdmin
+                    || (await IsOrganisationAdmin(organisation.Id, user.Id, cancellationToken)
+                        && op != Operation.Delete
+                        && op != Operation.Create);
         }
 
         /// <summary>
@@ -101,24 +62,77 @@ namespace Dissimilis.WebAPI.Services
         /// <returns></returns>
         public async Task<bool> CheckPermission(Group group, User user, Operation op, CancellationToken cancellationToken)
         {
-            if (user.IsSystemAdmin)
-                return true;
+            return user.IsSystemAdmin
+                    || await IsOrganisationAdmin(group.OrganisationId, user.Id, cancellationToken)
+                    || (await IsGroupAdmin(group.Id, user.Id, cancellationToken)
+                        && op != Operation.Delete
+                        && op != Operation.Create);
+        }
 
-            var parentOrganisation = await _dbContext.Organisations
-                .SingleOrDefaultAsync(o => o.Id == group.OrganisationId);
-            var orgAdmin = await GetOrgAdminIfExists(parentOrganisation, user, cancellationToken);
-            if (orgAdmin != null)
-                return true;
+        /// <summary>
+        /// Method to check if user has any admin privileges wherever that may be.
+        /// Used to let frontend regulate access to an admin view.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<UserAdminStatusDto> CheckUserAdminStatus(User user, CancellationToken cancellationToken)
+        {
+            bool isOrgAdmin = await _dbContext
+                .OrganisationUsers
+                .AnyAsync(ou =>
+                    ou.UserId == user.Id
+                    && ou.Role == Role.Admin);
 
-            bool isAllowed = false;
-            GroupUser groupAdmin = null;
-            if (group.Id != 0)
-                groupAdmin = await GetGroupAdminIfExists(group, user, cancellationToken);
+            bool isGroupAdmin = await _dbContext
+                .GroupUsers
+                .AnyAsync(gu =>
+                    gu.UserId == user.Id
+                    && gu.Role == Role.Admin);
 
-            if(groupAdmin != null && (op != Operation.Create || op != Operation.Delete))
-                isAllowed = true;
+            return new UserAdminStatusDto() 
+            {
+                SystemAdmin = user.IsSystemAdmin,
+                OrganisationAdmin = isOrgAdmin,
+                GroupAdmin = isGroupAdmin
+            };
 
-            return isAllowed;
+        }
+
+        /// <summary>
+        /// Helper method to see if user is an organisation admin in specified organisation
+        /// </summary>
+        /// <param name="organisationId"></param>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> IsOrganisationAdmin(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext
+                .OrganisationUsers
+                .AnyAsync(ou =>
+                    ou.UserId == userId
+                    && ou.OrganisationId == organisationId
+                    && ou.Role == Role.Admin
+                    , cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Helper method to see if user is a group admin in specified group
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> IsGroupAdmin(int groupId, int userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext
+                .GroupUsers
+                .AnyAsync(gu =>
+                    gu.UserId == userId
+                    && gu.GroupId == groupId
+                    && gu.Role == Role.Admin
+                    , cancellationToken: cancellationToken);
         }
     }
 }
