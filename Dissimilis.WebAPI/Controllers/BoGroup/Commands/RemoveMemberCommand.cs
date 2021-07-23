@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
     {
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly _IPermissionCheckerService _permissionChecker;
 
         public RemoveMemberCommandHandler(GroupRepository groupRepository, IAuthService authService, PermissionCheckerService permissionChecker)
         {

@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             }
             foreach (var groupId in request.GroupIds)
             {
-                var groupToUpdate = await _groupRepository.GetGroupById(groupId, cancellationToken);
+                var groupToUpdate = await _groupRepository.GetGroupByIdAsync(groupId, cancellationToken);
 
                 var GroupTag = await _songRepository.GetSongSharedGroup(song.Id, groupToUpdate.Id);
                 if(GroupTag == null)
