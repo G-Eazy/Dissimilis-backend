@@ -72,27 +72,27 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new User()
                 {
                     Name = "OrgAdminNorwayUser",
-                    Email = "Admin@Norway.no",
+                    Email = "OrgAdmin@Norway.no",
                 },
                 new User()
                 {
                     Name = "GroupAdminSandvikaUser",
-                    Email = "Admin@Sandvika_Norway.no",
+                    Email = "GroupAdmin@Sandvika_Norway.no",
                 },
                 new User()
                 {
                     Name = "GroupAdminSandvikaUser",
-                    Email = "Admin@Bergen_Norway.no",
+                    Email = "GroupAdmin@Bergen_Norway.no",
                 },
                 new User()
                 {
                     Name = "GroupAdminSandvikaUser",
-                    Email = "Admin@Trondheim_Norway.no",
+                    Email = "GroupAdmin@Trondheim_Norway.no",
                 },
                 new User()
                 {
                     Name = "OrgAdminGuatamalaUser",
-                    Email = "Admin@Guatemala.no",
+                    Email = "OrgAdmin@Guatemala.no",
                 },
                 new User()
                 {
