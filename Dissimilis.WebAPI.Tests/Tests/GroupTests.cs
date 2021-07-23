@@ -20,6 +20,7 @@ using Dissimilis.WebAPI.Controllers.Bogroup.Query;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -27,24 +28,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
     [CollectionDefinition("Serial", DisableParallelization = true)]
     public class GroupTests : BaseTestClass
     {
-        private readonly IMediator _mediator;
-        private UserDto AdminUser;
-        private UserDto SuppUser1;
-        private UserDto SuppUser2;
-        private UserDto SuppUser3;
-
         public GroupTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
-            _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-            var users = GetAllUsers().Result;
-            AdminUser = users.SingleOrDefault(user => user.Email == "test@test.no");
-            SuppUser1 = users.SingleOrDefault(user => user.Email == "supUser1@test.no");
-            SuppUser2 = users.SingleOrDefault(user => user.Email == "supUser2@test.no");
-            SuppUser3 = users.SingleOrDefault(user => user.Email == "supUser3@test.no");
-        }
-        private async Task<UserDto[]> GetAllUsers()
-        {
-            return await _mediator.Send(new QueryAll());
         }
 
         /// <summary>
@@ -86,17 +71,72 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             };
         }
 
+        
+
+      
+        
+
         [Fact]
         public async Task CreateGroupShouldSucceed()
+        public async Task TestAddMemberToGroupWhenCurrentUserIsAdminShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
+
+            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Member }));
+
+            var groupUser = _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
+            groupUser.ShouldNotBe(null);
+            groupUser.Role.ShouldBe(Role.Member);
+        }
+
+        [Fact]
+        public async Task TestAddAdminToGroupWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(BergenAdminUser.Id);
+
+            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Admin }));
 
             var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, NorwayOrganisation.Id, TrondheimAdminUser.Id)));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+            var groupUser = _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
+                .Groups.SingleOrDefault(groupUser =>
+                    groupUser.GroupId == BergenGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
+            groupUser.ShouldNotBe(null);
+            groupUser.Role.ShouldBe(Role.Admin);
         }
 
         [Fact]
+        public async Task TestAddMemberToGroupWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = Role.Admin })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == BergenGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestRemoveMemberFromGroupWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
+
+            await _mediator.Send(new RemoveMemberCommand(SandvikaGroup.Id, EdvardGriegFanUser.Id));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
+                .ShouldBeFalse();
         public async Task TestGetUsersInGroup()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
@@ -106,6 +146,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
         [Fact]
         public async Task UpdateGroupShouldSucceed()
+        public async Task TestCurrentUserLeaveGroupShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
 
@@ -118,6 +159,29 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+            TestServerFixture.ChangeCurrentUserId(U2FanUser.Id);
+
+            await _mediator.Send(new RemoveMemberCommand(SandvikaGroup.Id, U2FanUser.Id));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == U2FanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == U2FanUser.Id)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestRemoveMemberFromGroupWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(U2FanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new RemoveMemberCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id)));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Groups.Any(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .ShouldBeTrue();
         }
     }
 }
