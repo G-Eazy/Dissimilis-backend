@@ -71,18 +71,10 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             };
         }
 
-        
-
-      
-        
-
         [Fact]
-        public async Task CreateGroupShouldSucceed()
         public async Task TestAddMemberToGroupWhenCurrentUserIsAdminShouldSucceed()
         {
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
-
             await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Member }));
 
             var groupUser = _testServerFixture.GetContext()
@@ -99,9 +91,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Admin }));
 
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, NorwayOrganisation.Id, TrondheimAdminUser.Id)));
-            var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
-            group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
             var groupUser = _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
                 .Groups.SingleOrDefault(groupUser =>
@@ -137,6 +126,9 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .Groups.Any(groupUser =>
                     groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
                 .ShouldBeFalse();
+        }
+
+        [Fact]
         public async Task TestGetUsersInGroup()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
@@ -145,20 +137,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task UpdateGroupShouldSucceed()
         public async Task TestCurrentUserLeaveGroupShouldSucceed()
         {
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-
-            var updateDto = GetUpdateGroupAndOrganisationDto();
-            var updateItem = await _mediator.Send(new UpdateGroupCommand(TrondheimGroup.Id, updateDto));
-            var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
-
-            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
-            updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
-            updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
-            updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
             TestServerFixture.ChangeCurrentUserId(U2FanUser.Id);
 
             await _mediator.Send(new RemoveMemberCommand(SandvikaGroup.Id, U2FanUser.Id));
@@ -182,6 +162,39 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
                 .Groups.Any(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
                 .ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task CreateGroupShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, NorwayOrganisation.Id, TrondheimAdminUser.Id)));
+            var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
+            group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+        }
+
+        [Fact]
+        public async Task TestGetUsersInGroup()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var users = await _mediator.Send(new QueryUsersInGroup(TrondheimGroup.Id));
+            users.Length.ShouldBeGreaterThan(0, "Did not all users");
+        }
+
+        [Fact]
+        public async Task UpdateGroupShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var updateDto = GetUpdateGroupAndOrganisationDto();
+            var updateItem = await _mediator.Send(new UpdateGroupCommand(TrondheimGroup.Id, updateDto));
+            var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
+
+            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
+            updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
+            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
+            updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
+            updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
         }
     }
 }
