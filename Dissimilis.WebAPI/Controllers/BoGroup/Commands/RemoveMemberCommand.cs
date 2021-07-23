@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
 
             bool isAllowed = 
-                await _permissionChecker.CheckPermission(group, currentUser, Operation.Kick, cancellationToken)
+                await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Kick, cancellationToken)
                 || request.UserId == currentUser.Id;
             if (!isAllowed)
                 throw new UnauthorizedAccessException("Only an admin can remove other members from the group.");
