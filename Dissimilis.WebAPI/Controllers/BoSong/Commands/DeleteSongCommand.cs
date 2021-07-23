@@ -5,6 +5,7 @@ using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -22,11 +23,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DeleteSongCommandHandler(SongRepository songRepository, IAuthService authService)
+        public DeleteSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(DeleteSongCommand request, CancellationToken cancellationToken)
@@ -34,10 +37,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
-            if(! await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Delete, cancellationToken)) throw new UnauthorizedAccessException();
+
 
             await _songRepository.DeleteSong(currentUser, song, cancellationToken);
             song.SetUpdated(currentUser);

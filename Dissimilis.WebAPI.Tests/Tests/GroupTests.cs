@@ -173,13 +173,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
         }
 
-        [Fact]
-        public async Task TestGetUsersInGroup()
-        {
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-            var users = await _mediator.Send(new QueryUsersInGroup(TrondheimGroup.Id));
-            users.Length.ShouldBeGreaterThan(0, "Did not all users");
-        }
 
         [Fact]
         public async Task UpdateGroupShouldSucceed()

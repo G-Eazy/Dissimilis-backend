@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Dissimilis.DbContext.Models.Enums
 {
@@ -7,7 +8,9 @@ namespace Dissimilis.DbContext.Models.Enums
     /// </summary>
     public enum Role
     {
-        Member =10,
+        [Description("Member")]
+        Member = 10,
+        [Description("Admin")]
         Admin = 20
     }
 
@@ -37,7 +40,10 @@ namespace Dissimilis.DbContext.Models.Enums
         Kick = 40,
 
         [Description("Get")]
-        Get = 50
+        Get = 50,
+
+        [Description("Restore")]
+        Restore = 60,
     }
 
     public enum DefinedInstruments

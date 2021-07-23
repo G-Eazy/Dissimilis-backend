@@ -13,6 +13,7 @@ using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
 {
@@ -36,19 +37,23 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public AddComponentIntervalNoteHandler(SongRepository songRepository, IAuthService authService)
+        public AddComponentIntervalNoteHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser)) throw new UnauthorizedAccessException();
-
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))
+            {
+                throw new UnauthorizedAccessException();
+            }
             var songVoice = song.Voices.SingleOrDefault(voice => voice.Id == request.SongVoiceId);
             if (songVoice == null) throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
 

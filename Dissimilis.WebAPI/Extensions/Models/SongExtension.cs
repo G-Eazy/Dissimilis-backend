@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.WebAPI.Services;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -18,14 +21,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// </summary>
         /// <param name="user"> The user to chek for</param>
         /// <returns> true if readpermission</returns>
-        public static Expression<Func<Song, bool>> ReadAccessToSong( User user)
+        public static Expression<Func<Song, bool>> ReadAccessToSong(User user)
         {
             return (song => song.ProtectionLevel == ProtectionLevels.Public
             || song.ArrangerId == user.Id
-            || user.IsSystemAdmin
             || song.SharedUsers.Any(shared => shared.UserId == user.Id));
         }
-
 
         /// <summary>
         /// Get max bar positions for a song
@@ -253,7 +254,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
 
         }
-
         public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
