@@ -18,6 +18,7 @@ using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -25,89 +26,183 @@ namespace Dissimilis.WebAPI.xUnit.Tests
     [CollectionDefinition("Serial", DisableParallelization = true)]
     public class GroupTests : BaseTestClass
     {
-        private readonly IMediator _mediator;
-        private UserDto AdminUser;
-        private UserDto SuppUser1;
-        private UserDto SuppUser2;
-
         public GroupTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
-            _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-            var users = GetAllUsers().Result;
-            AdminUser = users.SingleOrDefault(user => user.Email == "test@test.no");
-            SuppUser1 = users.SingleOrDefault(user => user.Email == "supUser1@test.no");
-            SuppUser2 = users.SingleOrDefault(user => user.Email == "supUser2@test.no");
         }
-        private async Task<UserDto[]> GetAllUsers()
+        
+        [Fact]
+        public async Task TestAddMemberToGroupWhenCurrentUserIsAdminShouldSucceed()
         {
-            return await _mediator.Send(new QueryAll());
-        }
+            TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
 
-        /// <summary>
-        /// Helper method to create org for tests. Remember to have correct permissions.
-        /// </summary>
-        /// <param name="orgNumber"></param>
-        /// <returns></returns>
-        private async Task<OrganisationByIdDto> CreateOrganisation(int orgNumber, int adminId)
-        {
-            CreateOrganisationDto orgDto = new CreateOrganisationDto()
-            {
-                Name = $"TestOrg{orgNumber}",
-                FirstAdminId = adminId
-            };
-            var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
-            var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            return org;
-        }
+            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Member }));
 
-        private CreateGroupDto GetCreateGroupDto(int groupNumber, int orgId, int adminId)
-        {
-            return new CreateGroupDto()
-            {
-                Name = $"TestGroup{groupNumber}",
-                OrganisationId = orgId,
-                FirstAdminId = adminId
-            };
+            var groupUser = _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
+            groupUser.ShouldNotBe(null);
+            groupUser.Role.ShouldBe(Role.Member);
         }
 
         [Fact]
-        public async Task CreateGroupWithSysAdminShouldSucceed()
+        public async Task TestAddAdminToGroupWhenCurrentUserIsAdminShouldSucceed()
         {
-            TestServerFixture.ChangeCurrentUserId(AdminUser.UserId);
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
+            TestServerFixture.ChangeCurrentUserId(BergenAdminUser.Id);
 
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
-            var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
-            group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Admin }));
+
+            var groupUser = _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
+                .Groups.SingleOrDefault(groupUser =>
+                    groupUser.GroupId == BergenGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
+            groupUser.ShouldNotBe(null);
+            groupUser.Role.ShouldBe(Role.Admin);
         }
 
         [Fact]
-        public async Task CreateGroupWithOrgAdminShouldSucceed() {
-            // Should be allowed, since SuppUser1 is admin of org
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
-            TestServerFixture.ChangeCurrentUserId(SuppUser1.UserId);
-            var item2 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId)));
-            var group2 = await _mediator.Send(new QueryGroupById(item2.GroupId));
-            group2.Name.ShouldBeEquivalentTo("TestGroup2", "Group creation failed");
-        }
-
-        [Fact]
-        public async Task CreateGroupWithoutAdminShouldFail() {
-            // Should throw exception, since SuppUser2 is not sysadmin or orgadmin
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
-            TestServerFixture.ChangeCurrentUserId(SuppUser2.UserId);
-            var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(async () => await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(2, org.Id, SuppUser1.UserId))));
-            exception.Message.ShouldBeEquivalentTo("User does not have permission to create group in organisation", "Correct exception was not thrown");
-        }
-
-        [Fact]
-        public async Task TestGetAllUsersInGroup()
+        public async Task TestAddMemberToGroupWhenCurrentUserIsNotAdminShouldFail()
         {
-            OrganisationByIdDto org = await CreateOrganisation(1, SuppUser1.UserId);
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, org.Id, SuppUser1.UserId)));
-            var users = await _mediator.Send(new QueryUsersInGroup(1));
-            users.Length.ShouldBeGreaterThan(0, "Did not get all users");
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = Role.Admin })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == BergenGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .ShouldBeFalse();
         }
 
+        [Fact]
+        public async Task TestRemoveMemberFromGroupWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
+
+            await _mediator.Send(new RemoveMemberCommand(SandvikaGroup.Id, EdvardGriegFanUser.Id));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestCurrentUserLeaveGroupShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(U2FanUser.Id);
+
+            await _mediator.Send(new RemoveMemberCommand(SandvikaGroup.Id, U2FanUser.Id));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == U2FanUser.Id)
+                .Groups.Any(groupUser =>
+                    groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == U2FanUser.Id)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestRemoveMemberFromGroupWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(U2FanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new RemoveMemberCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id)));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Groups.Any(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestRemoveAdminWhenUserIsLastAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            await Should.ThrowAsync<InvalidOperationException>(async () =>
+                await _mediator.Send(
+                    new RemoveMemberCommand(TrondheimGroup.Id, TrondheimAdminUser.Id)));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == TrondheimAdminUser.Id)
+                .Groups.Any(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == TrondheimAdminUser.Id)
+                .ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestSetMemberToAdminWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            await _mediator.Send(new ChangeUserRoleCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id, new ChangeUserRoleDto { RoleToSet = Role.Admin }));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
+        [Fact]
+        public async Task TestSetMemberToAdminWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(SandvikaGroup.Id, EdvardGriegFanUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = Role.Admin })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
+                .Role.ShouldBe(Role.Member);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
+
+            await _mediator.Send(new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser2.Id, new ChangeUserRoleDto { RoleToSet = Role.Member }));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser2.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser2.Id)
+                .Role.ShouldBe(Role.Member);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = Role.Member })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsLastAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            await Should.ThrowAsync<InvalidOperationException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(TrondheimGroup.Id, TrondheimAdminUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = Role.Member })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == TrondheimAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == TrondheimAdminUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
     }
 }

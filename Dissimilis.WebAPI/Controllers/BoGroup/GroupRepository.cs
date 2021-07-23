@@ -3,8 +3,6 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,10 +17,18 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         {
             Context = context;
         }
+
+        public async Task SaveGroupAsync(Group group, CancellationToken cancellationToken)
+        {
+            await Context.Groups.AddAsync(group, cancellationToken);
+            await UpdateAsync(cancellationToken);
+        }
+
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
             await Context.SaveChangesAsync(cancellationToken);
         }
+
         public async Task<Group> GetGroupByIdAsync(int groupId, CancellationToken cancellationToken)
         {
             var group = await Context.Groups
@@ -39,10 +45,9 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
             return group;
         }
-
         internal async Task<GroupUser> GetGroupUserAsync(int userId, int groupId, CancellationToken cancellationToken)
         {
-            return await Context.GroupUsers.FindAsync(userId, groupId, cancellationToken);
+            return await Context.GroupUsers.FindAsync(userId, groupId);
         }
 
         internal async Task<bool> CheckUserAdminAsync(int userId, int groupId, CancellationToken cancellationToken)
@@ -51,14 +56,24 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return groupUser?.Role == Role.Admin;
         }
 
-        internal GroupUser FindOtherAdmin(User adminUser)
+        internal async Task<bool> IsUserLastAdmin(int userId, int groupId, CancellationToken cancellationToken)
         {
-            return Context.GroupUsers.FirstOrDefault(groupUser => groupUser.UserId == adminUser.Id && groupUser.Role == Role.Admin);
+            return await CheckUserAdminAsync(userId, groupId, cancellationToken)
+                    && !CheckIfAnotherGroupAdminExists(userId, groupId);
         }
 
-        internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, CancellationToken cancellationToken)
+        internal bool CheckIfAnotherGroupAdminExists(int userId, int groupId)
         {
-            var groupUser = await Context.GroupUsers.AddAsync(new GroupUser() { GroupId = groupId, UserId = userId, Role = Role.Member }, cancellationToken);
+            return Context.GroupUsers.Any(groupUser =>
+                groupUser.GroupId == groupId
+                && groupUser.UserId != userId
+                && groupUser.Role == Role.Admin);
+        }
+
+        internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, Role role, CancellationToken cancellationToken)
+        {
+            var groupUser = await Context.GroupUsers.AddAsync(new GroupUser() { GroupId = groupId, UserId = userId, Role = role }, cancellationToken);
+
             return groupUser.Entity;
         }
 

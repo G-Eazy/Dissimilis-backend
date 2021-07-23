@@ -82,7 +82,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 var usersToAdd = _dbContext.Users.Where(dbUser => dbUser.Email.Contains(orgEmailDomain));
                 foreach (var user in usersToAdd)
                 {
-                    var role = user.Email.Split("@")[0] == "OrgAdmin" ? Role.Admin : Role.Member;
+                    var role = user.Email.Split("@")[0].Contains("OrgAdmin") ? Role.Admin : Role.Member;
                     AddMemberToOrganisation(organisation, user, role);
                 }
             }

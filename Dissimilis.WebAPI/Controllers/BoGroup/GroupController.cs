@@ -3,6 +3,8 @@ using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoGroup.Queries;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,7 +17,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
     [Route("api/group")]
     [ApiController]
-    public class GroupController : ControllerBase
+    public class GroupController : Controller
     {
         private readonly IMediator _mediator;
 
@@ -24,21 +26,28 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             _mediator = mediator;
         }
 
-        [HttpPost("/{groupId:int}/addMember")]
-        [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
-        public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
+        /// <summary>
+        /// Create group
+        /// </summary>
+        [HttpPost]
+        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto command)
+        
         {
-            var newMemberAdded = await _mediator.Send(new AddMemberCommand(groupId, command));
-            var newMember = await _mediator.Send(new QueryGroupMemberByIds(newMemberAdded.UserId, groupId));
-            return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
+            var item = await _mediator.Send(new CreateGroupCommand(command));
+            var result = await _mediator.Send(new QueryGroupById(item.GroupId));
+
+            return Created($"{result.GroupId}", result);
         }
 
-        [HttpDelete("/{groupId:int}/removeMember/{userId:int}")]
-        [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> AddGroupMember(int groupId, int userId)
+        [HttpGet("{groupId:int}")]
+        [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetGroupById(int groupId)
         {
-            var memberRemoved = await _mediator.Send(new RemoveMemberCommand(groupId, userId));
-            return Ok(memberRemoved);
+            var group = await _mediator.Send(new QueryGroupById(groupId));
+            return Ok(group);
         }
 
         [HttpPatch("/{groupId:int}/changeUserRole/{userId:int}")]
@@ -48,6 +57,23 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
             var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, groupId));
             return Ok(memberUpdated);
+        }
+
+        [HttpPost("/{groupId:int}/addMember")]
+        [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
+        { 
+            var newMemberAdded = await _mediator.Send(new AddMemberCommand(groupId, command));
+            var newMember = await _mediator.Send(new QueryGroupMemberByIds(newMemberAdded.UserId, groupId));
+            return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
+        }
+
+        [HttpDelete("/{groupId:int}/removeMember/{userId:int}")]
+        [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
+        {
+            var memberRemoved = await _mediator.Send(new RemoveMemberCommand(groupId, userId));
+            return Ok(memberRemoved);
         }
     }
 }

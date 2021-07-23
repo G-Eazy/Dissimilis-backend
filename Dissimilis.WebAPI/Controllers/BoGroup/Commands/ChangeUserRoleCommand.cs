@@ -45,6 +45,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             bool isAllowed = await _permissionCheckerService.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
             if (!isAllowed) throw new UnauthorizedAccessException("Only an admin can change another user's role.");
 
+            bool isLastAdmin = await _groupRepository.IsUserLastAdmin(request.UserId, group.Id, cancellationToken);
+            if (isLastAdmin && request.Command.RoleToSet == Role.Member)
+                throw new InvalidOperationException("The user cannot be set to member as it is the last admin of the group.");
+
             var updatedGroupUser = await _groupRepository.ChangeUserRoleAsync(request.UserId, request.GroupId, request.Command.RoleToSet, cancellationToken);
 
             return new UserRoleChangedDto() { UserId = updatedGroupUser.UserId, GroupId = updatedGroupUser.GroupId, UpdatedRole = updatedGroupUser.Role };
