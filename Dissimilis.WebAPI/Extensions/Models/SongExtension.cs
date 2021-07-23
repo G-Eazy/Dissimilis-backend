@@ -242,13 +242,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
 
         }
-
-        public static Expression<Func<Song,Task<bool>>> ReadAccessToSong(User user, PermissionCheckerService permissionCheckerService, CancellationToken cancellationToken)
-        {
-            return async (Song song) => 
-            await permissionCheckerService.CheckPermission(song, user, Operation.Get, cancellationToken);
-        }
-
         public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()

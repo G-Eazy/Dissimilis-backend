@@ -10,6 +10,7 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Extensions.Models;
 using System;
 using Dissimilis.WebAPI.Services;
+using System.Collections.Generic;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -206,7 +207,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Song[]> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
+        public async Task<List<Song>> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
             var permissionCheckerService = new PermissionCheckerService(Context);
 
@@ -217,11 +218,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.OrganisationTags)
                 .AsSplitQuery()
                 .AsQueryable()
-                .Where(SongExtension.ReadAccessToSong(user, permissionCheckerService, cancellationToken))
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
                 .Take(searchCommand.MaxNumberOfSongs)
-                .ToArrayAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
         }
 
         public async Task DeleteSongSharedUser(Song song, User user, SongSharedUser sharedSongUser, CancellationToken cancellationToken)
