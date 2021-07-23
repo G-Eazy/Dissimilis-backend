@@ -50,42 +50,28 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             SongBar songBar = null;
-            await using (var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
-            {
-                var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
                 if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))throw new UnauthorizedAccessException();
 
-                var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
-                if (voice == null)
-                {
-                    throw new NotFoundException($"Voice with Id {voice.Id} not fond");
-                }
-
-                songBar = new SongBar()
-                {
-                    Position = voice.SongBars.OrderByDescending(sb => sb.Position).FirstOrDefault()?.Position + 1 ?? 1,
-                    RepAfter = request.Command.RepAfter,
-                    RepBefore = request.Command.RepBefore,
-                    House = request.Command.House
-                };
-
-                voice.SongBars = voice.SongBars.Concat(new[] { songBar }).ToArray();
-                song.SyncVoicesFrom(voice);
-
-                song.SetUpdatedOverAll(currentUser.Id);
-
-                try
-                {
-                    await _barRepository.UpdateAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw new ValidationException("Transaction error, aborting operation. Please try again.");
-                }
+            var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+            if (voice == null)
+            {
+                throw new NotFoundException($"Voice with Id {voice.Id} not fond");
             }
+
+            songBar = new SongBar()
+            {
+                Position = voice.SongBars.OrderByDescending(sb => sb.Position).FirstOrDefault()?.Position + 1 ?? 1,
+                RepAfter = request.Command.RepAfter,
+                RepBefore = request.Command.RepBefore,
+                House = request.Command.House
+            };
+
+            voice.SongBars.Add(songBar);
+            song.SyncVoicesFrom(voice);
+            song.SetUpdatedOverAll(currentUser.Id);
+            await _barRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }

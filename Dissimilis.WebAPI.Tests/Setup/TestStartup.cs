@@ -1,10 +1,12 @@
 ﻿using System.Data.Common;
 using Dissimilis.DbContext;
+using Dissimilis.WebAPI.DependencyInjection;
 using Dissimilis.WebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 {
     public class TestStartup : Startup
     {
+
         public TestStartup(IConfiguration configuration, IWebHostEnvironment env) : base(configuration, env, null)
         {
         }
@@ -19,10 +22,8 @@ namespace Dissimilis.WebAPI.xUnit.Setup
 
         public override void ConfigureDatabase(IServiceCollection services)
         {
-
             services.AddDbContext<DissimilisDbContext>(options => options
-                    .UseSqlite(CreateInMemoryDatabase()));
-        }
+                    .UseSqlite(CreateInMemoryDatabase()));        }
 
         private static DbConnection CreateInMemoryDatabase()
         {

@@ -11,6 +11,7 @@ using Dissimilis.WebAPI.Extensions.Models;
 using System;
 using Dissimilis.WebAPI.Services;
 using System.Collections.Generic;
+using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
