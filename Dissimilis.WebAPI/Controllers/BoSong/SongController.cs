@@ -227,7 +227,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// remove write permission for given user
         /// </summary>
         [HttpDelete("{songId:int}/shareSong/User/{userId:int}")]
-        [ProducesResponseType(typeof(ShortUserDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ShortUserDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RemoveSharedSongUser(int songId, int userId)
