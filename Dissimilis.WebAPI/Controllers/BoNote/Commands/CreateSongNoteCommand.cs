@@ -39,9 +39,9 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService authService, _IPermissionCheckerService IPermissionCheckerService)
+        public CreateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _noteRepository = noteRepository;
             _barRepository = barRepository;

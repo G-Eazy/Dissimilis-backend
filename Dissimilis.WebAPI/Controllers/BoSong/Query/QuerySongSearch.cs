@@ -26,13 +26,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
     {
         private readonly SongRepository _repository;
         private readonly IAuthService _authService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public QuerySongSearchHandler(SongRepository repository, IAuthService authService, _IPermissionCheckerService IPermissionCheckerService)
+        public QuerySongSearchHandler(SongRepository repository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _repository = repository;
             _authService = authService;
-            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<SongIndexDto[]> Handle(QuerySongSearch request, CancellationToken cancellationToken)

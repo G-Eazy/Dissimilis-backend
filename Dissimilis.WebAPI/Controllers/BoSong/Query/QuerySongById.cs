@@ -22,9 +22,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
     {
         private readonly SongRepository _repository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public QuerySongByIdHandler(SongRepository repository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public QuerySongByIdHandler(SongRepository repository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _repository = repository;
             _IAuthService = IAuthService;

@@ -34,10 +34,10 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
-        public DeleteSongBarCommandHandler(BarRepository repository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public DeleteSongBarCommandHandler(BarRepository repository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _barRepository = repository;
             _songRepository = songRepository;

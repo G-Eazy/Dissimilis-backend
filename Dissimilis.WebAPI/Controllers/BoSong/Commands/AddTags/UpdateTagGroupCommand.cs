@@ -30,9 +30,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         private readonly SongRepository _songRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateTagGroupCommandHandler(SongRepository songRepository, GroupRepository groupRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public UpdateTagGroupCommandHandler(SongRepository songRepository, GroupRepository groupRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _groupRepository = groupRepository;
@@ -45,7 +45,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
 
-            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException( "You dont have permission to get this song");
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException( "You dont have permission to edit this song");
 
             if (!request.GroupIds.All(x => currentUser.GetAllGroupIds().Contains(x)) && !currentUser.IsSystemAdmin)
             {

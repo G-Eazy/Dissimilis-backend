@@ -33,9 +33,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         private readonly SongRepository _songRepository;
         private readonly UserRepository _userRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public ShareSongUserCommandHandler(SongRepository songRepository, UserRepository userRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public ShareSongUserCommandHandler(SongRepository songRepository, UserRepository userRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _userRepository = userRepository;

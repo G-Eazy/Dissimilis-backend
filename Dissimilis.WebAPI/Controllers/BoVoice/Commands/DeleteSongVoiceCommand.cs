@@ -28,10 +28,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
     {
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;

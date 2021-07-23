@@ -21,10 +21,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
     public class QueryProtectionLevelSharedWithAndTagsHandler : IRequestHandler<QueryProtectionLevelSharedWithAndTags, ProtectionLevelSharedWithAndTagsDto>
     {
         private readonly SongRepository _repository;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly IAuthService _IAuthService;
 
-        public QueryProtectionLevelSharedWithAndTagsHandler(SongRepository repository, _IPermissionCheckerService IPermissionCheckerService, IAuthService authService)
+        public QueryProtectionLevelSharedWithAndTagsHandler(SongRepository repository, IPermissionCheckerService IPermissionCheckerService, IAuthService authService)
         {
             _repository = repository;
             _IPermissionCheckerService = IPermissionCheckerService;

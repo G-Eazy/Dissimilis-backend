@@ -29,10 +29,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
-        public DeleteBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public DeleteBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _IAuthService = IAuthService;

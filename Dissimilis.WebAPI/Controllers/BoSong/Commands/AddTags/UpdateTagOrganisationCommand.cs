@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -24,27 +25,28 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
         }
     }
 
-    public class RemoveTagOrganisationCommandHandler : IRequestHandler<UpdateTagOrganisationCommand, ShortOrganisationDto[]>
+    public class UpdateTagOrganisationCommandHandler : IRequestHandler<UpdateTagOrganisationCommand, ShortOrganisationDto[]>
     {
         private readonly SongRepository _songRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _IAuthService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public RemoveTagOrganisationCommandHandler(SongRepository songRepository, OrganisationRepository organisationRepository, IAuthService IAuthService)
+        public UpdateTagOrganisationCommandHandler(SongRepository songRepository, OrganisationRepository organisationRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _organisationRepository = organisationRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<ShortOrganisationDto[]> Handle(UpdateTagOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
-            if (song.ArrangerId != currentUser.Id && !currentUser.IsSystemAdmin)
-            {
-                throw new UnauthorizedAccessException("You dont have permission to edit this song");
-            }
+
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException("You dont have permission to edit this song");
+
             if (!request.OrganisationIds.All(x => currentUser.GetAllOrganisationIds().Contains(x)) && !currentUser.IsSystemAdmin)
             {
                 throw new Exception("You need to be in the organisation you want to remove");

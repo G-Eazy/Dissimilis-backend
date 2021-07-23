@@ -22,13 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class UpdateGroupCommandHandler : IRequestHandler<UpdateGroupCommand, UpdatedGroupCommandDto>
     {
-        private readonly _IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public UpdateGroupCommandHandler(_IPermissionCheckerService permissionChecker, GroupRepository groupRepository, IAuthService authService)
+        public UpdateGroupCommandHandler(IPermissionCheckerService IPermissionCheckerService, GroupRepository groupRepository, IAuthService authService)
         {
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _groupRepository = groupRepository;
             _authService = authService;
         }
@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
-            var isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
+            var isAllowed = await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
 
             if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update Group");

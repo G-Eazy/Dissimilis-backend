@@ -34,9 +34,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DuplicateAllChordsHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, _IPermissionCheckerService IPermissionCheckerService)
+        public DuplicateAllChordsHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;

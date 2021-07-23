@@ -27,9 +27,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService, _IPermissionCheckerService IPermissionCheckerService)
+        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _IPermissionCheckerService = IPermissionCheckerService;

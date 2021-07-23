@@ -28,13 +28,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
     {
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
-        private readonly _IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public RemoveMemberCommandHandler(GroupRepository groupRepository, IAuthService authService, PermissionCheckerService permissionChecker)
+        public RemoveMemberCommandHandler(GroupRepository groupRepository, IAuthService authService, PermissionCheckerService IPermissionCheckerService)
         {
             _groupRepository = groupRepository;
             _authService = authService;
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<MemberRemovedDto> Handle(RemoveMemberCommand request, CancellationToken cancellationToken)

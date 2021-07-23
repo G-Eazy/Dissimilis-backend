@@ -15,7 +15,7 @@ namespace Dissimilis.WebAPI.xUnit
     {
         internal readonly TestServerFixture _testServerFixture;
         internal readonly IMediator _mediator;
-        internal readonly _IPermissionCheckerService _permissionChecker;
+        internal readonly IPermissionCheckerService _permissionChecker;
 
         internal User SysAdminUser;
         internal User NorwayAdminUser;
@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.xUnit
             _testServerFixture = testServerFixture;
 
             _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-            _permissionChecker = _testServerFixture.GetServiceProvider().GetService<_IPermissionCheckerService>();
+            _permissionChecker = _testServerFixture.GetServiceProvider().GetService<IPermissionCheckerService>();
 
             UpdateAllUsers();
             UpdateAllSongs();

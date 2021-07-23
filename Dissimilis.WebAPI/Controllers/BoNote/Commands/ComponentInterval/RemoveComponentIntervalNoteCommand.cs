@@ -36,9 +36,9 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
     {
         private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public RemoveComponentIntervalNoteCommandHandler(SongRepository songRepository, AuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public RemoveComponentIntervalNoteCommandHandler(SongRepository songRepository, AuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = IAuthService;

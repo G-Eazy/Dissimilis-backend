@@ -1,10 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using IsolationLevel = System.Data.IsolationLevel;
-using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
@@ -12,8 +9,8 @@ using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
-using Dissimilis.WebAPI.Services;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Services;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {
@@ -36,9 +33,9 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public CreateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _barRepository = barRepository;
             _songRepository = songRepository;

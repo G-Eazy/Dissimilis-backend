@@ -32,9 +32,9 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
         private readonly NoteRepository _noteRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
-        private readonly _IPermissionCheckerService _IPermissionCheckerService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
+        public UpdateSongNoteCommandHandler(NoteRepository noteRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _noteRepository = noteRepository;
             _songRepository = songRepository;

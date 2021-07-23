@@ -22,13 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class UpdateOrganisationCommandHandler : IRequestHandler<UpdateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
-        private readonly _IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public UpdateOrganisationCommandHandler(_IPermissionCheckerService permissionChecker, OrganisationRepository organisationRepository, IAuthService authService)
+        public UpdateOrganisationCommandHandler(IPermissionCheckerService IPermissionCheckerService, OrganisationRepository organisationRepository, IAuthService authService)
         {
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _organisationRepository = organisationRepository;
             _authService = authService;
         }
@@ -37,7 +37,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
-            var isAllowed = await _permissionChecker.CheckPermission(organisation, currentUser, Operation.Modify, cancellationToken);
+            var isAllowed = await _IPermissionCheckerService.CheckPermission(organisation, currentUser, Operation.Modify, cancellationToken);
 
             if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to Update organisation");

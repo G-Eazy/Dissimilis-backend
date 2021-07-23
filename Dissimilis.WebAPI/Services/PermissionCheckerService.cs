@@ -10,7 +10,7 @@ using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Services
 {
-    public class PermissionCheckerService : _IPermissionCheckerService
+    public class PermissionCheckerService : IPermissionCheckerService
     {
         private readonly DissimilisDbContext _dbContext;
 
