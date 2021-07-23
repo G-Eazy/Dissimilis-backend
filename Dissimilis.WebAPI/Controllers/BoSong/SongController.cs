@@ -30,7 +30,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> MyLibrary()
         {
-            var result = await _mediator.Send(new QuerySongToLibrary());
+            var result = await _mediator.Send(new QuerySongToLibrary(false));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Songs created by or arranged by user that are deleted
+        /// </summary>
+        [HttpGet("mylibrary/deleted")]
+        [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> MyDeletedLibrary()
+        {
+            var result = await _mediator.Send(new QuerySongToLibrary(true));
             return Ok(result);
         }
 
@@ -186,6 +198,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var item = await _mediator.Send(new DuplicateSongCommand(songId, command));
             var result = await _mediator.Send(new QuerySongById(item.SongId));
 
+            return Ok(result);
+        }
+
+        [HttpPatch("{songId:int}/restore")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RestoreSong(int songId)
+        {
+            var item = await _mediator.Send(new RestoreDeletedSongCommand(songId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
             return Ok(result);
         }
 

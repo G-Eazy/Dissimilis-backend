@@ -57,48 +57,36 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
                 throw new UnauthorizedAccessException();
             }
 
-
             SongNote songNote;
 
-            await using (var transaction = await _noteRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken))
+            var songBar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+
+            if (songBar.Notes.Any(n => n.Position == request.Command.Position))
             {
-                var songBar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
-
-                if (songBar.Notes.Any(n => n.Position == request.Command.Position))
-                {
-                    throw new ValidationException("Note number already in use");
-                }
-
-                songNote = new SongNote()
-                {
-                    Position = request.Command.Position,
-                    Length = request.Command.Length,
-                    ChordName = request.Command.ChordName
-                };
-
-                if (songNote.ChordName != null)
-                {
-                    songNote.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(songNote.ChordName).ToArray());
-                }
-                else 
-                {
-                    songNote.SetNoteValues(request.Command.Notes);
-                }
-                songBar.Notes.Add(songNote);
-                songBar.CheckSongBarValidation();
-                songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
-
-                try
-                {
-                    await _noteRepository.UpdateAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw new ValidationException("Transaction error, aborting operation. Please try again.");
-                }
+                throw new ValidationException("Note number already in use");
             }
+
+            songNote = new SongNote()
+            {
+                Position = request.Command.Position,
+                Length = request.Command.Length,
+                ChordName = request.Command.ChordName
+            };
+
+            if (songNote.ChordName != null)
+            {
+                songNote.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(songNote.ChordName).ToArray());
+            }
+            else 
+            {
+                songNote.SetNoteValues(request.Command.Notes);
+            }
+            songBar.Notes.Add(songNote);
+            songBar.CheckSongBarValidation();
+            songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
+
+            await _noteRepository.UpdateAsync(cancellationToken);
+
             return new UpdatedCommandDto(songNote);
         }
     }
