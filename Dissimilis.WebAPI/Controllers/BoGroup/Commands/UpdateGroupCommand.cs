@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
         public async Task<UpdatedGroupCommandDto> Handle(UpdateGroupCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
+            var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
             var isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
 
             if (!isAllowed)

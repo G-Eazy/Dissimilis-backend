@@ -22,13 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         public async Task SaveOrganisationAsync(Organisation organisation, CancellationToken cancellationToken)
         {
             await Context.Organisations.AddAsync(organisation, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task SaveOrgUserAsync(OrganisationUser orgUser, CancellationToken cancellationToken)
         {
             await Context.OrganisationUsers.AddAsync(orgUser);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(CancellationToken cancellationToken)

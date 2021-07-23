@@ -55,6 +55,23 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(users);
         }
 
+        [HttpPost("/{groupId:int}/addMember")]
+        [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
+        public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
+        { 
+            var newMemberAdded = await _mediator.Send(new AddMemberCommand(groupId, command));
+            var newMember = await _mediator.Send(new QueryGroupMemberByIds(newMemberAdded.UserId, groupId));
+            return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
+        }
+
+        [HttpDelete("/{groupId:int}/removeMember/{userId:int}")]
+        [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
+        {
+            var memberRemoved = await _mediator.Send(new RemoveMemberCommand(groupId, userId));
+            return Ok(memberRemoved);
+        }
+
         [HttpPatch("{groupId:int}")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
