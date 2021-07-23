@@ -11,6 +11,7 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
+using System;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {
@@ -45,8 +46,13 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _songRepository.HasWriteAccess(song, currentUser))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (voice == null)
@@ -70,17 +76,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             song.SyncVoicesFrom(voice);
-
-            try
-            {
-                await _barRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _barRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(bar);
         }

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -35,12 +34,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
-            if(song.ArrangerId != currentUser.Id)
+            if(! await _songRepository.HasWriteAccess(song, currentUser))
             {
                 throw new UnauthorizedAccessException();
             }
 
-            await _songRepository.DeleteSong(song, cancellationToken);
+            await _songRepository.DeleteSong(currentUser, song, cancellationToken);
+            song.SetUpdated(currentUser);
 
             return null;
         }

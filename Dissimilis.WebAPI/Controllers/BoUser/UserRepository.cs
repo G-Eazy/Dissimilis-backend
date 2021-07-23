@@ -113,5 +113,10 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             await this._context.SaveChangesAsync();
             return user;
         }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken)
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

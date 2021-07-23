@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
@@ -15,9 +17,6 @@ namespace Dissimilis.WebAPI.xUnit
 {
     internal static class Extensions
     {
-
-        internal const string DefaultTestSongTitle = "TestSong";
-
         internal static void CheckSongVoiceIntegrity(SongByIdDto songDto, string stepDescription)
         {
             var refVoice = songDto.Voices.FirstOrDefault();
@@ -77,7 +76,7 @@ namespace Dissimilis.WebAPI.xUnit
             }
         }
 
-        internal static CreateSongDto CreateSongDto(int numerator = 4, int denominator = 4, string title = DefaultTestSongTitle)
+        internal static CreateSongDto CreateSongDto(string title, int numerator = 4, int denominator = 4)
         {
             return new CreateSongDto()
             {
@@ -221,14 +220,53 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static SearchQueryDto SearchQueryDto()
+        internal static SearchQueryDto SearchQueryDto(
+            string title = "", string OrderBy = "date", bool orderDescending = true, bool includeAll = true)
         {
             return new SearchQueryDto()
             {
-                Title = "Testuser",
-                OrderBy = "date",
-                OrderDescending = true
+                Title = title,
+                OrderBy = OrderBy,
+                OrderDescending = orderDescending,
+                IncludeAll = includeAll,
             };
+        }
+        internal static SearchQueryDto AllSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeAll = true,
+            };
+
+        }
+        internal static SearchQueryDto SharedWithUserSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                IncludeAll = false,
+                OrderDescending = true,
+                IncludeSharedWithUser = true
+            };
+
+        }
+
+        internal static SearchQueryDto GroupOrgSearchQueryDto(int[] groups, int[] orgs)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeAll = false,
+                IncludedGroupIdArray = groups,
+                IncludedOrganisationIdArray = orgs
+            };
+
         }
     }
 }

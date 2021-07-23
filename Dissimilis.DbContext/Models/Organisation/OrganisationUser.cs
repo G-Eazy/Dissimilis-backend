@@ -27,10 +27,10 @@ namespace Dissimilis.DbContext.Models
 
         public OrganisationUser() { }
 
-    public OrganisationUser(Organisation organisation, User user, Role role)
+    public OrganisationUser(int organisationId, int userId, Role role)
     {
-        Organisation = organisation;
-        User = user;
+        OrganisationId = organisationId;
+        UserId = userId;
         Role = role;
     }
     }
