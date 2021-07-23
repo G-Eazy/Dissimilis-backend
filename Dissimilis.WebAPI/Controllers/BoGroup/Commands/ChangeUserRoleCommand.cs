@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
+﻿using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -13,11 +14,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
     public class ChangeUserRoleCommand : IRequest<UserRoleChangedDto>
     {
         public int GroupId { get; set; }
+        public int UserId { get; set; }
         public ChangeUserRoleDto Command { get; set; }
 
-        public ChangeUserRoleCommand(int groupId, ChangeUserRoleDto command)
+        public ChangeUserRoleCommand(int groupId, int userId, ChangeUserRoleDto command)
         {
             GroupId = groupId;
+            UserId = userId;
             Command = command;
         }
     }
@@ -26,21 +29,23 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
     {
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _permissionCheckerService;
 
-        public ChangeUserRoleCommandHandler(GroupRepository groupRepository, IAuthService authService)
+        public ChangeUserRoleCommandHandler(GroupRepository groupRepository, IAuthService authService, IPermissionCheckerService permissionCheckerService)
         {
             _groupRepository = groupRepository;
             _authService = authService;
+            _permissionCheckerService = permissionCheckerService;
         }
         public async Task<UserRoleChangedDto> Handle(ChangeUserRoleCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            bool isUserAdmin = await _groupRepository.CheckUserAdminAsync(currentUser.Id, request.GroupId, cancellationToken);
-            if (!isUserAdmin) throw new UnauthorizedAccessException("Only an admin can change another user's role.");
+            var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
 
-            await using var transaction = await _groupRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            bool isAllowed = await _permissionCheckerService.CheckPermission(group, currentUser, Operation.Modify, cancellationToken);
+            if (!isAllowed) throw new UnauthorizedAccessException("Only an admin can change another user's role.");
 
-            var updatedGroupUser = await _groupRepository.ChangeUserRoleAsync(request.Command.MemberId, request.GroupId, request.Command.RoleToSet, cancellationToken);
+            var updatedGroupUser = await _groupRepository.ChangeUserRoleAsync(request.UserId, request.GroupId, request.Command.RoleToSet, cancellationToken);
 
             return new UserRoleChangedDto() { UserId = updatedGroupUser.UserId, GroupId = updatedGroupUser.GroupId, UpdatedRole = updatedGroupUser.Role };
         }

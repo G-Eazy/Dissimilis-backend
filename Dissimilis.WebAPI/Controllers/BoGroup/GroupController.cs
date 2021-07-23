@@ -33,19 +33,19 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
         }
 
-        [HttpDelete("/{groupId:int}/removeMember")]
-        [ProducesResponseType(typeof(UserRemovedDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] RemoveUserDto command)
+        [HttpDelete("/{groupId:int}/removeMember/{userId:int}")]
+        [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> AddGroupMember(int groupId, int userId)
         {
-            var memberRemoved = await _mediator.Send(new RemoveUserCommand(groupId, command));
+            var memberRemoved = await _mediator.Send(new RemoveMemberCommand(groupId, userId));
             return Ok(memberRemoved);
         }
 
-        [HttpPatch("/{groupId:int}/changeUserRole")]
+        [HttpPatch("/{groupId:int}/changeUserRole/{userId:int}")]
         [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ChangeUserRole(int groupId, [FromBody] ChangeUserRoleDto command)
+        public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
-            var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, command));
+            var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
             var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, groupId));
             return Ok(memberUpdated);
         }
