@@ -3,8 +3,6 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,18 +21,36 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         public async Task SaveGroupAsync(Group group, CancellationToken cancellationToken)
         {
             await Context.Groups.AddAsync(group, cancellationToken);
+            await UpdateAsync(cancellationToken);
+        }
+
+        public async Task UpdateAsync(CancellationToken cancellationToken)
+        {
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        internal async Task<GroupUser> GetGroupUserAsync(int userId, int groupId, CancellationToken cancellationToken)
-        public async Task UpdateAsync(CancellationToken cancellationToken)
+        public async Task<Group> GetGroupById(int groupId, CancellationToken cancellationToken)
         {
-            return await Context.GroupUsers.FindAsync(cancellationToken, userId, groupId);
-            await Context.SaveChangesAsync(cancellationToken);
+            var group = await Context.Groups
+                .Include(g => g.Organisation)
+                .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
+
+            if (group == null)
+                throw new NotFoundException($"Group with Id {groupId} not found");
+
+            await Context.GroupUsers
+                .Include(gu => gu.User)
+                .Where(gu => gu.GroupId == groupId)
+                .LoadAsync(cancellationToken);
+
+            return group;
+        }
+        internal async Task<GroupUser> GetGroupUserAsync(int userId, int groupId, CancellationToken cancellationToken)
+        {
+            return await Context.GroupUsers.FindAsync(userId, groupId);
         }
 
         internal async Task<bool> CheckUserAdminAsync(int userId, int groupId, CancellationToken cancellationToken)
-        public async Task<Group> GetGroupById(int groupId, CancellationToken cancellationToken)
         {
             var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken);
             return groupUser?.Role == Role.Admin;
@@ -44,13 +60,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         {
             return Context.GroupUsers.FirstOrDefault(groupUser => groupUser.Role == Role.Admin);
         }
-            var group = await Context.Groups
-                .Include(g => g.Organisation)
-                .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
 
-        internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, CancellationToken cancellationToken)
+        internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, Role role, CancellationToken cancellationToken)
         {
-            var groupUser = await Context.GroupUsers.AddAsync(new GroupUser() { GroupId = groupId, UserId = userId }, cancellationToken);
+            var groupUser = await Context.GroupUsers.AddAsync(new GroupUser() { GroupId = groupId, UserId = userId, Role = role }, cancellationToken);
 
             return groupUser.Entity;
         }

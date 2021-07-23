@@ -43,9 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             var existingGroupUser = await _groupRepository.GetGroupUserAsync(request.Command.NewMemberUserId, request.GroupId, cancellationToken);
             if (existingGroupUser != null) throw new ValidationException("The user is already a member of the group.");
 
-            await using var transaction = await _groupRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
-            var newGroupUser = await _groupRepository.AddUserToGroupAsync(request.Command.NewMemberUserId, request.GroupId, cancellationToken);
+            var newGroupUser = await _groupRepository.AddUserToGroupAsync(request.Command.NewMemberUserId, request.GroupId, request.Command.NewMemberRole, cancellationToken);
             await _groupRepository.UpdateAsync(cancellationToken);
 
             return new MemberAddedDto() { UserId = newGroupUser.UserId, GroupId = newGroupUser.GroupId };

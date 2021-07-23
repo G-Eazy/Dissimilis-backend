@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             if (!isUserAdmin && currentUser.Id != request.UserId)
                 throw new UnauthorizedAccessException("Only an admin can remove other members from the group.");
 
-            var groupUserToDelete = await _groupRepository.GetGroupUserAsync(currentUser.Id, request.GroupId, cancellationToken);
+            var groupUserToDelete = await _groupRepository.GetGroupUserAsync(request.UserId, request.GroupId, cancellationToken);
             if (groupUserToDelete == null)
                 throw new ValidationException("The user is not a member of the group.");
 
@@ -50,9 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             if (isUserToDeleteAdmin && nextAdmin == null)
                 throw new InvalidOperationException("The member cannot be removed from the group as it is the last admin.");
 
-            await using var transaction = await _groupRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
-            var deletedGroupUser = await _groupRepository.RemoveUserFromGroupAsync(currentUser.Id, request.GroupId, cancellationToken);
+            var deletedGroupUser = await _groupRepository.RemoveUserFromGroupAsync(request.UserId, request.GroupId, cancellationToken);
             await _groupRepository.UpdateAsync(cancellationToken);
 
             return new MemberRemovedDto() { UserId = deletedGroupUser.UserId, GroupId = deletedGroupUser.GroupId };
