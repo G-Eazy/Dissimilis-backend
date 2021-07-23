@@ -143,41 +143,12 @@ namespace Dissimilis.WebAPI.Services
             }
             if (op == Operation.Delete || op == Operation.Restore)
             {
-                return song.ArrangerId == user.Id 
+                return song.ArrangerId == user.Id
                     || user.IsSystemAdmin && song.ProtectionLevel == ProtectionLevels.Public;
             }
 
             return false;
         }
-        /// <summary>
-        /// Checks if a user has the privileges to perform desired operation on a song with songTags
-        /// Sysadmins: kick all tags, invite on public tags
-        /// Org admins: Kick all tags where user is OrgAdmin or group in org where user is OrgAdmin
-        /// Group admins: Kick all tags where user is GroupAdmin 
-        /// Other: All priviliges on own songs and shared songs
-        /// </summary>
-        /// <param name="song"></param>
-        /// <param name="user"></param>
-        /// <param name="op"></param>
-        /// <param name="group">null if trying to remove OrgTag</param>
-        /// <param name="organisation"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckTagPermission(Song song, User user, Operation op,
-            Organisation organisation, Group? group, CancellationToken cancellationToken)
-        {
-            if (op == Operation.Invite) return await CheckWriteAccess(song, user);
-            if(op == Operation.Kick)
-            {
-                if (user.IsSystemAdmin)
-                    return true;
-                if (group == null) return GetOrgAdminIfExists(organisation, user, cancellationToken) != null;
-                return GetOrgAdminIfExists(organisation, user, cancellationToken) != null ||
-                    GetGroupAdminIfExists(group, user, cancellationToken) != null;
-            }
-            return false;
-        }
-
         private async Task<bool> CheckWriteAccess(Song song, User user)
         {
             return user.IsSystemAdmin && song.ProtectionLevel == ProtectionLevels.Public 

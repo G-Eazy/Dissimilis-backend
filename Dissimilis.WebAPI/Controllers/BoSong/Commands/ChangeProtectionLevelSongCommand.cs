@@ -26,34 +26,29 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public ChangeProtectionLevelSongCommandHandler(SongRepository songRepository, IAuthService authService)
+        public ChangeProtectionLevelSongCommandHandler(SongRepository songRepository, IAuthService authService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
+
 
         public async Task<ProtectionLevelSongDto> Handle(ChangeProtectionLevelSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if( currentUser.Id != song.ArrangerId)
-            {
-                throw new UnauthorizedAccessException();
-            }
-            switch (request.Command.ProtectionLevel)
-            {
-                case "Public":
-                    song.ProtectionLevel = ProtectionLevels.Public;
-                    break;
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
-                case "Private": song.ProtectionLevel = ProtectionLevels.Private;
-                        break;
-                default:
-                    throw new Exception("Protectionlevel need to be either Private or Public");
-            }
-
+            song.ProtectionLevel = request.Command.ProtectionLevel switch
+            {
+                "Public" => ProtectionLevels.Public,
+                "Private" => ProtectionLevels.Private,
+                _ => throw new Exception("Protectionlevel need to be either Private or Public"),
+            };
             await _songRepository.UpdateAsync(cancellationToken);
 
             return new ProtectionLevelSongDto(song);

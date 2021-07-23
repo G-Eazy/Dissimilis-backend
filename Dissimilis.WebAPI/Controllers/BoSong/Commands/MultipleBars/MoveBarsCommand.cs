@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -17,7 +18,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
         public int SongId { get; }
         public MoveBarDto Command { get; }
 
-
         public MoveBarsCommand(int songId, MoveBarDto command)
         {
             SongId = songId;
@@ -29,16 +29,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly _IPermissionCheckerService _IPermissionCheckerService;
 
-        public MoveBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService)
+        public MoveBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService, _IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(MoveBarsCommand request, CancellationToken cancellationToken)
         {
             var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             song.MoveBars(request.Command.FromPosition, request.Command.MoveLength, request.Command.ToPostition);
 

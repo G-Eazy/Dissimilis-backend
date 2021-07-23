@@ -43,8 +43,7 @@ namespace Dissimilis.DbContext.Models.Enums
         Get = 50,
 
         [Description("Restore")]
-        Restore = 60
-
+        Restore = 60,
     }
 
     public enum DefinedInstruments
