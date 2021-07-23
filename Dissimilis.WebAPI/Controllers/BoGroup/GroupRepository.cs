@@ -29,7 +29,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await Context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Group> GetGroupById(int groupId, CancellationToken cancellationToken)
+        public async Task<Group> GetGroupByIdAsync(int groupId, CancellationToken cancellationToken)
         {
             var group = await Context.Groups
                 .Include(g => g.Organisation)
@@ -56,9 +56,18 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return groupUser?.Role == Role.Admin;
         }
 
-        internal GroupUser FindNextAdmin()
+        internal async Task<bool> IsUserLastAdmin(int userId, int groupId, CancellationToken cancellationToken)
         {
-            return Context.GroupUsers.FirstOrDefault(groupUser => groupUser.Role == Role.Admin);
+            return await CheckUserAdminAsync(userId, groupId, cancellationToken)
+                    && !CheckIfAnotherGroupAdminExists(userId, groupId);
+        }
+
+        internal bool CheckIfAnotherGroupAdminExists(int userId, int groupId)
+        {
+            return Context.GroupUsers.Any(groupUser =>
+                groupUser.GroupId == groupId
+                && groupUser.UserId != userId
+                && groupUser.Role == Role.Admin);
         }
 
         internal async Task<GroupUser> AddUserToGroupAsync(int userId, int groupId, Role role, CancellationToken cancellationToken)
