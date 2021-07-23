@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         public async Task<GroupIndexDto[]> Handle(QueryGetGroups request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var result = await _repository.GetGroups(request.OrganisationId, request.FilterBy, currentUser, cancellationToken);
+            var result = await _repository.GetGroupsAsync(request.OrganisationId, request.FilterBy, currentUser, cancellationToken);
 
             return result.Select(group => new GroupIndexDto(group)).ToArray();
         }

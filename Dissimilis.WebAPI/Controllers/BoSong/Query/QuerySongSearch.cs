@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
@@ -24,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         private readonly SongRepository _repository;
         private readonly IAuthService _authService;
 
-        public QuerySongSearchHandler(SongRepository repository, IAuthService authService)
+        public QuerySongSearchHandler(SongRepository repository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _repository = repository;
             _authService = authService;
@@ -33,9 +36,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         public async Task<SongIndexDto[]> Handle(QuerySongSearch request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            
-            var result = await _repository.GetSongSearchList(currentUser, request.Command, cancellationToken);
 
+            var result = await _repository.GetSongSearchList(currentUser, request.Command, cancellationToken);
             return result.Select(s => new SongIndexDto(s)).ToArray();
         }
     }

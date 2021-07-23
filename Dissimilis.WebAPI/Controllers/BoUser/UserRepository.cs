@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +114,35 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
 
             await this._context.SaveChangesAsync();
             return user;
+        }
+
+        /// <summary>
+        /// Returns a UserAdminStatusDto object containing an overview over users different privilege levels.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<UserAdminStatusDto> GetUserAdminStatuses(User user)
+        {
+            bool sysAdmin = user.IsSystemAdmin;
+            bool orgAdmin = false;
+            bool groupAdmin = false;
+
+            var orgAdminStatuses = await _context.OrganisationUsers
+                .FirstOrDefaultAsync(ou => ou.UserId == user.Id && ou.Role == Role.Admin);
+            if (orgAdminStatuses != null)
+                orgAdmin = true;
+
+            var groupAdminStatuses = await _context.GroupUsers
+                .FirstOrDefaultAsync(gu => gu.UserId == user.Id && gu.Role == Role.Admin);
+            if (groupAdminStatuses != null)
+                groupAdmin = true;
+
+            return new UserAdminStatusDto()
+            {
+                SystemAdmin = sysAdmin,
+                OrganisationAdmin = orgAdmin,
+                GroupAdmin = groupAdmin
+            };
         }
 
         public async Task UpdateAsync(CancellationToken cancellationToken)

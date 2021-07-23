@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
@@ -33,22 +34,22 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
         private readonly AuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public RemoveComponentIntervalHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService)
+
+        public RemoveComponentIntervalHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
         public async Task<UpdatedCommandDto> Handle(RemoveComponentIntervalCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
             if (songVoice == null)

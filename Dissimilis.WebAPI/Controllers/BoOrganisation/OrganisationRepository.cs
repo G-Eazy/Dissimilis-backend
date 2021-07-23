@@ -23,7 +23,13 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         public async Task SaveOrganisationAsync(Organisation organisation, CancellationToken cancellationToken)
         {
             await Context.Organisations.AddAsync(organisation, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
+        }
+
+        public async Task SaveOrgUserAsync(OrganisationUser orgUser, CancellationToken cancellationToken)
+        {
+            await Context.OrganisationUsers.AddAsync(orgUser);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(CancellationToken cancellationToken)
@@ -38,17 +44,19 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                 .SingleOrDefaultAsync(o => o.Id == organisationId, cancellationToken);
 
             if (organisation == null)
+            {
                 throw new NotFoundException($"Organisation with Id {organisationId} not found");
+            }
 
-            await Context.OrganisationUsers
-                .Include(ou => ou.User)
-                .Where(ou => ou.OrganisationId == organisationId)
-                .LoadAsync(cancellationToken);
+                await Context.OrganisationUsers
+                    .Include(ou => ou.User)
+                    .Where(ou => ou.OrganisationId == organisationId)
+                    .LoadAsync(cancellationToken);
 
             return organisation;
         }
 
-    public async Task<Organisation[]> GetOrganisations(string filterBy, User currentUser, CancellationToken cancellationToken)
+    public async Task<Organisation[]> GetOrganisationsAsync(string filterBy, User currentUser, CancellationToken cancellationToken)
     {
         return await Context.Organisations
                         .Include(x => x.Users)

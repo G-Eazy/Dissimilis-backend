@@ -21,13 +21,13 @@ namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
 
     public class QueryGroupByIdHandler : IRequestHandler<QueryGroupById, GroupByIdDto>
     {
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
 
-        public QueryGroupByIdHandler(IPermissionCheckerService permissionChecker, GroupRepository repository, IAuthService authService)
+        public QueryGroupByIdHandler(IPermissionCheckerService IPermissionCheckerService, GroupRepository repository, IAuthService authService)
         {
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _groupRepository = repository;
             _IAuthService = authService;
         }
@@ -35,12 +35,12 @@ namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
         public async Task<GroupByIdDto> Handle(QueryGroupById request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var group = await _groupRepository.GetGroupById(request.GroupId, cancellationToken);
+            var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
 
             if (group == null)
                 throw new NotFoundException($"Group with Id {request.GroupId} not found");
 
-            bool allowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Get, cancellationToken);
+            bool allowed = await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Get, cancellationToken);
             if (!allowed)
                 throw new ForbiddenException($"User with id {currentUser.Id} is not allowed to view this group");
 

@@ -22,14 +22,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
     public class CreateOrganisationCommandHandler : IRequestHandler<CreateOrganisationCommand, UpdatedOrganisationCommandDto>
     {
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly UserRepository _userRepository;
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
 
-        public CreateOrganisationCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
+        public CreateOrganisationCommandHandler(IPermissionCheckerService IPermissionCheckerService, UserRepository userRepository, OrganisationRepository organisationRepository, IAuthService authService)
         {
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _userRepository = userRepository;
             _organisationRepository = organisationRepository;
             _authService = authService;
@@ -44,18 +44,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
                     currentUser.Id
                 );
 
-            bool isAllowed = await _permissionChecker.CheckPermission(organisation, currentUser, Operation.Create, cancellationToken);
+            bool isAllowed = await _IPermissionCheckerService.CheckPermission(organisation, currentUser, Operation.Create, cancellationToken);
             if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to create organisation");
 
             await _organisationRepository.SaveOrganisationAsync(organisation, cancellationToken);
 
-            var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminOrgUser = new OrganisationUser(organisation.Id, adminUser.Id, Role.Admin);
-            organisation.Users.Add(adminOrgUser);
-            currentUser.Organisations.Add(adminOrgUser);
-            await _organisationRepository.UpdateAsync(cancellationToken);
-            await _userRepository.UpdateAsync(cancellationToken);
+            var adminOrgUser = new OrganisationUser(organisation.Id, request.Command.FirstAdminId, Role.Admin);
+            await _organisationRepository.SaveOrgUserAsync(adminOrgUser, cancellationToken);
 
             return new UpdatedOrganisationCommandDto(organisation);
         }

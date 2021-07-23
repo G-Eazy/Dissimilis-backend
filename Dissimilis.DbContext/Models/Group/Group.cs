@@ -24,16 +24,16 @@ namespace Dissimilis.DbContext.Models
         public string Name { get; set; }
 
         [MaxLength(100)]
-        public string? Address { get; set; }
+        public string Address { get; set; }
         
         [MaxLength(20)]
-        public string? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         [MaxLength(100)]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [MaxLength(300)]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
         /// <summary>
         /// The different users and their roles in the group
@@ -43,7 +43,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// List of all shared songs in this group
         /// </summary>
-        public ICollection<SongSharedGroup> SharedSongs { get; set; } = new List<SongSharedGroup>();
+        public ICollection<SongGroupTag> SharedSongs { get; set; } = new List<SongGroupTag>();
 
         /// <summary>
         /// this groups organisation

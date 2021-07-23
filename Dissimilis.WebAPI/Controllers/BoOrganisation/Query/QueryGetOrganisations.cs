@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
         public async Task<OrganisationIndexDto[]> Handle(QueryGetOrganisations request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var result = await _repository.GetOrganisations(request.FilterByRole, currentUser, cancellationToken);
+            var result = await _repository.GetOrganisationsAsync(request.FilterByRole, currentUser, cancellationToken);
 
             return result.Select(organisation => new OrganisationIndexDto(organisation)).ToArray();
         }

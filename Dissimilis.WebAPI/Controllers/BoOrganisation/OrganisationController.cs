@@ -2,11 +2,13 @@
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -68,5 +70,15 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             return Ok(result);
         }
 
+        [HttpPatch("{organisationId:int}")]
+        [ProducesResponseType(typeof(OrganisationByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> UpdateOrganisation(int organisationId, [FromBody] UpdateGroupAndOrganisationDto command)
+        {
+            var item = await _mediator.Send(new UpdateOrganisationCommand(organisationId, command));
+            var organisation = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
+            return Ok(organisation);
+        }
     }
 }

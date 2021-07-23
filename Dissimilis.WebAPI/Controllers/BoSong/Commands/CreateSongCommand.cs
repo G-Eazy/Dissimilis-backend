@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
@@ -24,17 +25,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongCommandHandler(SongRepository songRepository, IAuthService authService)
+        public CreateSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(CreateSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-
             var song = new Song()
             {
                 Title = request.Command.Title,
@@ -43,6 +45,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                 ArrangerId = currentUser.Id,
                 ProtectionLevel = ProtectionLevels.Private
             };
+            if(!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Create, cancellationToken)) throw new UnauthorizedAccessException();
 
             song.SetCreated(currentUser.Id);
             await _songRepository.SaveAsync(song, cancellationToken);
