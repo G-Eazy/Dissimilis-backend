@@ -1,4 +1,5 @@
 ﻿using Dissimilis.DbContext.Models.Enums;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.DbContext.Models
@@ -24,5 +25,14 @@ namespace Dissimilis.DbContext.Models
         ///predefined roles; admin and instructor
         /// </summary>
         public Role Role { get; set; }
+
+        public GroupUser() { }
+
+        public GroupUser(int groupId, int userId, Role role)
+        {
+            GroupId = groupId;
+            UserId = userId;
+            Role = role;
+        }
     }
 }

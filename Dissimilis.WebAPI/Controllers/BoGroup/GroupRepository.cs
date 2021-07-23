@@ -2,6 +2,7 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         }
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
+            await Context.Groups.AddAsync(group, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
         }
 

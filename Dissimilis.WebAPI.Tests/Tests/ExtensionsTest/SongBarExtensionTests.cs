@@ -1,16 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
-using Dissimilis.WebAPI.Controllers.BoSong;
-using Dissimilis.WebAPI.Controllers.BoSong.Commands;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Extensions.Models;
 using System;
-using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
-using static Dissimilis.WebAPI.xUnit.Extensions;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 
