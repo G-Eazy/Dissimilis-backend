@@ -22,13 +22,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         public async Task SaveGroupAsync(Group group, CancellationToken cancellationToken)
         {
             await Context.Groups.AddAsync(group, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task SaveGroupUserAsync(GroupUser groupUser, CancellationToken cancellationToken)
         {
             await Context.GroupUsers.AddAsync(groupUser, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await UpdateAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(CancellationToken cancellationToken)
