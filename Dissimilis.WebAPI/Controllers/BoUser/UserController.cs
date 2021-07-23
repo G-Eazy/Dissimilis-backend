@@ -54,5 +54,13 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         {
             return Ok();
         }
+
+        [HttpGet("currentUser/adminStatuses")]
+        [ProducesResponseType(typeof(UserAdminStatusDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetCurrentUserAdminStatuses()
+        {
+            var result = await _mediator.Send(new QueryUserAdminStatuses());
+            return Ok(result);
+        }
     }
 }

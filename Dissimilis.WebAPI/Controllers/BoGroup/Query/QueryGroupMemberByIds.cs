@@ -1,12 +1,9 @@
 ﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dissimilis.WebAPI.Controllers.BoGroup.Queries
+namespace Dissimilis.WebAPI.Controllers.BoGroup.Query
 {
     public class QueryGroupMemberByIds : IRequest<QueryMemberByIdsDto>
     {

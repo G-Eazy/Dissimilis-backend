@@ -1,5 +1,6 @@
 ﻿using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Services;
 using Dissimilis.WebAPI.xUnit.Setup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ namespace Dissimilis.WebAPI.xUnit
     {
         internal readonly TestServerFixture _testServerFixture;
         internal readonly IMediator _mediator;
+        internal readonly IPermissionCheckerService _permissionChecker;
 
         internal User SysAdminUser;
         internal User NorwayAdminUser;
@@ -47,6 +49,7 @@ namespace Dissimilis.WebAPI.xUnit
             _testServerFixture = testServerFixture;
 
             _mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            _permissionChecker = _testServerFixture.GetServiceProvider().GetService<IPermissionCheckerService>();
 
             UpdateAllUsers();
             UpdateAllSongs();
