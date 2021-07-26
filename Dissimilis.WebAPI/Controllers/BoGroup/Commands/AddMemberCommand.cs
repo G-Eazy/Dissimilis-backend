@@ -2,7 +2,7 @@
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using static Dissimilis.Core.Collections.EnumExtensions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,7 +49,9 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             var existingGroupUser = await _groupRepository.GetGroupUserAsync(request.Command.NewMemberUserId, request.GroupId, cancellationToken);
             if (existingGroupUser != null) throw new ValidationException("The user is already a member of the group.");
 
-            var newGroupUser = await _groupRepository.AddUserToGroupAsync(request.Command.NewMemberUserId, request.GroupId, request.Command.NewMemberRole, cancellationToken);
+            var newMemberRoleEnumValue = GetEnumValueFromDescriptionString<Role>(request.Command.NewMemberRole);
+
+            var newGroupUser = await _groupRepository.AddUserToGroupAsync(request.Command.NewMemberUserId, request.GroupId, newMemberRoleEnumValue, cancellationToken);
             await _groupRepository.UpdateAsync(cancellationToken);
 
             return new MemberAddedDto() { UserId = newGroupUser.UserId, GroupId = newGroupUser.GroupId };

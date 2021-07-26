@@ -7,7 +7,9 @@ namespace Dissimilis.DbContext.Models.Enums
     /// </summary>
     public enum Role
     {
-        Member =10,
+        [Description("Member")]
+        Member = 10,
+        [Description("Admin")]
         Admin = 20
     }
 

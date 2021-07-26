@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
             var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
-            var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, groupId));
+            var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, memberRoleChanged.GroupId));
             return Ok(memberUpdated);
         }
 

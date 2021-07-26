@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
 
-            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Member }));
+            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Member" }));
 
             var groupUser = _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(BergenAdminUser.Id);
 
-            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = Role.Admin }));
+            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Admin" }));
 
             var groupUser = _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
@@ -65,7 +65,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
 
             await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = Role.Admin })));
+                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = "Admin" })));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
@@ -136,7 +136,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
 
-            await _mediator.Send(new ChangeUserRoleCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id, new ChangeUserRoleDto { RoleToSet = Role.Admin }));
+            await _mediator.Send(new ChangeUserRoleCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id, new ChangeUserRoleDto { RoleToSet = "Admin" }));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
@@ -152,7 +152,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
                 await _mediator.Send(
                     new ChangeUserRoleCommand(SandvikaGroup.Id, EdvardGriegFanUser.Id,
-                                                new ChangeUserRoleDto { RoleToSet = Role.Admin })));
+                                                new ChangeUserRoleDto { RoleToSet = "Admin" })));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
@@ -165,7 +165,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
 
-            await _mediator.Send(new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser2.Id, new ChangeUserRoleDto { RoleToSet = Role.Member }));
+            await _mediator.Send(new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser2.Id, new ChangeUserRoleDto { RoleToSet = "Member" }));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser2.Id)
@@ -181,7 +181,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
                 await _mediator.Send(
                     new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser.Id,
-                                                new ChangeUserRoleDto { RoleToSet = Role.Member })));
+                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser.Id)
@@ -197,7 +197,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             await Should.ThrowAsync<InvalidOperationException>(async () =>
                 await _mediator.Send(
                     new ChangeUserRoleCommand(TrondheimGroup.Id, TrondheimAdminUser.Id,
-                                                new ChangeUserRoleDto { RoleToSet = Role.Member })));
+                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == TrondheimAdminUser.Id)
