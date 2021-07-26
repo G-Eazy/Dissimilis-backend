@@ -64,5 +64,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             var organisation = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
             return Ok(organisation);
         }
+
+        [HttpDelete("{organisationId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> DeleteOrganisation(int organisationId)
+        {
+            var res = await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            return Ok(res);
+        }
     }
 }

@@ -82,5 +82,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             var group = await _mediator.Send(new QueryGroupById(item.GroupId));
             return Ok(group);
         }
+
+        [HttpDelete("{organisationId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> DeleteGroup(int groupId)
+        {
+            var res = await _mediator.Send(new DeleteGroupCommand(groupId));
+            return Ok(res);
+        }
     }
 }
