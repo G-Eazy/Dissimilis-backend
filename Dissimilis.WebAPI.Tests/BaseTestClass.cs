@@ -21,8 +21,10 @@ namespace Dissimilis.WebAPI.xUnit
         internal User NorwayAdminUser;
         internal User GuatemalaAdminUser;
         internal User SandvikaAdminUser;
+        internal User SandvikaAdminUser2;
         internal User TrondheimAdminUser;
         internal User BergenAdminUser;
+        internal User QuetzaltenangoAdminUser;
         internal User DeepPurpleFanUser;
         internal User EdvardGriegFanUser;
         internal User JustinBieberFanUser;
@@ -46,6 +48,7 @@ namespace Dissimilis.WebAPI.xUnit
         internal Group SandvikaGroup;
         internal Group TrondheimGroup;
         internal Group BergenGroup;
+        internal Group QuetzaltenangoGroup;
         internal Group DeleteGroup;
 
         public BaseTestClass(TestServerFixture testServerFixture)
@@ -68,10 +71,12 @@ namespace Dissimilis.WebAPI.xUnit
             NorwayAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Norway.no");
             GuatemalaAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Guatemala.no");
             SandvikaAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Sandvika_Norway.no");
+            SandvikaAdminUser2 = users.SingleOrDefault(user => user.Email == "GroupAdmin2@Sandvika_Norway.no");
             TrondheimAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Trondheim_Norway.no");
             BergenAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Bergen_Norway.no");
             DeepPurpleFanUser = users.SingleOrDefault(user => user.Email == "Deep_Purple_fan@Trondheim_Norway.no");
             EdvardGriegFanUser = users.SingleOrDefault(user => user.Email == "Edvard_Grieg_fan@Sandvika_Norway.no");
+            QuetzaltenangoAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Quetzaltenango_Guatemala.no");
             JustinBieberFanUser = users.SingleOrDefault(user => user.Email == "Justin_Bieber_fan@Norway.no");
             RammsteinFanUser = users.SingleOrDefault(user => user.Email == "Rammstein_fan@Norway.no");
             U2FanUser = users.SingleOrDefault(user => user.Email == "U2_fan@Sandvika_Norway.no");
@@ -129,6 +134,7 @@ namespace Dissimilis.WebAPI.xUnit
             TrondheimGroup = groups.SingleOrDefault(group => group.Name == "Trondheim_Norway");
             BergenGroup = groups.SingleOrDefault(group => group.Name == "Bergen_Norway");
             DeleteGroup = groups.SingleOrDefault(group => group.Name == "Delete_Delete");
+            QuetzaltenangoGroup = groups.SingleOrDefault(group => group.Name == "Quetzaltenango_Guatemala");
 
             return groups;
         }

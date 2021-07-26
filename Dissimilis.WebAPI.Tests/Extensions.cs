@@ -4,12 +4,14 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 
@@ -267,6 +269,27 @@ namespace Dissimilis.WebAPI.xUnit
                 IncludedOrganisationIdArray = orgs
             };
 
+        }
+
+        internal static CreateGroupDto GetCreateGroupDto(int groupNumber, int orgId, int adminId)
+        {
+            return new CreateGroupDto()
+            {
+                Name = $"TestGroup{groupNumber}",
+                OrganisationId = orgId,
+                FirstAdminId = adminId
+            };
+        }
+        
+        internal static UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Address = "Nidarosveien 58",
+                Email = "NewAdmin@Trondheim_Norway.no",
+                Description = "The new and hip Trondheim group.",
+                PhoneNumber = "90944999",
+            };
         }
     }
 }

@@ -81,6 +81,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
+                    Name = "GroupAdminSandvikaUser2",
+                    Email = "GroupAdmin2@Sandvika_Norway.no",
+                },
+                new User()
+                {
                     Name = "GroupAdminBergenUser",
                     Email = "GroupAdmin@Bergen_Norway.no",
                 },
@@ -93,6 +98,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "OrgAdminGuatamalaUser",
                     Email = "OrgAdmin@Guatemala.no",
+                },
+                new User()
+                {
+                    Name = "GroupAdminQuetzaltenangoUser",
+                    Email = "GroupAdmin@Quetzaltenango_Guatemala.no",
                 },
                 new User()
                 {
@@ -176,6 +186,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new Group()
                 {
                     Name = "Trondheim_Norway",
+                },
+                new Group()
+                {
+                    Name = "Quetzaltenango_Guatemala"
                 },
                 new Group()
                 {

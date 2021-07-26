@@ -98,5 +98,16 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             Context.GroupUsers.Remove(groupUserToDelete);
             return groupUserToDelete;
         }
+
+        internal async Task<GroupUser> ChangeUserRoleAsync(int userId, int groupId, Role newRole, CancellationToken cancellationToken)
+        {
+            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken);
+            if (groupUser == null) throw new NotFoundException($"User with id {userId} is not a in the group with id {groupId}");
+
+            groupUser.Role = newRole;
+            await UpdateAsync(cancellationToken);
+
+            return groupUser;
+        }
     }
 }
