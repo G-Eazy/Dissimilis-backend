@@ -62,7 +62,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
                 Position = voice.SongBars.OrderByDescending(sb => sb.Position).FirstOrDefault()?.Position + 1 ?? 1,
                 RepAfter = request.Command.RepAfter,
                 RepBefore = request.Command.RepBefore,
-                House = request.Command.House
+                VoltaBracket = request.Command.VoltaBracket
             };
 
             voice.SongBars.Add(songBar);

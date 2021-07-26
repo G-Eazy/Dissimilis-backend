@@ -71,10 +71,10 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
             bar.RepAfter = request.Command?.RepAfter ?? bar.RepAfter;
             bar.RepBefore = request.Command?.RepBefore ?? bar.RepBefore;
-            bar.House = request.Command?.House ?? bar.House;
-            if (bar.House == 0)
+            bar.VoltaBracket = request.Command?.VoltaBracket ?? bar.VoltaBracket;
+            if (bar.VoltaBracket == 0)
             {
-                bar.House = null;
+                bar.VoltaBracket = null;
             }
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);

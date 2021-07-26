@@ -258,9 +258,6 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("House")
-                        .HasColumnType("int");
-
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
@@ -271,6 +268,9 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("SongVoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VoltaBracket")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -469,13 +469,13 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Group", "Group")
                         .WithMany("Users")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "User")
                         .WithMany("Groups")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -498,13 +498,13 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
                         .WithMany("Users")
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "User")
                         .WithMany("Organisations")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Organisation");
@@ -595,13 +595,13 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Group", "Group")
                         .WithMany("SharedSongs")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
                         .WithMany("GroupTags")
                         .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -614,13 +614,13 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
                         .WithMany("SharedSongs")
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
                         .WithMany("OrganisationTags")
                         .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Organisation");
@@ -633,13 +633,13 @@ namespace Dissimilis.DbContext.Migrations
                     b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
                         .WithMany("SharedUsers")
                         .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dissimilis.DbContext.Models.User", "User")
                         .WithMany("SongsShared")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Song");

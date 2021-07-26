@@ -13,6 +13,7 @@ using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
+using Dissimilis.WebAPI.Exceptions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -74,6 +75,27 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedOrg.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationWithCorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var organisationId = DeleteOrganisation.Id;
+            await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            var organisationShouldBeNull = _testServerFixture.GetContext().Organisations
+                .SingleOrDefault(g => g.Id == organisationId);
+            organisationShouldBeNull.ShouldBeNull($"Group was not deleted...");
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationWithIncorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var organisationId = -1;
+            await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteOrganisationCommand(organisationId)));
         }
     }
 }

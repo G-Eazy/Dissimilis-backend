@@ -123,6 +123,16 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "User with no songs",
                     Email = "NoSongs@Norway.no",
+                },
+                new User()
+                {
+                    Name = "Delete org user",
+                    Email = "DeleteOrgUser@Delete.no",
+                },
+                new User()
+                {
+                    Name = "Delete group user",
+                    Email = "DeleteGroupUser@Delete_Delete.no",
                 }
             };
         }
@@ -144,6 +154,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Guatemala"
                 },
+                new Organisation()
+                {
+                    Name = "Delete"
+                }
             };
         }
 
@@ -163,6 +177,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Trondheim_Norway",
                 },
+                new Group()
+                {
+                    Name = "Delete_Delete"
+                }
             };
         }
 
@@ -252,28 +270,28 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 new SongBar()
                 {
-                    House = null,
+                    VoltaBracket = null,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 0,
                 },
                 new SongBar()
                 {
-                    House = null,
+                    VoltaBracket = null,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 1,
                 },
                 new SongBar()
                 {
-                    House = 1,
+                    VoltaBracket = 1,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 2,
                 },
                 new SongBar()
                 {
-                    House = 1,
+                    VoltaBracket = 1,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 3,

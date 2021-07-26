@@ -32,9 +32,9 @@ namespace Dissimilis.DbContext.Models.Song
         public bool RepAfter { get; set; }
 
         /// <summary>
-        /// if 0, there is no house. otherwise it should follow an order
+        /// if 0, there is no volta bracket. otherwise it should follow an order
         /// </summary>
-        public int? House { get; set; }
+        public int? VoltaBracket { get; set; }
 
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Dissimilis.DbContext.Models.Song
         {
             return new SongBar()
             {
-                House = House,
+                VoltaBracket = VoltaBracket,
                 RepAfter = RepAfter,
                 RepBefore = RepBefore,
                 Position = Position,

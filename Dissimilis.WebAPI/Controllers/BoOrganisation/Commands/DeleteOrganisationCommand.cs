@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
@@ -34,6 +35,9 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+
+            if (organisation == null)
+                throw new NotFoundException($"Organisation with Id {request.OrganisationId} not found");
 
             bool isAllowed = await _IPermissionCheckerService.CheckPermission(organisation, currentUser, Operation.Delete, cancellationToken);
             if (!isAllowed)

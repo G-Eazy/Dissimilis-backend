@@ -29,6 +29,8 @@ namespace Dissimilis.WebAPI.xUnit
         internal User RammsteinFanUser;
         internal User U2FanUser;
         internal User NoSongsUser;
+        internal User DeleteOrgUser;
+        internal User DeleteGroupUser;
 
         internal Song LisaGikkTilSkolenSong;
         internal Song SmokeOnTheWaterSong;
@@ -39,10 +41,12 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal Organisation NorwayOrganisation;
         internal Organisation GuatemalaOrganisation;
+        internal Organisation DeleteOrganisation;
 
         internal Group SandvikaGroup;
         internal Group TrondheimGroup;
         internal Group BergenGroup;
+        internal Group DeleteGroup;
 
         public BaseTestClass(TestServerFixture testServerFixture)
         {
@@ -72,6 +76,8 @@ namespace Dissimilis.WebAPI.xUnit
             RammsteinFanUser = users.SingleOrDefault(user => user.Email == "Rammstein_fan@Norway.no");
             U2FanUser = users.SingleOrDefault(user => user.Email == "U2_fan@Sandvika_Norway.no");
             NoSongsUser = users.SingleOrDefault(user => user.Email == "NoSongs@Norway.no");
+            DeleteOrgUser = users.SingleOrDefault(user => user.Email == "DeleteOrgUser@Delete.no");
+            DeleteGroupUser = users.SingleOrDefault(user => user.Email == "DeleteGroupUser@Delete_Delete.no");
         }
 
         private List<User> GetAllUsers()
@@ -105,6 +111,7 @@ namespace Dissimilis.WebAPI.xUnit
             var organisations = GetAllOrganisations();
             NorwayOrganisation = organisations.SingleOrDefault(organisation => organisation.Name == "Norway");
             GuatemalaOrganisation = organisations.SingleOrDefault(organisation => organisation.Name == "Guatemala");
+            DeleteOrganisation = organisations.SingleOrDefault(organisation => organisation.Name == "Delete");
 
             return organisations;
         }
@@ -121,6 +128,7 @@ namespace Dissimilis.WebAPI.xUnit
             SandvikaGroup = groups.SingleOrDefault(group => group.Name == "Sandvika_Norway");
             TrondheimGroup = groups.SingleOrDefault(group => group.Name == "Trondheim_Norway");
             BergenGroup = groups.SingleOrDefault(group => group.Name == "Bergen_Norway");
+            DeleteGroup = groups.SingleOrDefault(group => group.Name == "Delete_Delete");
 
             return groups;
         }

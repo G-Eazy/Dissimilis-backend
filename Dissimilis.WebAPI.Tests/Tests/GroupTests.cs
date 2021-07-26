@@ -6,9 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
@@ -17,10 +14,10 @@ using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Exceptions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -188,6 +185,27 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task DeleteGroupWithCorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var groupId = DeleteGroup.Id;
+            await _mediator.Send(new DeleteGroupCommand(groupId));
+            var groupShouldBeNull = _testServerFixture.GetContext().Groups
+                .SingleOrDefault(g => g.Id == groupId);
+            groupShouldBeNull.ShouldBeNull("Group was not deleted...");
+        }
+
+        [Fact]
+        public async Task DeleteGroupWithIncorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var groupId = -1;
+            await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteGroupCommand(groupId)));
         }
     }
 }

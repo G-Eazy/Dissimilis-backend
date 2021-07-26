@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
+using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
@@ -34,6 +35,9 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
+
+            if (group == null)
+                throw new NotFoundException($"Group with Id {request.GroupId} not found");
 
             bool isAllowed = await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Delete, cancellationToken);
             if (!isAllowed)
