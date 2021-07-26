@@ -1,4 +1,8 @@
-﻿using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
+﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
@@ -15,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 {
-    [Route("api/organisation")]
+    [Route("api/organisations")]
     [ApiController]
     public class OrganisationController : Controller
     {
@@ -52,6 +56,18 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         {
             var users = await _mediator.Send(new QueryUsersInOrganisation(organisationId));
             return Ok(users);
+        }
+
+        /// <summary>
+        /// get all organisations filtered
+        /// </summary>
+        [HttpGet("")]
+        [ProducesResponseType(typeof(OrganisationIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetOrganisations([FromQuery] string filterByRole)
+        {
+            var result = await _mediator.Send(new QueryGetOrganisations(filterByRole));
+            return Ok(result);
         }
 
         [HttpPatch("{organisationId:int}")]

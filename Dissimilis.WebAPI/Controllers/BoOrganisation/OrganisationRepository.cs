@@ -2,6 +2,7 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,37 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                     .Where(ou => ou.OrganisationId == organisationId)
                     .LoadAsync(cancellationToken);
 
-                return organisation;
+            return organisation;
         }
+
+    public async Task<Organisation[]> GetOrganisationsAsync(string filterBy, User currentUser, CancellationToken cancellationToken)
+    {
+        return await Context.Organisations
+                        .Include(x => x.Users)
+                        .AsQueryable()
+                        .FilterOrganisations(filterBy, currentUser)
+                        .ToArrayAsync(cancellationToken);
     }
+}
+public static class IQueryableExtension
+{
+    public static IQueryable<Organisation> FilterOrganisations(this IQueryable<Organisation> organisations, string filterBy, User user)
+    {
+        return filterBy switch
+        {
+            "ADMIN" => organisations.Where(o =>
+            o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+
+            "GROUPADMIN" => organisations
+            .Include(x => x.Groups)
+            .ThenInclude(x => x.Users)
+            .Where(o =>
+            o.Groups.Any(g => g.Users.Any(u =>
+            u.UserId == user.Id && u.Role == Role.Admin))).AsQueryable(),
+
+            "MEMBER" => organisations.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+            _ => organisations,
+        };
+    }
+}
 }
