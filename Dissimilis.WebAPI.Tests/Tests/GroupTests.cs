@@ -207,5 +207,23 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var groupId = -1;
             await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteGroupCommand(groupId)));
         }
+
+        [Fact]
+        public async Task DeleteGroupGroupUserShouldBeRemoved()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            UpdateAllOrganisations();
+            UpdateAllGroups();
+            var groupId = DeleteGroup.Id;
+
+            var groupUser = _testServerFixture.GetContext().GroupUsers
+                .SingleOrDefault(gu => gu.GroupId == groupId);
+            groupUser.ShouldNotBeNull("No user was assigned to group to begin with");
+
+            await _mediator.Send(new DeleteGroupCommand(groupId));
+            var groupUserShouldBeNull = _testServerFixture.GetContext().GroupUsers
+                .SingleOrDefault(gu => gu.GroupId == groupId);
+            groupUserShouldBeNull.ShouldBeNull($"GroupUser was not deleted...");
+        }
     }
 }

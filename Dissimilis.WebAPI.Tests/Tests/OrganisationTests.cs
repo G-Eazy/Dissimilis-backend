@@ -81,6 +81,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task DeleteOrganisationWithCorrectIdShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            UpdateAllOrganisations();
 
             var organisationId = DeleteOrganisation.Id;
             await _mediator.Send(new DeleteOrganisationCommand(organisationId));
@@ -96,6 +97,25 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var organisationId = -1;
             await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteOrganisationCommand(organisationId)));
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationOrgUserShouldBeRemoved()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            UpdateAllOrganisations();
+
+            var organisationId = DeleteOrganisation.Id;
+
+            var orgUser = _testServerFixture.GetContext().OrganisationUsers
+                .FirstOrDefault(ou => ou.OrganisationId == organisationId);
+            orgUser.ShouldNotBeNull("No user was assigned to org to begin with");
+
+            await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            var organisationUserShouldBeNull = _testServerFixture.GetContext().OrganisationUsers
+                .FirstOrDefault(ou => ou.OrganisationId == organisationId);
+            organisationUserShouldBeNull.ShouldBeNull($"OrganisationUser was not deleted...");
         }
     }
 }
