@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
-    [Route("api/group")]
+    [Route("api/groups")]
     [ApiController]
     public class GroupController : Controller
     {
@@ -46,16 +46,16 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(group);
         }
 
-        [HttpGet("{groupId:int}/users")]
-        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetUsersInGroup(int groupId)
+        [HttpPatch("{groupId:int}/users/{userId:int}/changeUserRole")]
+        [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
-            var users = await _mediator.Send(new QueryUsersInGroup(groupId));
-            return Ok(users);
+            var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
+            var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, memberRoleChanged.GroupId));
+            return Ok(memberUpdated);
         }
 
-        [HttpPost("/{groupId:int}/addMember")]
+        [HttpPost("{groupId:int}/users")]
         [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
         { 
@@ -64,7 +64,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
         }
 
-        [HttpDelete("/{groupId:int}/removeMember/{userId:int}")]
+        [HttpDelete("{groupId:int}/users/{userId:int}")]
         [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
         {
