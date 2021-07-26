@@ -24,6 +24,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await UpdateAsync(cancellationToken);
         }
 
+        public async Task SaveGroupUserAsync(GroupUser groupUser, CancellationToken cancellationToken)
+        {
+            await Context.GroupUsers.AddAsync(groupUser, cancellationToken);
+            await UpdateAsync(cancellationToken);
+        }
+
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
             await Context.SaveChangesAsync(cancellationToken);
@@ -36,15 +42,18 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
                 .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
 
             if (group == null)
+            {
                 throw new NotFoundException($"Group with Id {groupId} not found");
+            }
 
-            await Context.GroupUsers
-                .Include(gu => gu.User)
-                .Where(gu => gu.GroupId == groupId)
-                .LoadAsync(cancellationToken);
+                await Context.GroupUsers
+                    .Include(gu => gu.User)
+                    .Where(gu => gu.GroupId == groupId)
+                    .LoadAsync(cancellationToken);
 
             return group;
         }
+
         internal async Task<GroupUser> GetGroupUserAsync(int userId, int groupId, CancellationToken cancellationToken)
         {
             return await Context.GroupUsers.FindAsync(userId, groupId);

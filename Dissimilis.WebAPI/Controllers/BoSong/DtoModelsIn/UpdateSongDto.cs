@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Dissimilis.DbContext.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
 {
@@ -16,7 +17,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
 
         [Range(1,10)]
         public int? DegreeOfDifficulty { get; set; }
-        
+        [MaxLength(250)]        
         public string SongNotes { get; set; }
 
         public string Composer { get; set; }

@@ -28,13 +28,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
     {
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public RemoveMemberCommandHandler(GroupRepository groupRepository, IAuthService authService, PermissionCheckerService permissionChecker)
+        public RemoveMemberCommandHandler(GroupRepository groupRepository, IAuthService authService, PermissionCheckerService IPermissionCheckerService)
         {
             _groupRepository = groupRepository;
             _authService = authService;
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<MemberRemovedDto> Handle(RemoveMemberCommand request, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
             var group = await _groupRepository.GetGroupByIdAsync(request.GroupId, cancellationToken);
 
             bool isAllowed = 
-                await _permissionChecker.CheckPermission(group, currentUser, Operation.Kick, cancellationToken)
+                await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Kick, cancellationToken)
                 || request.UserId == currentUser.Id;
             if (!isAllowed)
                 throw new UnauthorizedAccessException("Only an admin can remove other members from the group.");

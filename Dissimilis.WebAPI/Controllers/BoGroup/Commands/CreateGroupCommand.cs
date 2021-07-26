@@ -22,14 +22,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, UpdatedGroupCommandDto>
     {
-        private readonly IPermissionCheckerService _permissionChecker;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _authService;
 
-        public CreateGroupCommandHandler(IPermissionCheckerService permissionChecker, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
+        public CreateGroupCommandHandler(IPermissionCheckerService IPermissionCheckerService, UserRepository userRepository, GroupRepository groupRepository, IAuthService authService)
         {
-            _permissionChecker = permissionChecker;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
             _authService = authService;
@@ -44,18 +44,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
                     request.Command.OrganisationId,
                     currentUser.Id
                 );
-            bool isAllowed = await _permissionChecker.CheckPermission(group, currentUser, Operation.Create, cancellationToken);
+            bool isAllowed = await _IPermissionCheckerService.CheckPermission(group, currentUser, Operation.Create, cancellationToken);
             if (!isAllowed)
                 throw new System.UnauthorizedAccessException($"User does not have permission to create group in organisation");
 
                 await _groupRepository.SaveGroupAsync(group, cancellationToken);
 
-            var adminUser = await _userRepository.GetUserById(request.Command.FirstAdminId, cancellationToken);
-            var adminGroupUser = new GroupUser(group.Id, adminUser.Id, Role.Admin);
-            group.Users.Add(adminGroupUser);
-            currentUser.Groups.Add(adminGroupUser);
-            await _groupRepository.UpdateAsync(cancellationToken);
-            await _userRepository.UpdateAsync(cancellationToken);
+            var adminGroupUser = new GroupUser(group.Id, request.Command.FirstAdminId, Role.Admin);
+            await _groupRepository.SaveGroupUserAsync(adminGroupUser, cancellationToken);
 
             return new UpdatedGroupCommandDto(group);
         }

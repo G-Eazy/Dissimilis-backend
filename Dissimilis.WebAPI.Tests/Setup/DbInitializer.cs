@@ -96,9 +96,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 UserId = userToAdd.Id,
                 OrganisationId = organisation.Id,
             };
-            organisation.Users.Add(orgUser);
-            userToAdd.Organisations.Add(orgUser);
-
             _dbContext.OrganisationUsers.Add(orgUser);
             _dbContext.SaveChanges();
         }

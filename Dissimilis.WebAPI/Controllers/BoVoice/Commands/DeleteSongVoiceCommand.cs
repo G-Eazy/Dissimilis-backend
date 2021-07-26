@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
@@ -26,26 +28,31 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
     {
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService)
+        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
         {
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            
             if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
             }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             song.Voices.Remove(songVoice);
-            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            song.SetUpdated(currentUser.Id);
 
             await _voiceRepository.UpdateAsync(cancellationToken);
 

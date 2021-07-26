@@ -191,6 +191,7 @@ namespace Dissimilis.WebAPI
             DBMigrationJobs.DeleteOldInstruments(context);
             DBMigrationJobs.CreateNewInstruments(context);
             DBMigrationJobs.UpdateExistingInstrumentName(context);
+            DBMigrationJobs.SetAllSongsToPublic(context);
             if (ConfigurationInfo.IsLocalDebugBuild())
             {
                 // local seeding

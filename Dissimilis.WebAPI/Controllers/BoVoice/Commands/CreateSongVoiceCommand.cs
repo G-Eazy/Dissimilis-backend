@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
@@ -32,12 +33,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService)
+
+        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
+
         }
 
         public async Task<UpdatedCommandDto> Handle(CreateSongVoiceCommand request, CancellationToken cancellationToken)
@@ -47,10 +52,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser))
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             if (song.Voices.Any(v => v.VoiceNumber == request.Command.VoiceNumber))
             {
@@ -82,8 +84,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 song.SyncVoicesFrom(cloneVoice);
             }
-
-            await _voiceRepository.UpdateAsync(cancellationToken);
 
             try
             {
