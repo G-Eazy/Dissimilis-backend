@@ -60,7 +60,9 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
     {
         return await Context.Organisations
                         .Include(x => x.Users)
-                        .AsQueryable().FilterOrganisations(filterBy, currentUser).ToArrayAsync(cancellationToken);
+                        .AsQueryable()
+                        .FilterOrganisations(filterBy, currentUser)
+                        .ToArrayAsync(cancellationToken);
     }
 }
 public static class IQueryableExtension

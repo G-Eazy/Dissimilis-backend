@@ -12,8 +12,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
     public class QueryGetOrganisations : IRequest<OrganisationIndexDto[]>
     {
         public string FilterByRole { get; }
-        public int? OrganisationId { get; }
-
         public QueryGetOrganisations(string filterByRole)
         {
             FilterByRole = filterByRole;

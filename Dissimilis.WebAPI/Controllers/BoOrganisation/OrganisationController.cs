@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 {
-        [Route("api/organisations")]
+    [Route("api/organisations")]
     [ApiController]
     public class OrganisationController : Controller
     {
@@ -64,9 +64,9 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         [HttpGet("")]
         [ProducesResponseType(typeof(OrganisationIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetOrganisations([FromQuery] string filterBy)
+        public async Task<IActionResult> GetOrganisations([FromQuery] string filterByRole)
         {
-            var result = await _mediator.Send(new QueryGetOrganisations(filterBy));
+            var result = await _mediator.Send(new QueryGetOrganisations(filterByRole));
             return Ok(result);
         }
 
