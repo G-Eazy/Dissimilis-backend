@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.Commands
 
             var groupUserToDelete = await _groupRepository.GetGroupUserAsync(request.UserId, request.GroupId, cancellationToken);
             if (groupUserToDelete == null)
-                throw new ValidationException("The user is not a member of the group.");
+                throw new ValidationException("The user requested for removal is not a member of the group.");
 
             if (await _groupRepository.IsUserLastAdmin(groupUserToDelete.UserId, groupUserToDelete.GroupId, cancellationToken))
                 throw new InvalidOperationException("The member cannot be removed from the group as it is the last admin.");

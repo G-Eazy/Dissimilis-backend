@@ -47,13 +47,13 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(group);
         }
 
-        [HttpGet("{groupId:int}/users")]
-        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> GetUsersInGroup(int groupId)
+        [HttpPatch("{groupId:int}/users/{userId:int}/changeUserRole")]
+        [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
-            var users = await _mediator.Send(new QueryUsersInGroup(groupId));
-            return Ok(users);
+            var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
+            var memberUpdated = await _mediator.Send(new QueryGroupMemberByIds(memberRoleChanged.UserId, memberRoleChanged.GroupId));
+            return Ok(memberUpdated);
         }
 
         /// <summary>
