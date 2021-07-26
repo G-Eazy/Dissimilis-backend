@@ -59,7 +59,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
             songNote.Length = request.Command?.Length ?? songNote.Length;
             songNote.Position = request.Command?.Position ?? songNote.Position;
-            songNote.ChordName = request.Command?.ChordName ?? songNote.ChordName;
+            songNote.ChordName = request.Command.ChordName;
             if (songNote.ChordName != null)
             {
                 songNote.SetNoteValues(SongNoteExtension.GetNoteValuesFromChordName(songNote.ChordName).ToArray());
