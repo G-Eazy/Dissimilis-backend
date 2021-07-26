@@ -99,6 +99,8 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             if (groupUser == null) throw new NotFoundException($"User with id {userId} is not a in the group with id {groupId}");
 
             groupUser.Role = newRole;
+            await UpdateAsync(cancellationToken);
+
             return groupUser;
         }
     }
