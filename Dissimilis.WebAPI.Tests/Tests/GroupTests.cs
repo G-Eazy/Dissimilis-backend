@@ -21,6 +21,7 @@ using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.DbContext.Models.Enums;
+using static Dissimilis.WebAPI.xUnit.Extensions;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -31,7 +32,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public GroupTests(TestServerFixture testServerFixture) : base(testServerFixture)
         {
         }
-        
+
         [Fact]
         public async Task TestAddMemberToGroupWhenCurrentUserIsAdminShouldSucceed()
         {
@@ -202,16 +203,16 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         [Fact]
         public async Task TestSetAdminToMemberWhenCurrentUserIsLastAdminShouldFail()
         {
-            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+            TestServerFixture.ChangeCurrentUserId(QuetzaltenangoAdminUser.Id);
 
             await Should.ThrowAsync<InvalidOperationException>(async () =>
                 await _mediator.Send(
-                    new ChangeUserRoleCommand(TrondheimGroup.Id, TrondheimAdminUser.Id,
+                    new ChangeUserRoleCommand(QuetzaltenangoGroup.Id, QuetzaltenangoAdminUser.Id,
                                                 new ChangeUserRoleDto { RoleToSet = "Member" })));
 
             _testServerFixture.GetContext()
-                .Users.SingleOrDefault(user => user.Id == TrondheimAdminUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == TrondheimAdminUser.Id)
+                .Users.SingleOrDefault(user => user.Id == QuetzaltenangoAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
@@ -219,7 +220,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task CreateGroupShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-            var item1 = await _mediator.Send(new CreateGroupCommand(GetCreateGroupDto(1, NorwayOrganisation.Id, TrondheimAdminUser.Id)));
+            var createDto = GetCreateGroupDto(1, NorwayOrganisation.Id, NoSongsUser.Id);
+            var item1 = await _mediator.Send(new CreateGroupCommand(createDto));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
             group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
         }
@@ -234,7 +236,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updateItem = await _mediator.Send(new UpdateGroupCommand(TrondheimGroup.Id, updateDto));
             var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
 
-            updatedGroup.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
             updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
             updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");

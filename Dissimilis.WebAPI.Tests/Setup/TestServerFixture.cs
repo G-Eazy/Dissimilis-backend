@@ -101,6 +101,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
+                    Name = "GroupAdminQuetzaltenangoUser",
+                    Email = "GroupAdmin@Quetzaltenango_Guatemala.no",
+                },
+                new User()
+                {
                     Name = "Justin Bieber fan",
                     Email = "Justin_Bieber_fan@Norway.no",
                 },
@@ -167,6 +172,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 new Group()
                 {
                     Name = "Trondheim_Norway",
+                },
+                new Group()
+                {
+                    Name = "Quetzaltenango_Guatemala"
                 },
             };
         }
