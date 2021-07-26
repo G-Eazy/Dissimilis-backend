@@ -11,7 +11,6 @@ using Dissimilis.WebAPI.Extensions.Models;
 using System;
 using Dissimilis.WebAPI.Services;
 using System.Collections.Generic;
-using Dissimilis.WebAPI.Extensions.Models;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -218,9 +217,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Include(song => song.SharedUsers)
                 .Include(song => song.GroupTags)
                 .Include(song => song.OrganisationTags)
+                .Where(SongExtension.ReadAccessToSong(user)) //todo: dette kan forbedres til å bruke PermissionService
                 .AsSplitQuery()
                 .AsQueryable()
-                .Where(SongExtension.ReadAccessToSong(user)) //todo: dette kan forbedres til å bruke PermissionService
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
                 .Take(searchCommand.MaxNumberOfSongs)

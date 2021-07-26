@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoBar.Commands;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
@@ -53,12 +54,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var searchQueryDto = SearchQueryDto();
             var songDtos = await _mediator.Send(new QuerySongSearch(searchQueryDto));
 
-            songDtos.Length.ShouldBe(3);
+            songDtos.Length.ShouldBe(4);
 
             //Verify that all public songs are included.
             songDtos.Any(song => song.SongId == LisaGikkTilSkolenSong.Id).ShouldBeTrue();
             songDtos.Any(song => song.SongId == SpeedKingSong.Id).ShouldBeTrue();
             songDtos.Any(song => song.SongId == DovregubbensHallSong.Id).ShouldBeTrue();
+            songDtos.Any(song => song.SongId == BegyntePåBunnen.Id).ShouldBeTrue();
         }
         [Fact]
         public async Task TestSearchForAllSongsAsRegularUserDoesNotGivePrivateSongs()
@@ -70,7 +72,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var searchQueryDto = SearchQueryDto();
             var songDtos = await _mediator.Send(new QuerySongSearch(searchQueryDto));
 
-            songDtos.Length.ShouldBe(3);
+            songDtos.Length.ShouldBe(4);
 
             //Verify that private songs are not included.
             songDtos.Any(song => song.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
@@ -78,103 +80,185 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             songDtos.Any(song => song.SongId == BabySong.Id).ShouldBeFalse();
         }
 
-        //[Fact]
-        //public async Task TestSearchFilterWhenGroupSpecified()
-        //{
+        [Fact]
+        public async Task TestSearchFilterWhenGroupSpecified()
+        {
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-        //    int[] groupWithOneSong = { 3 };
-        //    int[] orgs = Array.Empty<int>();
-        //    var searchQueryDto = GroupOrgSearchQueryDto(groupWithOneSong, orgs);
-        //    var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
-        //    songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-        //    songDtos.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeFalse();
-        //    songDtos.Length.ShouldBe(1);
-        //}
+            CreateAndAddGroupTagIfNotExsisting(SpeedKingSong.Id, TrondheimGroup.Id);
 
-        //[Fact]
-        //public async Task TestSearchFilterWhenOrganisationsSpecifiedDefOrg()
-        //{
-        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
 
-        //    int[] defOrg = { 1};
-        //    int[] groups = Array.Empty<int>();
-        //    var searchQueryDto = GroupOrgSearchQueryDto(groups, defOrg);
-        //    var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
-        //    songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeFalse();
-        //    songDtos.Count().ShouldBe(3);
+            int[] groupWithOneSong = { TrondheimGroup.Id };
+            int[] EmptyList = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithOneSong, EmptyList);
+            var TrondheimSong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimSong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimSong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
+        }
 
-        //    int[] suppOrg = { 2 };
-        //    searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
-        //    songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
-        //    songDtos.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-        //    songDtos.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
-        //    songDtos.Length.ShouldBe(2);
+        [Fact]
+        public async Task TestSearchFilterWhenOrganisations()
+        {
 
-        //}
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-        //[Fact]
-        //public async Task TestSearchFilterWhenOrganisationsSpecifiedSuppOrg()
-        //{
-        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            CreateAndAddOrganisationTagIfNotExisting(SpeedKingSong.Id, NorwayOrganisation.Id);
 
-        //    int[] groups = Array.Empty<int>();
-        //    int[] suppOrg = { 2 };
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
 
-        //    var searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
-        //    var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
-        //    filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-        //    filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
-        //    filteredSongs.Length.ShouldBe(2);
-        //}
+            int[] orgWithOneSong = { NorwayOrganisation.Id };
+            int[] EmptyList = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(EmptyList, orgWithOneSong);
+            var NorwaySong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            NorwaySong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            NorwaySong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
+        }
 
-        //[Fact]
-        //public async Task TestSearchFilterGroupsAndOrganisationsSameOrg()
-        //{
-        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-
-        //    int[] suppOrg = { 2 };
-        //    int[] groups = { 3 };
+        [Fact]
+        public async Task TestSearchFilterGroupsAndOrganisationsSameOrg()
+        {
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
             
-        //    var searchQueryDto = GroupOrgSearchQueryDto(groups, suppOrg);
-        //    var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            CreateAndAddOrganisationTagIfNotExisting(SpeedKingSong.Id, NorwayOrganisation.Id);
+            CreateAndAddGroupTagIfNotExsisting(SmokeOnTheWaterSong.Id, TrondheimGroup.Id);
+
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
+
+            int[] orgWithOneSong = { NorwayOrganisation.Id };
+            int[] groupWithSong = { TrondheimGroup.Id};
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithSong, orgWithOneSong);
+            var TrondheimNorwaySong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimNorwaySong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimNorwaySong.Any(s => s.SongId == SmokeOnTheWaterSong.Id).ShouldBeTrue();
+            TrondheimNorwaySong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
+        }
+        [Fact]
+        public async Task TestSearchFilterGroupsAndOrganisationsDifferentOrg()
+        {
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            CreateAndAddGroupTagIfNotExsisting(SpeedKingSong.Id, TrondheimGroup.Id);
+
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+            CreateAndAddOrganisationTagIfNotExisting(BegyntePåBunnen.Id, GuatemalaOrganisation.Id);
             
-        //    filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-        //    filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeTrue();
-        //    filteredSongs.Any(s => s.Title.Equals(SongPublicGroup1DefOrg)).ShouldBeFalse();
-        //    filteredSongs.Any(s => s.Title.Equals(SongPublicDefOrg)).ShouldBeFalse();
-        //    filteredSongs.Length.ShouldBe(2);
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
 
-        //}
-        //[Fact]
-        //    public async Task TestSearchFilterGroupsAndOrganisationsDifferentOrg()
-        //    {
-        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
-            
-        //    int[] groups = { 3 };
-        //    int[] defOrg = { 1 };
+            int[] orgWithOneSong = { GuatemalaOrganisation.Id };
+            int[] groupWithSong = { TrondheimGroup.Id };
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithSong, orgWithOneSong);
+            var TrondheimGuatemalaSong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimGuatemalaSong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimGuatemalaSong.Any(s => s.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
+            TrondheimGuatemalaSong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
+            TrondheimGuatemalaSong.Any(s => s.SongId == BegyntePåBunnen.Id).ShouldBeTrue();
 
-        //    var searchQueryDto = GroupOrgSearchQueryDto(groups, defOrg);
-        //    var filteredSongs = await mediator.Send(new QuerySongSearch(searchQueryDto));
-            
-        //    filteredSongs.Any(s => s.Title.Equals(SongPublicSuppOrg)).ShouldBeFalse();
-        //    filteredSongs.Any(s => s.Title.Equals(DefaultSongDefOrg)).ShouldBeTrue();
-        //    filteredSongs.Any(s => s.Title.Equals(SongPrivateGroup3SuppOrg)).ShouldBeTrue();
-        //    filteredSongs.Length.ShouldBe(4);
-        //}
+        }
 
-        //[Fact]
-        //public async Task TestGetSongsFromMyLibrary()
-        //{
-        //    var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+        [Fact]
+        public async Task TestGetSongsFromMyLibrary()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            var MyLibary = await _mediator.Send(new QuerySongToLibrary());
 
-        //    var createSongDto = CreateSongDto(4, 4);
-        //    var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
-        //    var songDtos = await mediator.Send(new QuerySongToLibrary());
+            MyLibary.Count().ShouldBe(2);
 
-        //    songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
+        }
 
-        //    _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
-        //}
+        [Fact]
+        public async Task TestGetAllGroups()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ALL", null));
+
+            groups.Count().ShouldBe(GetAllGroups().Count());
+            groups.Any(g => g.GroupId == SandvikaGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeTrue();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllGroupsMember()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("MEMBER", null));
+
+            groups.Count().ShouldBe(1);
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeFalse();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllGroupsAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ADMIN", null));
+
+            groups.Count().ShouldBe(1);
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeFalse();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisations()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("ALL"));
+
+            orgs.Count().ShouldBe(GetAllOrganisations().Count());
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisationsAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("ADMIN"));
+
+            orgs.Count().ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
+        }
+        [Fact]
+        public async Task TestGetAllOrganisationsMember()
+        {
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("MEMBER"));
+
+            orgs.Count().ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisationsGroupAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("GROUPADMIN"));
+
+            orgs.Count().ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+        }
 
         //[Fact]
         //public async Task TestShareSongWithUser()
@@ -320,12 +404,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
         //    _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
         //}
-
-        [Fact]
-        public async Task TestGetTransposedCopyOfSong()
-        {
-            
-        }
 
 
         [Fact]

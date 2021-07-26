@@ -123,6 +123,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "User with no songs",
                     Email = "NoSongs@Norway.no",
+                },
+                new User()
+                {
+                    Name = "Oral Bee fan",
+                    Email = "Oral_Bee_fan@Guatemala.no",
                 }
             };
         }
@@ -217,6 +222,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Denominator = 4,
                     ProtectionLevel = ProtectionLevels.Public
                 },
+                new Song()
+                {
+                    Title = "Begynte på bunnen",
+                    Composer = "Oral_Bee",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Public
+                }
             };
         }
 
@@ -315,5 +328,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
             };
         }
+
     }
 }
