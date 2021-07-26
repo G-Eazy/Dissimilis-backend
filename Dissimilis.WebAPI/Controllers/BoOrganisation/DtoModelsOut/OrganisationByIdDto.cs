@@ -3,7 +3,7 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
 {
     public class OrganisationByIdDto
     {

@@ -54,5 +54,26 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
 
                 return organisation;
         }
+
+        public async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await Context.OrganisationUsers
+                .SingleOrDefaultAsync(orgUser =>
+                    orgUser.UserId == userId && orgUser.OrganisationId == organisationId);
+        }
+
+        public async Task<OrganisationUser> AddUserToOrganisationAsync(int organisationId, int userId, Role role, CancellationToken cancellationToken)
+        {
+            var orgUserAdded = await Context.OrganisationUsers
+                .AddAsync(
+                    new OrganisationUser()
+                    {
+                        OrganisationId = organisationId,
+                        UserId = userId,
+                        Role = role,
+                    }, cancellationToken);
+
+            return orgUserAdded.Entity;
+        }
     }
 }

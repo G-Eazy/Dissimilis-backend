@@ -1,15 +1,12 @@
-﻿using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -63,6 +60,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             var item = await _mediator.Send(new UpdateOrganisationCommand(organisationId, command));
             var organisation = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
             return Ok(organisation);
+        }
+
+        [HttpPost("{organisationId:int}/users")]
+        [ProducesResponseType(typeof(UserOrganisationAddedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> AddOrganisationUser(int organisationId, [FromBody] AddUserOrganisationDto command)
+        {
+            var organisationUser = await _mediator.Send(new AddUserOrganisationCommand(organisationId, command));
+            return Ok(organisationUser);
         }
     }
 }
