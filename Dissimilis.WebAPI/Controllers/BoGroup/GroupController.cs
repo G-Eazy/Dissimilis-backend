@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// Create group
         /// </summary>
-        [HttpPost("group")]
+        [HttpPost("groups")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto command)
@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"{result.GroupId}", result);
         }
 
-        [HttpGet("{groupId:int}")]
+        [HttpGet("groups/{groupId:int}")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetGroupById(int groupId)
@@ -47,7 +47,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(group);
         }
 
-        [HttpPatch("{groupId:int}/users/{userId:int}/changeUserRole")]
+        [HttpPatch("groups/{groupId:int}/users/{userId:int}/changeUserRole")]
         [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
@@ -80,7 +80,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(result);
         }
 
-        [HttpPost("{groupId:int}/addMember")]
+        [HttpPost("groups/{groupId:int}/users")]
         [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
         { 
@@ -89,7 +89,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
         }
 
-        [HttpDelete("{groupId:int}/removeMember/{userId:int}")]
+        [HttpDelete("groups/{groupId:int}/users/{userId:int}")]
         [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
         {
@@ -97,7 +97,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(memberRemoved);
         }
 
-        [HttpPatch("{groupId:int}")]
+        [HttpPatch("groups/{groupId:int}")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
