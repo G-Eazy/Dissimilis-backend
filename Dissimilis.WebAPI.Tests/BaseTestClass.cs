@@ -19,6 +19,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal User SysAdminUser;
         internal User NorwayAdminUser;
+        internal User NorwayAdminUser2;
         internal User GuatemalaAdminUser;
         internal User SandvikaAdminUser;
         internal User SandvikaAdminUser2;
@@ -69,6 +70,7 @@ namespace Dissimilis.WebAPI.xUnit
             var users = GetAllUsers();
             SysAdminUser = users.SingleOrDefault(user => user.Email == "SysAdmin@Norway.no");
             NorwayAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Norway.no");
+            NorwayAdminUser2 = users.SingleOrDefault(user => user.Email == "OrgAdmin2@Norway.no");
             GuatemalaAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Guatemala.no");
             SandvikaAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Sandvika_Norway.no");
             SandvikaAdminUser2 = users.SingleOrDefault(user => user.Email == "GroupAdmin2@Sandvika_Norway.no");

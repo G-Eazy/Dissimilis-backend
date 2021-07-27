@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
         public async Task<OrganisationByIdDto> Handle(QueryOrganisationById request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var org = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+            var org = await _organisationRepository.GetOrganisationByIdAsync(request.OrganisationId, cancellationToken);
             
             if(org == null)
                 throw new NotFoundException($"Organisation with Id {request.OrganisationId} not found");
