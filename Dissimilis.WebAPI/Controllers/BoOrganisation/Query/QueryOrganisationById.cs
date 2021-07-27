@@ -1,14 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.Boorganisation.Query
+namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
 {
     public class QueryOrganisationById : IRequest<OrganisationByIdDto>
     {

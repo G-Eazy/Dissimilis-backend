@@ -116,7 +116,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// </summary>
         /// <param name="user"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>

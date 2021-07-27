@@ -8,11 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
