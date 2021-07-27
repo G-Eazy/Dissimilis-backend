@@ -149,7 +149,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task GetOrgAsGroupAdminShouldReturnFalse()
         {
             var allowed = await _permissionChecker.CheckPermission(NorwayOrganisation, TrondheimAdminUser, Operation.Get, c);
-            Assert.False(allowed);
+            Assert.True(allowed);
         }
 
         [Fact]
