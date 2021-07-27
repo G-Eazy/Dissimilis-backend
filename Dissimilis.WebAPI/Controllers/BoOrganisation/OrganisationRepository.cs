@@ -63,9 +63,8 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         }
         public async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
         {
-            return await Context.OrganisationUsers
-                .SingleOrDefaultAsync(orgUser =>
-                    orgUser.UserId == userId && orgUser.OrganisationId == organisationId);
+            return await Context.OrganisationUsers.FindAsync(userId, organisationId);
+
         }
 
         internal async Task<OrganisationUser> AddUserToOrganisationAsync(int organisationId, int userId, Role role, CancellationToken cancellationToken)

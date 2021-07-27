@@ -32,7 +32,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
             }
             public async Task<QueryMemberByIdsDto> Handle(QueryOrganisationMemberByIds request, CancellationToken cancellationToken)
             {
-                var fetchedMember = await _organisationRepository.GetOrganisationUserAsync(request.UserId, request.OrganisationId, cancellationToken);
+                var fetchedMember = await _organisationRepository.GetOrganisationUserAsync(request.OrganisationId, request.UserId, cancellationToken);
                 return new QueryMemberByIdsDto() { UserId = fetchedMember.UserId, OrganisationId = fetchedMember.OrganisationId };
             }
         }
