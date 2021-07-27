@@ -2,7 +2,9 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +36,24 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         {
             await Context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<Group[]> GetGroupsAsync(int? organisationId, string filterBy, User currentUser, CancellationToken cancellationToken)
+        {
+            var query = Context.Groups
+                .Include(x => x.Users)
+                .Include(x => x.Organisation)
+                .AsQueryable();
+            if (organisationId != null)
+            {
+                query = query.Where(g => g.OrganisationId == organisationId).AsQueryable();
+            }
+            query = query.FilterGroups(filterBy, currentUser).AsQueryable();
+
+            var result = await query
+                .ToArrayAsync(cancellationToken);
+            return result;
+        }
+
 
         public async Task<Group> GetGroupByIdAsync(int groupId, CancellationToken cancellationToken)
         {
@@ -102,6 +122,20 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await UpdateAsync(cancellationToken);
 
             return groupUser;
+        }
+    }
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Group> FilterGroups(this IQueryable<Group> groups, string filterBy, User user)
+        {
+            return filterBy switch
+            {
+                "ADMIN" => groups.Where(o =>
+                o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+
+                "MEMBER" => groups.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                _ => groups,
+            };
         }
     }
 }

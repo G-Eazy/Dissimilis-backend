@@ -3,8 +3,6 @@ using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,15 +45,23 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                 throw new NotFoundException($"Organisation with Id {organisationId} not found");
             }
 
-                await Context.OrganisationUsers
-                    .Include(ou => ou.User)
-                    .Where(ou => ou.OrganisationId == organisationId)
-                    .LoadAsync(cancellationToken);
+            await Context.OrganisationUsers
+                .Include(ou => ou.User)
+                .Where(ou => ou.OrganisationId == organisationId)
+                .LoadAsync(cancellationToken);
 
-                return organisation;
+            return organisation;
         }
 
-        internal async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
+        public async Task<Organisation[]> GetOrganisationsAsync(string filterBy, User currentUser, CancellationToken cancellationToken)
+        {
+            return await Context.Organisations
+                            .Include(x => x.Users)
+                            .AsQueryable()
+                            .FilterOrganisations(filterBy, currentUser)
+                            .ToArrayAsync(cancellationToken);
+        }
+        public async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
         {
             return await Context.OrganisationUsers
                 .SingleOrDefaultAsync(orgUser =>
@@ -106,6 +112,28 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                     && orgUser.UserId == userId);
             var orgUserRemoved = Context.Remove(orgUserToRemove);
             return orgUserRemoved.Entity;
+        }
+    }
+
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Organisation> FilterOrganisations(this IQueryable<Organisation> organisations, string filterBy, User user)
+        {
+            return filterBy switch
+            {
+                "ADMIN" => organisations.Where(o =>
+                o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+
+                "GROUPADMIN" => organisations
+                .Include(x => x.Groups)
+                .ThenInclude(x => x.Users)
+                .Where(o =>
+                o.Groups.Any(g => g.Users.Any(u =>
+                u.UserId == user.Id && u.Role == Role.Admin))).AsQueryable(),
+
+                "MEMBER" => organisations.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                _ => organisations,
+            };
         }
     }
 }

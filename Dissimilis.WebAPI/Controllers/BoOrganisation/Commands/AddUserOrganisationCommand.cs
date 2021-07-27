@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             var newOrganisationUser = await _organisationRepository.AddUserToOrganisationAsync(request.OrganisationId, request.Command.NewUserId, newMemberRoleEnumValue, cancellationToken);
             await _organisationRepository.UpdateAsync(cancellationToken);
 
-            return new UserOrganisationUpdatedDto() { UserId = newOrganisationUser.UserId, OrganisationId = newOrganisationUser.OrganisationId, Role = newOrganisationUser.Role.GetDescription() };
+            return new UserOrganisationAddedDto(newOrganisationUser.UserId, newOrganisationUser.OrganisationId, newOrganisationUser.Role.GetDescription());
         }
     }
 }
