@@ -11,6 +11,8 @@ using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.Queries;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -23,11 +25,21 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task GetAllSysAdminsShouldReturn1()
+        public async Task GetAllSysAdminsShouldNotBeNull()
         {
-            var sysAdmin = await _mediator.Send(new QuerySysAdmins());
-            sysAdmin.ShouldNotBeNull("Sysadmins were not fetched correctly");
-            Assert.True(sysAdmin[0].Name == "SysAdminUser", "Sysadmin was not fetched correctly");
+            var sysAdmins = await _mediator.Send(new QuerySysAdmins());
+            sysAdmins.ShouldNotBeNull("Sysadmins were not fetched correctly");
+            //Assert.True(sysAdmins.Length == 2, $"Not all sysAdmins were fetched. Only {sysAdmins.Length} were fetched...");
+        }
+
+        [Fact]
+        public async Task UpdateSysAdminStatusShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            CheckSysAdminStatusUser.IsSystemAdmin.ShouldBeFalse("User was already sysadmin");
+
+            await _mediator.Send(new UpdateSysAdminStatusCommand(CheckSysAdminStatusUser.Id, new UpdateSysAdminStatusDto() { IsSystemAdmin = true }));
+            CheckSysAdminStatusUser.IsSystemAdmin.ShouldBeTrue("User sysAdmin status did not change");
         }
     }
 }

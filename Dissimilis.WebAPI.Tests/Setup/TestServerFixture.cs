@@ -149,7 +149,12 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "User to remove from organisation",
                     Email = "RemoveUser@Norway.no",
-                }
+                },
+                new User()
+                {
+                    Name = "User to test changing sysadmin status",
+                    Email = "CheckSystemAdminStatus@Norway.no"
+                },
             };
         }
 

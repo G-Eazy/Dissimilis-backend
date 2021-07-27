@@ -7,7 +7,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
 {
     public class OrganisationByIdDto
     {
-        public string Name { get; set; }
         public string OrganisationName { get; set; }
         public string Email { get; set; }
         public int Id { get; set; }
@@ -19,7 +18,6 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
 
         public OrganisationByIdDto(Organisation organisation)
         {
-            Name = organisation.Name;
             OrganisationName = organisation.Name;
             Email = organisation.Email;
             Id = organisation.Id;

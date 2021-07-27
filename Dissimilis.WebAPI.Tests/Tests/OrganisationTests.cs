@@ -46,7 +46,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            org.Name.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
+            org.OrganisationName.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
         }
 
 
@@ -66,7 +66,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updateItem = await _mediator.Send(new UpdateOrganisationCommand(GuatemalaOrganisation.Id, updateDto));
             var updatedOrg = await _mediator.Send(new QueryOrganisationById(updateItem.OrganisationId));
 
-            updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
+            updatedOrg.OrganisationName.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
             updatedOrg.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
             updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
