@@ -107,5 +107,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             var group = await _mediator.Send(new QueryGroupById(item.GroupId));
             return Ok(group);
         }
+
+        [HttpGet("groups/{groupId:int}/users")]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetUsersInGroup(int groupId)
+        {
+            var users = await _mediator.Send(new QueryUsersInGroup(groupId));
+            return Ok(users);
+        }
     }
 }

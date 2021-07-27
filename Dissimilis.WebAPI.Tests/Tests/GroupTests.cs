@@ -9,6 +9,7 @@ using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
 using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
+using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -228,6 +229,14 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task GetUsersInGroupShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var users = await _mediator.Send(new QueryUsersInGroup(SandvikaGroup.Id));
+            users.ShouldNotBeNull("Users were not fetched...");
         }
     }
 }
