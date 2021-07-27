@@ -7,6 +7,8 @@ using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
+using System.Linq;
+using System;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
