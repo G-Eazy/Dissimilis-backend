@@ -71,6 +71,12 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
+                    Name = "OrgAdminNorwayUser2",
+                    Email = "OrgAdmin2@Norway.no",
+                    IsSystemAdmin = true,
+                },
+                new User()
+                {
                     Name = "OrgAdminNorwayUser",
                     Email = "OrgAdmin@Norway.no",
                 },
