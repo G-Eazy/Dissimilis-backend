@@ -32,7 +32,8 @@ namespace Dissimilis.DbContext.Models.Song
         public bool RepAfter { get; set; }
 
         /// <summary>
-        /// if 0, there is no volta bracket. otherwise it should follow an order
+        /// If 0, there is no volta bracket. Otherwise it should follow an order
+        /// A volta bracket is the equivalent to "hus" in Norwegian music theory.
         /// </summary>
         public int? VoltaBracket { get; set; }
 

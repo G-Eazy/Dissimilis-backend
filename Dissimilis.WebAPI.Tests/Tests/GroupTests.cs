@@ -3,8 +3,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
@@ -249,7 +247,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task DeleteGroupWithIncorrectIdShouldSucceed()
+        public async Task DeleteGroupWithIncorrectIdShouldFail()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
 

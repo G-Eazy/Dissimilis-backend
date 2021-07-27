@@ -34,7 +34,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         public async Task<UpdatedOrganisationCommandDto> Handle(DeleteOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+            var organisation = await _organisationRepository.GetOrganisationByIdAsync(request.OrganisationId, cancellationToken);
 
             if (organisation == null)
                 throw new NotFoundException($"Organisation with Id {request.OrganisationId} not found");
