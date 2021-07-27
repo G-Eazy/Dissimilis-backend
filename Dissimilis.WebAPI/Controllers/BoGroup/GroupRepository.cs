@@ -126,15 +126,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
     }
     public static class IQueryableExtension
     {
-        public static IQueryable<Group> FilterGroups(this IQueryable<Group> groups, Role filterBy, User user)
+        public static IQueryable<Group> FilterGroups(this IQueryable<Group> groups, string filterBy, User user)
         {
             return filterBy switch
             {
-                
-                Role.Admin=> groups.Where(o =>
+                "ADMIN" => groups.Where(o =>
                 o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
 
-                Role.Member => groups.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                "MEMBER" => groups.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
                 _ => groups,
             };
         }
