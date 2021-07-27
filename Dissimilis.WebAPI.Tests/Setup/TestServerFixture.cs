@@ -71,6 +71,12 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
+                    Name = "OrgAdminNorwayUser2",
+                    Email = "OrgAdmin2@Norway.no",
+                    IsSystemAdmin = true,
+                },
+                new User()
+                {
                     Name = "OrgAdminNorwayUser",
                     Email = "OrgAdmin@Norway.no",
                 },
@@ -143,6 +149,16 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Delete group user",
                     Email = "DeleteGroupUser@Delete_Delete.no",
+                },
+                new User()
+                {
+                    Name = "Oral Bee fan",
+                    Email = "Oral_Bee_fan@Quetzaltenango_Guatemala.no",
+                },
+                new User()
+                {
+                    Name = "User to remove from organisation",
+                    Email = "RemoveUser@Norway.no",
                 }
             };
         }
@@ -249,6 +265,22 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Denominator = 4,
                     ProtectionLevel = ProtectionLevels.Public
                 },
+                new Song()
+                {
+                    Title = "Begynte på bunnen",
+                    Composer = "Oral_Bee",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Public
+                },
+                new Song()
+                {
+                    Title = "Baris",
+                    Composer = "Oral_Bee",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Private
+                }
             };
         }
 
@@ -347,5 +379,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
             };
         }
+
     }
 }

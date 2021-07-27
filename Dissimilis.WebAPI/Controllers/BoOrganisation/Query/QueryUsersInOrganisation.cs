@@ -5,7 +5,7 @@ using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Controllers.Bousers.Query
+namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
 {
     public class QueryUsersInOrganisation : IRequest<UserDto[]>{ 
         
@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers.Bousers.Query
         public async Task<UserDto[]> Handle(QueryUsersInOrganisation request, CancellationToken cancellationToken)
         {
             // Todo: Regulate access to commands pertaining to fetching of users and / or groups/orgs.
-            var Organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+            var Organisation = await _organisationRepository.GetOrganisationByIdAsync(request.OrganisationId, cancellationToken);
             var users = Organisation.Users
                 .Select(gu => new UserDto(gu.User))
                 .ToArray();

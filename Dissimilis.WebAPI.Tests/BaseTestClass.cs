@@ -19,6 +19,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal User SysAdminUser;
         internal User NorwayAdminUser;
+        internal User NorwayAdminUser2;
         internal User GuatemalaAdminUser;
         internal User SandvikaAdminUser;
         internal User SandvikaAdminUser2;
@@ -33,6 +34,8 @@ namespace Dissimilis.WebAPI.xUnit
         internal User NoSongsUser;
         internal User DeleteOrgUser;
         internal User DeleteGroupUser;
+        internal User OralBeeFanUser;
+        internal User RemoveFromOrgUser;
 
         internal Song LisaGikkTilSkolenSong;
         internal Song SmokeOnTheWaterSong;
@@ -40,6 +43,8 @@ namespace Dissimilis.WebAPI.xUnit
         internal Song DuHastSong;
         internal Song BabySong;
         internal Song DovregubbensHallSong;
+        internal Song BegyntePåBunnen;
+        internal Song Baris;
 
         internal Organisation NorwayOrganisation;
         internal Organisation GuatemalaOrganisation;
@@ -69,6 +74,7 @@ namespace Dissimilis.WebAPI.xUnit
             var users = GetAllUsers();
             SysAdminUser = users.SingleOrDefault(user => user.Email == "SysAdmin@Norway.no");
             NorwayAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Norway.no");
+            NorwayAdminUser2 = users.SingleOrDefault(user => user.Email == "OrgAdmin2@Norway.no");
             GuatemalaAdminUser = users.SingleOrDefault(user => user.Email == "OrgAdmin@Guatemala.no");
             SandvikaAdminUser = users.SingleOrDefault(user => user.Email == "GroupAdmin@Sandvika_Norway.no");
             SandvikaAdminUser2 = users.SingleOrDefault(user => user.Email == "GroupAdmin2@Sandvika_Norway.no");
@@ -83,6 +89,8 @@ namespace Dissimilis.WebAPI.xUnit
             NoSongsUser = users.SingleOrDefault(user => user.Email == "NoSongs@Norway.no");
             DeleteOrgUser = users.SingleOrDefault(user => user.Email == "DeleteOrgUser@Delete.no");
             DeleteGroupUser = users.SingleOrDefault(user => user.Email == "DeleteGroupUser@Delete_Delete.no");
+            OralBeeFanUser = users.SingleOrDefault(user => user.Email == "Oral_Bee_fan@Quetzaltenango_Guatemala.no");
+            RemoveFromOrgUser = users.SingleOrDefault(user => user.Email == "RemoveUser@Norway.no");
         }
 
         private List<User> GetAllUsers()
@@ -98,7 +106,8 @@ namespace Dissimilis.WebAPI.xUnit
             DuHastSong = songs.SingleOrDefault(song => song.Title == "Du hast");
             BabySong = songs.SingleOrDefault(song => song.Title == "Baby");
             DovregubbensHallSong = songs.SingleOrDefault(song => song.Title == "Dovregubbens hall");
-
+            BegyntePåBunnen = songs.SingleOrDefault(song => song.Title == "Begynte på bunnen");
+            Baris = songs.SingleOrDefault(song => song.Title == "Baris");
             return songs;
         }
 
@@ -121,7 +130,7 @@ namespace Dissimilis.WebAPI.xUnit
             return organisations;
         }
 
-        private List<Organisation> GetAllOrganisations()
+        public List<Organisation> GetAllOrganisations()
         {
             return _testServerFixture.GetContext().Organisations
                 .ToList();
@@ -139,10 +148,56 @@ namespace Dissimilis.WebAPI.xUnit
             return groups;
         }
 
-        private List<Group> GetAllGroups()
+        public List<Group> GetAllGroups()
         {
             return _testServerFixture.GetContext().Groups
                 .ToList();
+        }
+        internal void CreateAndAddGroupTagIfNotExsisting(int songId, int groupId)
+        {
+            var SongGroupTag = _testServerFixture.GetContext().SongGroupTags.SingleOrDefault(s => s.GroupId == groupId && s.SongId == songId);
+            if(SongGroupTag == null)
+            {
+            SongGroupTag = new SongGroupTag()
+                {
+                    SongId = songId,
+                    GroupId = groupId
+                };
+                _testServerFixture.GetContext().SongGroupTags.Add(SongGroupTag);
+                _testServerFixture.GetContext().SaveChanges();
+            }
+
+        }
+
+        internal void CreateAndAddOrganisationTagIfNotExisting(int songId, int orgId)
+        {
+            var SongOrganisationTag = _testServerFixture.GetContext().SongOrganisationTags.SingleOrDefault(s => s.OrganisationId == orgId && s.SongId == songId);
+            if (SongOrganisationTag == null)
+            {
+                SongOrganisationTag = new SongOrganisationTag()
+                {
+                    SongId = songId,
+                    OrganisationId = orgId
+                };
+                _testServerFixture.GetContext().SongOrganisationTags.Add(SongOrganisationTag);
+                _testServerFixture.GetContext().SaveChanges();
+            }
+        }
+
+        internal void CreateAndAddSharedUserIfNotExisting(int songId, int userId)
+        {
+            var SharedSongUser = _testServerFixture.GetContext().SongSharedUser.SingleOrDefault(s => s.UserId== userId && s.SongId == songId);
+            if (SharedSongUser == null)
+            {
+                SharedSongUser = new SongSharedUser()
+                {
+                    SongId = songId,
+                    UserId = userId
+                };
+                _testServerFixture.GetContext().SongSharedUser.Add(SharedSongUser);
+                _testServerFixture.GetContext().SaveChanges();
+            }
+
         }
     }
 }

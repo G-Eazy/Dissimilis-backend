@@ -1,4 +1,5 @@
 ﻿using System;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
