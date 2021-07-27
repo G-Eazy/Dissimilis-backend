@@ -60,12 +60,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             var deletedOrganisationUser = await _organisationRepository.RemoveUserFromOrganisationAsync(request.OrganisationId, request.UserId, cancellationToken);
             await _organisationRepository.UpdateAsync(cancellationToken);
 
-            return new UserOrganisationUpdatedDto()
-            { 
-                UserId = deletedOrganisationUser.UserId,
-                OrganisationId = deletedOrganisationUser.OrganisationId,
-                Role = deletedOrganisationUser.Role.GetDescription()
-            };
+            return new UserOrganisationUpdatedDto(deletedOrganisationUser.UserId, deletedOrganisationUser.OrganisationId, deletedOrganisationUser.Role.GetDescription());
         }
     }
 }

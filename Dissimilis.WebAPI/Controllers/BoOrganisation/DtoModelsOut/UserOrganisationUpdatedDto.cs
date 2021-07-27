@@ -11,7 +11,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
         public int OrganisationId { get; set; }
         public string Role { get; set; }
 
-        public UserOrganisationAddedDto(int userId, int organisationId, string role)
+        public UserOrganisationUpdatedDto(int userId, int organisationId, string role)
         {
             UserId = userId;
             OrganisationId = organisationId;
