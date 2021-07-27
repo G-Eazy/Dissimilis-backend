@@ -2,6 +2,7 @@
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoGroup
 {
-    [Route("api/groups")]
+    [Route("api/organisations")]
     [ApiController]
     public class GroupController : Controller
     {
@@ -26,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
         /// <summary>
         /// Create group
         /// </summary>
-        [HttpPost]
+        [HttpPost("groups")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto command)
@@ -37,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"{result.GroupId}", result);
         }
 
-        [HttpGet("{groupId:int}")]
+        [HttpGet("groups/{groupId:int}")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetGroupById(int groupId)
@@ -46,7 +47,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(group);
         }
 
-        [HttpPatch("{groupId:int}/users/{userId:int}/changeUserRole")]
+        [HttpPatch("groups/{groupId:int}/users/{userId:int}/changeUserRole")]
         [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
@@ -55,7 +56,31 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(memberUpdated);
         }
 
-        [HttpPost("{groupId:int}/users")]
+        /// <summary>
+        /// get all groups in a given organisation filtered
+        /// </summary>
+        [HttpGet("{organisationId:int}/groups")]
+        [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetGroupsInOrganisation(int organisationId, [FromQuery] string filterBy)
+        {
+            var result = await _mediator.Send(new QueryGetGroups(filterBy, organisationId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get all groups filtered
+        /// </summary>
+        [HttpGet("groups")]
+        [ProducesResponseType(typeof(GroupIndexDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetGroups([FromQuery] string filterBy)
+        {
+            var result = await _mediator.Send(new QueryGetGroups(filterBy, null));
+            return Ok(result);
+        }
+
+        [HttpPost("groups/{groupId:int}/users")]
         [ProducesResponseType(typeof(MemberAddedDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> AddGroupMember(int groupId, [FromBody] AddMemberDto command)
         { 
@@ -64,7 +89,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Created($"User with id {newMemberAdded.UserId} add to group with id {newMember.GroupId}.", newMember);
         }
 
-        [HttpDelete("{groupId:int}/users/{userId:int}")]
+        [HttpDelete("groups/{groupId:int}/users/{userId:int}")]
         [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
         {
@@ -72,7 +97,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(memberRemoved);
         }
 
-        [HttpPatch("{groupId:int}")]
+        [HttpPatch("groups/{groupId:int}")]
         [ProducesResponseType(typeof(GroupByIdDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]

@@ -49,7 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 
             if (!request.GroupIds.All(x => currentUser.GetAllGroupIds().Contains(x)) && !currentUser.IsSystemAdmin)
             {
-                throw new Exception("You need to be in the group you want to remove");
+                throw new Exception("You need to be in the group you want to update");
             }
             foreach (var groupId in request.GroupIds)
             {

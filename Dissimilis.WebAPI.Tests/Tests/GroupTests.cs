@@ -1,25 +1,12 @@
 ﻿using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.Boorganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
-using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 
@@ -90,15 +77,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                     groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
                 .ShouldBeFalse();
         }
-
-        [Fact]
-        public async Task TestGetUsersInGroup()
-        {
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-            var users = await _mediator.Send(new QueryUsersInGroup(TrondheimGroup.Id));
-            users.Length.ShouldBeGreaterThan(0, "Did not all users");
-        }
-
         [Fact]
         public async Task TestCurrentUserLeaveGroupShouldSucceed()
         {
@@ -112,7 +90,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                     groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == U2FanUser.Id)
                 .ShouldBeFalse();
         }
-
         [Fact]
         public async Task TestRemoveMemberFromGroupWhenCurrentUserIsNotAdminShouldFail()
         {
@@ -223,7 +200,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var createDto = GetCreateGroupDto(1, NorwayOrganisation.Id, NoSongsUser.Id);
             var item1 = await _mediator.Send(new CreateGroupCommand(createDto));
             var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
-            group1.Name.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
+            group1.GroupName.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
         }
 
 
