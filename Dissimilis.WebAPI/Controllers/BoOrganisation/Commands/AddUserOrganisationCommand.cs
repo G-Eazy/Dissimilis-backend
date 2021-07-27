@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 {
-    public class AddUserOrganisationCommand : IRequest<UserOrganisationAddedDto>
+    public class AddUserOrganisationCommand : IRequest<UserOrganisationUpdatedDto>
     {
         public int OrganisationId { get; }
         public AddUserOrganisationDto Command { get; }
@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         }
     }
 
-    public class AddMemberCommandHandler : IRequestHandler<AddUserOrganisationCommand, UserOrganisationAddedDto>
+    public class AddMemberCommandHandler : IRequestHandler<AddUserOrganisationCommand, UserOrganisationUpdatedDto>
     {
         private readonly OrganisationRepository _organisationRepository;
         private readonly IAuthService _authService;
@@ -38,7 +38,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             _IPermissionCheckerService = IPermissionCheckerService;
         }
 
-        public async Task<UserOrganisationAddedDto> Handle(AddUserOrganisationCommand request, CancellationToken cancellationToken)
+        public async Task<UserOrganisationUpdatedDto> Handle(AddUserOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
             var newOrganisationUser = await _organisationRepository.AddUserToOrganisationAsync(request.OrganisationId, request.Command.NewUserId, newMemberRoleEnumValue, cancellationToken);
             await _organisationRepository.UpdateAsync(cancellationToken);
 
-            return new UserOrganisationAddedDto() { UserId = newOrganisationUser.UserId, OrganisationId = newOrganisationUser.OrganisationId, Role = newOrganisationUser.Role.GetDescription() };
+            return new UserOrganisationUpdatedDto() { UserId = newOrganisationUser.UserId, OrganisationId = newOrganisationUser.OrganisationId, Role = newOrganisationUser.Role.GetDescription() };
         }
     }
 }

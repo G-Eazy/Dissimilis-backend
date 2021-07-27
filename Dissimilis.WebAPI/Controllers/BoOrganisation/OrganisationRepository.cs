@@ -55,14 +55,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                 return organisation;
         }
 
-        public async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
+        internal async Task<OrganisationUser> GetOrganisationUserAsync(int organisationId, int userId, CancellationToken cancellationToken)
         {
             return await Context.OrganisationUsers
                 .SingleOrDefaultAsync(orgUser =>
                     orgUser.UserId == userId && orgUser.OrganisationId == organisationId);
         }
 
-        public async Task<OrganisationUser> AddUserToOrganisationAsync(int organisationId, int userId, Role role, CancellationToken cancellationToken)
+        internal async Task<OrganisationUser> AddUserToOrganisationAsync(int organisationId, int userId, Role role, CancellationToken cancellationToken)
         {
             var orgUserAdded = await Context.OrganisationUsers
                 .AddAsync(
@@ -74,6 +74,38 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                     }, cancellationToken);
 
             return orgUserAdded.Entity;
+        }
+
+        internal async Task<bool> CheckUserAdminAsync(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            var orgUser = await GetOrganisationUserAsync(organisationId, userId, cancellationToken);
+            return orgUser?.Role == Role.Admin;
+        }
+
+        internal async Task<bool> CheckIfAnotherOrganisationAdminExists(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await Context.OrganisationUsers
+                .AnyAsync(orgUser =>
+                    orgUser.OrganisationId == organisationId
+                    && orgUser.UserId != userId
+                    && orgUser.Role == Role.Admin,
+                    cancellationToken);
+        }
+
+        internal async Task<bool> IsUserLastAdmin(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await CheckUserAdminAsync(organisationId, userId, cancellationToken)
+                && !await CheckIfAnotherOrganisationAdminExists(organisationId, userId, cancellationToken);
+        }
+
+        internal async Task<OrganisationUser> RemoveUserFromOrganisationAsync(int organisationId, int userId, CancellationToken cancellationToken)
+        {
+            var orgUserToRemove = await Context.OrganisationUsers
+                .SingleOrDefaultAsync(orgUser =>
+                    orgUser.OrganisationId == organisationId
+                    && orgUser.UserId == userId);
+            var orgUserRemoved = Context.Remove(orgUserToRemove);
+            return orgUserRemoved.Entity;
         }
     }
 }

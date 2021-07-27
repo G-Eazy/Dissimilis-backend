@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
 {
-    public class UserOrganisationAddedDto
+    public class UserOrganisationUpdatedDto
     {
         public int UserId { get; set; }
         public int OrganisationId { get; set; }

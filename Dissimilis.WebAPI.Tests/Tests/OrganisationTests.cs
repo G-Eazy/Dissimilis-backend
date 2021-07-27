@@ -1,18 +1,14 @@
 ﻿using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
-using Dissimilis.WebAPI.Controllers.Boorganisation.Query;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
+using System.Linq;
+using System;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -74,6 +70,36 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedOrg.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task TestRemoveUserFromGroupWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+
+            await _mediator.Send(new RemoveUserOrganisationCommand(NorwayOrganisation.Id, RemoveFromOrgUser.Id));
+
+            _testServerFixture.GetContext()
+                .OrganisationUsers.Any(orgUser =>
+                    orgUser.UserId == RemoveFromOrgUser.Id
+                    && orgUser.OrganisationId == NorwayOrganisation.Id)
+                .ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestRemoveUserFromGroupWhenCurrentUserIsLastAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+
+            await Should.ThrowAsync<InvalidOperationException>(async () =>
+                await _mediator.Send(new RemoveUserOrganisationCommand(NorwayOrganisation.Id, NorwayAdminUser.Id)));
+
+            var adminUser = _testServerFixture.GetContext()
+                .OrganisationUsers.SingleOrDefault(orgUser =>
+                    orgUser.UserId == NorwayAdminUser.Id
+                    && orgUser.OrganisationId == NorwayOrganisation.Id);
+            adminUser.ShouldNotBe(null);
+            adminUser.Role.ShouldBe(DbContext.Models.Enums.Role.Admin);
         }
     }
 }

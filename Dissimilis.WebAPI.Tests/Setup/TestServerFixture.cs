@@ -133,6 +133,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "User with no songs",
                     Email = "NoSongs@Norway.no",
+                },
+                new User()
+                {
+                    Name = "User to remove from organisation",
+                    Email = "RemoveUser@Norway.no",
                 }
             };
         }

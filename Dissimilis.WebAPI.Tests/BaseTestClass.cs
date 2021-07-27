@@ -31,6 +31,7 @@ namespace Dissimilis.WebAPI.xUnit
         internal User RammsteinFanUser;
         internal User U2FanUser;
         internal User NoSongsUser;
+        internal User RemoveFromOrgUser;
 
         internal Song LisaGikkTilSkolenSong;
         internal Song SmokeOnTheWaterSong;
@@ -77,6 +78,7 @@ namespace Dissimilis.WebAPI.xUnit
             RammsteinFanUser = users.SingleOrDefault(user => user.Email == "Rammstein_fan@Norway.no");
             U2FanUser = users.SingleOrDefault(user => user.Email == "U2_fan@Sandvika_Norway.no");
             NoSongsUser = users.SingleOrDefault(user => user.Email == "NoSongs@Norway.no");
+            RemoveFromOrgUser = users.SingleOrDefault(user => user.Email == "RemoveUser@Norway.no");
         }
 
         private List<User> GetAllUsers()
