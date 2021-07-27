@@ -62,27 +62,20 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
             var songNote = songBar.Notes.FirstOrDefault(note => note.Position == request.Command.SongNotePosition);
             if (songNote == null) throw new NotFoundException($"Note with position {request.Command.SongNotePosition} not found");
 
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
-            songNote.RemoveComponentInterval(request.Command.IntervalPosition);
-
-            if (songNote.NoteValues.Split("|").All(note => note == "X") && request.Command.DeleteOnLastIntervalRemoved)
+            if (songNote.ChordName == null)
             {
                 songBar.Notes.Remove(songNote);
-                songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
+            }
+            else
+            {
+                songNote.RemoveComponentInterval(request.Command.IntervalPosition);
+                if (songNote.NoteValues.Split("|").All(note => note == "X") && request.Command.DeleteOnLastIntervalRemoved)
+                    songBar.Notes.Remove(songNote);
             }
 
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
 
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }
