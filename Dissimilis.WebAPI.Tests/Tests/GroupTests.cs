@@ -135,7 +135,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
                 .Groups.SingleOrDefault(groupUser => 
-                groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                    groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
@@ -152,7 +152,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
                 .Groups.SingleOrDefault(groupUser => 
-                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
+                    groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
                 .Role.ShouldBe(Role.Member);
         }
 
@@ -167,7 +167,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser2.Id)
                 .Groups.SingleOrDefault(groupUser => 
-                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser2.Id)
+                     groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser2.Id)
                 .Role.ShouldBe(Role.Member);
         }
 
@@ -184,7 +184,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser.Id)
                 .Groups.SingleOrDefault(groupUser => 
-                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser.Id)
+                     groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
@@ -201,7 +201,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == QuetzaltenangoAdminUser.Id)
                 .Groups.SingleOrDefault(groupUser => 
-                groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
+                     groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
