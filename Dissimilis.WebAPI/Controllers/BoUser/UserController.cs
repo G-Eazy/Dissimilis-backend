@@ -62,5 +62,14 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             var result = await _mediator.Send(new QueryUserAdminStatuses());
             return Ok(result);
         }
+
+        [HttpGet("sysAdmins")]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetAllSysAdmins()
+        {
+            // TODO: Maybe add a restriction on this later
+            var result = await _mediator.Send(new QuerySysAdmins());
+            return Ok(result);
+        }
     }
 }
