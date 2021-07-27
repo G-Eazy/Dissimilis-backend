@@ -1,9 +1,9 @@
-﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -88,6 +88,15 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         {
             var deletedOrganisationUser = await _mediator.Send(new RemoveUserOrganisationCommand(organisationId, userId));
             return Ok(deletedOrganisationUser);
+        }
+
+        [HttpPatch("{organisationId:int}/users/{userId:int}/changeUserRole")]
+        [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangeUserRole(int organisationId, int userId, [FromBody] ChangeUserRoleDto command)
+        {
+            var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(organisationId, userId, command));
+            var memberUpdated = await _mediator.Send(new QueryOrganisationMemberByIds(memberRoleChanged.UserId, memberRoleChanged.OrganisationId));
+            return Ok(memberUpdated);
         }
     }
 }

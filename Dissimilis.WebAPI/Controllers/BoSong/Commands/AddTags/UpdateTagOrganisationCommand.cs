@@ -53,7 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             }
             foreach (var organisationId in request.OrganisationIds)
             {
-                var organisationToUpdate = await _organisationRepository.GetOrganisationById(organisationId, cancellationToken);
+                var organisationToUpdate = await _organisationRepository.GetOrganisationByIdAsync(organisationId, cancellationToken);
 
                 var OrganisationTag = await _songRepository.GetSongSharedOrganisation(song.Id, organisationToUpdate.Id);
                 if (OrganisationTag == null)

@@ -68,10 +68,16 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                     return startPos >= request.Command.NotePosition && request.Command.NotePosition >= endPos;}))
                 { throw new ValidationException("Note number already in use"); }
 
+                var chordName = request.Command.ChordName == ""
+                    ? null
+                    : request.Command.ChordName;
+
                 songNote = new SongNote()
                 {
-                    ChordName = request.Command.ChordName,
-                    NoteValues = String.Join("|", Enumerable.Repeat("X", SongNoteExtension.GetNoteValuesFromChordName(request.Command.ChordName).Count)),
+                    ChordName = chordName,
+                    NoteValues = chordName == null
+                        ? String.Join("|", request.Command.Notes)
+                        : String.Join("|", Enumerable.Repeat("X", SongNoteExtension.GetNoteValuesFromChordName(request.Command.ChordName).Count)),
                     Position = request.Command.NotePosition,
                     Length = request.Command.Length,
                 };
@@ -79,19 +85,10 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                 songBar.Notes.Add(songNote);
             }
 
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            if (songNote.ChordName != null)
+                songNote.AddComponentInterval(request.Command.IntervalPosition);
 
-            songNote.AddComponentInterval(request.Command.IntervalPosition);
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }
