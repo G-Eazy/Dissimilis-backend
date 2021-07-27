@@ -21,7 +21,11 @@ namespace Dissimilis.DbContext
                     adminUser.IsSystemAdmin = true;
                 }
             }
-
+            var summerIntern = context.Users.SingleOrDefault(u => u.Email == "carl.valdemar.ebbesen@ciber.no");
+            if(summerIntern != null)
+            {
+                summerIntern.IsSystemAdmin = true;
+            }
             context.SaveChanges();
         }
     }
