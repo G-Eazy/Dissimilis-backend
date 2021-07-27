@@ -87,6 +87,22 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
+        public async Task TestRemoveUserFromGroupWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(RammsteinFanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new RemoveUserOrganisationCommand(NorwayOrganisation.Id, NorwayAdminUser.Id)));
+
+            var adminUser = _testServerFixture.GetContext()
+                .OrganisationUsers.SingleOrDefault(orgUser =>
+                    orgUser.UserId == NorwayAdminUser.Id
+                    && orgUser.OrganisationId == NorwayOrganisation.Id);
+            adminUser.ShouldNotBe(null);
+            adminUser.Role.ShouldBe(DbContext.Models.Enums.Role.Admin);
+        }
+
+        [Fact]
         public async Task TestRemoveUserFromGroupWhenCurrentUserIsLastAdminShouldFail()
         {
             TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
