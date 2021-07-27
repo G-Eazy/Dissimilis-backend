@@ -35,7 +35,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         }
 
 
-        public async Task<Organisation> GetOrganisationById(int organisationId, CancellationToken cancellationToken)
+        public async Task<Organisation> GetOrganisationByIdAsync(int organisationId, CancellationToken cancellationToken)
         {
             var organisation = await Context.Organisations
                 .SingleOrDefaultAsync(o => o.Id == organisationId, cancellationToken);
@@ -112,6 +112,16 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
                     && orgUser.UserId == userId);
             var orgUserRemoved = Context.Remove(orgUserToRemove);
             return orgUserRemoved.Entity;
+        }
+        internal async Task<OrganisationUser> ChangeUserRoleAsync(int userId, int organisationId, Role newRole, CancellationToken cancellationToken)
+        {
+            var organisationUser = await GetOrganisationUserAsync(userId, organisationId, cancellationToken);
+            if (organisationUser == null) throw new NotFoundException($"User with id {userId} is not a in the organisation with id {organisationId}");
+
+            organisationUser.Role = newRole;
+            await UpdateAsync(cancellationToken);
+
+            return organisationUser;
         }
     }
 

@@ -25,11 +25,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
 
-            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Member" }));
+            await _mediator.Send(new AddMemberCommand(SandvikaGroup.Id, 
+                new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Member" }));
 
             var groupUser = _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == RammsteinFanUser.Id);
             groupUser.ShouldNotBe(null);
             groupUser.Role.ShouldBe(Role.Member);
         }
@@ -39,7 +41,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(BergenAdminUser.Id);
 
-            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Admin" }));
+            await _mediator.Send(new AddMemberCommand(BergenGroup.Id, 
+                new AddMemberDto() { NewMemberUserId = RammsteinFanUser.Id, NewMemberRole = "Admin" }));
 
             var groupUser = _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == RammsteinFanUser.Id)
@@ -55,7 +58,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
 
             await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = "Admin" })));
+                await _mediator.Send(new AddMemberCommand(BergenGroup.Id, 
+                new AddMemberDto() { NewMemberUserId = DeepPurpleFanUser.Id, NewMemberRole = "Admin" })));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
@@ -124,11 +128,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
 
-            await _mediator.Send(new ChangeUserRoleCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id, new ChangeUserRoleDto { RoleToSet = "Admin" }));
+            await _mediator.Send(new ChangeUserRoleCommand(TrondheimGroup.Id, DeepPurpleFanUser.Id, 
+                new ChangeUserRoleDto { RoleToSet = "Admin" }));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == TrondheimGroup.Id && groupUser.UserId == DeepPurpleFanUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
@@ -144,7 +150,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == EdvardGriegFanUser.Id)
                 .Role.ShouldBe(Role.Member);
         }
 
@@ -153,11 +160,13 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(SandvikaAdminUser.Id);
 
-            await _mediator.Send(new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser2.Id, new ChangeUserRoleDto { RoleToSet = "Member" }));
+            await _mediator.Send(new ChangeUserRoleCommand(SandvikaGroup.Id, SandvikaAdminUser2.Id, 
+                new ChangeUserRoleDto { RoleToSet = "Member" }));
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser2.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser2.Id)
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser2.Id)
                 .Role.ShouldBe(Role.Member);
         }
 
@@ -173,7 +182,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == SandvikaAdminUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == SandvikaGroup.Id && groupUser.UserId == SandvikaAdminUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 
@@ -189,7 +199,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             _testServerFixture.GetContext()
                 .Users.SingleOrDefault(user => user.Id == QuetzaltenangoAdminUser.Id)
-                .Groups.SingleOrDefault(groupUser => groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser => 
+                groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
                 .Role.ShouldBe(Role.Admin);
         }
 

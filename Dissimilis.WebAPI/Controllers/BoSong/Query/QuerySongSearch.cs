@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
         private readonly SongRepository _repository;
         private readonly IAuthService _authService;
 
-        public QuerySongSearchHandler(SongRepository repository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
+        public QuerySongSearchHandler(SongRepository repository, IAuthService authService)
         {
             _repository = repository;
             _authService = authService;

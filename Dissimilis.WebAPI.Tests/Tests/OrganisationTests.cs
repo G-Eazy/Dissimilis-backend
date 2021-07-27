@@ -7,6 +7,10 @@ using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
+using System;
+using System.Linq;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -71,7 +75,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestRemoveUserFromGroupWhenCurrentUserIsAdminShouldSucceed()
+        public async Task TestRemoveUserFromOrganisationWhenCurrentUserIsAdminShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
 
@@ -85,7 +89,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestRemoveUserFromGroupWhenCurrentUserIsNotAdminShouldFail()
+        public async Task TestRemoveUserFromOrganisationWhenCurrentUserIsNotAdminShouldFail()
         {
             TestServerFixture.ChangeCurrentUserId(RammsteinFanUser.Id);
 
@@ -101,7 +105,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestRemoveUserFromGroupWhenCurrentUserIsLastAdminShouldFail()
+        public async Task TestRemoveUserFromOrganisationWhenCurrentUserIsLastAdminShouldFail()
         {
             TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
 
@@ -115,5 +119,87 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             adminUser.ShouldNotBe(null);
             adminUser.Role.ShouldBe(DbContext.Models.Enums.Role.Admin);
         }
+
+        [Fact]
+        public async Task TestSetMemberToAdminWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+
+            await _mediator.Send(new ChangeUserRoleCommand(NorwayOrganisation.Id, DeepPurpleFanUser.Id, 
+                new ChangeUserRoleDto { RoleToSet = "Admin" }));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == DeepPurpleFanUser.Id)
+                .Organisations.SingleOrDefault(orgUser => 
+                orgUser.OrganisationId == NorwayOrganisation.Id && orgUser.UserId == DeepPurpleFanUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
+        [Fact]
+        public async Task TestSetMemberToAdminWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(NorwayOrganisation.Id, EdvardGriegFanUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = "Admin" })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == EdvardGriegFanUser.Id)
+                .Organisations.SingleOrDefault(orgUser => 
+                orgUser.OrganisationId == NorwayOrganisation.Id && orgUser.UserId == EdvardGriegFanUser.Id)
+                .Role.ShouldBe(Role.Member);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsAdminShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayOrganisation.Id);
+
+            await _mediator.Send(new ChangeUserRoleCommand(NorwayOrganisation.Id, NorwayAdminUser2.Id, 
+                new ChangeUserRoleDto { RoleToSet = "Member" }));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == NorwayAdminUser2.Id)
+                .Organisations.SingleOrDefault(orgUser => 
+                orgUser.OrganisationId == NorwayOrganisation.Id && orgUser.UserId == NorwayAdminUser2.Id)
+                .Role.ShouldBe(Role.Member);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsNotAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
+
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(NorwayOrganisation.Id, NorwayAdminUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == NorwayAdminUser.Id)
+                .Organisations.SingleOrDefault(orgUser => 
+                orgUser.OrganisationId == NorwayOrganisation.Id && orgUser.UserId == NorwayAdminUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsLastAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(GuatemalaAdminUser.Id);
+
+            await Should.ThrowAsync<InvalidOperationException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(GuatemalaOrganisation.Id, GuatemalaAdminUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == GuatemalaAdminUser.Id)
+                .Organisations.SingleOrDefault(orgUser => 
+                orgUser.OrganisationId == GuatemalaOrganisation.Id && orgUser.UserId == GuatemalaAdminUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
     }
 }

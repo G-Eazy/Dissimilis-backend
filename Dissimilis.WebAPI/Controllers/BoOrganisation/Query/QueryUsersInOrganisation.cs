@@ -5,7 +5,7 @@ using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using System.Linq;
 
-namespace Dissimilis.WebAPI.Controllers.Bousers.Query
+namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
 {
     public class QueryUsersInOrganisation : IRequest<UserDto[]>{ 
         

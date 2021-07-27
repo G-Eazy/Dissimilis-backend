@@ -2,19 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoBar.Commands;
-using Dissimilis.WebAPI.Controllers.BoNote.Commands;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
-using Dissimilis.WebAPI.Controllers.BoSong.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
-using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
-using Dissimilis.WebAPI.Controllers.BoUser.Queries;
-using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 using static Dissimilis.WebAPI.xUnit.Extensions;
@@ -180,11 +171,24 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var groups = await _mediator.Send(new QueryGetGroups("ALL", null));
 
-            groups.Count().ShouldBe(GetAllGroups().Count());
+            groups.Length.ShouldBe(GetAllGroups().Count);
             groups.Any(g => g.GroupId == SandvikaGroup.Id).ShouldBeTrue();
             groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
             groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeTrue();
 
+        }
+        [Fact]
+        public async Task TestGetAllGroupsInOrganisation()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ALL", NorwayOrganisation.Id));
+
+            groups.Length.ShouldBe(GetAllGroups().Where(group => group.OrganisationId == NorwayOrganisation.Id).ToArray().Length);
+            groups.Any(g => g.GroupId == SandvikaGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == QuetzaltenangoGroup.Id).ShouldBeFalse();
         }
 
         [Fact]
@@ -232,7 +236,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var orgs = await _mediator.Send(new QueryGetOrganisations("ADMIN"));
 
-            orgs.Count().ShouldBe(1);
+            orgs.Length.ShouldBe(1);
             orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
             orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
         }
@@ -243,7 +247,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var orgs = await _mediator.Send(new QueryGetOrganisations("MEMBER"));
 
-            orgs.Count().ShouldBe(1);
+            orgs.Length.ShouldBe(1);
             orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
             orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeFalse();
         }
@@ -255,7 +259,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var orgs = await _mediator.Send(new QueryGetOrganisations("GROUPADMIN"));
 
-            orgs.Count().ShouldBe(1);
+            orgs.Length.ShouldBe(1);
             orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
             orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
         }
