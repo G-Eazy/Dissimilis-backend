@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut
 {
-    public class UserOrganisationAddedDto
+    public class UserOrganisationUpdatedDto
     {
         public int UserId { get; set; }
         public int OrganisationId { get; set; }
         public string Role { get; set; }
 
-        public UserOrganisationAddedDto(int userId, int organisationId, string role)
+        public UserOrganisationUpdatedDto(int userId, int organisationId, string role)
         {
             UserId = userId;
             OrganisationId = organisationId;

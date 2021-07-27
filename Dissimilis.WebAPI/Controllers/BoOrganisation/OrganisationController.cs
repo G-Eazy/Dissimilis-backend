@@ -75,11 +75,19 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         }
 
         [HttpPost("{organisationId:int}/users")]
-        [ProducesResponseType(typeof(UserOrganisationAddedDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UserOrganisationUpdatedDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> AddOrganisationUser(int organisationId, [FromBody] AddUserOrganisationDto command)
         {
             var organisationUser = await _mediator.Send(new AddUserOrganisationCommand(organisationId, command));
-            return Ok(organisationUser);
+            return Created($"User with id {organisationUser.UserId} added", organisationUser);
+        }
+
+        [HttpDelete("{organisationId:int}/users/{userId:int}")]
+        [ProducesResponseType(typeof(UserOrganisationUpdatedDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> AddOrganisationUser(int organisationId, int userId)
+        {
+            var deletedOrganisationUser = await _mediator.Send(new RemoveUserOrganisationCommand(organisationId, userId));
+            return Ok(deletedOrganisationUser);
         }
     }
 }
