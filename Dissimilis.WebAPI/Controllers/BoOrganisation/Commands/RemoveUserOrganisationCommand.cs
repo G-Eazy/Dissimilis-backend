@@ -42,7 +42,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
         public async Task<UserOrganisationUpdatedDto> Handle(RemoveUserOrganisationCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var organisation = await _organisationRepository.GetOrganisationById(request.OrganisationId, cancellationToken);
+            var organisation = await _organisationRepository.GetOrganisationByIdAsync(request.OrganisationId, cancellationToken);
 
             bool isAllowed = 
                 await _IPermissionCheckerService.CheckPermission(organisation, currentUser, Operation.Kick, cancellationToken)

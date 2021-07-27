@@ -47,7 +47,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
 
                 var roleToSetEnumValue = GetEnumValueFromDescriptionString<Role>(request.Command.RoleToSet);
 
-                bool isLastAdmin = await _organisationRepository.IsUserLastAdmin(request.UserId, organisation.Id, cancellationToken);
+                bool isLastAdmin = await _organisationRepository.IsUserLastAdmin(organisation.Id, request.UserId, cancellationToken);
                 if (isLastAdmin && roleToSetEnumValue == Role.Member)
                     throw new InvalidOperationException("The user cannot be set to member as it is the last admin of the organisation.");
 

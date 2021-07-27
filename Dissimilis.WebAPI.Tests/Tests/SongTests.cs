@@ -9,6 +9,9 @@ using Dissimilis.WebAPI.xUnit.Setup;
 using Shouldly;
 using Xunit;
 using static Dissimilis.WebAPI.xUnit.Extensions;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {

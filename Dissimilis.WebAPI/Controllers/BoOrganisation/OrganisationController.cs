@@ -1,4 +1,5 @@
-﻿using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+﻿using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;

@@ -115,7 +115,7 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
         }
         internal async Task<OrganisationUser> ChangeUserRoleAsync(int userId, int organisationId, Role newRole, CancellationToken cancellationToken)
         {
-            var organisationUser = await GetOrganisationUserAsync(userId, organisationId, cancellationToken);
+            var organisationUser = await GetOrganisationUserAsync(organisationId, userId, cancellationToken);
             if (organisationUser == null) throw new NotFoundException($"User with id {userId} is not a in the organisation with id {organisationId}");
 
             organisationUser.Role = newRole;

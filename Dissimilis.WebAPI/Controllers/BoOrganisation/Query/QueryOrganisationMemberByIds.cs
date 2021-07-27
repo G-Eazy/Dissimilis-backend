@@ -36,7 +36,4 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Query
                 return new QueryMemberByIdsDto() { UserId = fetchedMember.UserId, OrganisationId = fetchedMember.OrganisationId };
             }
         }
-    }
-
-}
 }

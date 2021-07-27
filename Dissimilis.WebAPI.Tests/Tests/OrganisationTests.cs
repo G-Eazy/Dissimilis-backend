@@ -4,7 +4,6 @@ using Xunit;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.Bousers.Query;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using System;
@@ -101,23 +100,23 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                     orgUser.UserId == NorwayAdminUser.Id
                     && orgUser.OrganisationId == NorwayOrganisation.Id);
             adminUser.ShouldNotBe(null);
-            adminUser.Role.ShouldBe(DbContext.Models.Enums.Role.Admin);
+            adminUser.Role.ShouldBe(Role.Admin);
         }
 
         [Fact]
         public async Task TestRemoveUserFromOrganisationWhenCurrentUserIsLastAdminShouldFail()
         {
-            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+            TestServerFixture.ChangeCurrentUserId(GuatemalaAdminUser.Id);
 
             await Should.ThrowAsync<InvalidOperationException>(async () =>
-                await _mediator.Send(new RemoveUserOrganisationCommand(NorwayOrganisation.Id, NorwayAdminUser.Id)));
+                await _mediator.Send(new RemoveUserOrganisationCommand(GuatemalaOrganisation.Id, GuatemalaAdminUser.Id)));
 
             var adminUser = _testServerFixture.GetContext()
                 .OrganisationUsers.SingleOrDefault(orgUser =>
-                    orgUser.UserId == NorwayAdminUser.Id
-                    && orgUser.OrganisationId == NorwayOrganisation.Id);
+                    orgUser.UserId == GuatemalaAdminUser.Id
+                    && orgUser.OrganisationId == GuatemalaOrganisation.Id);
             adminUser.ShouldNotBe(null);
-            adminUser.Role.ShouldBe(DbContext.Models.Enums.Role.Admin);
+            adminUser.Role.ShouldBe(Role.Admin);
         }
 
         [Fact]
