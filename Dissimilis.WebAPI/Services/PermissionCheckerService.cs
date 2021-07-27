@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.DbContext.Models.Song;
+using System.Linq;
 
 namespace Dissimilis.WebAPI.Services
 {
@@ -34,6 +35,8 @@ namespace Dissimilis.WebAPI.Services
             CancellationToken cancellationToken)
         {
             return user.IsSystemAdmin
+                    || (await IsGroupAdminInOrganisation(organisation.Id, user.Id, cancellationToken)
+                        && op == Operation.Get)
                     || (await IsOrganisationAdmin(organisation.Id, user.Id, cancellationToken)
                         && op != Operation.Delete
                         && op != Operation.Create);
@@ -108,6 +111,18 @@ namespace Dissimilis.WebAPI.Services
                     && ou.OrganisationId == organisationId
                     && ou.Role == Role.Admin
                     , cancellationToken: cancellationToken);
+        }
+
+        private async Task<bool> IsGroupAdminInOrganisation(int parentOrganisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext
+                .Groups
+                .Where(group => group.OrganisationId == parentOrganisationId)
+                .AnyAsync(group =>
+                    group.Users
+                    .Any(groupUser => groupUser.UserId == userId && groupUser.Role == Role.Admin)
+                    , cancellationToken);
+
         }
 
         /// <summary>
