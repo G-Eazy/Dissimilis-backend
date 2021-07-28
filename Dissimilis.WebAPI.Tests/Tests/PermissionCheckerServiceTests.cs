@@ -18,6 +18,48 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
         }
 
+
+        [Fact]
+        public async Task GetSysAdminStatusSysAdminShouldBeTrue()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(SysAdminUser, c);
+            Assert.True(adminDto.SystemAdmin);
+        }
+
+        [Fact]
+        public async Task GetSysAdminStatusNotSysAdminShouldBeFalse()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(NorwayAdminUser, c);
+            Assert.False(adminDto.SystemAdmin);
+        }
+
+        [Fact]
+        public async Task GetOrgAdminStatusOrgAdminShouldBeTrue()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(NorwayAdminUser, c);
+            Assert.True(adminDto.OrganisationAdmin);
+        }
+
+        [Fact]
+        public async Task GetOrgAdminStatusNotOrgAdminShouldBeFalse()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(TrondheimAdminUser, c);
+            Assert.False(adminDto.OrganisationAdmin);
+        }
+
+        [Fact]
+        public async Task GetGroupAdminStatusGroupAdminShouldBeTrue()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(TrondheimAdminUser, c);
+            Assert.True(adminDto.GroupAdmin);
+        }
+
+        [Fact]
+        public async Task GetGroupAdminStatusNotGroupAdminShouldBeFalse()
+        {
+            var adminDto = await _permissionChecker.CheckUserAdminStatus(DeepPurpleFanUser, c);
+            Assert.False(adminDto.GroupAdmin);
+        }
         /*
          * ***********************************************
          * 
@@ -26,7 +68,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
          * 
          * 
          * ***********************************************
-         */ 
+         */
 
 
         // Create

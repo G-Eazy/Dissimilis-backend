@@ -10,19 +10,19 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
 
     public class QueryUserAdminStatusesHandler : IRequestHandler<QueryUserAdminStatuses, UserAdminStatusDto>
     {
-        private readonly UserRepository _repository;
+        private readonly IPermissionCheckerService _permissionChecker;
         private readonly IAuthService _authService;
 
-        public QueryUserAdminStatusesHandler(UserRepository repository, IAuthService authService)
+        public QueryUserAdminStatusesHandler(IPermissionCheckerService permissionChecker, IAuthService authService)
         {
-            _repository = repository;
+            _permissionChecker = permissionChecker;
             _authService = authService;
         }
 
         public async Task<UserAdminStatusDto> Handle(QueryUserAdminStatuses request, CancellationToken cancellationToken)
         {
             var user = _authService.GetVerifiedCurrentUser();
-            var adminStatuses = await _repository.GetUserAdminStatuses(user);
+            var adminStatuses = await _permissionChecker.CheckUserAdminStatus(user, cancellationToken);
 
             return adminStatuses;
         }
