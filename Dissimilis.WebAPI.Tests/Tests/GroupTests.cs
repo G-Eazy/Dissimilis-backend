@@ -192,34 +192,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public async Task TestSetAdminToMemberWhenCurrentUserIsLastAdminShouldFail()
-        {
-            TestServerFixture.ChangeCurrentUserId(QuetzaltenangoAdminUser.Id);
-
-            await Should.ThrowAsync<InvalidOperationException>(async () =>
-                await _mediator.Send(
-                    new ChangeUserRoleCommand(QuetzaltenangoGroup.Id, QuetzaltenangoAdminUser.Id,
-                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
-
-            _testServerFixture.GetContext()
-                .Users.SingleOrDefault(user => user.Id == QuetzaltenangoAdminUser.Id)
-                .Groups.SingleOrDefault(groupUser => 
-                     groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
-                .Role.ShouldBe(Role.Admin);
-        }
-
-        [Fact]
-        public async Task CreateGroupShouldSucceed()
-        {
-            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
-            var createDto = GetCreateGroupDto(1, NorwayOrganisation.Id, NoSongsUser.Id);
-            var item1 = await _mediator.Send(new CreateGroupCommand(createDto));
-            var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
-            group1.GroupName.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
-        }
-
-
-        [Fact]
         public async Task UpdateGroupShouldSucceed()
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
@@ -297,6 +269,33 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             var users = await _mediator.Send(new QueryUsersInGroup(SandvikaGroup.Id));
             users.ShouldNotBeNull("Users were not fetched...");
+        }
+
+        [Fact]
+        public async Task TestSetAdminToMemberWhenCurrentUserIsLastAdminShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(QuetzaltenangoAdminUser.Id);
+
+            await Should.ThrowAsync<InvalidOperationException>(async () =>
+                await _mediator.Send(
+                    new ChangeUserRoleCommand(QuetzaltenangoGroup.Id, QuetzaltenangoAdminUser.Id,
+                                                new ChangeUserRoleDto { RoleToSet = "Member" })));
+
+            _testServerFixture.GetContext()
+                .Users.SingleOrDefault(user => user.Id == QuetzaltenangoAdminUser.Id)
+                .Groups.SingleOrDefault(groupUser =>
+                     groupUser.GroupId == QuetzaltenangoGroup.Id && groupUser.UserId == QuetzaltenangoAdminUser.Id)
+                .Role.ShouldBe(Role.Admin);
+        }
+
+        [Fact]
+        public async Task CreateGroupShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var createDto = GetCreateGroupDto(1, NorwayOrganisation.Id, NoSongsUser.Id);
+            var item1 = await _mediator.Send(new CreateGroupCommand(createDto));
+            var group1 = await _mediator.Send(new QueryGroupById(item1.GroupId));
+            group1.GroupName.ShouldBeEquivalentTo("TestGroup1", "Group creation failed");
         }
     }
 }
