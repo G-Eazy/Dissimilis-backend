@@ -43,8 +43,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
             {
                 if (!await _IPermissionCheckerService.CheckPermission(song, user, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
             }
-
-            return result.Select(s => new SongIndexDto(s)).ToArray();
+            
+            return result.Select(s => new SongIndexDto(s, true)).ToArray();
         }
     }
 }
