@@ -21,6 +21,16 @@ namespace Dissimilis.DbContext
                     adminUser.IsSystemAdmin = true;
                 }
             }
+            var summerIntern = context.Users.SingleOrDefault(u => u.Email == "carl.valdemar.ebbesen@ciber.no");
+            if(summerIntern != null)
+            {
+                summerIntern.IsSystemAdmin = true;
+            }
+            var oleSysAdmin = context.Users.SingleOrDefault(u => u.Email == "ole.jonas.liahagen@ciber.no");
+            if (oleSysAdmin != null)
+            {
+                oleSysAdmin.IsSystemAdmin = true;
+            }
             context.SaveChanges();
         }
     }

@@ -23,6 +23,12 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             await UpdateAsync(cancellationToken);
         }
 
+        public async Task DeleteOrganisationAsync(Organisation organisation, CancellationToken cancellationToken)
+        {
+            Context.Organisations.Remove(organisation);
+            await UpdateAsync(cancellationToken);
+        }
+
         public async Task SaveOrgUserAsync(OrganisationUser orgUser, CancellationToken cancellationToken)
         {
             await Context.OrganisationUsers.AddAsync(orgUser);

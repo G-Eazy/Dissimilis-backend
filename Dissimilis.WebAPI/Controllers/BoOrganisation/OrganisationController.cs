@@ -98,5 +98,14 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation
             var memberUpdated = await _mediator.Send(new QueryOrganisationMemberByIds(memberRoleChanged.UserId, memberRoleChanged.OrganisationId));
             return Ok(memberUpdated);
         }
+
+        [HttpDelete("{organisationId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> DeleteOrganisation(int organisationId)
+        {
+            var res = await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            return Ok(res);
+        }
     }
 }

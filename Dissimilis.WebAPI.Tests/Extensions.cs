@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
         {
-            firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
+            firstBarDto.VoltaBracket.ShouldBe(secondBarDto.VoltaBracket, "VoltaBracket not matching - " + stepDescription);
             firstBarDto.RepAfter.ShouldBe(secondBarDto.RepAfter, "RepAfter not matching - " + stepDescription);
             firstBarDto.RepBefore.ShouldBe(secondBarDto.RepBefore, "RepBefore not matching - " + stepDescription);
 
@@ -114,11 +114,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static UpdateBarDto CreateUpdateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static UpdateBarDto CreateUpdateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new UpdateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -187,11 +187,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static CreateBarDto CreateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static CreateBarDto CreateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new CreateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };

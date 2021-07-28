@@ -7,8 +7,11 @@ using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.Bogroup.Query;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
+using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
@@ -229,6 +232,63 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedGroup.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task DeleteGroupWithCorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var groupId = DeleteGroup.Id;
+            await _mediator.Send(new DeleteGroupCommand(groupId));
+            var groupShouldBeNull = _testServerFixture.GetContext().Groups
+                .SingleOrDefault(g => g.Id == groupId);
+            groupShouldBeNull.ShouldBeNull("Group was not deleted...");
+        }
+
+        [Fact]
+        public async Task DeleteGroupWithIncorrectIdShouldFail()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var groupId = -1;
+            await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteGroupCommand(groupId)));
+        }
+
+        [Fact]
+        public async Task DeleteGroupGroupUserShouldBeRemoved()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            UpdateAllOrganisations();
+            UpdateAllGroups();
+            DeleteGroup = new DbContext.Models.Group()
+            {
+                Name = "DeleteGroup",
+                OrganisationId = NorwayOrganisation.Id,
+            };
+            _testServerFixture.GetContext().Groups.Add(DeleteGroup);
+            await _testServerFixture.GetContext().SaveChangesAsync();
+
+            var deleteUser = new DbContext.Models.GroupUser()
+            {
+                UserId = SysAdminUser.Id,
+                GroupId = DeleteGroup.Id
+            };
+
+            _testServerFixture.GetContext().GroupUsers.Add(deleteUser);
+
+            await _testServerFixture.GetContext().SaveChangesAsync();
+
+            var groupId = DeleteGroup.Id;
+
+            var groupUser = _testServerFixture.GetContext().GroupUsers
+                .SingleOrDefault(gu => gu.GroupId == groupId);
+            groupUser.ShouldNotBeNull($"User with id {deleteUser.UserId}, {deleteUser.GroupId} not found");
+
+            await _mediator.Send(new DeleteGroupCommand(groupId));
+            var groupUserShouldBeNull = _testServerFixture.GetContext().GroupUsers
+                .SingleOrDefault(gu => gu.GroupId == groupId);
+            groupUserShouldBeNull.ShouldBeNull($"GroupUser was not deleted...");
         }
 
         [Fact]

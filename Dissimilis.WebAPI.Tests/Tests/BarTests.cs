@@ -111,7 +111,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .Voices.SingleOrDefault(voice => voice.Id == voiceId)
                 .SongBars.SingleOrDefault(bar => bar.Id == barBeforeUpdate.Id);
 
-            updatedBar.House.ShouldBe(2);
+            updatedBar.VoltaBracket.ShouldBe(2);
             updatedBar.RepAfter.ShouldBeTrue();
             updatedBar.RepBefore.ShouldBeFalse();
         }
@@ -132,7 +132,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .Voices.SingleOrDefault(voice => voice.Id == voiceId)
                 .SongBars.SingleOrDefault(bar => bar.Id == barBeforeUpdate.Id);
 
-            updatedBar.House.ShouldBe(barBeforeUpdate.House);
+            updatedBar.VoltaBracket.ShouldBe(barBeforeUpdate.VoltaBracket);
             updatedBar.RepAfter.ShouldBe(barBeforeUpdate.RepAfter);
             updatedBar.RepBefore.ShouldBe(barBeforeUpdate.RepBefore);
         }

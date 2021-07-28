@@ -247,7 +247,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     var masterBar = masterVoice.SongBars.ToList()[i];
                     var slaveBar = otherVoice.SongBars.ToList()[i];
 
-                    slaveBar.House = masterBar.House;
+                    slaveBar.VoltaBracket = masterBar.VoltaBracket;
                     slaveBar.RepAfter = masterBar.RepAfter;
                     slaveBar.RepBefore = masterBar.RepBefore;
                 }

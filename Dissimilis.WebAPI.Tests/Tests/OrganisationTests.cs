@@ -10,6 +10,8 @@ using System;
 using System.Linq;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -71,6 +73,60 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedOrg.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationWithCorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            UpdateAllOrganisations();
+
+            var organisationId = DeleteOrganisation.Id;
+            await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            var organisationShouldBeNull = _testServerFixture.GetContext().Organisations
+                .SingleOrDefault(g => g.Id == organisationId);
+            organisationShouldBeNull.ShouldBeNull($"Group was not deleted...");
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationWithIncorrectIdShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            var organisationId = -1;
+            await Should.ThrowAsync<NotFoundException>(async () => await _mediator.Send(new DeleteOrganisationCommand(organisationId)));
+        }
+
+        [Fact]
+        public async Task DeleteOrganisationOrgUserShouldBeRemoved()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+
+            Organisation org = new Organisation()
+            {
+                Name = "deletedOrg",
+            };
+            _testServerFixture.GetContext().Organisations.Add(org);
+            await _testServerFixture.GetContext().SaveChangesAsync();
+
+            var addOrgUser = new OrganisationUser()
+            {
+                UserId = SysAdminUser.Id,
+                OrganisationId = org.Id
+            };
+            _testServerFixture.GetContext().OrganisationUsers.Add(addOrgUser);
+            await _testServerFixture.GetContext().SaveChangesAsync();
+    
+            var organisationId = org.Id;
+
+            var orgUser = _testServerFixture.GetContext().OrganisationUsers
+                .FirstOrDefault(ou => ou.OrganisationId == organisationId);
+            orgUser.ShouldNotBeNull("No user was assigned to org to begin with");
+
+            await _mediator.Send(new DeleteOrganisationCommand(organisationId));
+            var organisationUserShouldBeNull = _testServerFixture.GetContext().OrganisationUsers
+                .FirstOrDefault(ou => ou.OrganisationId == organisationId);
+            organisationUserShouldBeNull.ShouldBeNull($"OrganisationUser was not deleted...");
         }
 
         [Fact]

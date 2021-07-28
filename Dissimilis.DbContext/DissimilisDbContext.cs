@@ -251,12 +251,12 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.Group)
                 .WithMany(x => x.Users)
                 .HasForeignKey(x => x.GroupId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.User)
                 .WithMany(x => x.Groups)
                 .HasForeignKey(x => x.UserId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
         }
         static void BuildOrganisationUser(ModelBuilder builder)
         {
@@ -267,12 +267,12 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.Organisation)
                 .WithMany(x => x.Users)
                 .HasForeignKey(x => x.OrganisationId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.User)
                 .WithMany(x => x.Organisations)
                 .HasForeignKey(x => x.UserId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
         }
         static void BuildSongGroupTag(ModelBuilder builder)
         {
@@ -283,12 +283,12 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.Group)
                 .WithMany(x => x.SharedSongs)
                 .HasForeignKey(x => x.GroupId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.Song)
                 .WithMany(x => x.GroupTags)
                 .HasForeignKey(x => x.SongId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
         }
         static void BuildSongOrganisationTag(ModelBuilder builder)
         {
@@ -299,12 +299,12 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.Organisation)
                 .WithMany(x => x.SharedSongs)
                 .HasForeignKey(x => x.OrganisationId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.Song)
                 .WithMany(x => x.OrganisationTags)
                 .HasForeignKey(x => x.SongId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
         }
         static void BuildSongSharedUser(ModelBuilder builder)
         {
@@ -314,12 +314,12 @@ namespace Dissimilis.DbContext
             entity.HasOne(x => x.User)
                 .WithMany(x => x.SongsShared)
                 .HasForeignKey(x => x.UserId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(x => x.Song)
                 .WithMany(x => x.SharedUsers)
                 .HasForeignKey(x => x.SongId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
         #endregion
