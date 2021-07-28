@@ -23,6 +23,18 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        [MaxLength(100)]
+        public string Address { get; set; }
+        
+        [MaxLength(20)]
+        public string PhoneNumber { get; set; }
+
+        [MaxLength(100)]
+        public string Email { get; set; }
+
+        [MaxLength(300)]
+        public string Description { get; set; }
+
         /// <summary>
         /// The different users and their roles in the group
         /// </summary>
@@ -31,7 +43,7 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// List of all shared songs in this group
         /// </summary>
-        public ICollection<SongSharedGroup> SharedSongs { get; set; } = new List<SongSharedGroup>();
+        public ICollection<SongGroupTag> SharedSongs { get; set; } = new List<SongGroupTag>();
 
         /// <summary>
         /// this groups organisation
@@ -49,17 +61,20 @@ namespace Dissimilis.DbContext.Models
         public Group() { }
 
         /// <summary>
-        /// Constructor for User
+        /// Constructor with params
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="adminUser"></param>
         /// <param name="organisationId"></param>
-        public Group(GroupUser adminUser, int organisationId, string name)
+        /// <param name="address"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        public Group(string name, int organisationId, int createdById)
         {
             Name = name;
-            Users.Add(adminUser);
             OrganisationId = organisationId;
-           
+            CreatedOn = DateTimeOffset.Now;
+            CreatedById = createdById;
         }
     }
 }

@@ -4,6 +4,8 @@ using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 
 namespace Dissimilis.WebAPI.Controllers.BoUser
 {
@@ -54,5 +56,33 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         {
             return Ok();
         }
+
+        [HttpGet("currentUser/adminStatuses")]
+        [ProducesResponseType(typeof(UserAdminStatusDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetCurrentUserAdminStatuses()
+        {
+            var result = await _mediator.Send(new QueryUserAdminStatuses());
+            return Ok(result);
+        }
+
+        [HttpGet("sysAdmins")]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetAllSysAdmins()
+        {
+            // TODO: Maybe add a restriction on this later
+            var result = await _mediator.Send(new QuerySysAdmins());
+            return Ok(result);
+        }
+
+        [HttpPatch("{userId:int}/updateSysAdminStatus")]
+        [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> UpdateSysAdminStatus(int userId, [FromBody] UpdateSysAdminStatusDto command) 
+        {
+            var item = await _mediator.Send(new UpdateSysAdminStatusCommand(userId, command));
+            var result = await _mediator.Send(new QueryUserById(item.UserId));
+            return Ok(result);
+        }
+
     }
 }

@@ -30,6 +30,7 @@ namespace Dissimilis.DbContext.Models.Song
         [MaxLength(500)]
         public string Title { get; set; }
 
+        public DateTimeOffset? Deleted { get; set; }
 
         /// <summary>
         /// The composer of the song
@@ -104,12 +105,9 @@ namespace Dissimilis.DbContext.Models.Song
         /// <summary>
         /// The groups with read permission on the song
         /// </summary>
-        public ICollection<SongSharedGroup> SharedGroups { get; set; } = new List<SongSharedGroup>();
+        public ICollection<SongGroupTag> GroupTags { get; set; } = new List<SongGroupTag>();
+        public ICollection<SongOrganisationTag> OrganisationTags { get; set; } = new List<SongOrganisationTag>();
 
-        /// <summary>
-        /// The organisations with read permission on this song
-        /// </summary>
-        public ICollection<SongSharedOrganisation> SharedOrganisations { get; set; } = new List<SongSharedOrganisation>();
         public ICollection<SongSnapshot> Snapshots { get; set; } = new List<SongSnapshot>();
     }
 }

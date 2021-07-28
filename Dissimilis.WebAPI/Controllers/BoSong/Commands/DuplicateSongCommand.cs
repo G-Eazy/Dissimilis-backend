@@ -1,9 +1,11 @@
-﻿using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+﻿using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,20 +27,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService)
+        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _authService = authService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(DuplicateSongCommand request, CancellationToken cancellationToken)
         {
             var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
+            var currentUser = _authService.GetVerifiedCurrentUser();
 
-            var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
+            if (!await _IPermissionCheckerService.CheckPermission(duplicateFromSong, currentUser, Operation.Get, cancellationToken)) throw new UnauthorizedAccessException();
 
-            duplicatedSong.SetUpdated(_authService.GetVerifiedCurrentUser().Id);
+            var duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
+            duplicatedSong.SetUpdated(currentUser.Id);
             await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);

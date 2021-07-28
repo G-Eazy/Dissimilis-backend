@@ -25,6 +25,18 @@ namespace Dissimilis.DbContext.Models
         [Required]
         public string Name { get; set; }
 
+        [MaxLength(100)]
+        public string Address { get; set; }
+
+        [MaxLength(20)]
+        public string PhoneNumber { get; set; }
+
+        [MaxLength(100)]
+        public string Email { get; set; }
+
+        [MaxLength(300)]
+        public string Description { get; set; }
+
         /// <summary>
         /// The users in the organisation with their roles
         /// </summary>
@@ -37,11 +49,11 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// List of all shared songs in this organisation
         /// </summary>
-        public ICollection<SongSharedOrganisation> SharedSongs { get; set; } = new List<SongSharedOrganisation>();
+        public ICollection<SongOrganisationTag> SharedSongs { get; set; } = new List<SongOrganisationTag>();
 
         public User CreatedBy { get; set; }
         public int? CreatedById { get; set; }
-        public DateTimeOffset? CreatedOn { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; } = DateTimeOffset.Now;
 
         /// <summary>
         /// Empty constructor 
@@ -49,15 +61,18 @@ namespace Dissimilis.DbContext.Models
         public Organisation() { }
 
         /// <summary>
-        /// Constructor that takes a name of the organisation
+        /// Constructor with params
         /// </summary>
         /// <param name="name"></param>
-        /// <param adminUser="adminUser"></param>
-        public Organisation(string name, OrganisationUser adminUser)
+        /// <param name="address"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        /// <param name="createdById"></param>
+        public Organisation(string name, int createdById)
         {
             Name = name;
-            Users.Add(adminUser);
-            
+            CreatedById = createdById;
+            CreatedOn = DateTimeOffset.Now;
         }
     }
 }

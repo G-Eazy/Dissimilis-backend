@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -29,19 +30,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CopyBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService)
+        public CopyBarsCommandHandler(SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(CopyBarsCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
             var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
+
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
             song.PerformSnapshot(currentUser);
 
             song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
@@ -51,17 +54,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
             song.SetUpdatedOverAll(currentUser.Id);
 
             await _songRepository.UpdateAsync(cancellationToken);
-
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
 
             return new UpdatedSongCommandDto(song);
         }

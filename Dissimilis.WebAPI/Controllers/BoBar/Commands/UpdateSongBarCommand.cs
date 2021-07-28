@@ -11,6 +11,8 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
+using System;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {
@@ -35,18 +37,25 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService)
+        public UpdateSongBarCommandHandler(BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _barRepository = barRepository;
             _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(UpdateSongBarCommand request, CancellationToken cancellationToken)
         {
-            var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
-            await using var transaction = await _barRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (voice == null)
@@ -63,25 +72,15 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
             bar.RepAfter = request.Command?.RepAfter ?? bar.RepAfter;
             bar.RepBefore = request.Command?.RepBefore ?? bar.RepBefore;
-            bar.House = request.Command?.House ?? bar.House;
-            if (bar.House == 0)
+            bar.VoltaBracket = request.Command?.VoltaBracket ?? bar.VoltaBracket;
+            if (bar.VoltaBracket == 0)
             {
-                bar.House = null;
+                bar.VoltaBracket = null;
             }
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             song.SyncVoicesFrom(voice);
-
-            try
-            {
-                await _barRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _barRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(bar);
         }

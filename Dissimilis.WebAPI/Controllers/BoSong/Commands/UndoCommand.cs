@@ -47,13 +47,16 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             SongByIdDto deserialisedSong = Newtonsoft.Json.JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
             User currentUser = _IAuthService.GetVerifiedCurrentUser();
 
-            undoFromSong.RemoveElementsFromOldSong(deserialisedSong.Voices);
+            undoFromSong.Undo();
+            await _repository.UpdateAsync(cancellationToken);
+
+            /*undoFromSong.RemoveElementsFromOldSong(deserialisedSong.Voices);
             await _repository.SaveAsync(undoFromSong, cancellationToken);
             await _repository.UpdateAsync(cancellationToken);
 
             undoFromSong.AddSnapshotValues(deserialisedSong, currentUser);
-            //await _repository.SaveAsync(undoFromSong, cancellationToken);
-            await _repository.UpdateAsync(cancellationToken);
+            await _repository.SaveAsync(undoFromSong, cancellationToken);
+            await _repository.UpdateAsync(cancellationToken);*/
 
 
             /*Song undoFromSong;

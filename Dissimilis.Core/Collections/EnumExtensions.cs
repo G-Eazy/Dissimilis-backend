@@ -48,5 +48,12 @@ namespace Dissimilis.Core.Collections
 
             return "";
         }
+
+        public static T GetEnumValueFromDescriptionString<T>(string description) where T : struct
+        {
+            return GetEnumValues<T>()
+                .Where(value => value.GetDescription() == description)
+                .FirstOrDefault();
+        }
     }
 }

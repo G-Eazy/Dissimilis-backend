@@ -16,7 +16,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
         public int Position { get; set; }
         public bool RepBefore { get; set; }
         public bool RepAfter { get; set; }
-        public int? House { get; set; }
+        public int? VoltaBracket { get; set; }
         public NoteDto[] Chords { get; set; }
 
         public BarDto(SongBar songBar)
@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
             Position = songBar.Position;
             RepBefore = songBar.RepBefore;
             RepAfter = songBar.RepAfter;
-            House = songBar.House;
+            VoltaBracket = songBar.VoltaBracket;
             Chords = songBar.GetBarNotes()
                 .OrderBy(n => n.Position)
                 .Select(n => new NoteDto(n))
@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
 
         public static BarDto JsonToBarDto(JToken json)
         {
-            int house = (json["House"].Value<string>() != null) ? int.Parse(json["House"].Value<string>()) : 0;
+            int voltaBracket = (json["VoltaBracket"].Value<string>() != null) ? int.Parse(json["VoltaBracket"].Value<string>()) : 0;
             return new BarDto()
             {
                 BarId = int.Parse(json["BarId"].Value<string>()),
@@ -48,7 +48,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
                 Position = int.Parse(json["Position"].Value<string>()),
                 RepBefore = bool.Parse(json["RepBefore"].Value<string>()),
                 RepAfter = bool.Parse(json["RepAfter"].Value<string>()),
-                House = (house != 0) ? house : null,
+                VoltaBracket = (voltaBracket != 0) ? voltaBracket : null,
                 Chords = null
             };
         }
@@ -61,7 +61,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
                 Position = barDto.Position,
                 RepBefore = barDto.RepBefore,
                 RepAfter = barDto.RepAfter,
-                House = barDto.House,
+                VoltaBracket = barDto.VoltaBracket,
                 SongVoiceId = barDto.SongVoiceId,
                 Notes = new List<SongNote>(),
                 SongVoice = voice

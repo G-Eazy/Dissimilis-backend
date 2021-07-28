@@ -139,7 +139,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("House")
+                    b.Property<int?>("VoltaBracket")
                         .HasColumnType("int");
 
                     b.Property<int>("Position")

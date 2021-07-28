@@ -1,13 +1,17 @@
 ﻿using System.Linq;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 
@@ -15,9 +19,6 @@ namespace Dissimilis.WebAPI.xUnit
 {
     internal static class Extensions
     {
-
-        internal const string DefaultTestSongTitle = "TestSong";
-
         internal static void CheckSongVoiceIntegrity(SongByIdDto songDto, string stepDescription)
         {
             var refVoice = songDto.Voices.FirstOrDefault();
@@ -54,7 +55,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
         {
-            firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
+            firstBarDto.VoltaBracket.ShouldBe(secondBarDto.VoltaBracket, "VoltaBracket not matching - " + stepDescription);
             firstBarDto.RepAfter.ShouldBe(secondBarDto.RepAfter, "RepAfter not matching - " + stepDescription);
             firstBarDto.RepBefore.ShouldBe(secondBarDto.RepBefore, "RepBefore not matching - " + stepDescription);
 
@@ -77,7 +78,7 @@ namespace Dissimilis.WebAPI.xUnit
             }
         }
 
-        internal static CreateSongDto CreateSongDto(int numerator = 4, int denominator = 4, string title = DefaultTestSongTitle)
+        internal static CreateSongDto CreateSongDto(string title, int numerator = 4, int denominator = 4)
         {
             return new CreateSongDto()
             {
@@ -113,11 +114,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static UpdateBarDto CreateUpdateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static UpdateBarDto CreateUpdateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new UpdateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -186,11 +187,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static CreateBarDto CreateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static CreateBarDto CreateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new CreateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -221,13 +222,84 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static SearchQueryDto SearchQueryDto()
+        internal static SearchQueryDto SearchQueryDto(
+            string title = "", string OrderBy = "date", bool orderDescending = true, bool includeAll = true)
         {
             return new SearchQueryDto()
             {
-                Title = "Testuser",
+                Title = title,
+                OrderBy = OrderBy,
+                OrderDescending = orderDescending,
+                IncludeAll = includeAll,
+            };
+        }
+        internal static SearchQueryDto AllSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
                 OrderBy = "date",
-                OrderDescending = true
+                OrderDescending = true,
+                IncludeAll = true,
+            };
+
+        }
+        internal static SearchQueryDto MyLibarySearchQueryDto(int currentUserId)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                ArrangerId = currentUserId,
+            };
+
+        }
+        internal static SearchQueryDto SharedWithUserSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                IncludeAll = false,
+                OrderDescending = true,
+                IncludeSharedWithUser = true
+            };
+
+        }
+
+        internal static SearchQueryDto GroupOrgSearchQueryDto(int[] groups, int[] orgs)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeAll = false,
+                IncludedGroupIdArray = groups,
+                IncludedOrganisationIdArray = orgs
+            };
+
+        }
+
+        internal static CreateGroupDto GetCreateGroupDto(int groupNumber, int orgId, int adminId)
+        {
+            return new CreateGroupDto()
+            {
+                Name = $"TestGroup{groupNumber}",
+                OrganisationId = orgId,
+                FirstAdminId = adminId
+            };
+        }
+        
+        internal static UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Address = "Nidarosveien 58",
+                Email = "NewAdmin@Trondheim_Norway.no",
+                Description = "The new and hip Trondheim group.",
+                PhoneNumber = "90944999",
             };
         }
     }

@@ -6,6 +6,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,14 +24,14 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         }
 
         /// <summary>
-        /// Songs created by or arranged by user
+        /// Songs created by or arranged by user that are deleted
         /// </summary>
-        [HttpGet("mylibrary")]
+        [HttpGet("mylibrary/deleted")]
         [ProducesResponseType(typeof(SongIndexDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> MyLibrary()
+        public async Task<IActionResult> MyDeletedLibrary()
         {
-            var result = await _mediator.Send(new QuerySongToLibrary());
+            var result = await _mediator.Send(new QueryDeletedMyLibary());
             return Ok(result);
         }
 
@@ -189,6 +190,91 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return Ok(result);
         }
 
+        [HttpPatch("{songId:int}/restore")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> RestoreSong(int songId)
+        {
+            var item = await _mediator.Send(new RestoreDeletedSongCommand(songId));
+            var result = await _mediator.Send(new QuerySongById(item.SongId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// share write permission with given user
+        /// </summary>
+        [HttpPost("{songId:int}/shareSong/User/{userId:int}")]
+        [ProducesResponseType(typeof(ShortUserDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongUser(int songId, int userId)
+        {
+            var result = await _mediator.Send(new ShareSongUserCommand(songId, userId));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// remove write permission for given user
+        /// </summary>
+        [HttpDelete("{songId:int}/shareSong/User/{userId:int}")]
+        [ProducesResponseType(typeof(ShortUserDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveSharedSongUser(int songId, int userId)
+        {
+            var result = await _mediator.Send(new RemoveShareSongUserCommand(songId, userId));
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// Update grouptags for a given song
+        /// </summary>
+        [HttpPatch("{songId:int}/Tag/Group")]
+        [ProducesResponseType(typeof(ShortGroupDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveTagGroup(int songId,[FromBody] UpdateTagsDto Ids)
+        {
+            var result = await _mediator.Send(new UpdateTagGroupCommand(songId, Ids.TagIds));
+            return Ok(result);
+        }
+        /// <summary>
+        /// Update organisationtags for a given song
+        /// </summary>
+        [HttpPatch("{songId:int}/Tag/Organisation")]
+        [ProducesResponseType(typeof(ShortOrganisationDto[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> RemoveTagOrganisation(int songId,[FromBody] UpdateTagsDto Ids)
+        {
+            var result = await _mediator.Send(new UpdateTagOrganisationCommand(songId, Ids.TagIds));
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get shared users, group/organisaton tags, public/private on a given song
+        /// </summary>
+        [HttpGet("{songId:int}/getProtectionLevelSharedWithAndTags")]
+        [ProducesResponseType(typeof(ProtectionLevelSharedWithAndTagsDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetTagOrganisation(int songId)
+        {
+            var result = await _mediator.Send(new QueryProtectionLevelSharedWithAndTags(songId));
+            return Ok(result);
+        }
+
+        ///<summary>
+        /// set public or private
+        /// </summary>
+        [HttpPost("{songId:int}/changeProtectionLevel")]
+        [ProducesResponseType(typeof(ProtectionLevelSongDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ShareSongOrganisation(int songId, [FromBody] UpdateProtectionLevelDto protectionLevel)
+        {
+            var result = await _mediator.Send(new ChangeProtectionLevelSongCommand(protectionLevel, songId));
+            return Ok(result);
+        }
         /// <summary>
         /// Undo last action performed on a song
         /// </summary>

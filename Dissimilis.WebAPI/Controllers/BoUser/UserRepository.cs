@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +114,10 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
 
             await this._context.SaveChangesAsync();
             return user;
+        }
+        public async Task UpdateAsync(CancellationToken cancellationToken)
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

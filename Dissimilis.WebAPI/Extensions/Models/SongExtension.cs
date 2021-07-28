@@ -1,16 +1,13 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using Dissimilis.Core.Collections;
-using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
-using System;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using Dissimilis.DbContext;
-using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
@@ -19,6 +16,18 @@ namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class SongExtension
     {
+        /// <summary>
+        /// Return true if the given user have readpermission on the song in the expression
+        /// </summary>
+        /// <param name="user"> The user to chek for</param>
+        /// <returns> true if readpermission</returns>
+        public static Expression<Func<Song, bool>> ReadAccessToSong(User user)
+        {
+            return (song => song.ProtectionLevel == ProtectionLevels.Public
+            || song.ArrangerId == user.Id
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
+        }
+
         /// <summary>
         /// Get max bar positions for a song
         /// </summary>
@@ -58,7 +67,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 highestBarNumber++;
                 while (songVoice.SongBars.Count < maxBarCount)
                 {
-                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToArray();
+                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToList();
                 }
 
                 songVoice.SortBars();
@@ -223,7 +232,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="masterVoice"></param>
         public static void SyncVoicesFrom(this Song song, SongVoice masterVoice)
         {
-            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToArray();
+            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToList();
             if (!otherVoices.Any())
             {
                 return;
@@ -236,26 +245,25 @@ namespace Dissimilis.WebAPI.Extensions.Models
             {
                 foreach (var otherVoice in otherVoices)
                 {
-                    var masterBar = masterVoice.SongBars.ToArray()[i];
-                    var slaveBar = otherVoice.SongBars.ToArray()[i];
+                    var masterBar = masterVoice.SongBars.ToList()[i];
+                    var slaveBar = otherVoice.SongBars.ToList()[i];
 
-                    slaveBar.House = masterBar.House;
+                    slaveBar.VoltaBracket = masterBar.VoltaBracket;
                     slaveBar.RepAfter = masterBar.RepAfter;
                     slaveBar.RepBefore = masterBar.RepBefore;
                 }
             }
 
         }
-
-        public static Song Clone(this Song song, string title = null)
+        public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
             {
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
                 Speed = song.Speed,
+                ArrangerId = arrangerId,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
                 SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
@@ -335,7 +343,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
         }
 
-        public static Song GetUndoneSong(this Song song)
+        public static void Undo(this Song song)
         {
             if (song.Snapshots.Count == 0)
                 throw new NotFoundException("No more snapshots to pop...");
@@ -363,7 +371,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             foreach (var voice in song.Voices) Console.WriteLine("voice");
             Console.WriteLine("/////////////////////////////");*/
 
-            return undoneSong;
+            //return undoneSong;
         }
 
         /// <summary>
@@ -402,7 +410,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 else
                     orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
 
-                result = orderedSnapshots[0];
+                result = orderedSnapshots[orderedSnapshots.Length-1];
                 song.Snapshots.Remove(result);
             }
             return result;

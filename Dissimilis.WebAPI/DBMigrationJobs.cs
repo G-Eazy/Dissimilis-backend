@@ -109,5 +109,21 @@ namespace Dissimilis.DbContext
             toChange.ForEach(instrument => instrument.Name = instrument.DefinedInstrument?.GetDescription());
             Context.SaveChanges();
         }
+        public static void SetAllSongsToPublic(DissimilisDbContext Context)
+        {
+            var allSongsWithoutPLevel = Context.Songs.Where(s => s.ProtectionLevel == 0);
+            allSongsWithoutPLevel.ForEach(song => song.ProtectionLevel = ProtectionLevels.Public);
+            Context.SaveChanges();
+        }
+
+        public static void UpdateAllSongsDeletedStatus(DissimilisDbContext Context)
+        {
+            var allSongs = Context.Songs;
+            foreach(var song in allSongs)
+            {
+                //song.Deleted = null;
+            }
+            Context.SaveChanges();
+        }
     }
 }
