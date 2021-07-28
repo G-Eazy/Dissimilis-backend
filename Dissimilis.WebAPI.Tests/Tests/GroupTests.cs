@@ -226,7 +226,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
 
             updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
+            updatedGroup.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
         }
