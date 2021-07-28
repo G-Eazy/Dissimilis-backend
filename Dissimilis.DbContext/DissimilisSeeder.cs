@@ -26,6 +26,11 @@ namespace Dissimilis.DbContext
             {
                 summerIntern.IsSystemAdmin = true;
             }
+            var oleSysAdmin = context.Users.SingleOrDefault(u => u.Email == "ole.jonas.liahagen@ciber.no");
+            if (oleSysAdmin != null)
+            {
+                oleSysAdmin.IsSystemAdmin = true;
+            }
             context.SaveChanges();
         }
     }
