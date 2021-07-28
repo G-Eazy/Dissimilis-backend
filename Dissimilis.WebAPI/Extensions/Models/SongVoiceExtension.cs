@@ -29,20 +29,19 @@ namespace Dissimilis.WebAPI.Extensions.Models
         }
 
 
-        public static (List<SongVoice>, List<SongNote> removeNotes) GetSongVoicesFromDto(Song song, SongSnapshot snapshot, SongVoiceDto[] voiceDtos)
+        public static List<SongVoice> GetSongVoicesFromDto(Song song, SongSnapshot snapshot, SongVoiceDto[] voiceDtos)
         {
             List<SongVoice> voices = new List<SongVoice>();
-            List<SongNote> removeNotes = new List<SongNote>();
             foreach (var voiceDto in voiceDtos)
             {
                 SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
                 if (voice == null)
                     voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById, song);
                
-                voice.SongBars = SongBarExtension.GetSongBarsFromDto(voiceDto.Bars, voice, removeNotes);
+                voice.SongBars = SongBarExtension.GetSongBarsFromDto(voiceDto.Bars, voice);
                 voices.Add(voice);
             }
-            return (voices, removeNotes);
+            return voices;
         }
 
         public static SongVoice Clone(this SongVoice songVoice, string VoiceName, User user = null, Instrument instrument = null, int voiceNumber = -1)

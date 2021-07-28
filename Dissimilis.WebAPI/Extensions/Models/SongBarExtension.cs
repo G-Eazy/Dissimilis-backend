@@ -145,7 +145,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return songBar;
         }
 
-        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice, List<SongNote> removeNotes)
+        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice)
         {
             List<SongBar> newBars = new List<SongBar>();
             foreach (var barDto in barDtos)
@@ -154,7 +154,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 if (bar == null) 
                     bar = BarDto.ConvertToSongBar(barDto, voice);
 
-                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar, removeNotes);
+                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar);
                 newBars.Add(bar);
             }
             return newBars;

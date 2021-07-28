@@ -335,7 +335,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             }
         }
 
-        public static (Song, List<SongNote>) GetUndoneSong(this Song song)
+        public static Song GetUndoneSong(this Song song)
         {
             if (song.Snapshots.Count == 0)
                 throw new NotFoundException("No more snapshots to pop...");
@@ -345,11 +345,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
             SongByIdDto deserialisedSong = Newtonsoft.Json.JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
             
             Song undoneSong = new Song() { };
-            List<SongNote> removeNotes;
             undoneSong.Title = deserialisedSong.Title;
             undoneSong.UpdatedBy = snapshot.CreatedBy;
             undoneSong.UpdatedOn = DateTimeOffset.Now;
-            (undoneSong.Voices, removeNotes) = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
+            undoneSong.Voices = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
             
             /*JObject deserialisedSong = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(snapshot.SongObjectJSON);
             JArray voiceJSONs = deserialisedSong["Voices"].Value<JArray>();*/
@@ -364,7 +363,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             foreach (var voice in song.Voices) Console.WriteLine("voice");
             Console.WriteLine("/////////////////////////////");*/
 
-            return (undoneSong, removeNotes);
+            return undoneSong;
         }
 
         /// <summary>
