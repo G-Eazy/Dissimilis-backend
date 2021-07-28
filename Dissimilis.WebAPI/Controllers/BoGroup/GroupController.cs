@@ -108,7 +108,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             return Ok(group);
         }
 
-        [HttpDelete("{organisationId:int}")]
+        [HttpDelete("{organisationId:int}/groups/{groupId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> DeleteGroup(int groupId)
