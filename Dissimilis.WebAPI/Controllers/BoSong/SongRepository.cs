@@ -100,15 +100,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             return song;
         }
 
-        public async Task<Song[]> GetAllSongsInMyLibrary(int userId, CancellationToken cancellationToken)
-        {
-            var songs = await Context.Songs
-                .Where(s => (s.CreatedById == userId || s.ArrangerId == userId) && s.Deleted == null)
-                .ToArrayAsync(cancellationToken);
-            
-            return songs;
-        }
-
         public async Task SaveAsync(Song song, CancellationToken cancellationToken)
         {
             await Context.Songs.AddAsync(song, cancellationToken);
@@ -209,14 +200,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
         public async Task<List<Song>> GetSongSearchList(User user, SearchQueryDto searchCommand, CancellationToken cancellationToken)
         {
-            var permissionCheckerService = new PermissionCheckerService(Context);
-
             return await Context.Songs
                 .Include(song => song.Arranger)
                 .Include(song => song.SharedUsers)
                 .Include(song => song.GroupTags)
                 .Include(song => song.OrganisationTags)
-                .Where(SongExtension.ReadAccessToSong(user)) //todo: dette kan forbedres til å bruke PermissionService
+                .Where(song => song.Deleted == null)
+                .Where(SongExtension.ReadAccessToSong(user))
                 .AsSplitQuery()
                 .AsQueryable()
                 .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)

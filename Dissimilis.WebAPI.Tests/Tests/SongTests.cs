@@ -30,7 +30,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            var songDtos = await _mediator.Send(new QuerySongToLibrary(false));
+            var songDtos = await _mediator.Send(new QuerySongSearch(MyLibarySearchQueryDto(DeepPurpleFanUser.Id)));
 
             songDtos.Length.ShouldBe(2);
 
@@ -154,16 +154,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TrondheimGuatemalaSong.Any(s => s.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
             TrondheimGuatemalaSong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
             TrondheimGuatemalaSong.Any(s => s.SongId == BegyntePÂBunnen.Id).ShouldBeTrue();
-
-        }
-
-        [Fact]
-        public async Task TestGetSongsFromMyLibrary()
-        {
-            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
-            var MyLibary = await _mediator.Send(new QuerySongToLibrary());
-
-            MyLibary.Count().ShouldBe(2);
 
         }
 

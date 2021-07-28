@@ -158,7 +158,7 @@ namespace Dissimilis.WebAPI.Services
         public async Task<bool> CheckPermission(Song song, User user, Operation op, CancellationToken cancellationToken)
         {
             if (op == Operation.Create) return true;
-            if (op == Operation.Get && song.ProtectionLevel == ProtectionLevels.Public) return true;
+            if (op == Operation.Get && song.ProtectionLevel == ProtectionLevels.Public) return song.Deleted == null;
             if (op == Operation.Get || op == Operation.Modify || op == Operation.Invite || op == Operation.Kick)
             {
                 return await CheckWriteAccess(song, user);

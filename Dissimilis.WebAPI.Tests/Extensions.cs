@@ -244,6 +244,17 @@ namespace Dissimilis.WebAPI.xUnit
             };
 
         }
+        internal static SearchQueryDto MyLibarySearchQueryDto(int currentUserId)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                ArrangerId = currentUserId,
+            };
+
+        }
         internal static SearchQueryDto SharedWithUserSearchQueryDto()
         {
             return new SearchQueryDto()
