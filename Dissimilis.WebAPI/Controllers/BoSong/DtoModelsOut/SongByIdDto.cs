@@ -34,7 +34,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
         
         public string Creator { get; set; }
         public string UpdatedBy { get; set; }
-        public SongByIdDto(Song song)
+        public bool CurrentUserHasWriteAccess { get; set; }
+        public SongByIdDto(Song song, bool currentUserHasWriteAccess)
         {
             SongId = song.Id;
             Title = song.Title;
@@ -53,6 +54,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
                 .Select(p => new SongVoiceDto(p))
                 .OrderBy(p => p.PartNumber)
                 .ToArray();
+            CurrentUserHasWriteAccess = currentUserHasWriteAccess;
         }
     }
 }

@@ -37,7 +37,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
             if (!await _IPermissionCheckerService.CheckPermission(result, currentUser, Operation.Get, cancellationToken)) throw new UnauthorizedAccessException();
 
-            return new SongByIdDto(result);
+            bool currentUserHasWriteAccess = await _IPermissionCheckerService.CheckPermission(result, currentUser, Operation.Modify, cancellationToken);
+
+            return new SongByIdDto(result, currentUserHasWriteAccess);
         }
     }
 }

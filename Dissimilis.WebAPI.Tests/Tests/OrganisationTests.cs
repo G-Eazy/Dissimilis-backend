@@ -11,6 +11,7 @@ using System.Linq;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.DbContext.Models;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -47,7 +48,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             var item = await _mediator.Send(new CreateOrganisationCommand(orgDto));
             var org = await _mediator.Send(new QueryOrganisationById(item.OrganisationId));
-            org.Name.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
+            org.OrganisationName.ShouldBeEquivalentTo("TestOrg1", "Creation of organisation failed");
         }
 
 
@@ -67,7 +68,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updateItem = await _mediator.Send(new UpdateOrganisationCommand(GuatemalaOrganisation.Id, updateDto));
             var updatedOrg = await _mediator.Send(new QueryOrganisationById(updateItem.OrganisationId));
 
-            updatedOrg.Name.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
+            updatedOrg.OrganisationName.ShouldBeEquivalentTo(updateDto.Name, "Name did not match");
             updatedOrg.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
             updatedOrg.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedOrg.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
@@ -101,9 +102,22 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
 
-            UpdateAllOrganisations();
+            Organisation org = new Organisation()
+            {
+                Name = "deletedOrg",
+            };
+            _testServerFixture.GetContext().Organisations.Add(org);
+            await _testServerFixture.GetContext().SaveChangesAsync();
 
-            var organisationId = DeleteOrganisation.Id;
+            var addOrgUser = new OrganisationUser()
+            {
+                UserId = SysAdminUser.Id,
+                OrganisationId = org.Id
+            };
+            _testServerFixture.GetContext().OrganisationUsers.Add(addOrgUser);
+            await _testServerFixture.GetContext().SaveChangesAsync();
+    
+            var organisationId = org.Id;
 
             var orgUser = _testServerFixture.GetContext().OrganisationUsers
                 .FirstOrDefault(ou => ou.OrganisationId == organisationId);

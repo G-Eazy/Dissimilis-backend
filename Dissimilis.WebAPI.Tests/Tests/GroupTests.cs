@@ -229,7 +229,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             var updatedGroup = await _mediator.Send(new QueryGroupById(updateItem.GroupId));
 
             updatedGroup.Address.ShouldBeEquivalentTo(updateDto.Address, "Address did not match");
-            updatedGroup.EmailAddress.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
+            updatedGroup.Email.ShouldBeEquivalentTo(updateDto.Email, "Email was not updated");
             updatedGroup.Description.ShouldBeEquivalentTo(updateDto.Description, "Description was not updated");
             updatedGroup.PhoneNumber.ShouldBeEquivalentTo(updateDto.PhoneNumber, "Phonenumber was not updated");
         }
@@ -261,11 +261,29 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
             UpdateAllOrganisations();
             UpdateAllGroups();
+            DeleteGroup = new DbContext.Models.Group()
+            {
+                Name = "DeleteGroup",
+                OrganisationId = NorwayOrganisation.Id,
+            };
+            _testServerFixture.GetContext().Groups.Add(DeleteGroup);
+            await _testServerFixture.GetContext().SaveChangesAsync();
+
+            var deleteUser = new DbContext.Models.GroupUser()
+            {
+                UserId = SysAdminUser.Id,
+                GroupId = DeleteGroup.Id
+            };
+
+            _testServerFixture.GetContext().GroupUsers.Add(deleteUser);
+
+            await _testServerFixture.GetContext().SaveChangesAsync();
+
             var groupId = DeleteGroup.Id;
 
             var groupUser = _testServerFixture.GetContext().GroupUsers
                 .SingleOrDefault(gu => gu.GroupId == groupId);
-            groupUser.ShouldNotBeNull("No user was assigned to group to begin with");
+            groupUser.ShouldNotBeNull($"User with id {deleteUser.UserId}, {deleteUser.GroupId} not found");
 
             await _mediator.Send(new DeleteGroupCommand(groupId));
             var groupUserShouldBeNull = _testServerFixture.GetContext().GroupUsers

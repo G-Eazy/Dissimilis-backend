@@ -10,24 +10,22 @@ using System.Threading.Tasks;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 {
-    public class QuerySongToLibrary : IRequest<SongIndexDto[]> 
+    public class QueryDeletedMyLibary : IRequest<SongIndexDto[]> 
     { 
-        public bool GetDeleted { get; }
 
-        public QuerySongToLibrary(bool getDeleted = false)
+        public QueryDeletedMyLibary()
         {
-            GetDeleted = getDeleted;
         }
     }
 
-    public class QuerySongToLibraryHandler : IRequestHandler<QuerySongToLibrary, SongIndexDto[]>
+    public class QueryDeletedMyLibaryHandler : IRequestHandler<QueryDeletedMyLibary, SongIndexDto[]>
     {
         private readonly SongRepository _repository;
         private readonly IAuthService _authService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
-        public QuerySongToLibraryHandler(SongRepository repository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService) 
+        public QueryDeletedMyLibaryHandler(SongRepository repository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService) 
         {
             _repository = repository;
             _authService = authService;
@@ -35,23 +33,18 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Query
 
         }
 
-        public async Task<SongIndexDto[]> Handle(QuerySongToLibrary request, CancellationToken cancellationToken)
+        public async Task<SongIndexDto[]> Handle(QueryDeletedMyLibary request, CancellationToken cancellationToken)
         {
             var user = _authService.GetVerifiedCurrentUser();
 
-            Song[] result = null;
-
-            if (!request.GetDeleted)
-                result = await _repository.GetAllSongsInMyLibrary(user.Id, cancellationToken);
-            else
-                result = await _repository.GetMyDeletedSongs(user, cancellationToken);
+            var result = await _repository.GetMyDeletedSongs(user, cancellationToken);
 
             foreach(var song in result)
             {
                 if (!await _IPermissionCheckerService.CheckPermission(song, user, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
             }
-
-            return result.Select(s => new SongIndexDto(s)).ToArray();
+            
+            return result.Select(s => new SongIndexDto(s, true)).ToArray();
         }
     }
 }

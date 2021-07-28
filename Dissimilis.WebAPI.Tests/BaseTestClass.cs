@@ -36,6 +36,7 @@ namespace Dissimilis.WebAPI.xUnit
         internal User DeleteGroupUser;
         internal User OralBeeFanUser;
         internal User RemoveFromOrgUser;
+        internal User CheckSysAdminStatusUser;
 
         internal Song LisaGikkTilSkolenSong;
         internal Song SmokeOnTheWaterSong;
@@ -91,6 +92,7 @@ namespace Dissimilis.WebAPI.xUnit
             DeleteGroupUser = users.SingleOrDefault(user => user.Email == "DeleteGroupUser@Delete_Delete.no");
             OralBeeFanUser = users.SingleOrDefault(user => user.Email == "Oral_Bee_fan@Quetzaltenango_Guatemala.no");
             RemoveFromOrgUser = users.SingleOrDefault(user => user.Email == "RemoveUser@Norway.no");
+            CheckSysAdminStatusUser = users.SingleOrDefault(user => user.Email == "CheckSystemAdminStatus@Norway.no");
         }
 
         private List<User> GetAllUsers()

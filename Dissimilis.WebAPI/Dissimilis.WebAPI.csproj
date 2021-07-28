@@ -56,6 +56,14 @@
 	<ItemGroup>
 		<Folder Include="Exceptions\" />
 	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\BoOrganisation\Query\" />
+    <Folder Include="Controllers\BoGroup\Commands\" />
+    <Folder Include="Controllers\BoGroup\DtoModelsIn\" />
+    <Folder Include="Controllers\BoGroup\DtoModelsOut\" />
+    <Folder Include="Controllers\BoGroup\Query\" />
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<Content Update="wwwroot\favicon.ico">

@@ -53,14 +53,14 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
             
 
-            var songVoice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
+            var songVoice = song.Voices.SingleOrDefault(v => v.Id == request.SongVoiceId);
             if (songVoice == null)throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
 
-            var songBar = songVoice.SongBars.FirstOrDefault(bar => bar.Position == request.SongBarPosition);
+            var songBar = songVoice.SongBars.SingleOrDefault(bar => bar.Position == request.SongBarPosition);
             if (songBar == null) throw new NotFoundException($"Bar with position {request.SongBarPosition} not found");
 
-            var songNote = songBar.Notes.FirstOrDefault(note => note.Position == request.Command.SongNotePosition);
-            if (songNote == null) throw new NotFoundException($"Note with position {request.Command.SongNotePosition} not found");
+            var songNote = songBar.Notes.SingleOrDefault(note => note.Position == request.Command.NotePosition);
+            if (songNote == null) throw new NotFoundException($"Note with position {request.Command.NotePosition} not found");
 
             if (songNote.ChordName == null)
             {

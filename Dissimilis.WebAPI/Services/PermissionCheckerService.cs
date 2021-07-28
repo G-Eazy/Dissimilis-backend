@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.DbContext.Models.Song;
+using System.Linq;
 
 namespace Dissimilis.WebAPI.Services
 {
@@ -34,6 +35,8 @@ namespace Dissimilis.WebAPI.Services
             CancellationToken cancellationToken)
         {
             return user.IsSystemAdmin
+                    || (await IsGroupAdminInOrganisation(organisation.Id, user.Id, cancellationToken)
+                        && op == Operation.Get)
                     || (await IsOrganisationAdmin(organisation.Id, user.Id, cancellationToken)
                         && op != Operation.Delete
                         && op != Operation.Create);
@@ -110,6 +113,18 @@ namespace Dissimilis.WebAPI.Services
                     , cancellationToken: cancellationToken);
         }
 
+        private async Task<bool> IsGroupAdminInOrganisation(int parentOrganisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext
+                .Groups
+                .Where(group => group.OrganisationId == parentOrganisationId)
+                .AnyAsync(group =>
+                    group.Users
+                    .Any(groupUser => groupUser.UserId == userId && groupUser.Role == Role.Admin)
+                    , cancellationToken);
+
+        }
+
         /// <summary>
         /// Helper method to see if user is a group admin in specified group
         /// </summary>
@@ -143,7 +158,7 @@ namespace Dissimilis.WebAPI.Services
         public async Task<bool> CheckPermission(Song song, User user, Operation op, CancellationToken cancellationToken)
         {
             if (op == Operation.Create) return true;
-            if (op == Operation.Get && song.ProtectionLevel == ProtectionLevels.Public) return true;
+            if (op == Operation.Get && song.ProtectionLevel == ProtectionLevels.Public) return song.Deleted == null;
             if (op == Operation.Get || op == Operation.Modify || op == Operation.Invite || op == Operation.Kick)
             {
                 return await CheckWriteAccess(song, user);
