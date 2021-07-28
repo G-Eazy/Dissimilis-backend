@@ -74,6 +74,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             songNote.SongBar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _noteRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songNote);
         }

@@ -57,7 +57,6 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
         {
             return new SongBar()
             {
-                Id = barDto.BarId,
                 Position = barDto.Position,
                 RepBefore = barDto.RepBefore,
                 RepAfter = barDto.RepAfter,

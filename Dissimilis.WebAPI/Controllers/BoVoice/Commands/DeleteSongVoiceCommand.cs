@@ -57,7 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
             song.Voices.Remove(songVoice);
             song.SetUpdated(currentUser.Id);
-
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

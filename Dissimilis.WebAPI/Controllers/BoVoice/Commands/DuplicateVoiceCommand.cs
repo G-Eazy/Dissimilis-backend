@@ -67,6 +67,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             song.Voices.Add(duplicatedVoice);
 
             await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(duplicatedVoice);
         }

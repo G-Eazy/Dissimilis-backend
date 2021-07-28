@@ -83,6 +83,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
                 song.SyncVoicesFrom(cloneVoice);
             }
             await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
+
             return new UpdatedCommandDto(songVoice);
         }
     }

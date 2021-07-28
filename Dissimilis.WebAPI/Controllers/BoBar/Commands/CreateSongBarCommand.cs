@@ -69,6 +69,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             song.SyncVoicesFrom(voice);
             song.SetUpdatedOverAll(currentUser.Id);
             await _barRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }

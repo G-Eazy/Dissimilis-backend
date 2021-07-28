@@ -17,7 +17,6 @@ namespace Dissimilis.WebAPI.Extensions.Interfaces
 
         public static void SetUpdated(this ICreatedAndUpdated item, int? userId)
         {
-            Console.WriteLine(item.CreatedById);
             item.UpdatedById = userId;
             item.UpdatedOn = DateTimeOffset.Now;
        }

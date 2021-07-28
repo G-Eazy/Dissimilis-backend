@@ -44,6 +44,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Where(sb => sb.SongVoice.SongId == songId)
                 .LoadAsync(cancellationToken);
 
+            await Context.SongSnapshots
+                .Include(s => s.Song)
+                .Where(s => s.SongId == songId)
+                .LoadAsync(cancellationToken);
+
             return song;
         }
         public async Task<Song> GetSongWithTagsSharedUsers(int songId, CancellationToken cancellationToken)

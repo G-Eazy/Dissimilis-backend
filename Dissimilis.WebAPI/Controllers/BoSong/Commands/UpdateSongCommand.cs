@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
             song.PerformSnapshot(currentUser);

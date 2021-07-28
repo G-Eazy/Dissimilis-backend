@@ -367,9 +367,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     SongNote note = bar.Notes.SingleOrDefault(n => n.Position == noteDto.Position);
                     if (note == null)
                         note = NoteDto.ConvertToSongNote(noteDto, bar);
-                    note.SetNoteValues(noteDto.Notes);
-                    note.ChordName = noteDto.ChordName;
-                    note.Length = noteDto.Length;
+                    else
+                    {
+                        note.ChordName = noteDto.ChordName;
+                        note.SetNoteValues(noteDto.Notes);
+                        note.Length = noteDto.Length;
+                    }
                     newNotes.Add(note);
                 }
             }
