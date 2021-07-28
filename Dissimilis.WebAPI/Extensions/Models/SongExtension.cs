@@ -264,9 +264,10 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 Speed = song.Speed,
                 ArrangerId = arrangerId,
                 DegreeOfDifficulty = song.DegreeOfDifficulty,
+                ProtectionLevel = song.ProtectionLevel,
                 SongNotes = song.SongNotes,
                 Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
-            };
+            }; 
         }
 
         public static Song Transpose(this Song song, int transpose = 0)
