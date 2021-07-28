@@ -4,12 +4,14 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
 using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 
@@ -53,7 +55,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
         {
-            firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
+            firstBarDto.VoltaBracket.ShouldBe(secondBarDto.VoltaBracket, "VoltaBracket not matching - " + stepDescription);
             firstBarDto.RepAfter.ShouldBe(secondBarDto.RepAfter, "RepAfter not matching - " + stepDescription);
             firstBarDto.RepBefore.ShouldBe(secondBarDto.RepBefore, "RepBefore not matching - " + stepDescription);
 
@@ -112,11 +114,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static UpdateBarDto CreateUpdateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static UpdateBarDto CreateUpdateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new UpdateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -185,11 +187,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static CreateBarDto CreateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static CreateBarDto CreateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new CreateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -242,6 +244,17 @@ namespace Dissimilis.WebAPI.xUnit
             };
 
         }
+        internal static SearchQueryDto MyLibarySearchQueryDto(int currentUserId)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                ArrangerId = currentUserId,
+            };
+
+        }
         internal static SearchQueryDto SharedWithUserSearchQueryDto()
         {
             return new SearchQueryDto()
@@ -267,6 +280,27 @@ namespace Dissimilis.WebAPI.xUnit
                 IncludedOrganisationIdArray = orgs
             };
 
+        }
+
+        internal static CreateGroupDto GetCreateGroupDto(int groupNumber, int orgId, int adminId)
+        {
+            return new CreateGroupDto()
+            {
+                Name = $"TestGroup{groupNumber}",
+                OrganisationId = orgId,
+                FirstAdminId = adminId
+            };
+        }
+        
+        internal static UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Address = "Nidarosveien 58",
+                Email = "NewAdmin@Trondheim_Norway.no",
+                Description = "The new and hip Trondheim group.",
+                PhoneNumber = "90944999",
+            };
         }
     }
 }

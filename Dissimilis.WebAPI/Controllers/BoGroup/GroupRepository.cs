@@ -2,7 +2,9 @@
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Extensions.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +26,12 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await UpdateAsync(cancellationToken);
         }
 
+        public async Task DeleteGroupAsync(Group group, CancellationToken cancellationToken)
+        {
+            Context.Groups.Remove(group);
+            await UpdateAsync(cancellationToken);
+        }
+
         public async Task SaveGroupUserAsync(GroupUser groupUser, CancellationToken cancellationToken)
         {
             await Context.GroupUsers.AddAsync(groupUser, cancellationToken);
@@ -35,6 +43,24 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<Group[]> GetGroupsAsync(int? organisationId, string filterBy, User currentUser, CancellationToken cancellationToken)
+        {
+            var query = Context.Groups
+                .Include(x => x.Users)
+                .Include(x => x.Organisation)
+                .AsQueryable();
+            if (organisationId != null)
+            {
+                query = query.Where(g => g.OrganisationId == organisationId).AsQueryable();
+            }
+            query = query.FilterGroups(filterBy, currentUser).AsQueryable();
+
+            var result = await query
+                .ToArrayAsync(cancellationToken);
+            return result;
+        }
+
+
         public async Task<Group> GetGroupByIdAsync(int groupId, CancellationToken cancellationToken)
         {
             var group = await Context.Groups
@@ -42,12 +68,14 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
                 .SingleOrDefaultAsync(g => g.Id == groupId, cancellationToken);
 
             if (group == null)
+            {
                 throw new NotFoundException($"Group with Id {groupId} not found");
+            }
 
-            await Context.GroupUsers
-                .Include(gu => gu.User)
-                .Where(gu => gu.GroupId == groupId)
-                .LoadAsync(cancellationToken);
+                await Context.GroupUsers
+                    .Include(gu => gu.User)
+                    .Where(gu => gu.GroupId == groupId)
+                    .LoadAsync(cancellationToken);
 
             return group;
         }
@@ -89,6 +117,31 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
             var groupUserToDelete = await GetGroupUserAsync(userId, groupId, cancellationToken);
             Context.GroupUsers.Remove(groupUserToDelete);
             return groupUserToDelete;
+        }
+
+        internal async Task<GroupUser> ChangeUserRoleAsync(int userId, int groupId, Role newRole, CancellationToken cancellationToken)
+        {
+            var groupUser = await GetGroupUserAsync(userId, groupId, cancellationToken);
+            if (groupUser == null) throw new NotFoundException($"User with id {userId} is not a in the group with id {groupId}");
+
+            groupUser.Role = newRole;
+            await UpdateAsync(cancellationToken);
+
+            return groupUser;
+        }
+    }
+    public static class IQueryableExtension
+    {
+        public static IQueryable<Group> FilterGroups(this IQueryable<Group> groups, string filterBy, User user)
+        {
+            return filterBy switch
+            {
+                "ADMIN" => groups.Where(o =>
+                o.Users.Any(x => x.UserId == user.Id && x.Role == Role.Admin)).AsQueryable(),
+
+                "MEMBER" => groups.Where(o => o.Users.Any(x => x.UserId == user.Id)).AsQueryable(),
+                _ => groups,
+            };
         }
     }
 }

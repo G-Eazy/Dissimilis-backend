@@ -1,18 +1,13 @@
 ﻿using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using Dissimilis.WebAPI.Controllers.BoOrganisation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Linq;
-using Dissimilis.Configuration;
-using Dissimilis.WebAPI.Exceptions;
-using Microsoft.AspNetCore.Http;
 using Dissimilis.DbContext.Models.Enums;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
+using Dissimilis.DbContext.Models.Song;
+using System.Linq;
 
 namespace Dissimilis.WebAPI.Services
 {
@@ -26,21 +21,22 @@ namespace Dissimilis.WebAPI.Services
         }
 
         /// <summary>
-        /// 
-        /// Checks if a user has the privileges to perform desired operation on an organisation.
+        /// Checks if a user has the privileges to perform desired operation on an organisation
         /// Sysadmins: All privileges
         /// Org-admins: All privileges except create/delete
         /// Other: No privileges
-        /// 
         /// </summary>
         /// <param name="organisation"></param>
         /// <param name="user"></param>
         /// <param name="op"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> CheckPermission(Organisation organisation, User user, Operation op, CancellationToken cancellationToken)
+        public async Task<bool> CheckPermission(Organisation organisation, User user, Operation op,
+            CancellationToken cancellationToken)
         {
             return user.IsSystemAdmin
+                    || (await IsGroupAdminInOrganisation(organisation.Id, user.Id, cancellationToken)
+                        && op == Operation.Get)
                     || (await IsOrganisationAdmin(organisation.Id, user.Id, cancellationToken)
                         && op != Operation.Delete
                         && op != Operation.Create);
@@ -117,6 +113,18 @@ namespace Dissimilis.WebAPI.Services
                     , cancellationToken: cancellationToken);
         }
 
+        private async Task<bool> IsGroupAdminInOrganisation(int parentOrganisationId, int userId, CancellationToken cancellationToken)
+        {
+            return await _dbContext
+                .Groups
+                .Where(group => group.OrganisationId == parentOrganisationId)
+                .AnyAsync(group =>
+                    group.Users
+                    .Any(groupUser => groupUser.UserId == userId && groupUser.Role == Role.Admin)
+                    , cancellationToken);
+
+        }
+
         /// <summary>
         /// Helper method to see if user is a group admin in specified group
         /// </summary>
@@ -133,6 +141,42 @@ namespace Dissimilis.WebAPI.Services
                     && gu.GroupId == groupId
                     && gu.Role == Role.Admin
                     , cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Checks if a user has the privileges to perform desired operation on a song
+        /// Sysadmins: All privileges, not private songs
+        /// Org admins: All privileges, not private songs
+        /// Group admins: All privileges, not private songs
+        /// Other: All priviliges on own songs and shared songs, read public
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        /// <param name="op"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckPermission(Song song, User user, Operation op, CancellationToken cancellationToken)
+        {
+            if (op == Operation.Create) return true;
+            if (op == Operation.Get && song.ProtectionLevel == ProtectionLevels.Public) return song.Deleted == null;
+            if (op == Operation.Get || op == Operation.Modify || op == Operation.Invite || op == Operation.Kick)
+            {
+                return await CheckWriteAccess(song, user);
+            }
+            if (op == Operation.Delete || op == Operation.Restore)
+            {
+                return song.ArrangerId == user.Id
+                    || user.IsSystemAdmin && song.ProtectionLevel == ProtectionLevels.Public;
+            }
+
+            return false;
+        }
+        private async Task<bool> CheckWriteAccess(Song song, User user)
+        {
+            return user.IsSystemAdmin && song.ProtectionLevel == ProtectionLevels.Public 
+                ||song.ArrangerId == user.Id
+                ||await _dbContext.SongSharedUser.AnyAsync(songSharedUser =>
+                songSharedUser.UserId == user.Id && songSharedUser.SongId == song.Id);
         }
     }
 }

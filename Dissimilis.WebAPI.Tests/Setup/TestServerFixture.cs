@@ -71,6 +71,12 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
                 new User()
                 {
+                    Name = "OrgAdminNorwayUser2",
+                    Email = "OrgAdmin2@Norway.no",
+                    IsSystemAdmin = true,
+                },
+                new User()
+                {
                     Name = "OrgAdminNorwayUser",
                     Email = "OrgAdmin@Norway.no",
                 },
@@ -78,6 +84,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "GroupAdminSandvikaUser",
                     Email = "GroupAdmin@Sandvika_Norway.no",
+                },
+                new User()
+                {
+                    Name = "GroupAdminSandvikaUser2",
+                    Email = "GroupAdmin2@Sandvika_Norway.no",
                 },
                 new User()
                 {
@@ -93,6 +104,11 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "OrgAdminGuatamalaUser",
                     Email = "OrgAdmin@Guatemala.no",
+                },
+                new User()
+                {
+                    Name = "GroupAdminQuetzaltenangoUser",
+                    Email = "GroupAdmin@Quetzaltenango_Guatemala.no",
                 },
                 new User()
                 {
@@ -123,7 +139,32 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "User with no songs",
                     Email = "NoSongs@Norway.no",
-                }
+                },
+                new User()
+                {
+                    Name = "Delete org user",
+                    Email = "DeleteOrgUser@Delete.no",
+                },
+                new User()
+                {
+                    Name = "Delete group user",
+                    Email = "DeleteGroupUser@Delete_Delete.no",
+                },
+                new User()
+                {
+                    Name = "Oral Bee fan",
+                    Email = "Oral_Bee_fan@Quetzaltenango_Guatemala.no",
+                },
+                new User()
+                {
+                    Name = "User to remove from organisation",
+                    Email = "RemoveUser@Norway.no",
+                },
+                new User()
+                {
+                    Name = "User to test changing sysadmin status",
+                    Email = "CheckSystemAdminStatus@Norway.no"
+                },
             };
         }
 
@@ -144,6 +185,10 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Guatemala"
                 },
+                new Organisation()
+                {
+                    Name = "Delete"
+                }
             };
         }
 
@@ -163,6 +208,14 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 {
                     Name = "Trondheim_Norway",
                 },
+                new Group()
+                {
+                    Name = "Quetzaltenango_Guatemala"
+                },
+                new Group()
+                {
+                    Name = "Delete_Delete"
+                }
             };
         }
 
@@ -217,6 +270,22 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                     Denominator = 4,
                     ProtectionLevel = ProtectionLevels.Public
                 },
+                new Song()
+                {
+                    Title = "Begynte på bunnen",
+                    Composer = "Oral_Bee",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Public
+                },
+                new Song()
+                {
+                    Title = "Baris",
+                    Composer = "Oral_Bee",
+                    Numerator = 4,
+                    Denominator = 4,
+                    ProtectionLevel = ProtectionLevels.Private
+                }
             };
         }
 
@@ -252,28 +321,28 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 new SongBar()
                 {
-                    House = null,
+                    VoltaBracket = null,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 0,
                 },
                 new SongBar()
                 {
-                    House = null,
+                    VoltaBracket = null,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 1,
                 },
                 new SongBar()
                 {
-                    House = 1,
+                    VoltaBracket = 1,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 2,
                 },
                 new SongBar()
                 {
-                    House = 1,
+                    VoltaBracket = 1,
                     RepAfter = false,
                     RepBefore = false,
                     Position = 3,
@@ -315,5 +384,6 @@ namespace Dissimilis.WebAPI.xUnit.Setup
                 },
             };
         }
+
     }
 }

@@ -10,10 +10,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut
 {
     public class GroupByIdDto
     {
-        public string Name { get; set; }
+        public string GroupName { get; set; }
         public int OrganisationId { get; set; }
         public string OrganisationName { get; set; }
-        public string EmailAddress { get; set; }
+        public string Email { get; set; }
         public int GroupId { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
@@ -23,10 +23,10 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut
 
         public GroupByIdDto(Group group)
         {
-            Name = group.Name;
+            GroupName = group.Name;
             OrganisationId = group.OrganisationId;
             OrganisationName = group.Organisation.Name;
-            EmailAddress = group.Email;
+            Email = group.Email;
             GroupId = group.Id;
             Address = group.Address;
             PhoneNumber = group.PhoneNumber;

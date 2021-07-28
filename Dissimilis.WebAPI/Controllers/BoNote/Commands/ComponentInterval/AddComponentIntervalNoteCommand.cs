@@ -13,6 +13,7 @@ using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
 {
@@ -36,19 +37,23 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
     {
         private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public AddComponentIntervalNoteHandler(SongRepository songRepository, IAuthService authService)
+        public AddComponentIntervalNoteHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
         public async Task<UpdatedCommandDto> Handle(AddComponentIntervalNoteCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-            if (!await _songRepository.HasWriteAccess(song, currentUser)) throw new UnauthorizedAccessException();
-
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))
+            {
+                throw new UnauthorizedAccessException();
+            }
             var songVoice = song.Voices.SingleOrDefault(voice => voice.Id == request.SongVoiceId);
             if (songVoice == null) throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
 
@@ -63,10 +68,16 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                     return startPos >= request.Command.NotePosition && request.Command.NotePosition >= endPos;}))
                 { throw new ValidationException("Note number already in use"); }
 
+                var chordName = request.Command.ChordName == ""
+                    ? null
+                    : request.Command.ChordName;
+
                 songNote = new SongNote()
                 {
-                    ChordName = request.Command.ChordName,
-                    NoteValues = String.Join("|", Enumerable.Repeat("X", SongNoteExtension.GetNoteValuesFromChordName(request.Command.ChordName).Count)),
+                    ChordName = chordName,
+                    NoteValues = chordName == null
+                        ? String.Join("|", request.Command.Notes)
+                        : String.Join("|", Enumerable.Repeat("X", SongNoteExtension.GetNoteValuesFromChordName(request.Command.ChordName).Count)),
                     Position = request.Command.NotePosition,
                     Length = request.Command.Length,
                 };
@@ -74,19 +85,10 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                 songBar.Notes.Add(songNote);
             }
 
-            await using var transaction = await _songRepository.Context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            if (songNote.ChordName != null)
+                songNote.AddComponentInterval(request.Command.IntervalPosition);
 
-            songNote.AddComponentInterval(request.Command.IntervalPosition);
-            try
-            {
-                await _songRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }
