@@ -171,6 +171,24 @@ namespace Dissimilis.WebAPI.Services
 
             return false;
         }
+
+        /// <summary>
+        /// Checks if a user has the privileges to perform desired operation on a user object
+        /// Sysadmins: All privileges
+        /// Self: All privileges
+        /// Org admins: No privileges
+        /// Group admins: No privileges
+        /// Other: No privileges
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="currentUser"></param>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public bool CheckPermission(User user, User currentUser)
+        {
+            return currentUser.IsSystemAdmin || user.Id == currentUser.Id;
+        }
+
         private async Task<bool> CheckWriteAccess(Song song, User user)
         {
             return user.IsSystemAdmin && song.ProtectionLevel == ProtectionLevels.Public 
