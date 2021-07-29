@@ -12,6 +12,7 @@ using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Newtonsoft.Json;
+using Dissimilis.DbContext;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -302,7 +303,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="user"></param>
         public static void PerformSnapshot(this Song song, User user)
         {
-            string JSONsnapshot = Newtonsoft.Json.JsonConvert.SerializeObject(new SongByIdDto(song));
+            string JSONsnapshot = JsonConvert.SerializeObject(new SongByIdDto(song));
+
+            if(song.Snapshots.Count >= 5)
+            {
+                song.PopSnapshot(false);
+            }
 
             SongSnapshot snapshot = new SongSnapshot()
             {
@@ -312,10 +318,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 SongObjectJSON = JSONsnapshot
             };
 
-            if(song.Snapshots.Count >= 5)
-            {
-                song.PopSnapshot(false);
-            }
             song.Snapshots.Add(snapshot);
         }
 

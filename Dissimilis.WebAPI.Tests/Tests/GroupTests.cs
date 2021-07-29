@@ -12,7 +12,6 @@ using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 using Dissimilis.WebAPI.Exceptions;
-using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {

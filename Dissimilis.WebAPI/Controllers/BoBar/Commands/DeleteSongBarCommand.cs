@@ -70,8 +70,8 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             song.RemoveSongBarFromAllVoices(bar.Position);
             song.SetUpdatedOverAll(currentUser.Id);
             song.SyncVoicesFrom(songVoice);
-            await _barRepository.UpdateAsync(cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
+            await _barRepository.UpdateAsync(cancellationToken);
 
             return null;
         }

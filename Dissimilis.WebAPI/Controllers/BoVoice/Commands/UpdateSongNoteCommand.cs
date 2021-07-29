@@ -58,7 +58,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             note.ChordName = request.Command.ChordName;
             note.SetNoteValues(request.Command.Notes);
 
-
             part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);

@@ -149,7 +149,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             foreach (var barDto in barDtos)
             {
                 SongBar bar = voice.SongBars.SingleOrDefault(b => b.Position == barDto.Position);
-                if (bar == null) 
+                if (bar == null)
                     bar = BarDto.ConvertToSongBar(barDto, voice);
 
                 bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar);

@@ -57,6 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
                 throw new NotFoundException($"Voice with Id {voice.Id} not fond");
             }
             song.PerformSnapshot(currentUser);
+
             songBar = new SongBar()
             {
                 Position = voice.SongBars.OrderByDescending(sb => sb.Position).FirstOrDefault()?.Position + 1 ?? 1,
@@ -68,8 +69,8 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             voice.SongBars.Add(songBar);
             song.SyncVoicesFrom(voice);
             song.SetUpdatedOverAll(currentUser.Id);
-            await _barRepository.UpdateAsync(cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
+            await _barRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);
         }

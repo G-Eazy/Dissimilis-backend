@@ -48,9 +48,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
             song.PerformSnapshot(currentUser);
 
             song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
-            
-
-
             song.SetUpdatedOverAll(currentUser.Id);
 
             await _songRepository.UpdateAsync(cancellationToken);
