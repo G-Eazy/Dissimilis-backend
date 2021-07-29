@@ -209,7 +209,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                 .Where(SongExtension.ReadAccessToSong(user))
                 .AsSplitQuery()
                 .AsQueryable()
-                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser, searchCommand.IncludeAll)
+                .FilterQueryable(user, searchCommand.Title, searchCommand.ArrangerId, searchCommand.IncludedOrganisationIdArray, searchCommand.IncludedGroupIdArray, searchCommand.IncludeSharedWithUser)
                 .OrderQueryable(searchCommand.OrderBy, searchCommand.OrderDescending)
                 .Take(searchCommand.MaxNumberOfSongs)
                 .ToListAsync(cancellationToken);
@@ -297,7 +297,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public static class IQueryableExtension
     {
-        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser, bool includeAll)
+        public static IQueryable<Song> FilterQueryable(this IQueryable<Song> songs, User currentUser, string searchText, int? arrangerId, int[] includedOrganisationIdArray, int[] includedGroupIdArray, bool includeSharedWithUser)
         {
             return songs
                 .Where(song =>
@@ -308,13 +308,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
                     )
                     &&
                     (
-                        includeAll
+                            (!includeSharedWithUser && includedGroupIdArray.Length == 0 && includedOrganisationIdArray.Length == 0)
                         ||
-                        (
                             (includeSharedWithUser && song.SharedUsers.Any(sharedSong => sharedSong.UserId == currentUser.Id))
                             || song.OrganisationTags.Any(organisation => includedOrganisationIdArray.Contains(organisation.OrganisationId))
                             || song.GroupTags.Any(group => includedGroupIdArray.Contains(group.GroupId))
-                        )
                     )
                     );
         }

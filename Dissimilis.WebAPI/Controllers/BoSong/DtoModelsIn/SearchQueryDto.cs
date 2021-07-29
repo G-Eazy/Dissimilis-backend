@@ -40,12 +40,6 @@
         /// <summary>
         /// show songs shared with user, that the user has write permission on
         /// </summary>
-        public bool IncludeSharedWithUser { get; set; }
-
-        /// <summary>
-        /// If true returns all public songs in the system.
-        /// Only overrides IncludedGroupIdArray, IncludedOrganisationIdArray and IncludeSharedWithUser. (not Title, ArrangerId)
-        /// </summary>
-        public bool IncludeAll { get; set; } = true;
+        public bool IncludeSharedWithUser { get; set; } = false;
     }
 }
