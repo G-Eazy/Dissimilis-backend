@@ -31,15 +31,15 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
     public class DuplicateAllChordsHandler : IRequestHandler<DuplicateAllChordsCommand, UpdatedCommandDto>
     {
-        private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly AuthService _authService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
         public DuplicateAllChordsHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _voiceRepository = voiceRepository;
             _songRepository = songRepository;
+            _voiceRepository = voiceRepository;
             _authService = authService;
             _IPermissionCheckerService = IPermissionCheckerService;
 
@@ -56,28 +56,18 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-            var sourceVoice = songVoice.Song.Voices.FirstOrDefault(v => v.Id == request.Command.SourceVoiceId);
+            var sourceVoice = songVoice.Song.Voices.SingleOrDefault(v => v.Id == request.Command.SourceVoiceId);
             if (sourceVoice == null)
             {
                 throw new NotFoundException($"Source voice with id {request.Command.SourceVoiceId} not found");
             }
 
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            song.PerformSnapshot(currentUser);
 
             songVoice.DuplicateAllChords(sourceVoice, request.Command.IncludeComponentIntervals);
-            songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
-
-            try
-            {
-                await _voiceRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
-
+            songVoice.SetSongVoiceUpdated(currentUser.Id);
+            await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

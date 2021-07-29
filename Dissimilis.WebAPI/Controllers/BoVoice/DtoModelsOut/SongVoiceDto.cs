@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.DbContext.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
 {
@@ -28,6 +31,38 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
                 .Select(b => new BarDto(b))
                 .ToArray();
 
+        }
+
+        public SongVoiceDto () { }
+
+        public static SongVoiceDto JsonToSongVoiceDto(JToken json)
+        {
+            return new SongVoiceDto()
+            {
+                SongVoiceId = json["SongVoiceId"].Value<int>(),
+                SongId = json["SongId"].Value<int>(),
+                PartNumber = json["PartNumber"].Value<int>(),
+                VoiceName = json["VoiceName"].Value<string>(),
+                IsMain = json["IsMain"].Value<bool>(),
+                Instrument = json["Instrument"].Value<string>(),
+                Bars = null,
+            };
+        }
+
+        public static SongVoice ConvertToSongVoice(SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById, Song song)
+        {
+            SongVoice voice = new SongVoice() 
+            {
+                SongId = voiceDto.SongId,
+                VoiceNumber = voiceDto.PartNumber,
+                VoiceName = voiceDto.VoiceName,
+                Song = song,
+                IsMainVoice = voiceDto.IsMain,
+                UpdatedById = updatedById,
+                UpdatedOn = updatedOn
+            };
+
+            return voice;
         }
     }
 }

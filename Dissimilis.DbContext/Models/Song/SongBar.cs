@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -14,7 +15,7 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         [Key]
         public int Id { get; set; }
-
+        
 
         /// <summary>
         /// Priority of the bar in a spesific part

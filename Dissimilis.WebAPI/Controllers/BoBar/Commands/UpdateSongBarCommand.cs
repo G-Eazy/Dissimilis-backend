@@ -68,6 +68,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             {
                 throw new NotFoundException($"Bar with Id {request.BarId} not found");
             }
+            song.PerformSnapshot(currentUser);
 
             bar.RepAfter = request.Command?.RepAfter ?? bar.RepAfter;
             bar.RepBefore = request.Command?.RepBefore ?? bar.RepBefore;
@@ -79,7 +80,8 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 
             song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
             song.SyncVoicesFrom(voice);
-            await _barRepository.UpdateAsync(cancellationToken);
+            //await _barRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(bar);
         }

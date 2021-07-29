@@ -47,8 +47,6 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
         public async Task<UpdatedCommandDto> Handle(CreateSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
-
             var currentUser = _authService.GetVerifiedCurrentUser();
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
@@ -62,10 +60,10 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new ValidationException("VoiceName not defined");
             }
+            song.PerformSnapshot(currentUser);
 
             var nextVoiceNumber = song.Voices.OrderByDescending(v => v.VoiceNumber).FirstOrDefault()?.VoiceNumber ?? 0;
             nextVoiceNumber++;
-
             var songVoice = new SongVoice()
             {
                 VoiceNumber = request.Command.VoiceNumber ?? nextVoiceNumber,
@@ -84,17 +82,8 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 song.SyncVoicesFrom(cloneVoice);
             }
-
-            try
-            {
-                await _voiceRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
+            await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

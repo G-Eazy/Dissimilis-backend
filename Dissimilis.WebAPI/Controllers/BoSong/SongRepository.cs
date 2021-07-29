@@ -3,14 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Dissimilis.DbContext.Models;
 using Dissimilis.WebAPI.Extensions.Models;
 using System;
 using Dissimilis.WebAPI.Services;
 using System.Collections.Generic;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -41,6 +42,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SongBars
                 .Include(sb => sb.Notes)
                 .Where(sb => sb.SongVoice.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongSnapshots
+                .Include(s => s.Song)
+                .Where(s => s.SongId == songId)
                 .LoadAsync(cancellationToken);
 
             return song;
@@ -95,6 +101,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             await Context.SongBars
                 .Include(b => b.Notes)
                 .Where(b => b.SongVoice.SongId == songId)
+                .LoadAsync(cancellationToken);
+
+            await Context.SongSnapshots
+                .Include(s => s.Song)
+                .Where(s => s.SongId == songId)
                 .LoadAsync(cancellationToken);
 
             return song;

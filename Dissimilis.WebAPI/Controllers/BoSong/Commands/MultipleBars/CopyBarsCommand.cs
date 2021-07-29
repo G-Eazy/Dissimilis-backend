@@ -45,10 +45,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
 
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+            song.PerformSnapshot(currentUser);
 
             song.CopyBars(request.Command.FromPosition, request.Command.CopyLength, request.Command.ToPosition);
-
-            song.SetUpdatedOverAll(_IAuthService.GetVerifiedCurrentUser().Id);
+            song.SetUpdatedOverAll(currentUser.Id);
 
             await _songRepository.UpdateAsync(cancellationToken);
 

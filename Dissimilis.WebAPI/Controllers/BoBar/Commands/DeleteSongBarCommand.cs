@@ -65,10 +65,12 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             {
                 throw new NotFoundException($"Bar with Id {request.BarId} was not found");
             }
+            song.PerformSnapshot(currentUser);
 
             song.RemoveSongBarFromAllVoices(bar.Position);
             song.SetUpdatedOverAll(currentUser.Id);
             song.SyncVoicesFrom(songVoice);
+            await _songRepository.UpdateAsync(cancellationToken);
             await _barRepository.UpdateAsync(cancellationToken);
 
             return null;

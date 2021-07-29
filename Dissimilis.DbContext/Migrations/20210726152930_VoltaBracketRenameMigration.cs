@@ -11,7 +11,7 @@ namespace Dissimilis.DbContext.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn("VoltaBracket", "SongBars", "House");
+            migrationBuilder.RenameColumn("VoltaBracket", "SongBars", "VoltaBracket");
         }
     }
 }

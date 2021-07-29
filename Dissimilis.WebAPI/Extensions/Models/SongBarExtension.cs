@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using FoodLabellingAPI.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -137,6 +141,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 })
                 .ToList();
             return songBar;
+        }
+
+        public static List<SongBar> GetSongBarsFromDto(BarDto[] barDtos, SongVoice voice)
+        {
+            List<SongBar> newBars = new List<SongBar>();
+            foreach (var barDto in barDtos)
+            {
+                SongBar bar = voice.SongBars.SingleOrDefault(b => b.Position == barDto.Position);
+                if (bar == null)
+                    bar = BarDto.ConvertToSongBar(barDto, voice);
+
+                bar.Notes = SongNoteExtension.GetSongNotesFromDto(barDto.Chords, bar);
+                newBars.Add(bar);
+            }
+            return newBars;
         }
 
         public static SongBar AddComponentInterval(this SongBar songBar, int intervalPosition)

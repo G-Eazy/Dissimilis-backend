@@ -6,6 +6,9 @@ using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Newtonsoft.Json.Linq;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -344,6 +347,38 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songNote.SetNoteValues(updatedNoteValues);
             return songNote;
         }
+
+        public static List<SongNote> GetSongNotesFromDto(NoteDto[] noteDtos, SongBar bar)
+        {
+            List<SongNote> newNotes = new List<SongNote>();
+            foreach (var noteDto in noteDtos)
+            {
+                bool emptyNote = noteDto.Notes[0] == "Z";
+                if (emptyNote)
+                {
+                    for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
+                    {
+                        var noteToBeRemoved = bar.Notes.SingleOrDefault(n => n.Position == i);
+                        bar.Notes.Remove(noteToBeRemoved);
+                    }
+                }
+                else
+                {
+                    SongNote note = bar.Notes.SingleOrDefault(n => n.Position == noteDto.Position);
+                    if (note == null)
+                        note = NoteDto.ConvertToSongNote(noteDto, bar);
+                    else
+                    {
+                        note.ChordName = noteDto.ChordName;
+                        note.SetNoteValues(noteDto.Notes);
+                        note.Length = noteDto.Length;
+                    }
+                    newNotes.Add(note);
+                }
+            }
+            return newNotes;
+        }
+
 
         public static SongNote Transpose(this SongNote songNote, int transposeValue)
         {

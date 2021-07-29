@@ -58,13 +58,13 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             SongNote songNote;
-
             var songBar = await _barRepository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
             if (songBar.Notes.Any(n => n.Position == request.Command.Position))
             {
                 throw new ValidationException("Note number already in use");
             }
+            song.PerformSnapshot(currentUser);
 
             songNote = new SongNote()
             {
@@ -85,6 +85,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             songBar.CheckSongBarValidation();
             songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
 
+            await _songRepository.UpdateAsync(cancellationToken);
             await _noteRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songNote);

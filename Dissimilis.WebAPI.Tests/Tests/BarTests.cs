@@ -73,27 +73,15 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         [Fact]
         public async Task TestUpdateBarCommand()
         {
-            using (var transaction = _testServerFixture.GetContext().Database.BeginTransaction())
-            {
-                try
-                {
-                    transaction.CreateSavepoint("BeforeTestRun");
-                    //Fetch voice to add bars to.
-                    var voice = SmokeOnTheWaterSong
-                        .Voices.First();
-                    var barToUpdate = voice
-                        .SongBars.First();
+            //Fetch voice to add bars to.
+            var voice = SmokeOnTheWaterSong
+                .Voices.First();
+            var barToUpdate = voice
+                .SongBars.First();
 
-                    //Test edgecases
-                    await TestUpdateBarWhenCurrentUserIsArrangerShouldUpdate(SmokeOnTheWaterSong.Id, voice.Id, barToUpdate);
-                    await TestUpdateBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotUpdate(SmokeOnTheWaterSong.Id, voice.Id, barToUpdate);
-                }
-                finally
-                {
-                    transaction.RollbackToSavepoint("BeforeTestRun");
-                }
-            };
-            
+            //Test edgecases
+            await TestUpdateBarWhenCurrentUserIsArrangerShouldUpdate(SmokeOnTheWaterSong.Id, voice.Id, barToUpdate);
+            await TestUpdateBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotUpdate(SmokeOnTheWaterSong.Id, voice.Id, barToUpdate);
         }
 
         private async Task TestUpdateBarWhenCurrentUserIsArrangerShouldUpdate(int songId, int voiceId, SongBar barBeforeUpdate)
@@ -137,65 +125,70 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedBar.RepBefore.ShouldBe(barBeforeUpdate.RepBefore);
         }
 
-        [Fact]
+        //[Fact]
         public async Task TestDeleteSongBarCommand()
         {
-            using (var transaction = _testServerFixture.GetContext().Database.BeginTransaction())
-            {
-                try
-                {
-                    transaction.CreateSavepoint("BeforeTestRun");
-                    //Fetch bar to use for tests
-                    var voice = SpeedKingSong
-                        .Voices.FirstOrDefault();
-                    var barToDeleteWithPermittedUser = voice
-                        .SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
-                    var barToDeleteWithUnpermittedUser = voice
-                        .SongBars.FirstOrDefault(bar => bar.Notes.Count == 0);
+            
+            //Fetch bar to use for tests
+            var voice = SpeedKingSong
+                .Voices.FirstOrDefault();
+            var barToDeleteWithPermittedUser = voice
+                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
+            var barToDeleteWithUnpermittedUser = voice
+                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 0);
 
-                    //Test edgecases
-                    await TestDeleteBarWhenCurrentUserIsArrangerShouldDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithPermittedUser.Id);
-                    await TestDeleteBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithUnpermittedUser.Id);
-                }
-                finally
-                {
-                    transaction.RollbackToSavepoint("BeforeTestRun");
-                }
-            };
+            //Test edgecases
+            //await TestDeleteBarWhenCurrentUserIsArrangerShouldDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithPermittedUser.Id);
+            //await TestDeleteBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithUnpermittedUser.Id);
         }
 
-        private async Task TestDeleteBarWhenCurrentUserIsArrangerShouldDelete(int songId, int voiceId, int barId)
+        [Fact]
+        public async Task TestDeleteBarWhenCurrentUserIsArrangerShouldDelete()
         {
             //Change current user to arranger of song.
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            
+            var voice = SpeedKingSong
+                .Voices.FirstOrDefault();
+            var bar = voice
+                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
+            int barId = bar.Id;
 
             //Execute command for deleting bar.
-            var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(songId, voiceId, barId));
+            //var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id));
+            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
+                await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id)), $"Id of snapshots were {SpeedKingSong.Snapshots.ElementAt(0).Id}, {SpeedKingSong.Snapshots.ElementAt(1).Id}");
 
             //Fetch song and verify that bar is deleted from database.
             UpdateAllSongs();
 
             SpeedKingSong
-                .Voices.SingleOrDefault(voice => voice.Id == voiceId)
-                .SongBars.Any(bar => bar.Id == barId)
+                .Voices.SingleOrDefault(v => v.Id == voice.Id)
+                .SongBars.Any(b => b.Id == barId)
                 .ShouldBeFalse();
         }
 
-        private async Task TestDeleteBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(int songId, int voiceId, int barId)
+        [Fact]
+        public async Task TestDeleteBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete()
         {
             //Change user to one without write access.
             TestServerFixture.ChangeCurrentUserId(EdvardGriegFanUser.Id);
 
+            var voice = SpeedKingSong
+                .Voices.FirstOrDefault();
+            var bar = voice
+                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 0);
+
             //Verify that correct exception is thrown.
             await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-                await _mediator.Send(new DeleteSongBarCommand(songId, voiceId, barId)));
+                await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id)));
 
             //Fetch song and verify that bar is still in database.
             UpdateAllSongs();
 
             SpeedKingSong
-                .Voices.SingleOrDefault(voice => voice.Id == voiceId)
-                .SongBars.Any(bar => bar.Id == barId)
+                .Voices.SingleOrDefault(v => v.Id == voice.Id)
+                .SongBars.Any(b => b.Id == bar.Id)
                 .ShouldBeTrue();
         }
 

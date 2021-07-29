@@ -30,16 +30,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
     public class AddComponentIntervalHandler : IRequestHandler<AddComponentIntervalCommand, UpdatedCommandDto>
     {
-        private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly AuthService _authService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
         public AddComponentIntervalHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _voiceRepository = voiceRepository;
             _songRepository = songRepository;
+            _voiceRepository = voiceRepository;
             _authService = authService;
             _IPermissionCheckerService = IPermissionCheckerService;
 
@@ -57,23 +57,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            song.PerformSnapshot(currentUser);
 
             songVoice.AddComponentInterval(request.Command.IntervalPosition);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
-
-            try
-            {
-                await _voiceRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
-
+            await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

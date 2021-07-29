@@ -49,13 +49,14 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             SongBar songBar = null;
             var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
-                if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))throw new UnauthorizedAccessException();
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken))throw new UnauthorizedAccessException();
 
             var voice = song.Voices.FirstOrDefault(v => v.Id == request.SongVoiceId);
             if (voice == null)
             {
                 throw new NotFoundException($"Voice with Id {voice.Id} not fond");
             }
+            song.PerformSnapshot(currentUser);
 
             songBar = new SongBar()
             {
@@ -68,6 +69,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
             voice.SongBars.Add(songBar);
             song.SyncVoicesFrom(voice);
             song.SetUpdatedOverAll(currentUser.Id);
+            await _songRepository.UpdateAsync(cancellationToken);
             await _barRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songBar);

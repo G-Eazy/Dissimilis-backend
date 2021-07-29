@@ -21,6 +21,7 @@ namespace Dissimilis.DbContext
         public DbSet<SongVoice> SongVoices { get; set; }
         public DbSet<SongBar> SongBars { get; set; }
         public DbSet<SongNote> SongNotes { get; set; }
+        public DbSet<SongSnapshot> SongSnapshots { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Instrument> Instruments { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
@@ -47,6 +48,7 @@ namespace Dissimilis.DbContext
             //Here we are building the models and creating the different keys
             BuildUser(modelBuilder);
             BuildSong(modelBuilder);
+            BuildSongSnapshot(modelBuilder);
             BuildSongVoice(modelBuilder);
             BuildInstrument(modelBuilder);
             BuildBar(modelBuilder);
@@ -128,6 +130,16 @@ namespace Dissimilis.DbContext
                 .WithMany(x => x.SongsUpdated)
                 .HasForeignKey(x => x.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        static void BuildSongSnapshot(ModelBuilder builder)
+        {
+            var entity = builder.Entity<SongSnapshot>();
+
+            entity.HasOne(x => x.Song)
+                .WithMany(x => x.Snapshots)
+                .HasForeignKey(x => x.SongId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         static void BuildSongVoice(ModelBuilder builder)

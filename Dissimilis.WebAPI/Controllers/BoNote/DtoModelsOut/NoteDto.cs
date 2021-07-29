@@ -1,4 +1,8 @@
 ﻿using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Extensions.Models;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut
 {
@@ -25,6 +29,21 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut
             Length = songNote.Length;
             Notes = songNote.GetNoteValues();
             ChordName = songNote.ChordName;
+        }
+
+        public NoteDto() { }
+
+        public static SongNote ConvertToSongNote(NoteDto note, SongBar bar)
+        {
+            return new SongNote()
+            {
+                Position = note.Position,
+                ChordName = note.ChordName,
+                Length = note.Length,
+                NoteValues = (note.ChordName == null) ? string.Join("|", note.Notes) : string.Join("|", SongNoteExtension.GetNoteValuesFromChordName(note.ChordName)),
+                SongBar = bar,
+                BarId = bar.Id
+            };
         }
     }
 }
