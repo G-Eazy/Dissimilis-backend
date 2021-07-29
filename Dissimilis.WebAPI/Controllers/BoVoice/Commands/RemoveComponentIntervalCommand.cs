@@ -52,10 +52,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
-            if (songVoice == null)
-            {
-                throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
-            }
+
             song.PerformSnapshot(currentUser);
 
             songVoice.RemoveComponentInterval(request.Command.IntervalPosition, request.Command.DeleteChordsOnLastIntervalRemoved);
