@@ -261,7 +261,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         public async Task TestShareSongWithUser()
         {
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
-            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, OralBeeFanUser.Id));
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, OralBeeFanUser.Email));
             UpdateAllSongs();
             SpeedKingSong.SharedUsers.Any(u => u.UserId == OralBeeFanUser.Id).ShouldBeTrue();
         }
@@ -283,7 +283,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
             await Should.ThrowAsync<Exception>(async () =>
-            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, DeepPurpleFanUser.Id)));
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, DeepPurpleFanUser.Email)));
         }
 
         [Fact]
@@ -292,7 +292,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
             CreateAndAddSharedUserIfNotExisting(SpeedKingSong.Id, GuatemalaAdminUser.Id);
             await Should.ThrowAsync<Exception>(async () =>
-            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, GuatemalaAdminUser.Id)));
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, GuatemalaAdminUser.Email)));
         }
 
         [Fact]
