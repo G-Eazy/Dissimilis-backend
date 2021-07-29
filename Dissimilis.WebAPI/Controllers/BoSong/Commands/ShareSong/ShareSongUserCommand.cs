@@ -19,12 +19,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
     {
         public int SongId { get; }
 
-        public int UserId { get; }
+        public string UserEmail { get; }
 
-        public ShareSongUserCommand(int songId, int userId)
+        public ShareSongUserCommand(int songId, string userEmail)
         {
             SongId = songId;
-            UserId = userId;
+            UserEmail = userEmail;
         }
     }
 
@@ -49,10 +49,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
             var song = await _songRepository.GetSongWithTagsSharedUsers(request.SongId, cancellationToken);
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
-            var userToAdd = await _userRepository.GetUserById(request.UserId, cancellationToken);
+            var userToAdd = await _userRepository.GetUserByEmail(request.UserEmail, cancellationToken);
             var isShared = await _songRepository.GetSongSharedUser(song.Id, userToAdd.Id);
 
-            if (isShared != null || request.UserId == currentUser.Id)
+            if (isShared != null || userToAdd.Id == currentUser.Id)
             {
                 throw new Exception("User already added to song");
             }
