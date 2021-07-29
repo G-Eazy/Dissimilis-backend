@@ -7,6 +7,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
 {
     public class AddComponentIntervalDto
     {
+        public int SourceVoiceId { get; set; }
         public int IntervalPosition { get; set; }
     }
 }

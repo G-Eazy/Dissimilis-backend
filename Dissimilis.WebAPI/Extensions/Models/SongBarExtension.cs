@@ -99,16 +99,16 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             var updatedSongNotes = sourceSongBar.Notes
                 .Select(srcNote => {
+                    var originalNote = songBar.Notes
+                            .Where(note =>
+                            {
+                                var (startPos, endPos) = note.GetNotePositionRange();
+                                return startPos <= srcNote.Position && srcNote.Position <= endPos;
+                            })
+                            .SingleOrDefault();
                     //If the note is singular keep the original.
                     if (srcNote.ChordName == null)
                     {
-                        var originalNote = songBar.Notes
-                            .Where(note =>
-                                {
-                                    var (startPos, endPos) = note.GetNotePositionRange();
-                                    return startPos <= srcNote.Position && srcNote.Position <= endPos;
-                                })
-                            .SingleOrDefault();
                         if (originalNote != null)
                         {
                             originalNote.Length -= (srcNote.Position - originalNote.Position);
@@ -116,14 +116,21 @@ namespace Dissimilis.WebAPI.Extensions.Models
                         }
                         return originalNote;
                     }
-                    return srcNote.Clone(includeComponentIntervals);
+                    //If the original note already exists, do not override
+                    else if (originalNote != null)
+                    {
+                        return originalNote;
+                    }
+                    else
+                    {
+                        return srcNote.Clone(includeComponentIntervals);
+                    }
                 })
                 .Where(note => note != null)
                 .ToList();
             songBar.Notes = updatedSongNotes;
             return songBar;
         }
-
         public static SongBar RemoveComponentInterval(this SongBar songBar, int intervalPosition)
         {
             songBar.Notes = songBar.Notes
@@ -131,6 +138,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     //If the note is a chord remove component interval.
                     if (note.ChordName != null)
                     {
+                        var updatedNote = note.RemoveComponentInterval(intervalPosition);
                         return note.RemoveComponentInterval(intervalPosition);
                     }
                     return note;
@@ -151,6 +159,20 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     return note;
                 })
                 .ToList();
+            return songBar;
+        }
+
+        public static SongBar RemoveEmptyChords(this SongBar songBar)
+        {
+            songBar.Notes = songBar.Notes
+                .Select(note =>
+                {
+                    if (note.NoteValues.Split("|").All(noteValue => noteValue == "X"))
+                        return null;
+                    return note;
+                })
+                .ToList();
+
             return songBar;
         }
 

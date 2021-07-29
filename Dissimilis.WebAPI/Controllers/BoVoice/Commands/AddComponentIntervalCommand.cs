@@ -58,22 +58,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            var sourceVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.Command.SourceVoiceId, cancellationToken);
+            if (sourceVoice == null)
+            {
+                throw new NotFoundException($"Source Voice with id {request.Command.SourceVoiceId} not found");
+            }
 
-            songVoice.AddComponentInterval(request.Command.IntervalPosition);
+            songVoice.AddComponentInterval(sourceVoice, request.Command.IntervalPosition);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
 
-            try
-            {
-                await _voiceRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
-
+            await _voiceRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }
