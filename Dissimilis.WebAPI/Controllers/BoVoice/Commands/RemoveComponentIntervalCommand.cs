@@ -57,7 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
 
-            songVoice.RemoveComponentInterval(request.Command.IntervalPosition);
+            songVoice.RemoveComponentInterval(request.Command.IntervalPosition, request.Command.DeleteChordsOnLastIntervalRemoved);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
 
             await _voiceRepository.UpdateAsync(cancellationToken);
