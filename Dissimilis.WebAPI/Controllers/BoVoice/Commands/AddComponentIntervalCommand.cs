@@ -53,14 +53,14 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
 
             var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
-            if (songVoice == null)
-            {
-                throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
-            }
+
             song.PerformSnapshot(currentUser);
 
-            songVoice.AddComponentInterval(request.Command.IntervalPosition);
+            var sourceVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.Command.SourceVoiceId, cancellationToken);
+
+            songVoice.AddComponentInterval(sourceVoice, request.Command.IntervalPosition);
             songVoice.SetSongVoiceUpdated(_authService.GetVerifiedCurrentUser().Id);
+
             await _voiceRepository.UpdateAsync(cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
 

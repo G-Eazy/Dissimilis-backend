@@ -202,13 +202,13 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// <summary>
         /// share write permission with given user
         /// </summary>
-        [HttpPost("{songId:int}/shareSong/User/{userId:int}")]
+        [HttpPost("{songId:int}/shareSong/User")]
         [ProducesResponseType(typeof(ShortUserDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ShareSongUser(int songId, int userId)
+        public async Task<IActionResult> ShareSongUser(int songId, [FromQuery] string userEmail)
         {
-            var result = await _mediator.Send(new ShareSongUserCommand(songId, userId));
+            var result = await _mediator.Send(new ShareSongUserCommand(songId, userEmail));
             return Ok(result);
         }
 
