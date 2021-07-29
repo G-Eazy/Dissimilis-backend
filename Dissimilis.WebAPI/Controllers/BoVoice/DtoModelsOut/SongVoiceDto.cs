@@ -14,7 +14,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
         public string Instrument { get; set; }
         public string VoiceName { get; set; }
         public bool IsMain { get; set; }
-        public int PartNumber { get; set; }
+        public int VoiceNumber { get; set; }
         public BarDto[] Bars { get; set; }
 
 
@@ -22,7 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
         {
             SongVoiceId = songVoice.Id;
             SongId = songVoice.SongId;
-            PartNumber = songVoice.VoiceNumber;
+            VoiceNumber = songVoice.VoiceNumber;
             VoiceName = songVoice.VoiceName ?? songVoice.Instrument?.Name;
             IsMain = songVoice.IsMainVoice;
             Instrument = songVoice.Instrument?.Name;
@@ -35,26 +35,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
 
         public SongVoiceDto () { }
 
-        public static SongVoiceDto JsonToSongVoiceDto(JToken json)
-        {
-            return new SongVoiceDto()
-            {
-                SongVoiceId = json["SongVoiceId"].Value<int>(),
-                SongId = json["SongId"].Value<int>(),
-                PartNumber = json["PartNumber"].Value<int>(),
-                VoiceName = json["VoiceName"].Value<string>(),
-                IsMain = json["IsMain"].Value<bool>(),
-                Instrument = json["Instrument"].Value<string>(),
-                Bars = null,
-            };
-        }
-
         public static SongVoice ConvertToSongVoice(SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById, Song song)
         {
             SongVoice voice = new SongVoice() 
             {
                 SongId = voiceDto.SongId,
-                VoiceNumber = voiceDto.PartNumber,
+                VoiceNumber = voiceDto.VoiceNumber,
                 VoiceName = voiceDto.VoiceName,
                 Song = song,
                 IsMainVoice = voiceDto.IsMain,

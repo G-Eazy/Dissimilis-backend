@@ -149,7 +149,7 @@ namespace Dissimilis.DbContext
             entity.HasIndex(x => new
             {
                 x.SongId,
-                PartNumber = x.VoiceNumber
+                VoiceNumber = x.VoiceNumber
             }).IsUnique();
 
             //set foregin key for creator id
@@ -180,12 +180,12 @@ namespace Dissimilis.DbContext
         {
             var entity = builder.Entity<SongBar>();
 
-            //Set a unique Id for barnumber that is related to PartId
+            //Set a unique barnumber that is related to VoiceId
             //Each barnumber needs to be unique but only within it's
-            //corresponding Part.
+            //corresponding Voice.
             entity.HasIndex(x => new { x.SongVoiceId, x.Position });
 
-            //Set foregin key for PartId linked to the Id of Part
+            //Set foreign key for VoiceId linked to the Id of Voice
             entity.HasOne(x => x.SongVoice)
                 .WithMany(x => x.SongBars)
                 .HasForeignKey(x => x.SongVoiceId)
@@ -197,12 +197,12 @@ namespace Dissimilis.DbContext
         {
             var entity = builder.Entity<SongNote>();
 
-            //Set a unique Id for barnumber that is related to PartId
-            //Each barnumber needs to be unique but only within it's
-            //corresponding Part.
+            //Set a unique notenumber that is related to BarId
+            //Each notenumber needs to be unique but only within it's
+            //corresponding Bar.
             entity.HasIndex(x => new { x.BarId, NoteNumber = x.Position }).IsUnique();
 
-            //Set foregin key for PartId linked to the Id of Part
+            //Set foreign key for BarId linked to the Id of Bar
             entity.HasOne(x => x.SongBar)
                 .WithMany(x => x.Notes)
                 .HasForeignKey(x => x.BarId)
