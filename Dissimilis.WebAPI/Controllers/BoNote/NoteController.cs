@@ -4,6 +4,7 @@ using Dissimilis.WebAPI.Controllers.BoNote.Commands;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -97,7 +98,23 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         [ProducesResponseType(typeof(ChordOptionsDto), (int)HttpStatusCode.OK)]
         public IActionResult GetChordOptions()
         {
-            var result = GetChordOptionsCommandHandler.Handle();
+            var result = new ChordOptionsDto() { ChordOptions = SongNoteExtension.GetAllChordOptions() };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Used for fetching all possible chord names.
+        /// </summary>
+        [HttpGet("chord/intervalNames")]
+        [ProducesResponseType(typeof(IntervalNamesDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult GetIntervalNames([FromQuery] string chordName)
+        {
+            if (chordName == "")
+            {
+                return BadRequest($"Please specify a chordname in the url.");
+            }
+            var result = new IntervalNamesDto() { IntervalNames = SongNoteExtension.GetIntervalNames(chordName) };
             return Ok(result);
         }
 
@@ -108,7 +125,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         [ProducesResponseType(typeof(SingleNoteOptionsDto), (int)HttpStatusCode.OK)]
         public IActionResult GetSingleNoteOptions()
         {
-            var result = GetSingleNoteOptionsCommandHandler.Handle();
+            var result = new SingleNoteOptionsDto() { SingleNoteOptions = SongNoteExtension.GetAllSingleNoteOptions() };
             return Ok(result);
         }
     }
