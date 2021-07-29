@@ -13,10 +13,10 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn
         [MinLength(1)]
         [MaxLength(100)]
         public string[] Notes { get; set; } = Array.Empty<string>();
-        [Range(0, int.MaxValue)]
-        public int NotePosition { get; set; }
         [Range(1, int.MaxValue)]
         public int Length { get; set; }
+        [Range(0, int.MaxValue)]
+        public int NotePosition { get; set; }
         [Range(0, int.MaxValue)]
         public int IntervalPosition { get; set; }
     }
