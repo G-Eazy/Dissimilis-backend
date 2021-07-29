@@ -186,10 +186,7 @@ namespace Dissimilis.WebAPI.Services
         /// <returns></returns>
         public bool CheckPermission(User user, User currentUser)
         {
-            if (currentUser.IsSystemAdmin || user.Id == currentUser.Id)
-                return true;
-            else
-                return false;
+            return currentUser.IsSystemAdmin || user.Id == currentUser.Id;
         }
 
         private async Task<bool> CheckWriteAccess(Song song, User user)
