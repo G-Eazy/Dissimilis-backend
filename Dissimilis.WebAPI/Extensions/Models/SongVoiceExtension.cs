@@ -75,18 +75,29 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return newSongVoice;
         }
 
-        public static SongVoice AddComponentInterval(this SongVoice songVoice, int intervalPosition)
+        public static SongVoice AddComponentInterval(this SongVoice songVoice, SongVoice sourceVoice, int intervalPosition)
         {
+            songVoice.DuplicateAllChords(sourceVoice, false);
             songVoice.SongBars = songVoice.SongBars.Select(bar =>
-                    bar.AddComponentInterval(intervalPosition)
+                {
+                    bar.AddComponentInterval(intervalPosition);
+                    bar.RemoveEmptyChords();
+                    return bar;
+                } 
                 ).ToArray();
+
             return songVoice;
         }
 
-        public static SongVoice RemoveComponentInterval(this SongVoice songVoice, int intervalPosition)
+        public static SongVoice RemoveComponentInterval(this SongVoice songVoice, int intervalPosition, bool deleteChordsOnLastIntervalRemoved)
         {
             songVoice.SongBars = songVoice.SongBars.Select(bar =>
-                    bar.RemoveComponentInterval(intervalPosition)
+                {
+                    bar.RemoveComponentInterval(intervalPosition);
+                    if (deleteChordsOnLastIntervalRemoved)
+                        bar.RemoveEmptyChords();
+                    return bar;
+                }
                 ).ToArray();
             return songVoice;
         }

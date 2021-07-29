@@ -33,7 +33,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
             if (voice == null)
             {
-                throw new NotFoundException($"Part with SongId {songId} and PartId {songVoiceId} not found.");
+                throw new NotFoundException($"Voice with SongId {songId} and VoiceId {songVoiceId} not found.");
             }
 
             await context.SongBars
