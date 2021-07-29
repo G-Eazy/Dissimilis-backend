@@ -35,13 +35,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
             int count = 1;
             foreach (var voiceDto in voiceDtos)
             {
-                SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.PartNumber);
+                SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.VoiceNumber);
                 if (voice == null)
                     voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById, song);
                 else
                 {
                     voice.VoiceName = voiceDto.VoiceName;
-                    voice.VoiceNumber = voiceDto.PartNumber;
+                    voice.VoiceNumber = voiceDto.VoiceNumber;
                 }
                
                 voice.SongBars = SongBarExtension.GetSongBarsFromDto(voiceDto.Bars, voice);

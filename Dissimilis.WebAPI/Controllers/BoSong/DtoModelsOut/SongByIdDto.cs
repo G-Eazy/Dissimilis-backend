@@ -55,7 +55,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             Creator = song.CreatedBy?.Name;
             Voices = song.Voices
                 .Select(p => new SongVoiceDto(p))
-                .OrderBy(p => p.PartNumber)
+                .OrderBy(p => p.VoiceNumber)
                 .ToArray();
             CurrentUserHasWriteAccess = currentUserHasWriteAccess;
         }
@@ -77,7 +77,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
             Creator = song.CreatedBy?.Name;
             Voices = song.Voices
                 .Select(p => new SongVoiceDto(p))
-                .OrderBy(p => p.PartNumber)
+                .OrderBy(p => p.VoiceNumber)
                 .ToArray();
         }
     }

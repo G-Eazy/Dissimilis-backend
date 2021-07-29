@@ -12,13 +12,13 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Query
     public class QueryBarById : IRequest<BarDto>
     {
         public int SongId { get; }
-        public int PartId { get; }
+        public int VoiceId { get; }
         public int BarId { get; }
 
-        public QueryBarById(int songId, int partId, int barId)
+        public QueryBarById(int songId, int voiceId, int barId)
         {
             SongId = songId;
-            PartId = partId;
+            VoiceId = voiceId;
             BarId = barId;
         }
     }
@@ -45,7 +45,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar.Query
             var song = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Get, cancellationToken)) throw new UnauthorizedAccessException();
 
-            var result = await _barRepository.GetSongBarById(request.SongId, request.PartId, request.BarId, cancellationToken);
+            var result = await _barRepository.GetSongBarById(request.SongId, request.VoiceId, request.BarId, cancellationToken);
 
             return new BarDto(result);
         }

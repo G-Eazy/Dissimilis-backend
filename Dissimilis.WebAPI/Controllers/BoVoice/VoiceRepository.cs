@@ -25,13 +25,13 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<SongVoice> GetSongVoiceById(int songId, int songVoiceId, CancellationToken cancellationToken)
         {
-            var part = await context.SongVoices
+            var voice = await context.SongVoices
                 .Include(sv => sv.Instrument)
                 .Include(sv => sv.Song)
                 .Where(p => p.SongId == songId)
                 .FirstOrDefaultAsync(p => p.Id == songVoiceId, cancellationToken);
 
-            if (part == null)
+            if (voice == null)
             {
                 throw new NotFoundException($"Part with SongId {songId} and PartId {songVoiceId} not found.");
             }
@@ -41,7 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 .Where(sb => sb.SongVoiceId == songVoiceId)
                 .LoadAsync(cancellationToken);
 
-            return part;
+            return voice;
         }
 
         public async Task<List<SongVoice>> MigrateSongVoice(CancellationToken cancellationToken)

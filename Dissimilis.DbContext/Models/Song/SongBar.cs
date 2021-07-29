@@ -18,7 +18,7 @@ namespace Dissimilis.DbContext.Models.Song
         
 
         /// <summary>
-        /// Priority of the bar in a spesific part
+        /// Priority of the bar in a spesific voice
         /// </summary>
         public int Position { get; set; }
 
@@ -40,8 +40,8 @@ namespace Dissimilis.DbContext.Models.Song
 
 
         /// <summary>
-        /// The part it is linked to
-        /// and the corresponding PartId
+        /// The voice it is linked to
+        /// and the corresponding VoiceId
         /// </summary>
         public SongVoice SongVoice { get; set; }
         public int SongVoiceId { get; set; }
