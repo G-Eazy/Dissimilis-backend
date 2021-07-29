@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
-using Dissimilis.WebAPI.Services;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
+using Newtonsoft.Json;
+using Dissimilis.DbContext;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -275,6 +277,66 @@ namespace Dissimilis.WebAPI.Extensions.Models
             song.Voices = song.Voices.Select(v => v.Transpose(transpose)).ToArray();
 
             return song;
+        }
+
+
+        public static void Undo(this Song song)
+        {
+            if (song.Snapshots.Count == 0)
+                throw new NotFoundException("No more snapshots to pop...");
+
+            SongSnapshot snapshot = song.PopSnapshot(true);
+            SongByIdDto deserialisedSong = JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
+            
+            song.Title = deserialisedSong.Title;
+            song.UpdatedBy = snapshot.CreatedBy;
+            song.UpdatedOn = DateTimeOffset.Now;
+            song.Composer = deserialisedSong.Composer;
+            song.Speed = deserialisedSong.Speed;
+            song.SongNotes = deserialisedSong.SongNotes;
+            song.Voices = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
+        }
+
+        /// <summary>
+        /// This method should be called before any action that updates a song, except when the song itself is created.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        public static void PerformSnapshot(this Song song, User user)
+        {
+            string JSONsnapshot = JsonConvert.SerializeObject(new SongByIdDto(song));
+
+            if(song.Snapshots.Count >= 5)
+            {
+                song.PopSnapshot(false);
+            }
+
+            SongSnapshot snapshot = new SongSnapshot()
+            {
+                SongId = song.Id,
+                CreatedById = user.Id,
+                CreatedOn = DateTimeOffset.Now,
+                SongObjectJSON = JSONsnapshot
+            };
+
+            song.Snapshots.Add(snapshot);
+        }
+
+        public static SongSnapshot PopSnapshot(this Song song, bool descendingOrder)
+        {
+            SongSnapshot result = null;
+            SongSnapshot[] orderedSnapshots;
+            if (song.Snapshots.Count > 0)
+            {
+                if(descendingOrder)
+                    orderedSnapshots = song.Snapshots.OrderByDescending(s => s.CreatedOn).ToArray();
+                else
+                    orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
+
+                result = orderedSnapshots.First();
+                song.Snapshots.Remove(result);
+            }
+            return result;
         }
     }
 }

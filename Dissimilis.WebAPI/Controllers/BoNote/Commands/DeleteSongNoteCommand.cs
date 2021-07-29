@@ -31,17 +31,17 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
     public class DeleteSongNoteCommandHandler : IRequestHandler<DeleteSongNoteCommand, UpdatedCommandDto>
     {
+        private readonly SongRepository _songRepository;
         private readonly NoteRepository _noteRepository;
         private readonly BarRepository _barRepository;
-        private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
         public DeleteSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
+            _songRepository = songRepository;
             _noteRepository = noteRepository;
             _barRepository = barRepository;
-            _songRepository = songRepository;
             _IAuthService = IAuthService;
             _IPermissionCheckerService = IPermissionCheckerService;
         }
@@ -61,11 +61,13 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
+            song.PerformSnapshot(currentUser);
 
             bar.Notes.Remove(songNote);
 
             bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
+            await _songRepository.UpdateAsync(cancellationToken);
             await _noteRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songNote);

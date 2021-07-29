@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
@@ -15,14 +16,14 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {
     public class UpdateSongNoteCommand : IRequest<UpdatedCommandDto>
     {
-        public int SongChordId { get; }
         public int SongId { get; }
+        public int SongChordId { get; }
         public UpdateNoteDto Command { get; }
 
         public UpdateSongNoteCommand(int songId, int songChordId, UpdateNoteDto command)
         {
-            SongChordId = songChordId;
             SongId = songId;
+            SongChordId = songChordId;
             Command = command;
         }
     }
@@ -36,8 +37,8 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
         public UpdateSongNoteCommandHandler(NoteRepository noteRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _noteRepository = noteRepository;
             _songRepository = songRepository;
+            _noteRepository = noteRepository;
             _IAuthService = IAuthService;
             _IPermissionCheckerService = IPermissionCheckerService;
         }
@@ -56,6 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
             }
+            song.PerformSnapshot(_IAuthService.GetVerifiedCurrentUser());
 
             songNote.Length = request.Command?.Length ?? songNote.Length;
             songNote.Position = request.Command?.Position ?? songNote.Position;
@@ -71,6 +73,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
             songNote.SongBar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
+            await _songRepository.UpdateAsync(cancellationToken);
             await _noteRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songNote);

@@ -16,12 +16,12 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
             Context = context;
         }
 
-        public async Task<SongBar> GetSongBarById(int songId, int partId, int barId, CancellationToken cancellationToken)
+        public async Task<SongBar> GetSongBarById(int songId, int voiceId, int barId, CancellationToken cancellationToken)
         {
             var bar = await Context.SongBars
                 .Include(b => b.SongVoice.Song)
                 .Include(b => b.Notes)
-                .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
+                .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == voiceId)
                 .SingleOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
             if (bar == null) throw new NotFoundException($"Bar with ID {barId} not found.");

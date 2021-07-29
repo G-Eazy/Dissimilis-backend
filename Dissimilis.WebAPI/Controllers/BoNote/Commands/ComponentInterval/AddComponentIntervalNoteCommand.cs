@@ -67,6 +67,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
                     var (startPos, endPos) = note.GetNotePositionRange();
                     return startPos >= request.Command.NotePosition && request.Command.NotePosition >= endPos;}))
                 { throw new ValidationException("Note number already in use"); }
+                song.PerformSnapshot(currentUser);
 
                 var chordName = request.Command.ChordName == ""
                     ? null

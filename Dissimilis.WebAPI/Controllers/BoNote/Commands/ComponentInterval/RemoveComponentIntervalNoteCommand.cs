@@ -61,6 +61,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
 
             var songNote = songBar.Notes.SingleOrDefault(note => note.Position == request.Command.NotePosition);
             if (songNote == null) throw new NotFoundException($"Note with position {request.Command.NotePosition} not found");
+            song.PerformSnapshot(currentUser);
 
             if (songNote.ChordName == null)
             {

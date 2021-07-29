@@ -7,6 +7,8 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Dissimilis.WebAPI.Extensions.Models;
+
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -39,9 +41,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<UpdatedSongCommandDto> Handle(UpdateSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _IAuthService.GetVerifiedCurrentUser();
-            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
 
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+            song.PerformSnapshot(currentUser);
 
             song.Title = request.Command?.Title ?? song.Title;
             song.Composer = request.Command?.Composer ?? song.Composer;

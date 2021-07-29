@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.DbContext.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
 {
@@ -11,7 +14,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
         public string Instrument { get; set; }
         public string VoiceName { get; set; }
         public bool IsMain { get; set; }
-        public int PartNumber { get; set; }
+        public int VoiceNumber { get; set; }
         public BarDto[] Bars { get; set; }
 
 
@@ -19,7 +22,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
         {
             SongVoiceId = songVoice.Id;
             SongId = songVoice.SongId;
-            PartNumber = songVoice.VoiceNumber;
+            VoiceNumber = songVoice.VoiceNumber;
             VoiceName = songVoice.VoiceName ?? songVoice.Instrument?.Name;
             IsMain = songVoice.IsMainVoice;
             Instrument = songVoice.Instrument?.Name;
@@ -28,6 +31,24 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
                 .Select(b => new BarDto(b))
                 .ToArray();
 
+        }
+
+        public SongVoiceDto () { }
+
+        public static SongVoice ConvertToSongVoice(SongVoiceDto voiceDto, DateTimeOffset updatedOn, int updatedById, Song song)
+        {
+            SongVoice voice = new SongVoice() 
+            {
+                SongId = voiceDto.SongId,
+                VoiceNumber = voiceDto.VoiceNumber,
+                VoiceName = voiceDto.VoiceName,
+                Song = song,
+                IsMainVoice = voiceDto.IsMain,
+                UpdatedById = updatedById,
+                UpdatedOn = updatedOn
+            };
+
+            return voice;
         }
     }
 }

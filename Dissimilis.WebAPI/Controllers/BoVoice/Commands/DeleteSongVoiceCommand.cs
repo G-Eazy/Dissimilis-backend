@@ -7,8 +7,10 @@ using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 {
@@ -16,6 +18,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
     {
         public int SongId { get; }
         public int SongVoiceId { get; }
+        //public IMediator _mediator { get; set; }
 
         public DeleteSongVoiceCommand(int songId, int songVoiceId)
         {
@@ -50,11 +53,11 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
                 throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
             }
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+            song.PerformSnapshot(currentUser);
 
             song.Voices.Remove(songVoice);
             song.SetUpdated(currentUser.Id);
-
-            await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(songVoice);
         }

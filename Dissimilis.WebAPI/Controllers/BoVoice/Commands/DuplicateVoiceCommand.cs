@@ -57,28 +57,17 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
-
             if (string.IsNullOrEmpty(request.Command.VoiceName))
             {
                 throw new Exception("Voicename can't be a empty string");
             }
-
-            await using var transaction = await _voiceRepository.context.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            song.PerformSnapshot(currentUser);
 
             var duplicatedVoice = songVoice.Clone(request.Command.VoiceName, currentUser, null, song.Voices.Max(v => v.VoiceNumber));
             song.Voices.Add(duplicatedVoice);
 
-            try
-            {
-                await _voiceRepository.UpdateAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                throw new ValidationException("Transaction error, aborting operation. Please try again.");
-            }
-
+            await _voiceRepository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedCommandDto(duplicatedVoice);
         }

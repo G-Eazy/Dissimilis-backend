@@ -30,16 +30,16 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 
     public class AddComponentIntervalHandler : IRequestHandler<AddComponentIntervalCommand, UpdatedCommandDto>
     {
-        private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
+        private readonly VoiceRepository _voiceRepository;
         private readonly AuthService _authService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
         public AddComponentIntervalHandler(VoiceRepository voiceRepository, SongRepository songRepository, AuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _voiceRepository = voiceRepository;
             _songRepository = songRepository;
+            _voiceRepository = voiceRepository;
             _authService = authService;
             _IPermissionCheckerService = IPermissionCheckerService;
 
@@ -57,6 +57,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
             {
                 throw new NotFoundException($"Voice with id {request.SongVoiceId} not found");
             }
+            song.PerformSnapshot(currentUser);
 
             var sourceVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.Command.SourceVoiceId, cancellationToken);
             if (sourceVoice == null)

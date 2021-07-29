@@ -6,6 +6,9 @@ using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Newtonsoft.Json.Linq;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -229,6 +232,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         private static Dictionary<string, string[]> AllChordOptions { get; set; } = GenerateAllChordOptions();
 
+        public static string[] GetIntervalNames(string chordName)
+        {
+            var chordPattern = GetRootNoteAndChordPattern(chordName).Item2;
+            return GetIntervalCodesFromChordPattern(chordPattern)
+                .Select(ic => IntervalNames[Int64.Parse(ic.Substring(0, ic.Length - 1)) - 1])
+                .ToArray();
+        }
+
         private static Dictionary<string, string[]> GenerateAllChordOptions()
         {
             Dictionary<string, string[]> chordOptions = new();
@@ -281,15 +292,20 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return (rootNote, chordPattern);
         }
 
+        private static string[] GetIntervalCodesFromChordPattern(string chordPattern)
+        {
+            return ChordFormulas
+                .Where(formula => formula[2].Split(" ").Contains(chordPattern))
+                .Select(formula => formula[0].Split(" "))
+                .SingleOrDefault();
+        }
+
         public static List<string> GetNoteValuesFromChordName(string chordName)
         {
             var (rootNote, chordPattern) = GetRootNoteAndChordPattern(chordName);
 
             int startIndex = _allNotes.IndexOf(rootNote);
-            string[] intervalCodes = ChordFormulas
-                .Where(formula => formula[2].Split(" ").Contains(chordPattern))
-                .Select(formula => formula[0].Split(" "))
-                .SingleOrDefault();
+            string[] intervalCodes = GetIntervalCodesFromChordPattern(chordPattern);
             
             List<string> noteValues = new();
 
@@ -344,6 +360,38 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songNote.SetNoteValues(updatedNoteValues);
             return songNote;
         }
+
+        public static List<SongNote> GetSongNotesFromDto(NoteDto[] noteDtos, SongBar bar)
+        {
+            List<SongNote> newNotes = new List<SongNote>();
+            foreach (var noteDto in noteDtos)
+            {
+                bool emptyNote = noteDto.Notes[0] == "Z";
+                if (emptyNote)
+                {
+                    for (int i = noteDto.Position; i < noteDto.Position + noteDto.Length; i++)
+                    {
+                        var noteToBeRemoved = bar.Notes.SingleOrDefault(n => n.Position == i);
+                        bar.Notes.Remove(noteToBeRemoved);
+                    }
+                }
+                else
+                {
+                    SongNote note = bar.Notes.SingleOrDefault(n => n.Position == noteDto.Position);
+                    if (note == null)
+                        note = NoteDto.ConvertToSongNote(noteDto, bar);
+                    else
+                    {
+                        note.ChordName = noteDto.ChordName;
+                        note.SetNoteValues(noteDto.Notes);
+                        note.Length = noteDto.Length;
+                    }
+                    newNotes.Add(note);
+                }
+            }
+            return newNotes;
+        }
+
 
         public static SongNote Transpose(this SongNote songNote, int transposeValue)
         {

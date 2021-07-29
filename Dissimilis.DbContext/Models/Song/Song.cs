@@ -16,7 +16,7 @@ namespace Dissimilis.DbContext.Models.Song
     
 
     /// <summary>
-    /// This is the whole songs, which contains one or more parts 
+    /// This is the whole song, which contains one or more voices 
     /// </summary>
     public class Song : ICreatedAndUpdated
     {
@@ -106,10 +106,8 @@ namespace Dissimilis.DbContext.Models.Song
         /// The groups with read permission on the song
         /// </summary>
         public ICollection<SongGroupTag> GroupTags { get; set; } = new List<SongGroupTag>();
-
-        /// <summary>
-        /// The organisations with read permission on this song
-        /// </summary>
         public ICollection<SongOrganisationTag> OrganisationTags { get; set; } = new List<SongOrganisationTag>();
+
+        public ICollection<SongSnapshot> Snapshots { get; set; } = new List<SongSnapshot>();
     }
 }
