@@ -38,6 +38,14 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             return user;
         }
 
+        public async Task<User> GetUserByEmail(string email, CancellationToken cancellationToken)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                throw new NotFoundException($"User with email {email} not found");
+            return user;
+        }
+
         public async Task<User> CreateOrFindUserAsync(UserEntityMetadata userMeta)
         {
             var user = await GetUserByMsIdAsync(userMeta.id);
