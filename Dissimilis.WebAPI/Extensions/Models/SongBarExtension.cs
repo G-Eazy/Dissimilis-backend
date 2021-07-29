@@ -171,6 +171,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                         return null;
                     return note;
                 })
+                .Where(note => note != null)
                 .ToList();
 
             return songBar;
