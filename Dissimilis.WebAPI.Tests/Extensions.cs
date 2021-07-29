@@ -223,14 +223,13 @@ namespace Dissimilis.WebAPI.xUnit
         }
 
         internal static SearchQueryDto SearchQueryDto(
-            string title = "", string OrderBy = "date", bool orderDescending = true, bool includeAll = true)
+            string title = "", string OrderBy = "date", bool orderDescending = true)
         {
             return new SearchQueryDto()
             {
                 Title = title,
                 OrderBy = OrderBy,
                 OrderDescending = orderDescending,
-                IncludeAll = includeAll,
             };
         }
         internal static SearchQueryDto AllSearchQueryDto()
@@ -240,7 +239,6 @@ namespace Dissimilis.WebAPI.xUnit
                 Title = "",
                 OrderBy = "date",
                 OrderDescending = true,
-                IncludeAll = true,
             };
 
         }
@@ -261,7 +259,6 @@ namespace Dissimilis.WebAPI.xUnit
             {
                 Title = "",
                 OrderBy = "date",
-                IncludeAll = false,
                 OrderDescending = true,
                 IncludeSharedWithUser = true
             };
@@ -275,7 +272,6 @@ namespace Dissimilis.WebAPI.xUnit
                 Title = "",
                 OrderBy = "date",
                 OrderDescending = true,
-                IncludeAll = false,
                 IncludedGroupIdArray = groups,
                 IncludedOrganisationIdArray = orgs
             };
