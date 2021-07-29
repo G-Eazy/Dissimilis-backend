@@ -28,7 +28,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         }
     }
 
-    public class CreatePartCommandHandler : IRequestHandler<CreateSongVoiceCommand, UpdatedCommandDto>
+    public class CreateSongVoiceCommandHandler : IRequestHandler<CreateSongVoiceCommand, UpdatedCommandDto>
     {
         private readonly VoiceRepository _voiceRepository;
         private readonly SongRepository _songRepository;
@@ -36,7 +36,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
 
-        public CreatePartCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
+        public CreateSongVoiceCommandHandler(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _voiceRepository = voiceRepository;
             _songRepository = songRepository;

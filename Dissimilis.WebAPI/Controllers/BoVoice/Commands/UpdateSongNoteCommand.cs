@@ -44,9 +44,9 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         {
             var song = await _repository.GetSongById(request.SongId, cancellationToken);
 
-            var part = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
+            var bar = await _repository.GetSongBarById(request.SongId, request.SongVoiceId, request.SongBarId, cancellationToken);
 
-            var note = part.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
+            var note = bar.Notes.FirstOrDefault(n => n.Id == request.SongChordId);
             if (note == null)
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
@@ -58,7 +58,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             note.ChordName = request.Command.ChordName;
             note.SetNoteValues(request.Command.Notes);
 
-            part.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
+            bar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _repository.UpdateAsync(cancellationToken);
 

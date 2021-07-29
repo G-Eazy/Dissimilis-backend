@@ -22,12 +22,12 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
         }
 
 
-        public async Task<SongBar> GetSongBarById(int songId, int partId, int barId, CancellationToken cancellationToken)
+        public async Task<SongBar> GetSongBarById(int songId, int voiceId, int barId, CancellationToken cancellationToken)
         {
             var bar = await context.SongBars
                 .Include(b => b.SongVoice.Song)
                 .Include(b => b.Notes)
-                .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == partId)
+                .Where(b => b.SongVoice.SongId == songId && b.SongVoiceId == voiceId)
                 .SingleOrDefaultAsync(x => x.Id == barId, cancellationToken);
 
             if (bar == null)
@@ -46,13 +46,13 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
         public async Task<SongVoice> GetSongVoiceById(int songId, int songVoiceId, CancellationToken cancellationToken)
         {
-            var part = await context.SongVoices
+            var voice = await context.SongVoices
                 .Include(sv => sv.Instrument)
                 .Include(sv => sv.Song)
                 .Where(p => p.SongId == songId)
                 .SingleOrDefaultAsync(p => p.Id == songVoiceId, cancellationToken);
 
-            if (part == null)
+            if (voice == null)
             {
                 throw new NotFoundException($"Part with SongId {songId} and PartId {songVoiceId} not found.");
             }
@@ -62,7 +62,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
                 .Where(sb => sb.SongVoiceId == songVoiceId)
                 .LoadAsync(cancellationToken);
 
-            return part;
+            return voice;
         }
 
         public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)

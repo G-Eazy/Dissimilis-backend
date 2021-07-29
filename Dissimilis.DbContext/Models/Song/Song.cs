@@ -16,7 +16,7 @@ namespace Dissimilis.DbContext.Models.Song
     
 
     /// <summary>
-    /// This is the whole songs, which contains one or more parts 
+    /// This is the whole song, which contains one or more voices 
     /// </summary>
     public class Song : ICreatedAndUpdated
     {

@@ -232,6 +232,14 @@ namespace Dissimilis.WebAPI.Extensions.Models
 
         private static Dictionary<string, string[]> AllChordOptions { get; set; } = GenerateAllChordOptions();
 
+        public static string[] GetIntervalNames(string chordName)
+        {
+            var chordPattern = GetRootNoteAndChordPattern(chordName).Item2;
+            return GetIntervalCodesFromChordPattern(chordPattern)
+                .Select(ic => IntervalNames[Int64.Parse(ic.Substring(0, ic.Length - 1)) - 1])
+                .ToArray();
+        }
+
         private static Dictionary<string, string[]> GenerateAllChordOptions()
         {
             Dictionary<string, string[]> chordOptions = new();
@@ -284,15 +292,20 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return (rootNote, chordPattern);
         }
 
+        private static string[] GetIntervalCodesFromChordPattern(string chordPattern)
+        {
+            return ChordFormulas
+                .Where(formula => formula[2].Split(" ").Contains(chordPattern))
+                .Select(formula => formula[0].Split(" "))
+                .SingleOrDefault();
+        }
+
         public static List<string> GetNoteValuesFromChordName(string chordName)
         {
             var (rootNote, chordPattern) = GetRootNoteAndChordPattern(chordName);
 
             int startIndex = _allNotes.IndexOf(rootNote);
-            string[] intervalCodes = ChordFormulas
-                .Where(formula => formula[2].Split(" ").Contains(chordPattern))
-                .Select(formula => formula[0].Split(" "))
-                .SingleOrDefault();
+            string[] intervalCodes = GetIntervalCodesFromChordPattern(chordPattern);
             
             List<string> noteValues = new();
 
