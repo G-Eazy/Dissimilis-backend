@@ -13,6 +13,7 @@ using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.Queries;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoUser.Commands;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -40,6 +41,18 @@ namespace Dissimilis.WebAPI.xUnit.Tests
 
             await _mediator.Send(new UpdateSysAdminStatusCommand(CheckSysAdminStatusUser.Id, new UpdateSysAdminStatusDto() { IsSystemAdmin = true }));
             CheckSysAdminStatusUser.IsSystemAdmin.ShouldBeTrue("User sysAdmin status did not change");
+        }
+
+        [Fact]
+        public async Task DeleteUserShouldSucceed()
+        {
+            TestServerFixture.ChangeCurrentUserId(SysAdminUser.Id);
+            var deleteUser = _testServerFixture.GetContext().Users.SingleOrDefault(u => u.Email == "RemoveUser@Norway.no");
+            deleteUser.ShouldNotBeNull("User was null");
+
+            await _mediator.Send(new DeleteUserCommand(deleteUser.Id));
+            deleteUser = _testServerFixture.GetContext().Users.SingleOrDefault(u => u.Email == "RemoveUser@Norway.no");
+            deleteUser.ShouldBeNull("User was not deleted");
         }
     }
 }

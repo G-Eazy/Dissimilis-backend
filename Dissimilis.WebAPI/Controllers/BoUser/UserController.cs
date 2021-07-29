@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Commands;
+using Dissimilis.WebAPI.Controllers.BoUser.Commands;
 
 namespace Dissimilis.WebAPI.Controllers.BoUser
 {
@@ -82,6 +83,16 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             var item = await _mediator.Send(new UpdateSysAdminStatusCommand(userId, command));
             var result = await _mediator.Send(new QueryUserById(item.UserId));
             return Ok(result);
+        }
+
+        [HttpDelete("{userId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            await _mediator.Send(new DeleteUserCommand(userId));
+            return Ok();
         }
 
     }

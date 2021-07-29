@@ -15,6 +15,7 @@ namespace Dissimilis.WebAPI.Services
         Task<bool> CheckPermission(Organisation org, User user, Operation op, CancellationToken c);
         Task<bool> CheckPermission(Group group, User user, Operation op, CancellationToken c);
         Task<bool> CheckPermission(Song song, User user, Operation op, CancellationToken c);
+        bool CheckPermission(User deleteUser, User currentUser);
         Task<UserAdminStatusDto> CheckUserAdminStatus(User user, CancellationToken c);
     }
 }

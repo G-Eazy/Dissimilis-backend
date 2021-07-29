@@ -3,8 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
@@ -101,6 +99,12 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             return await _context.Users.SingleOrDefaultAsync(x => x.MsId == id);
         }
 
+
+        public async Task DeleteUser(User user, CancellationToken cancellationToken)
+        {
+            _context.Users.Remove(user);
+            await UpdateAsync(cancellationToken);
+        }
 
         /// <summary>
         /// Update the user country fk
