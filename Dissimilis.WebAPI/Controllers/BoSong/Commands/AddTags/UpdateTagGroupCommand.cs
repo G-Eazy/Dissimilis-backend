@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoGroup;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
@@ -28,13 +29,15 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
     public class UpdateTagGroupCommandHandler : IRequestHandler<UpdateTagGroupCommand, ShortGroupDto[]>
     {
         private readonly SongRepository _songRepository;
+        private readonly UserRepository _userRepository;
         private readonly GroupRepository _groupRepository;
         private readonly IAuthService _IAuthService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public UpdateTagGroupCommandHandler(SongRepository songRepository, GroupRepository groupRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
+        public UpdateTagGroupCommandHandler(SongRepository songRepository, UserRepository userRepository, GroupRepository groupRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
             _songRepository = songRepository;
+            _userRepository = userRepository;
             _groupRepository = groupRepository;
             _IAuthService = IAuthService;
             _IPermissionCheckerService = IPermissionCheckerService;
@@ -47,9 +50,11 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException( "You dont have permission to edit this song");
 
-            if (!request.GroupIds.All(x => currentUser.GetAllGroupIds().Contains(x)) && !currentUser.IsSystemAdmin)
+            var groupIds = await _userRepository.GetGroupUserIds(currentUser);
+
+            if (!request.GroupIds.All(groupIds.Contains) && !currentUser.IsSystemAdmin)
             {
-                throw new Exception("You need to be in the group you want to update");
+                throw new UnauthorizedAccessException("You need to be in the group you want to tag your song with.");
             }
             foreach (var groupId in request.GroupIds)
             {
