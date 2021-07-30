@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
@@ -130,6 +131,22 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         public async Task UpdateAsync(CancellationToken cancellationToken)
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<int>> GetUserOrganisationIds(User user)
+        {
+            return await _context.OrganisationUsers
+                .Where(ou => ou.UserId == user.Id)
+                .Select(ou => ou.OrganisationId)
+                .ToListAsync();
+        }
+
+        public async Task<List<int>> GetUserGroupIds(User user)
+        {
+            return await _context.GroupUsers
+                .Where(gu => gu.UserId == user.Id)
+                .Select(gu => gu.GroupId)
+                .ToListAsync();
         }
     }
 }

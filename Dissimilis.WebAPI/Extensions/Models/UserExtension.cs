@@ -21,14 +21,5 @@ namespace Dissimilis.WebAPI.Extensions.Models
         {
             return user.Organisations.Any(x => x.OrganisationId == organisationId && x.Role == Role.Admin);
         }
-        public static List<int> GetAllOrganisationIds(this User user)
-        {
-            return user.Organisations.Select(o => o.OrganisationId).ToList();
-        }
-
-        public static List<int> GetAllGroupIds(this User user)
-        {
-            return user.Groups.Select(g => g.GroupId).ToList();
-        }
     }
 }
