@@ -133,7 +133,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<int>> GetUserOrganisationIds(User user)
+        public async Task<List<int>> GetOrganisationUserIds(User user)
         {
             return await _context.OrganisationUsers
                 .Where(ou => ou.UserId == user.Id)
@@ -141,7 +141,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 .ToListAsync();
         }
 
-        public async Task<List<int>> GetUserGroupIds(User user)
+        public async Task<List<int>> GetGroupUserIds(User user)
         {
             return await _context.GroupUsers
                 .Where(gu => gu.UserId == user.Id)

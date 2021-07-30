@@ -50,7 +50,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
 
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException("You dont have permission to edit this song");
 
-            var organisationIds = await _userRepository.GetUserOrganisationIds(currentUser);
+            var organisationIds = await _userRepository.GetOrganisationUserIds(currentUser);
 
             if (!request.OrganisationIds.All(organisationIds.Contains) && !currentUser.IsSystemAdmin)
             {
