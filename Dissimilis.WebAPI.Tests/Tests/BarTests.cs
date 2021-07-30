@@ -125,23 +125,6 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             updatedBar.RepBefore.ShouldBe(barBeforeUpdate.RepBefore);
         }
 
-        //[Fact]
-        public async Task TestDeleteSongBarCommand()
-        {
-            
-            //Fetch bar to use for tests
-            var voice = SpeedKingSong
-                .Voices.FirstOrDefault();
-            var barToDeleteWithPermittedUser = voice
-                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 4);
-            var barToDeleteWithUnpermittedUser = voice
-                .SongBars.FirstOrDefault(bar => bar.Notes.Count == 0);
-
-            //Test edgecases
-            //await TestDeleteBarWhenCurrentUserIsArrangerShouldDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithPermittedUser.Id);
-            //await TestDeleteBarWhenCurrentUserDoesNotHaveWriteAccessShouldNotDelete(SpeedKingSong.Id, voice.Id, barToDeleteWithUnpermittedUser.Id);
-        }
-
         [Fact]
         public async Task TestDeleteBarWhenCurrentUserIsArrangerShouldDelete()
         {
