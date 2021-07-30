@@ -39,7 +39,23 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
             return Ok(result);
         }
 
+        [HttpGet("{voiceId:int}/intervalNames")]
+        [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<IActionResult> GetAllIntervalNames(int songId, int voiceId)
+        {
+            var result = await _mediator.Send(new QueryAllIntervalNames(songId, voiceId));
+            return Ok(result);
+        }
 
+        /// <summary>
+        /// Gives a set of all interval names for chords in specified voice.
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <param name="voiceId"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPatch("{voiceId:int}")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateSongVoice(int songId, int voiceId, [FromBody] CreateSongVoiceDto command)

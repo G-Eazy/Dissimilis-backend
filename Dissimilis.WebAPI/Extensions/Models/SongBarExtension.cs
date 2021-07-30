@@ -201,5 +201,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songBar.Notes = songBar.Notes.Select(note => note.Transpose(transpose)).ToList();
             return songBar;
         }
+
+        public static HashSet<string> GetAllIntervalNames(this SongBar songBar)
+        {
+            return songBar.Notes
+                .Where(note => note.ChordName != null)
+                .SelectMany(note => SongNoteExtension.GetIntervalNames(note.ChordName))
+                .ToHashSet();
+        }
     }
 }
