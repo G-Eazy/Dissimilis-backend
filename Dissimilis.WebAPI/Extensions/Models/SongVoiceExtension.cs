@@ -119,5 +119,12 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 ).ToArray();
             return songVoice;
         }
+
+        public static HashSet<string> GetAllIntervalNames(this SongVoice songVoice)
+        {
+            return songVoice.SongBars
+                .SelectMany(bar => bar.GetAllIntervalNames())
+                .ToHashSet();
+        }
     }
 }

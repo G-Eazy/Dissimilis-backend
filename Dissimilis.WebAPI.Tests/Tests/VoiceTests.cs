@@ -27,6 +27,21 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
         }
 
+        [Fact]
+        public async Task TestGetAllIntervalNames()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+
+            var songVoice = SmokeOnTheWaterSong.Voices.First();
+            var result = await _mediator.Send(new QueryAllIntervalNames(SmokeOnTheWaterSong.Id, songVoice.Id));
+
+            var expectedResult = new HashSet<string>()
+            {
+                "Root", "Third", "Fifth", "Seventh", "Ninth", "Thirteenth"
+            };
+
+            result.IntervalNames.ShouldBeEquivalentTo(expectedResult);
+        }
        
         //[Fact]
         //public async Task TestSyncBetweenVoices()
