@@ -226,7 +226,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"
         };
 
-        private static Dictionary<string, string[]> AllChordOptions { get; set; } = GenerateAllChordOptions();
+        private static List<string> AllChordOptions { get; set; } = GenerateAllChordOptions();
 
         public static string[] GetIntervalNames(string chordName)
         {
@@ -243,9 +243,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 .ToHashSet();
         }
 
-        private static Dictionary<string, string[]> GenerateAllChordOptions()
+        private static List<string> GenerateAllChordOptions()
         {
-            Dictionary<string, string[]> chordOptions = new();
+            List<string> chordOptions = new();
 
             foreach (var rootNote in _allNotes)
             {
@@ -254,11 +254,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                     string chordPattern = chordFormula[2].Split(" ")[0];
                     chordPattern = chordPattern == "M" ? "" : chordPattern;
 
-                    string[] intervalNames = chordFormula[0].Split(" ")
-                        .Select(interval => IntervalNames[Int64.Parse(interval.Substring(0, interval.Length - 1)) - 1])
-                        .ToArray();
-
-                    chordOptions[rootNote + chordPattern] = intervalNames;
+                    chordOptions.Add(rootNote + chordPattern);
                 }
             }
 
@@ -324,9 +320,9 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return new List<string>(_allNotes);
         }
 
-        public static Dictionary<string, string[]> GetAllChordOptions()
+        public static List<string> GetAllChordOptions()
         {
-            return new Dictionary<string, string[]>(AllChordOptions);
+            return new List<string>(AllChordOptions);
         }
 
         public static (int startPos, int endPos) GetNotePositionRange(this SongNote songNote)
