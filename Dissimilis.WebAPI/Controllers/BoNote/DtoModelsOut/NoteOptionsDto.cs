@@ -5,6 +5,6 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut
     public class NoteOptionsDto
     {
         public List<string> SingleNoteOptions { get; set; }
-        public Dictionary<string, string[]> ChordOptions { get; set; }
+        public List<string> ChordOptions { get; set; }
     }
 }
