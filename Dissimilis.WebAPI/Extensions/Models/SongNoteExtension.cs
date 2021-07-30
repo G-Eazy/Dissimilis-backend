@@ -4,10 +4,6 @@ using System.Linq;
 using System;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Exceptions;
-using Dissimilis.WebAPI.Extensions.Interfaces;
-using Newtonsoft.Json.Linq;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 
 namespace Dissimilis.WebAPI.Extensions.Models
@@ -226,7 +222,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         //The names of all intervals that a chords may consist of.
         private static string[] IntervalNames = new string[]
         {
-            "Root", "Second", "Third", "Forth", "Fifth", "Sixth", "Seventh", "Octave",
+            "Root", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Octave",
             "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"
         };
 
@@ -238,6 +234,13 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return GetIntervalCodesFromChordPattern(chordPattern)
                 .Select(ic => IntervalNames[Int64.Parse(ic.Substring(0, ic.Length - 1)) - 1])
                 .ToArray();
+        }
+
+        public static HashSet<string> SortIntervalNames(this HashSet<string> intervalNames)
+        {
+            return intervalNames
+                .OrderBy(iN => Array.FindIndex(IntervalNames, item => item == iN))
+                .ToHashSet();
         }
 
         private static Dictionary<string, string[]> GenerateAllChordOptions()

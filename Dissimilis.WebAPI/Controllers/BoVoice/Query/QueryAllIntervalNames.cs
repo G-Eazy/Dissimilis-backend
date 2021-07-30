@@ -47,7 +47,7 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice.Query
 
                 var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
 
-                return new IntervalNamesDto() { IntervalNames = songVoice.GetAllIntervalNames() };
+                return new IntervalNamesDto() { IntervalNames = songVoice.GetAllIntervalNames().SortIntervalNames() };
             }
         }
     }
