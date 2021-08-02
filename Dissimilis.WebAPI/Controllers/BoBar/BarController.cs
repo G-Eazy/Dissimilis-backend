@@ -27,6 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
         /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateBar(int songId, int voiceId, [FromBody] CreateBarDto command)
         {
             var item = await _mediator.Send(new CreateSongBarCommand(songId, voiceId, command));
@@ -40,6 +41,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
         /// </summary>
         [HttpPatch("{barId:int}")]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> UpdateBar(int songId, int voiceId, int barId, [FromBody] UpdateBarDto command)
         {
             await _mediator.Send(new UpdateSongBarCommand(songId, voiceId, barId, command));
@@ -51,6 +53,7 @@ namespace Dissimilis.WebAPI.Controllers.BoBar
         /// Delete bar
         /// </summary>
         [HttpDelete("{barId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(SongVoiceDto), (int)HttpStatusCode.NoContent)]
         public async Task<IActionResult> DeleteBar(int songId, int voiceId, int barId)
         {

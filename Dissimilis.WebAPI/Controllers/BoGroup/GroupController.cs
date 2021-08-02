@@ -49,6 +49,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
         [HttpPatch("groups/{groupId:int}/users/{userId:int}/changeUserRole")]
         [ProducesResponseType(typeof(UserRoleChangedDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ChangeUserRole(int groupId, int userId, [FromBody] ChangeUserRoleDto command)
         {
             var memberRoleChanged = await _mediator.Send(new ChangeUserRoleCommand(groupId, userId, command));
@@ -91,6 +92,7 @@ namespace Dissimilis.WebAPI.Controllers.BoGroup
 
         [HttpDelete("groups/{groupId:int}/users/{userId:int}")]
         [ProducesResponseType(typeof(MemberRemovedDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RemoveGroupMember(int groupId, int userId)
         {
             var memberRemoved = await _mediator.Send(new RemoveMemberCommand(groupId, userId));

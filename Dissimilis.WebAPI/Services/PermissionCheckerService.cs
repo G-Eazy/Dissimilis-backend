@@ -182,7 +182,6 @@ namespace Dissimilis.WebAPI.Services
         /// </summary>
         /// <param name="user"></param>
         /// <param name="currentUser"></param>
-        /// <param name="op"></param>
         /// <returns></returns>
         public bool CheckPermission(User user, User currentUser)
         {

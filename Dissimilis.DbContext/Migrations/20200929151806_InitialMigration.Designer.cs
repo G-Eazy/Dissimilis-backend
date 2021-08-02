@@ -142,7 +142,7 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<int>("BarNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VoltaBracket")
+                    b.Property<int?>("House")
                         .HasColumnType("int");
 
                     b.Property<bool>("RepAfter")

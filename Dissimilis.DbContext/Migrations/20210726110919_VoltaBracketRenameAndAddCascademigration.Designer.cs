@@ -272,7 +272,7 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<int>("SongVoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VoltaBracket")
+                    b.Property<int?>("House")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

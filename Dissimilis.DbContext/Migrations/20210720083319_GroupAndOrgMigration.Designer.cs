@@ -257,7 +257,7 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("VoltaBracket")
+                    b.Property<int?>("House")
                         .HasColumnType("int");
 
                     b.Property<int>("Position")

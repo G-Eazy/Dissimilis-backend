@@ -1,4 +1,5 @@
 ﻿using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
@@ -38,15 +39,29 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
         public async Task<UpdatedSongCommandDto> Handle(CreateTransposedSongCommand request, CancellationToken cancellationToken)
         {
-            // Do we have to get the fullsong to transpose
+
             var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _authService.GetVerifiedCurrentUser();
-            
+
             if (!await _IPermissionCheckerService.CheckPermission(duplicateFromSong, currentUser, Operation.Get, cancellationToken)) throw new UnauthorizedAccessException();
-            
-            var duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
-            duplicatedSong = duplicatedSong.Transpose(request.Command.Transpose);
-            duplicatedSong.SetUpdated(currentUser);
+
+            Song duplicatedSong = null;
+
+            using (var transaction = _songRepository.Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
+
+                    duplicatedSong = duplicatedSong.Transpose(request.Command.Transpose);
+                    duplicatedSong.SetUpdated(currentUser);
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    await _songRepository.UpdateAsync(cancellationToken);
+                }
+            }
             await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
