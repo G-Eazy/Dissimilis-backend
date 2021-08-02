@@ -168,7 +168,7 @@ namespace Dissimilis.DbContext.Migrations
                     BarNumber = table.Column<int>(nullable: false),
                     RepBefore = table.Column<bool>(nullable: false),
                     RepAfter = table.Column<bool>(nullable: false),
-                    VoltaBracket = table.Column<int>(nullable: true),
+                    House = table.Column<int>(nullable: true),
                     SongVoiceId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

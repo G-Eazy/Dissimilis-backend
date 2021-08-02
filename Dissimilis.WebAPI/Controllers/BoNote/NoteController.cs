@@ -27,7 +27,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         /// Create note
         /// </summary>
         [HttpPost("bar/{barId:int}/note")]
-        [ProducesResponseType((int)HttpStatusCode.)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(BarDto), (int)HttpStatusCode.Created)]
         public async Task<IActionResult> CreateNote(int songId, int voiceId, int barId, [FromBody] CreateNoteDto command)
         {
