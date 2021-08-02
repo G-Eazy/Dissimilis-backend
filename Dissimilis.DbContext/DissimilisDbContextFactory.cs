@@ -49,6 +49,7 @@ namespace Dissimilis.DbContext
                         maxRetryDelay: TimeSpan.FromSeconds(30),
                         errorNumbersToAdd: null);
                     optionsBuilder.CommandTimeout(10000);
+                    optionsBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 }).Options;
         }
 
