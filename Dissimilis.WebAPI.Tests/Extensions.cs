@@ -187,6 +187,22 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
+        internal static UpdateNoteDto UpdateNoteDto(int position, int length, string chordName, string[] value = null)
+        {
+            if (value == null && chordName == null)
+            {
+                value = new string[] { "A" };
+            }
+
+            return new UpdateNoteDto()
+            {
+                Position = position,
+                Length = length,
+                Notes = chordName != null ? SongNoteExtension.GetNoteValuesFromChordName(chordName).ToArray() : value,
+                ChordName = chordName
+            };
+        }
+
         internal static CreateBarDto CreateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new CreateBarDto()
