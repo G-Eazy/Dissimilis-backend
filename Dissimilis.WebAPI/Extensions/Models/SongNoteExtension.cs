@@ -226,8 +226,6 @@ namespace Dissimilis.WebAPI.Extensions.Models
             "Ninth", "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth"
         };
 
-        private static List<string> AllChordOptions { get; set; } = GenerateAllChordOptions();
-
         public static string[] GetIntervalNames(string chordName)
         {
             var chordPattern = GetRootNoteAndChordPattern(chordName).Item2;
@@ -243,7 +241,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 .ToHashSet();
         }
 
-        private static List<string> GenerateAllChordOptions()
+        public static List<string> GenerateAllChordOptions()
         {
             List<string> chordOptions = new();
 
@@ -320,11 +318,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return new List<string>(_allNotes);
         }
 
-        public static List<string> GetAllChordOptions()
-        {
-            return new List<string>(AllChordOptions);
-        }
-
+      
         public static (int startPos, int endPos) GetNotePositionRange(this SongNote songNote)
         {
             int startPosition = songNote.Position;

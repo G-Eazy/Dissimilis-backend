@@ -102,7 +102,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
             var result = new NoteOptionsDto()
             {
                 SingleNoteOptions = SongNoteExtension.GetAllSingleNoteOptions(),
-                ChordOptions = SongNoteExtension.GetAllChordOptions()
+                ChordOptions = SongNoteExtension.GenerateAllChordOptions()
             };
             return Ok(result);
         }

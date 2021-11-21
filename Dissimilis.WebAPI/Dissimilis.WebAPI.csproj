@@ -55,6 +55,7 @@
 
 	<ItemGroup>
 		<Folder Include="Exceptions\" />
+		<Folder Include="Properties\" />
 	</ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\BoOrganisation\Query\" />

@@ -138,10 +138,8 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             int barId = bar.Id;
 
             //Execute command for deleting bar.
-            //var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id));
-            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-                await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id)), $"Id of snapshots were {SpeedKingSong.Snapshots.ElementAt(0).Id}, {SpeedKingSong.Snapshots.ElementAt(1).Id}");
-
+            var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id));
+            
             //Fetch song and verify that bar is deleted from database.
             UpdateAllSongs();
 
