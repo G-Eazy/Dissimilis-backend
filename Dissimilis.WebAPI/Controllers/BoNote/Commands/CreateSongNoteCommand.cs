@@ -35,15 +35,13 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 
     public class CreateSongNoteCommandHandler : IRequestHandler<CreateSongNoteCommand, UpdatedCommandDto>
     {
-        private readonly NoteRepository _noteRepository;
         private readonly BarRepository _barRepository;
         private readonly SongRepository _songRepository;
         private readonly IAuthService _IAuthService;
         private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongNoteCommandHandler(NoteRepository noteRepository, BarRepository barRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
+        public CreateSongNoteCommandHandler( BarRepository barRepository, SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _noteRepository = noteRepository;
             _barRepository = barRepository;
             _songRepository = songRepository;
             _IAuthService = authService;
@@ -85,8 +83,9 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             songBar.CheckSongBarValidation();
             songBar.SongVoice.SetSongVoiceUpdated(currentUser.Id);
 
+            await _barRepository.UpdateAsync(cancellationToken);
             await _songRepository.UpdateAsync(cancellationToken);
-            await _noteRepository.UpdateAsync(cancellationToken);
+
 
             return new UpdatedCommandDto(songNote);
         }

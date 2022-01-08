@@ -25,10 +25,9 @@ namespace Dissimilis.WebAPI.Controllers.BoNote
         internal async Task<SongNote> GetSongNoteById(int songNoteId, CancellationToken cancellationToken)
         {
             var songNote = await context.SongNotes
-                .Include(songNote => songNote.SongBar)
-                    .ThenInclude(songBar => songBar.SongVoice)
-                        .ThenInclude(songVoice => songVoice.Song)
-                .SingleOrDefaultAsync(songNote => songNote.Id == songNoteId);
+                .Include(songNote => songNote.SongBar.SongVoice.Song)
+                .Include(sonNote => sonNote.SongBar.Notes)
+                .SingleOrDefaultAsync(songNote => songNote.Id == songNoteId, cancellationToken: cancellationToken);
 
             if (songNote == null)
             {

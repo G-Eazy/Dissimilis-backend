@@ -31,6 +31,8 @@ namespace Dissimilis.WebAPI.xUnit.Setup
             {
                 DataSource = ":memory:",
                 ForeignKeys = true,
+                Cache = SqliteCacheMode.Private,
+                Mode = SqliteOpenMode.Memory
             }.ToString();
             var connection = new SqliteConnection(connectionString);
             connection.Open();
@@ -52,7 +54,7 @@ namespace Dissimilis.WebAPI.xUnit.Setup
         {
             services.AddSingleton<TestServerFixture>();
             services.AddSingleton<IAuthService, TestAuthService>();
-            services.AddSingleton<DbContext.DissimilisDbContextFactory>();
+           // services.AddSingleton<DissimilisDbContextFactory>();
         }
     }
 }

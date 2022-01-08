@@ -6,7 +6,10 @@ using Xunit;
 using Shouldly;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 using System;
+using System.ComponentModel.DataAnnotations;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoNote.Commands;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
@@ -130,7 +133,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         {
             //Change current user to arranger of song.
             TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
-            
+
             var voice = SpeedKingSong
                 .Voices.FirstOrDefault();
             var bar = voice
@@ -138,9 +141,7 @@ namespace Dissimilis.WebAPI.xUnit.Tests
             int barId = bar.Id;
 
             //Execute command for deleting bar.
-            //var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id));
-            await Should.ThrowAsync<UnauthorizedAccessException>(async () =>
-                await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id)), $"Id of snapshots were {SpeedKingSong.Snapshots.ElementAt(0).Id}, {SpeedKingSong.Snapshots.ElementAt(1).Id}");
+            var updatedSongNote = await _mediator.Send(new DeleteSongBarCommand(SpeedKingSong.Id, voice.Id, bar.Id));
 
             //Fetch song and verify that bar is deleted from database.
             UpdateAllSongs();
@@ -173,6 +174,40 @@ namespace Dissimilis.WebAPI.xUnit.Tests
                 .Voices.SingleOrDefault(v => v.Id == voice.Id)
                 .SongBars.Any(b => b.Id == bar.Id)
                 .ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestCheckSongBarWithNotesThatIsToLong()
+        {
+            var voice = SmokeOnTheWaterSong.Voices.First();
+
+            //Set current user to arranger of song.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+
+            //Execute command for creating bar.
+            var barUpdatedDto = await _mediator.Send(new CreateSongBarCommand(voice.SongId, voice.Id, CreateBarDto()));
+
+            try
+            {
+                await _mediator.Send(new CreateSongNoteCommand(voice.SongId, voice.Id, barUpdatedDto.SongBarId, CreateNoteDto(5, 4, null, new[] { "C" })));
+                throw new Exception("This should not be possible");
+            }
+            catch (ValidationException e)
+            {
+                e.Message.ShouldBe("A note seems to stretch over the max position of the SongBar");
+            }
+
+            var noteDto = await _mediator.Send(new CreateSongNoteCommand(voice.SongId, voice.Id, barUpdatedDto.SongBarId, CreateNoteDto(6, 2, null, new[] { "C" })));
+
+            try
+            {
+                await _mediator.Send(new UpdateSongNoteCommand(voice.SongId, noteDto.SongChordId, UpdateNoteDto(6, 4, null, new[] { "C" })));
+                throw new Exception("This should not be possible");
+            }
+            catch (ValidationException e)
+            {
+                e.Message.ShouldBe("A note seems to stretch over the max position of the SongBar");
+            }
         }
 
     }

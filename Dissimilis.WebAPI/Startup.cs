@@ -67,18 +67,15 @@ namespace Dissimilis.WebAPI
             services.AddSingleton<ITelemetryInitializer>(new LoggingInitializer(Configuration["Logging:ApplicationInsights:RoleName"]));
             services.AddApplicationInsightsTelemetry();
             TelemetryDebugWriter.IsTracingDisabled = true;
-
-            ConfigureDatabase(services);
-
-            services.AddServices<Startup>();
-
-
+            
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
+            ConfigureDatabase(services);
             services.AddTransient<DissimilisDbContextFactory>();
+            
+            services.AddServices<Startup>();
             AddAuthService(services);
-
             services.AddControllers();
             services.AddSwaggerGen(SwaggerConfiguration.SetSwaggerGenOptions);
             services.AddCors(options =>
@@ -119,7 +116,7 @@ namespace Dissimilis.WebAPI
             services.AddDbContext<DissimilisDbContext>(options => options.UseSqlServer(connectionString));
         }
 
-        private void EnsureNorwegianCulture(IApplicationBuilder app)
+        private static void EnsureNorwegianCulture(IApplicationBuilder app)
         {
             var requestOpt = new RequestLocalizationOptions();
             requestOpt.SupportedCultures = new List<CultureInfo>
@@ -135,7 +132,7 @@ namespace Dissimilis.WebAPI
             app.UseRequestLocalization(requestOpt);
         }
 
-        public class SingleCultureProvider : IRequestCultureProvider
+        private class SingleCultureProvider : IRequestCultureProvider
         {
             public Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
             {
@@ -151,7 +148,7 @@ namespace Dissimilis.WebAPI
 
             Migrate(dbContext);
             InitializeDb(app, dbContext);
-
+            
             app.UseRouting();
             app.UseCors(CORSPOLICY);
 
@@ -166,7 +163,11 @@ namespace Dissimilis.WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseWebUserAuthentication();
+            if (!ConfigurationInfo.IsAutomatedTestingMode())
+            {
+                app.UseWebUserAuthentication();
+            }
+
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }

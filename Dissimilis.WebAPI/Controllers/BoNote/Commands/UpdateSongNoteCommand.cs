@@ -51,8 +51,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
             if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
 
 
-            var songNote = await _noteRepository.GetSongNoteById(request.SongChordId, cancellationToken);
-
+            var songNote = song.Voices.SelectMany(v => v.SongBars.SelectMany(sb => sb.Notes)).SingleOrDefault(sn => sn.Id == request.SongChordId);
             if (songNote == null)
             {
                 throw new NotFoundException($"Chord with Id {request.SongChordId} not found");
@@ -71,6 +70,7 @@ namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
                 songNote.SetNoteValues(request.Command.Notes);
             }
 
+            songNote.SongBar.CheckSongBarValidation();
             songNote.SongBar.SongVoice.SetSongVoiceUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
 
             await _songRepository.UpdateAsync(cancellationToken);
