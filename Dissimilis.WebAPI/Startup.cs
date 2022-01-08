@@ -163,7 +163,11 @@ namespace Dissimilis.WebAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseWebUserAuthentication();
+            if (!ConfigurationInfo.IsAutomatedTestingMode())
+            {
+                app.UseWebUserAuthentication();
+            }
+
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
