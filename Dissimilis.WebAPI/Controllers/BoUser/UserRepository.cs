@@ -57,9 +57,15 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 return user;
             }
 
-            user = string.IsNullOrWhiteSpace(userMeta.Email())
-                ? await CreateUserAsync(userMeta)
-                : await GetUserByEmailAsync(userMeta.Email()) ?? await CreateUserAsync(userMeta);
+            user = await GetUserByEmailAsync(userMeta.Email());
+            if (user != null)
+            {
+                user.MsId = userMeta.id;
+                await UpdateAsync(null);
+                return user;
+            }
+
+            user = await CreateUserAsync(userMeta);
 
             return user;
         }
@@ -76,7 +82,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             var user = new User()
             {
                 Name = meta.displayName,
-                Email = (meta.mail ?? meta.userPrincipalName).ToLower(),
+                Email = meta.Email() ?? (meta.mail ?? meta.userPrincipalName).ToLower(),
                 MsId = meta.id
             };
             await _context.Users.AddAsync(user);
@@ -128,9 +134,16 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             await this._context.SaveChangesAsync();
             return user;
         }
-        public async Task UpdateAsync(CancellationToken cancellationToken)
+        public async Task UpdateAsync(CancellationToken? cancellationToken = null)
         {
-            await _context.SaveChangesAsync();
+            if (cancellationToken.HasValue)
+            {
+                await _context.SaveChangesAsync(cancellationToken.Value);
+            }
+            else
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<List<int>> GetOrganisationUserIds(User user)
