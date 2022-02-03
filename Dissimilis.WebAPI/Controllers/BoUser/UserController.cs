@@ -48,6 +48,18 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         }
 
         /// <summary>
+        /// Fetch the users that is in my groups and/or organizations. Fetch all or search in name or email
+        /// </summary>
+        /// <returns>User</returns>
+        [HttpPost("myGroupUsers")]
+        [ProducesResponseType(typeof(UserPagedResultDto), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UsersInMyGroups([FromBody] UsersInMyGroupsDto dto)
+        {
+            var result = await _mediator.Send(new QueryUsersInMyGroups(dto));
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Draft of a logout method
         /// </summary>
         /// <returns></returns>
@@ -78,7 +90,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
         [HttpPatch("{userId:int}/updateSysAdminStatus")]
         [ProducesResponseType(typeof(UserDto[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> UpdateSysAdminStatus(int userId, [FromBody] UpdateSysAdminStatusDto command) 
+        public async Task<IActionResult> UpdateSysAdminStatus(int userId, [FromBody] UpdateSysAdminStatusDto command)
         {
             var item = await _mediator.Send(new UpdateSysAdminStatusCommand(userId, command));
             var result = await _mediator.Send(new QueryUserById(item.UserId));

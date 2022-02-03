@@ -22,7 +22,7 @@ namespace Dissimilis.DbContext.Models
         public int UserId { get; set; }
 
         /// <summary>
-        ///predefined roles; admin and instructor
+        ///predefined roles
         /// </summary>
         public Role Role { get; set; }
 

@@ -25,7 +25,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Commands
         private readonly IAuthService _authService;
         private readonly IPermissionCheckerService _permissionChecker;
 
-        public DeleteUserCommandHandler(UserRepository userRepository, IAuthService authService, PermissionCheckerService IPermissionCheckerService)
+        public DeleteUserCommandHandler(UserRepository userRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
             _userRepository = userRepository;
             _authService = authService;
@@ -39,7 +39,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Commands
             if (userToBeDeleted == null)
                 throw new NotFoundException($"User with id {request.UserId} not found");
 
-            if (!_permissionChecker.CheckPermission(userToBeDeleted, currentUser))
+            if (!_permissionChecker.IsAdminUser(currentUser))
                 throw new UnauthorizedAccessException($"User {currentUser.Name} does not have the privileges to delete this user");
 
             await _userRepository.DeleteUser(userToBeDeleted, cancellationToken);

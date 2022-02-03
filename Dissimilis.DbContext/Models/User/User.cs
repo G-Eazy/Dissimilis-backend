@@ -21,11 +21,11 @@ namespace Dissimilis.DbContext.Models
         /// </summary>
         [MaxLength(200)]
         public string MsId { get; set; }
-         
+
         /// <summary>
         /// Boolean value to check if the user is systemAdmin, 
         /// </summary>
-        public bool IsSystemAdmin { get; set;}
+        public bool IsSystemAdmin { get; set; }
 
         /// <summary>
         /// Email address of user
@@ -91,5 +91,6 @@ namespace Dissimilis.DbContext.Models
             this.Name = name;
             this.CountryId = countryId;
         }
+        
     }
 }
