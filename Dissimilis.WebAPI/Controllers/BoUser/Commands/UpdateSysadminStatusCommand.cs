@@ -33,17 +33,19 @@ namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
     {
         private readonly UserRepository _userRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _permissionCheckerService;
 
-        public UpdateSysAdminStatusCommandHandler(UserRepository userRepository, IAuthService authService, PermissionCheckerService IPermissionCheckerService)
+        public UpdateSysAdminStatusCommandHandler(UserRepository userRepository, IAuthService authService, IPermissionCheckerService permissionCheckerService)
         {
             _userRepository = userRepository;
             _authService = authService;
+            _permissionCheckerService = permissionCheckerService;
         }
 
         public async Task<UserUpdatedDto> Handle(UpdateSysAdminStatusCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            if (!currentUser.IsSystemAdmin)
+            if (!_permissionCheckerService.IsAdminUser(currentUser))
                 throw new UnauthorizedAccessException($"User {currentUser.Name} does not have the privileges to edit sysadmin status");
 
             var changeSysAdminStatusUser = await _userRepository.GetUserById(request.UserId, cancellationToken);

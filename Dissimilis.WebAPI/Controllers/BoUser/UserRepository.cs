@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.Core.Collections;
+using Dissimilis.Core.Types;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.PagedExtensions;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +29,46 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             return await _context.Users
                 .OrderBy(u => u.Name)
                 .ToArrayAsync(cancellationToken);
+        }
+
+        public async Task<PagedResult<User>> GetPagedUsersInMyGroups(UsersInMyGroupsDto user, User currentUser, CancellationToken cancellationToken)
+        {
+            var query = _context.Users
+                .OrderBy(u => u.Email)
+                .AsQueryable();
+
+            if (!currentUser.IsSystemAdmin)
+            {
+                var myGroupIds = await _context.GroupUsers
+                    .Where(gu => gu.UserId == currentUser.Id)
+                    .Select(gu => gu.GroupId)
+                    .ToArrayAsync(cancellationToken);
+
+                query = query.Where(u => u.Groups.Any(g => myGroupIds.Contains(g.GroupId)));
+            }
+
+            if (user.SearchText.NotNullOrWhiteSpace())
+            {
+                var searchText = $"%{user.SearchText.Trim()}%";
+                query = query.Where(u => EF.Functions.Like(u.Name, searchText) ||
+                                         EF.Functions.Like(u.Email, searchText));
+            }
+
+            if (user.OrganizationFilter.Any())
+            {
+                query = query.Where(u => u.Organisations.Any(o => user.OrganizationFilter.Contains(o.OrganisationId)));
+            }
+
+            if (user.GroupFilter.Any())
+            {
+                query = query.Where(u => u.Groups.Any(o => user.GroupFilter.Contains(o.GroupId)));
+            }
+
+
+            var result = await query
+                .GetPaged(user, cancellationToken);
+
+            return result;
         }
 
         public async Task<User> GetUserById(int userId, CancellationToken cancellationToken)
@@ -52,7 +97,9 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             {
                 if (string.IsNullOrWhiteSpace(user.Email))
                 {
-                    user = await AddEmailToUser(user, userMeta);
+                    user = AddEmailToUser(user, userMeta);
+                    user.Name = userMeta.displayName;
+                    await UpdateAsync(null);
                 }
                 return user;
             }
@@ -61,6 +108,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             if (user != null)
             {
                 user.MsId = userMeta.id;
+                user.Name = userMeta.displayName;
                 await UpdateAsync(null);
                 return user;
             }
@@ -70,10 +118,9 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
             return user;
         }
 
-        public async Task<User> AddEmailToUser(User user, UserEntityMetadata meta)
+        public User AddEmailToUser(User user, UserEntityMetadata meta)
         {
-            user.Email = (meta.mail ?? meta.userPrincipalName).ToLower();
-            await _context.SaveChangesAsync();
+            user.Email = (meta.Email() != string.Empty ? meta.Email() : (meta.mail ?? meta.userPrincipalName)).ToLower();
             return user;
         }
 
