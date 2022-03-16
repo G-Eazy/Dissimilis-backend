@@ -1,4 +1,4 @@
-﻿namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn
+﻿namespace Dissimilis.WebAPI.Controllers.BoBar
 {
     public class UpdateBarDto
     {

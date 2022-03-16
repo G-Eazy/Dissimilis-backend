@@ -3,13 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Dissimilis.WebAPI.Controllers.BoBar;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using System;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands
 {

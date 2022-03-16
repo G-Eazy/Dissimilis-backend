@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using MediatR;

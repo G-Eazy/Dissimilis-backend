@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoBar;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using FoodLabellingAPI.Collections;
 using Newtonsoft.Json.Linq;

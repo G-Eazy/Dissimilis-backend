@@ -1,13 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoGroup;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.Bogroup.Query
+namespace Dissimilis.WebAPI.Controllers.BoGroup.Query
 {
     public class QueryGroupById : IRequest<GroupByIdDto>
     {

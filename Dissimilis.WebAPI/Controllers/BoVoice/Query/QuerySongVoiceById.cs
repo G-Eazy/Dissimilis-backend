@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 

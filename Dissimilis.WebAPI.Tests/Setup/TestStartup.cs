@@ -1,6 +1,5 @@
 ﻿using System.Data.Common;
 using Dissimilis.DbContext;
-using Dissimilis.WebAPI.DependencyInjection;
 using Dissimilis.WebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

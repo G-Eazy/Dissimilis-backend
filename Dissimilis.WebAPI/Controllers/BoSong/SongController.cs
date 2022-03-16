@@ -2,11 +2,11 @@
 using System.Net;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.AddTags;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.ShareSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoSong.Query;
-using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

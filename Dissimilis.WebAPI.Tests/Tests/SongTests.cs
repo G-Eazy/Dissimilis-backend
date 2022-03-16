@@ -2,16 +2,18 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
-using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.xUnit.Setup;
 using Shouldly;
 using Xunit;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.AddTags;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.ShareSong;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoSong.ShareSong;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {

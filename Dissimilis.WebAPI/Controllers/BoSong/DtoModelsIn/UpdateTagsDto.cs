@@ -1,5 +1,5 @@
 ﻿
-namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn
 {
     public class UpdateTagsDto
     {

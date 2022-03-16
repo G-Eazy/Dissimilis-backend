@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
+namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
     public class CreateSongVoiceDto
     {

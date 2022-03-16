@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
     public class IntervalNamesDto
     {

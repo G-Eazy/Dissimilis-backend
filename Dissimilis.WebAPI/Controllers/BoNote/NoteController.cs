@@ -1,5 +1,4 @@
-﻿using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoBar.Query;
+﻿using Dissimilis.WebAPI.Controllers.BoBar.Query;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
@@ -9,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Threading.Tasks;
+using Dissimilis.WebAPI.Controllers.BoBar;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote
 {

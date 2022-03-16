@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,11 +6,10 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoGroup;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser;
-using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.AddTags
 {
     public class UpdateTagGroupCommand : IRequest<ShortGroupDto[]>
     {

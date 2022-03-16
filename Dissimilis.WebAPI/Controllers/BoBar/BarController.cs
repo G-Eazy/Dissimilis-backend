@@ -3,11 +3,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Dissimilis.WebAPI.Controllers.BoBar.Commands;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoBar.Query;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoSong;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Controllers.BoVoice.Query;
-using Dissimilis.WebAPI.Controllers.BoSong.Query;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar
 {

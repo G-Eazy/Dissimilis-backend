@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoVoice.Query;
 using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

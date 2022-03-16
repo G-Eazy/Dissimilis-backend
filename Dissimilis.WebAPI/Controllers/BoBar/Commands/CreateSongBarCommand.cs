@@ -4,12 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Dissimilis.DbContext.Models.Song;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Services;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands

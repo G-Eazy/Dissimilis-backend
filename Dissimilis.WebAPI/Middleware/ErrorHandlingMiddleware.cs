@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using BadHttpRequestException = Microsoft.AspNetCore.Http.BadHttpRequestException;
 
-namespace Dissimilis.WebAPI
+namespace Dissimilis.WebAPI.Middleware
 {
     public class ErrorHandlingMiddleware
     {

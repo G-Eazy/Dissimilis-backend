@@ -8,8 +8,6 @@ using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Newtonsoft.Json;
 using Dissimilis.DbContext;
