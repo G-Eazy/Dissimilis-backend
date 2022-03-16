@@ -1,8 +1,6 @@
-﻿using Dissimilis.WebAPI.Controllers.Bogroup.Query;
-using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
+﻿using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;

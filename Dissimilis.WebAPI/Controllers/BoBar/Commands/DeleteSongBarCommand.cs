@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using IsolationLevel = System.Data.IsolationLevel;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {

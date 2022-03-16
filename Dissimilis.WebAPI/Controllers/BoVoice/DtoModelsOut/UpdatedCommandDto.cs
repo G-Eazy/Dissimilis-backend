@@ -1,6 +1,6 @@
 ﻿using Dissimilis.DbContext.Models.Song;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn
+namespace Dissimilis.WebAPI.Controllers.BoVoice
 {
     public class UpdatedCommandDto
     {

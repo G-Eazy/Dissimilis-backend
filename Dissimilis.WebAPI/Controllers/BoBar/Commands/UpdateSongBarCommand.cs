@@ -5,14 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using System;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 
 namespace Dissimilis.WebAPI.Controllers.BoBar.Commands
 {

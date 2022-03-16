@@ -1,22 +1,14 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Services;
-using Dissimilis.WebAPI.Extensions.Interfaces;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Extensions.Models;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.DbContext.Models.Song;
-using System.Collections.Generic;
-using Dissimilis.WebAPI.Controllers.BoNote;
-using Dissimilis.WebAPI.Controllers.BoBar;
-using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Services;
+using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class UndoCommand : IRequest<UpdatedSongCommandDto>
     {

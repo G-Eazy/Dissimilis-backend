@@ -6,7 +6,7 @@ using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.Query
+namespace Dissimilis.WebAPI.Controllers.BoSong
 {
     public class QuerySongSearch : IRequest<SongIndexDto[]>
     {

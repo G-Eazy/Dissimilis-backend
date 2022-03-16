@@ -1,15 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 {
     public class UpdateSongNoteCommand : IRequest<UpdatedCommandDto>
     {

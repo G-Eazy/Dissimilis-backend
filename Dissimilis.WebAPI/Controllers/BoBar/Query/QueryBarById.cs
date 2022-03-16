@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Services;
 using MediatR;

@@ -1,21 +1,13 @@
-﻿using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoOrganisation.DtoModelsOut;
-using Dissimilis.WebAPI.Services;
-using static Dissimilis.Core.Collections.EnumExtensions;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoUser;
-using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoUser.DtoModelsOut;
 using Dissimilis.WebAPI.Exceptions;
+using Dissimilis.WebAPI.Services;
+using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoOrganisation.Commands
+namespace Dissimilis.WebAPI.Controllers.BoUser.Commands
 {
     public class UpdateSysAdminStatusCommand : IRequest<UserUpdatedDto>
     {

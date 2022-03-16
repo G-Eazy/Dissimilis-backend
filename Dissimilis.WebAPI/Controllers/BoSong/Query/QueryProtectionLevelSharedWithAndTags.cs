@@ -6,7 +6,7 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.Query
+namespace Dissimilis.WebAPI.Controllers.BoSong
 {
     public class QueryProtectionLevelSharedWithAndTags : IRequest<ProtectionLevelSharedWithAndTagsDto>
     {

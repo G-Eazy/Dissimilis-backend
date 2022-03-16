@@ -3,9 +3,9 @@ using System.Linq;
 using Dissimilis.Core.Collections;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsOut;
 using Dissimilis.DbContext.Models;
 using System.Collections.Generic;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut
 {

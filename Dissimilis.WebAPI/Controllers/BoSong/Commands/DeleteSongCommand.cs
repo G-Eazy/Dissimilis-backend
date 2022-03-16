@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using Dissimilis.DbContext.Models.Enums;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class DeleteSongCommand : IRequest<UpdatedSongCommandDto>
     {

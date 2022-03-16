@@ -3,7 +3,6 @@ using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using Dissimilis.WebAPI.Repositories;
 
 namespace Dissimilis.WebAPI.Controllers.BoUser
 {
@@ -11,13 +10,11 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
     {
         private readonly DissimilisDbContext _context;
         private readonly UserRepository _userRepo;
-        private readonly OrganisationRepository _orgRepo;
         private readonly CountryRepository _countryRepo;
         public UserHandlingRepository(DissimilisDbContext context)
         {
             _context = context;
             _userRepo = new UserRepository(context);
-            _orgRepo = new OrganisationRepository(context);
             _countryRepo = new CountryRepository(context);
         }
 

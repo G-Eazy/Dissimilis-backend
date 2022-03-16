@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Models;
 using Newtonsoft.Json.Linq;
 
-namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
+namespace Dissimilis.WebAPI.Controllers.BoBar
 {
     public class BarDto
     {

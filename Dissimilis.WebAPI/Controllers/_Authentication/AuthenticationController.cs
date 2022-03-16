@@ -9,7 +9,7 @@ using Experis.Ciber.Authentication.Microsoft.APIObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Dissimilis.WebAPI.Controllers
+namespace Dissimilis.WebAPI.Controllers._Authentication
 {
     public class AuthenticationController : Experis.Ciber.Authentication.Microsoft.Controllers.LoginControllerBase
         <DissimilisServicePrincipal, DissimilisWebCredentials>

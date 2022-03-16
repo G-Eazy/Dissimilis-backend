@@ -1,4 +1,4 @@
-﻿namespace Dissimilis.WebAPI.Controllers.BoBar.DtoModelsOut
+﻿namespace Dissimilis.WebAPI.Controllers.BoBar
 {
     public class Voice
     {

@@ -1,16 +1,14 @@
-﻿using Dissimilis.Core.Collections;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Dissimilis.Core.Collections;
+using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using static Dissimilis.WebAPI.Extensions.Models.SongNoteExtension;
 
 
-namespace Dissimilis.DbContext
+namespace Dissimilis.WebAPI
 {
     public static class DBMigrationJobs
     {

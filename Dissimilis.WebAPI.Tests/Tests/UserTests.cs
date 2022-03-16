@@ -6,7 +6,6 @@ using Xunit;
 using Shouldly;
 using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoGroup.Commands;
-using Dissimilis.WebAPI.Controllers.Bogroup.Query;
 using Dissimilis.DbContext.Models.Enums;
 using static Dissimilis.WebAPI.xUnit.Extensions;
 using Dissimilis.WebAPI.Controllers.BoGroup.Query;

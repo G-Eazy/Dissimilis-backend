@@ -1,18 +1,11 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Services;
-using Dissimilis.DbContext.Interfaces;
-using Dissimilis.WebAPI.Extensions.Interfaces;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Models;
+using Dissimilis.WebAPI.Services;
+using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class PerformSnapshotCommand : IRequest<UpdatedSongCommandDto>
     {

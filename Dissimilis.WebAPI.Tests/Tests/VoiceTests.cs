@@ -6,7 +6,6 @@ using Dissimilis.WebAPI.Controllers.BoBar.Query;
 using Dissimilis.WebAPI.Controllers.BoNote.Commands;
 using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
-using Dissimilis.WebAPI.Controllers.BoSong.Query;
 using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Controllers.BoVoice.Commands;
 using Dissimilis.WebAPI.Controllers.BoVoice.Query;

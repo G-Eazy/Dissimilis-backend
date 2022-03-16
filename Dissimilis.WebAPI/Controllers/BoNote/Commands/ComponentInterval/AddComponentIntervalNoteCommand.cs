@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Models;
@@ -14,6 +13,7 @@ using Dissimilis.WebAPI.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 
 namespace Dissimilis.WebAPI.Controllers.BoNote.Commands.ComponentInterval
 {

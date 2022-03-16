@@ -1,19 +1,14 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Enums;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoUser;
 using Dissimilis.WebAPI.Services;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong.ShareSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands.ShareSong
 {
     public class ShareSongUserCommand : IRequest<ShortUserDto[]>
     {
