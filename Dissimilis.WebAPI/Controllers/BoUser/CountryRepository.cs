@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Dissimilis.DbContext;
 using Dissimilis.DbContext.Models;
-using Microsoft.EntityFrameworkCore;
 using Experis.Ciber.Authentication.Microsoft.APIObjects;
+using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Repositories
+namespace Dissimilis.WebAPI.Controllers.BoUser
 {
     public class CountryRepository
     {
