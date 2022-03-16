@@ -24,10 +24,13 @@ namespace Dissimilis.WebAPI.Controllers.BoUser.Queries
         public async Task<UserDto[]> Handle(QueryAll request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            if (!currentUser.IsSystemAdmin)
-                throw new UnauthorizedAccessException($"User {currentUser.Name} does not have the privileges to delete this user");
+            // TODO opened in order to get "add users to group" for group admins (not system admin) to work. This call should be moved to the "paged" user call with search. 
+            //if (!currentUser.IsSystemAdmin)
+            //    throw new UnauthorizedAccessException($"User {currentUser.Name} does not have the privileges to delete this user");
 
             var result = await _repository.GetAllUsers(cancellationToken);
+
+
 
             return result
                 .Select(u => new UserDto(u))
