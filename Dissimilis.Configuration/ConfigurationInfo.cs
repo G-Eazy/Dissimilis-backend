@@ -28,7 +28,8 @@ namespace Dissimilis.Configuration
         private enum OptionalValues
         {
             AZURE_DIRECTORY_ID,
-            AZURE_APPLICATION_ID
+            AZURE_APPLICATION_ID,
+            IS_AUTOMATED_TESTING_MODE
         }
 
         internal static IConfiguration StaticConfig;
@@ -97,6 +98,7 @@ namespace Dissimilis.Configuration
 
             return value.Trim();
         }
+        private static bool GetValueAsBool(OptionalValues enumKey, string fallback) => GetValue(enumKey, fallback) == "1";
 
         #endregion
 
@@ -127,6 +129,8 @@ namespace Dissimilis.Configuration
         public static Guid GetAzureDirectoryId() => new Guid(GetValue(OptionalValues.AZURE_DIRECTORY_ID, "774897da - 0c2c - 4c71 - 9897 - 873c4d659aee"));
 
         public static Guid GetAzureApplicationId() => new Guid(GetValue(OptionalValues.AZURE_APPLICATION_ID, "5a41da85-fa69-4aa0-93f2-1ce65104a1b2"));
+
+        public static bool IsAutomatedTestingMode() => GetValueAsBool(OptionalValues.IS_AUTOMATED_TESTING_MODE, "0");
 
     }
 

@@ -15,10 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dissimilis.Configuration\Dissimilis.Configuration.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
+    <ProjectReference Include="..\Dissimilis.Core\Dissimilis.Core.csproj" />
   </ItemGroup>
 
 </Project>

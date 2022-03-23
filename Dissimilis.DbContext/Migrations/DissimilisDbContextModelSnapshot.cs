@@ -39,12 +39,79 @@ namespace Dissimilis.DbContext.Migrations
                     b.ToTable("Countries");
                 });
 
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.GroupUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("GroupUsers");
+                });
+
             modelBuilder.Entity("Dissimilis.DbContext.Models.Instrument", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<int?>("DefinedInstrument")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -66,20 +133,59 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<Guid?>("MsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("Address")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Organisations");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.OrganisationUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "OrganisationId");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.ToTable("OrganisationUsers");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
@@ -102,10 +208,25 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("DegreeOfDifficulty")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("Deleted")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("Denominator")
                         .HasColumnType("int");
 
                     b.Property<int>("Numerator")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProtectionLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SongNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Speed")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -137,9 +258,6 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("House")
-                        .HasColumnType("int");
-
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
@@ -150,6 +268,9 @@ namespace Dissimilis.DbContext.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("SongVoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VoltaBracket")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -191,6 +312,35 @@ namespace Dissimilis.DbContext.Migrations
                     b.ToTable("SongNotes");
                 });
 
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SongObjectJSON")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("SongSnapshots");
+                });
+
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.Property<int>("Id")
@@ -219,6 +369,9 @@ namespace Dissimilis.DbContext.Migrations
                     b.Property<DateTimeOffset?>("UpdatedOn")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("VoiceName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("VoiceNumber")
                         .HasColumnType("int");
 
@@ -236,6 +389,51 @@ namespace Dissimilis.DbContext.Migrations
                     b.ToTable("SongVoices");
                 });
 
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongGroupTag", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("SongGroupTags");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongOrganisationTag", b =>
+                {
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrganisationId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("SongOrganisationTags");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongSharedUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("SongSharedUser");
+                });
+
             modelBuilder.Entity("Dissimilis.DbContext.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -251,6 +449,9 @@ namespace Dissimilis.DbContext.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("IsSystemAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MsId")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -259,9 +460,6 @@ namespace Dissimilis.DbContext.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<int?>("OrganisationId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -274,9 +472,73 @@ namespace Dissimilis.DbContext.Migrations
                         .IsUnique()
                         .HasFilter("[MsId] IS NOT NULL");
 
-                    b.HasIndex("OrganisationId");
-
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Group", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
+                        .WithMany("GroupsCreated")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
+                        .WithMany("Groups")
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Organisation");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.GroupUser", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.Group", "Group")
+                        .WithMany("Users")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.User", "User")
+                        .WithMany("Groups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Organisation", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
+                        .WithMany("OrganisationsCreated")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.OrganisationUser", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
+                        .WithMany("Users")
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.User", "User")
+                        .WithMany("Organisations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organisation");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
@@ -325,6 +587,25 @@ namespace Dissimilis.DbContext.Migrations
                     b.Navigation("SongBar");
                 });
 
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongSnapshot", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
+                        .WithMany("Snapshots")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Song");
+                });
+
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.SongVoice", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.User", "CreatedBy")
@@ -357,6 +638,63 @@ namespace Dissimilis.DbContext.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongGroupTag", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.Group", "Group")
+                        .WithMany("SharedSongs")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
+                        .WithMany("GroupTags")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongOrganisationTag", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
+                        .WithMany("SharedSongs")
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
+                        .WithMany("OrganisationTags")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organisation");
+
+                    b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.SongSharedUser", b =>
+                {
+                    b.HasOne("Dissimilis.DbContext.Models.Song.Song", "Song")
+                        .WithMany("SharedUsers")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dissimilis.DbContext.Models.User", "User")
+                        .WithMany("SongsShared")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Song");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Dissimilis.DbContext.Models.User", b =>
                 {
                     b.HasOne("Dissimilis.DbContext.Models.Country", "Country")
@@ -364,18 +702,18 @@ namespace Dissimilis.DbContext.Migrations
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Dissimilis.DbContext.Models.Organisation", "Organisation")
-                        .WithMany("Users")
-                        .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Country");
-
-                    b.Navigation("Organisation");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Country", b =>
                 {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Dissimilis.DbContext.Models.Group", b =>
+                {
+                    b.Navigation("SharedSongs");
+
                     b.Navigation("Users");
                 });
 
@@ -386,11 +724,23 @@ namespace Dissimilis.DbContext.Migrations
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Organisation", b =>
                 {
+                    b.Navigation("Groups");
+
+                    b.Navigation("SharedSongs");
+
                     b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.Song.Song", b =>
                 {
+                    b.Navigation("GroupTags");
+
+                    b.Navigation("OrganisationTags");
+
+                    b.Navigation("SharedUsers");
+
+                    b.Navigation("Snapshots");
+
                     b.Navigation("Voices");
                 });
 
@@ -406,9 +756,19 @@ namespace Dissimilis.DbContext.Migrations
 
             modelBuilder.Entity("Dissimilis.DbContext.Models.User", b =>
                 {
+                    b.Navigation("Groups");
+
+                    b.Navigation("GroupsCreated");
+
+                    b.Navigation("Organisations");
+
+                    b.Navigation("OrganisationsCreated");
+
                     b.Navigation("SongsArranged");
 
                     b.Navigation("SongsCreated");
+
+                    b.Navigation("SongsShared");
 
                     b.Navigation("SongsUpdated");
 

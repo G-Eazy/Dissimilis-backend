@@ -1,18 +1,22 @@
 ﻿using System.Linq;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoBar;
+using Dissimilis.WebAPI.Controllers.BoGroup.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
-using Dissimilis.WebAPI.DTOs;
+using Dissimilis.WebAPI.Controllers.BoVoice;
+using Dissimilis.WebAPI.Controllers.MultiUseDtos.DtoModelsIn;
+using Dissimilis.WebAPI.Extensions.Models;
 using Shouldly;
 
 namespace Dissimilis.WebAPI.xUnit
 {
     internal static class Extensions
     {
-
-        internal const string DefaultTestSongTitle = "TestSong";
-
         internal static void CheckSongVoiceIntegrity(SongByIdDto songDto, string stepDescription)
         {
             var refVoice = songDto.Voices.FirstOrDefault();
@@ -49,7 +53,7 @@ namespace Dissimilis.WebAPI.xUnit
 
         internal static void CheckBarEqualTo(this BarDto firstBarDto, BarDto secondBarDto, bool includeNoteComparison = false, string stepDescription = null)
         {
-            firstBarDto.House.ShouldBe(secondBarDto.House, "House not matching - " + stepDescription);
+            firstBarDto.VoltaBracket.ShouldBe(secondBarDto.VoltaBracket, "VoltaBracket not matching - " + stepDescription);
             firstBarDto.RepAfter.ShouldBe(secondBarDto.RepAfter, "RepAfter not matching - " + stepDescription);
             firstBarDto.RepBefore.ShouldBe(secondBarDto.RepBefore, "RepBefore not matching - " + stepDescription);
 
@@ -72,7 +76,7 @@ namespace Dissimilis.WebAPI.xUnit
             }
         }
 
-        internal static CreateSongDto CreateSongDto(int numerator = 4, int denominator = 4, string title = DefaultTestSongTitle)
+        internal static CreateSongDto CreateSongDto(string title, int numerator = 4, int denominator = 4)
         {
             return new CreateSongDto()
             {
@@ -95,7 +99,7 @@ namespace Dissimilis.WebAPI.xUnit
         {
             return new CreateSongVoiceDto()
             {
-                Instrument = voiceName,
+                VoiceName = voiceName,
                 VoiceNumber = voiceNumber
             };
         }
@@ -108,20 +112,11 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static UpdateSongVoiceDto UpdateSongVoiceDto(string voiceName, int voiceNumber)
-        {
-            return new UpdateSongVoiceDto()
-            {
-                Instrument = voiceName,
-                VoiceNumber = voiceNumber
-            };
-        }
-
-        internal static UpdateBarDto CreateUpdateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static UpdateBarDto CreateUpdateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new UpdateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
@@ -174,9 +169,9 @@ namespace Dissimilis.WebAPI.xUnit
             };
         }
 
-        internal static CreateNoteDto CreateNoteDto(int position, int lenght, string[] value = null)
+        internal static CreateNoteDto CreateNoteDto(int position, int length, string chordName, string[] value = null)
         {
-            if (value == null)
+            if (value == null && chordName == null)
             {
                 value = new string[] { "A" };
             }
@@ -184,28 +179,137 @@ namespace Dissimilis.WebAPI.xUnit
             return new CreateNoteDto()
             {
                 Position = position,
-                Length = lenght,
-                Notes = value
+                Length = length,
+                Notes = chordName != null ? SongNoteExtension.GetNoteValuesFromChordName(chordName).ToArray() : value,
+                ChordName = chordName
             };
         }
 
-        internal static CreateBarDto CreateBarDto(int? house = null, bool repAfter = false, bool repBefore = false)
+        internal static UpdateNoteDto UpdateNoteDto(int position, int length, string chordName, string[] value = null)
+        {
+            if (value == null && chordName == null)
+            {
+                value = new string[] { "A" };
+            }
+
+            return new UpdateNoteDto()
+            {
+                Position = position,
+                Length = length,
+                Notes = chordName != null ? SongNoteExtension.GetNoteValuesFromChordName(chordName).ToArray() : value,
+                ChordName = chordName
+            };
+        }
+
+        internal static CreateBarDto CreateBarDto(int? VoltaBracket = null, bool repAfter = false, bool repBefore = false)
         {
             return new CreateBarDto()
             {
-                House = house,
+                VoltaBracket = VoltaBracket,
                 RepAfter = repAfter,
                 RepBefore = repBefore
             };
         }
 
-        internal static SearchQueryDto SearchQueryDto()
+        internal static DuplicateAllChordsDto DuplicateAllChordsDto(int sourceVoiceId, bool includeComponentIntervals)
+        {
+            return new DuplicateAllChordsDto()
+            {
+                SourceVoiceId = sourceVoiceId,
+                IncludeComponentIntervals = includeComponentIntervals,
+            };
+        }
+
+        internal static AddComponentIntervalDto AddComponentIntervalDto(int IntervalPosition)
+        {
+            return new AddComponentIntervalDto()
+            {
+                IntervalPosition = IntervalPosition
+            };
+        }
+
+        internal static RemoveComponentIntervalDto RemoveComponentIntervalDto(int IntervalPosition)
+        {
+            return new RemoveComponentIntervalDto()
+            {
+                IntervalPosition = IntervalPosition
+            };
+        }
+
+        internal static SearchQueryDto SearchQueryDto(
+            string title = "", string OrderBy = "date", bool orderDescending = true)
         {
             return new SearchQueryDto()
             {
-                Title = "Testuser",
+                Title = title,
+                OrderBy = OrderBy,
+                OrderDescending = orderDescending,
+            };
+        }
+        internal static SearchQueryDto AllSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
                 OrderBy = "date",
-                OrderDescending = true
+                OrderDescending = true,
+            };
+
+        }
+        internal static SearchQueryDto MyLibarySearchQueryDto(int currentUserId)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                ArrangerId = currentUserId,
+            };
+
+        }
+        internal static SearchQueryDto SharedWithUserSearchQueryDto()
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludeSharedWithUser = true
+            };
+
+        }
+
+        internal static SearchQueryDto GroupOrgSearchQueryDto(int[] groups, int[] orgs)
+        {
+            return new SearchQueryDto()
+            {
+                Title = "",
+                OrderBy = "date",
+                OrderDescending = true,
+                IncludedGroupIdArray = groups,
+                IncludedOrganisationIdArray = orgs
+            };
+
+        }
+
+        internal static CreateGroupDto GetCreateGroupDto(int groupNumber, int orgId, int adminId)
+        {
+            return new CreateGroupDto()
+            {
+                Name = $"TestGroup{groupNumber}",
+                OrganisationId = orgId,
+                FirstAdminId = adminId
+            };
+        }
+        
+        internal static UpdateGroupAndOrganisationDto GetUpdateGroupAndOrganisationDto()
+        {
+            return new UpdateGroupAndOrganisationDto()
+            {
+                Address = "Nidarosveien 58",
+                Email = "NewAdmin@Trondheim_Norway.no",
+                Description = "The new and hip Trondheim group.",
+                PhoneNumber = "90944999",
             };
         }
     }

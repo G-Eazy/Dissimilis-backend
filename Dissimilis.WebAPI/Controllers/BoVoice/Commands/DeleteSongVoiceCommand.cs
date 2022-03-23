@@ -1,18 +1,23 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoVoice.DtoModelsIn;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoSong;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace Dissimilis.WebAPI.Controllers.BoVoice
+namespace Dissimilis.WebAPI.Controllers.BoVoice.Commands
 {
     public class DeleteSongVoiceCommand : IRequest<UpdatedCommandDto>
     {
         public int SongId { get; }
         public int SongVoiceId { get; }
+        //public IMediator _mediator { get; set; }
 
         public DeleteSongVoiceCommand(int songId, int songVoiceId)
         {
@@ -23,32 +28,37 @@ namespace Dissimilis.WebAPI.Controllers.BoVoice
 
     public class DeleteSongVoiceCommandHandle : IRequestHandler<DeleteSongVoiceCommand, UpdatedCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly VoiceRepository _voiceRepository;
+        private readonly SongRepository _songRepository;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
         private readonly IAuthService _IAuthService;
 
-        public DeleteSongVoiceCommandHandle(Repository repository, IAuthService IAuthService)
+        public DeleteSongVoiceCommandHandle(VoiceRepository voiceRepository, SongRepository songRepository, IAuthService IAuthService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _repository = repository;
+            _voiceRepository = voiceRepository;
+            _songRepository = songRepository;
             _IAuthService = IAuthService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedCommandDto> Handle(DeleteSongVoiceCommand request, CancellationToken cancellationToken)
         {
-            var song = await _repository.GetSongById(request.SongId, cancellationToken);
-
-            var voice = song.Voices.FirstOrDefault(sv => sv.Id == request.SongVoiceId);
-            if (voice == null)
+            var song = await _songRepository.GetSongById(request.SongId, cancellationToken);
+            var songVoice = await _voiceRepository.GetSongVoiceById(request.SongId, request.SongVoiceId, cancellationToken);
+            var currentUser = _IAuthService.GetVerifiedCurrentUser();
+            
+            if (songVoice == null)
             {
                 throw new NotFoundException($"Voice with Id {request.SongVoiceId} not found");
             }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Modify, cancellationToken)) throw new UnauthorizedAccessException();
+            song.PerformSnapshot(currentUser);
 
-            song.Voices.Remove(voice);
+            song.Voices.Remove(songVoice);
+            song.SetUpdated(currentUser.Id);
+            await _songRepository.UpdateAsync(cancellationToken);
 
-            song.SetUpdated(_IAuthService.GetVerifiedCurrentUser().Id);
-
-            await _repository.UpdateAsync(cancellationToken);
-
-            return null;
+            return new UpdatedCommandDto(songVoice);
         }
     }
 }

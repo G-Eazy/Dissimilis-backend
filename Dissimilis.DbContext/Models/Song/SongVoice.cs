@@ -12,7 +12,7 @@ namespace Dissimilis.DbContext.Models.Song
     {
         [Key]
         public int Id { get; set; }
-
+        public string VoiceName { get; set; }
         public int VoiceNumber { get; set; }
         public bool IsMainVoice { get; set; }
 
@@ -24,13 +24,13 @@ namespace Dissimilis.DbContext.Models.Song
         public DateTimeOffset? UpdatedOn { get; set; }
 
         /// <summary>
-        /// The instrument entity of this Part
+        /// The instrument entity of this voice
         /// </summary>
         public Instrument Instrument { get; set; }
         public int? InstrumentId { get; set; }
 
         /// <summary>
-        /// The Song that this Part belongs too
+        /// The Song that this voice belongs too
         /// </summary>
         public Song Song { get; set; }
         public int SongId { get; set; }
@@ -40,16 +40,17 @@ namespace Dissimilis.DbContext.Models.Song
         public SongVoice() { }
 
         /// <summary>
-        /// Constructor to create a part
+        /// Constructor to create a voice
         /// </summary>
         /// <param name="songId"></param>
         /// <param name="instrumentId"></param>
         /// <param name="voiceNumber"></param>
-        public SongVoice(int songId, int instrumentId, int voiceNumber)
+        public SongVoice(int songId, int instrumentId, int voiceNumber, string voiceName)
         {
             SongId = songId;
             InstrumentId = instrumentId;
             VoiceNumber = voiceNumber;
+            VoiceName = voiceName;
         }
 
     }

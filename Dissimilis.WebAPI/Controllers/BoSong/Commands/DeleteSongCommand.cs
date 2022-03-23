@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class DeleteSongCommand : IRequest<UpdatedSongCommandDto>
     {
@@ -20,26 +21,27 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class DeleteSongCommandHandler : IRequestHandler<DeleteSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DeleteSongCommandHandler(Repository repository, IAuthService authService)
+        public DeleteSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(DeleteSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-            var song = await _repository.GetSongByIdForUpdate(request.SongId, cancellationToken);
+            var song = await _songRepository.GetSongByIdForUpdate(request.SongId, cancellationToken);
 
-            if(song.ArrangerId != currentUser.Id)
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Delete, cancellationToken)) throw new UnauthorizedAccessException();
 
-            await _repository.DeleteSong(song, cancellationToken);
+
+            await _songRepository.DeleteSong(currentUser, song, cancellationToken);
+            song.SetUpdated(currentUser);
 
             return null;
         }

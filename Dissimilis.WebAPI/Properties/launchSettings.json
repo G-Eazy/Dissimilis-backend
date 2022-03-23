@@ -11,6 +11,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "API_BASEURL": "http://localhost:5000/",
         "FRONTEND_BASE_URL": "http://localhost:3000/",
+        "IS_AUTOMATED_TESTING_MODE": 0,
 
         "SQL_CONNECTION_STRING": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DissimilisDev;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
 

@@ -58,17 +58,17 @@ namespace Dissimilis.Core.Collections
                 .Select(g => g.First());
         }
 
-        [DebuggerStepThrough]
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> values)
-        {
-            var hash = new HashSet<T>();
-            foreach (var value in values)
-            {
-                hash.Add(value);
-            }
+        //[DebuggerStepThrough]
+        //public static HashSet<T> ToHashSet<T>(this IEnumerable<T> values)
+        //{
+        //    var hash = new HashSet<T>();
+        //    foreach (var value in values)
+        //    {
+        //        hash.Add(value);
+        //    }
 
-            return hash;
-        }
+        //    return hash;
+        //}
 
         [DebuggerStepThrough]
         public static bool AnyAndNotNull<T>(this IEnumerable<T> values, Func<T, bool> predicate = null) =>
