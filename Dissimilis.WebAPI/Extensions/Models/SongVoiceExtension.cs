@@ -1,7 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dissimilis.DbContext.Models;
 using Dissimilis.DbContext.Models.Song;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoVoice;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
@@ -23,26 +28,36 @@ namespace Dissimilis.WebAPI.Extensions.Models
             songVoice.Song.SetUpdated(userId);
         }
 
-        public static string GetNextSongVoiceName(this string songVoiceInstrumentName)
-        {
-            var parts = songVoiceInstrumentName.Split(' ').ToList();
-            var lastPart = parts.Last();
-            if (!string.IsNullOrWhiteSpace(lastPart) && int.TryParse(lastPart, out var result))
-            {
-                parts.Remove(lastPart);
-                parts.Add((result + 1).ToString());
-                return string.Join(" ", parts);
-            }
 
-            return songVoiceInstrumentName + " 1";
+        public static List<SongVoice> GetSongVoicesFromDto(Song song, SongSnapshot snapshot, SongVoiceDto[] voiceDtos)
+        {
+            List<SongVoice> voices = new List<SongVoice>();
+            int count = 1;
+            foreach (var voiceDto in voiceDtos)
+            {
+                SongVoice voice = song.Voices.SingleOrDefault(v => v.VoiceNumber == voiceDto.VoiceNumber);
+                if (voice == null)
+                    voice = SongVoiceDto.ConvertToSongVoice(voiceDto, DateTimeOffset.Now, snapshot.CreatedById, song);
+                else
+                {
+                    voice.VoiceName = voiceDto.VoiceName;
+                    voice.VoiceNumber = voiceDto.VoiceNumber;
+                }
+               
+                voice.SongBars = SongBarExtension.GetSongBarsFromDto(voiceDto.Bars, voice);
+                voices.Add(voice);
+                count++;
+            }
+            return voices;
         }
 
-        public static SongVoice Clone(this SongVoice songVoice, User user = null, Instrument instrument = null, int voiceNumber = -1)
+        public static SongVoice Clone(this SongVoice songVoice, string VoiceName, User user = null, Instrument instrument = null, int voiceNumber = -1)
         {
             var newSongVoice = new SongVoice()
             {
                 SongBars = songVoice.SongBars.Select(b => b.Clone()).ToArray(),
                 Instrument = instrument ?? songVoice.Instrument,
+                VoiceName = VoiceName,
                 VoiceNumber = voiceNumber == -1 ? songVoice.VoiceNumber : voiceNumber + 1
             };
 
@@ -60,11 +75,56 @@ namespace Dissimilis.WebAPI.Extensions.Models
             return newSongVoice;
         }
 
-        public static SongVoice Transpose(this SongVoice songVoice, int transpose = 0)
+        public static SongVoice AddComponentInterval(this SongVoice songVoice, SongVoice sourceVoice, int intervalPosition)
         {
-            songVoice.SongBars = songVoice.SongBars.Select(b => b.Transpose(transpose)).ToArray();
+            songVoice.DuplicateAllChords(sourceVoice, false);
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                {
+                    bar.AddComponentInterval(intervalPosition);
+                    bar.RemoveEmptyChords();
+                    return bar;
+                } 
+                ).ToArray();
 
             return songVoice;
+        }
+
+        public static SongVoice RemoveComponentInterval(this SongVoice songVoice, int intervalPosition, bool deleteChordsOnLastIntervalRemoved)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                {
+                    bar.RemoveComponentInterval(intervalPosition);
+                    if (deleteChordsOnLastIntervalRemoved)
+                        bar.RemoveEmptyChords();
+                    return bar;
+                }
+                ).ToArray();
+            return songVoice;
+        }
+
+        public static SongVoice DuplicateAllChords(this SongVoice songVoice, SongVoice sourceSongVoice, bool includeComponentIntervals = true)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+            {
+                var sourceBar = sourceSongVoice.SongBars.First(srcBar => srcBar.Position == bar.Position);
+                return bar.DuplicateAllChords(sourceBar, includeComponentIntervals);
+            }).ToList();
+            return songVoice;
+        }
+
+        public static SongVoice Transpose(this SongVoice songVoice, int transpose = 0)
+        {
+            songVoice.SongBars = songVoice.SongBars.Select(bar =>
+                    bar.Transpose(transpose)
+                ).ToArray();
+            return songVoice;
+        }
+
+        public static HashSet<string> GetAllIntervalNames(this SongVoice songVoice)
+        {
+            return songVoice.SongBars
+                .SelectMany(bar => bar.GetAllIntervalNames())
+                .ToHashSet();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Dissimilis.Core.Collections;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 
 namespace Dissimilis.DbContext.Models
@@ -16,14 +18,21 @@ namespace Dissimilis.DbContext.Models
         /// <summary>
         /// String containing the InstrumentType
         /// </summary>
-        [MaxLength(250)]
+        [MaxLength(250)] 
         [Required]
         public string Name { get; set; }
 
-        
+        public DefinedInstruments? DefinedInstrument { get; set; }
+        /// <summary>
+        /// the different songVoices in the whole database using this instrument
+        /// </summary>
         public ICollection<SongVoice> SongVoices { get; set; } = new List<SongVoice>();
 
         public Instrument() { }
+        public Instrument(DefinedInstruments instrument) {
+            DefinedInstrument = instrument;
+            Name = instrument.GetDescription();
+        }
 
         /// <summary>
         /// Instrument constructor
@@ -31,7 +40,7 @@ namespace Dissimilis.DbContext.Models
         /// <param name="instrument"></param>
         public Instrument(string instrument)
         {
-            this.Name = instrument;
+            Name = instrument;
         }
     }
 }

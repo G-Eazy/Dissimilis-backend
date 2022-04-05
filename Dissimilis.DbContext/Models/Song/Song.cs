@@ -2,11 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Dissimilis.DbContext.Interfaces;
+using Dissimilis.DbContext.Models.Enums;
 
 namespace Dissimilis.DbContext.Models.Song
 {
     /// <summary>
-    /// This is the whole songs, which contains one or more parts 
+    /// The different sharing options a song could have:
+    /// private: only you and people in sharedUsers
+    /// Group: all in sharedUsers and sharedGroups
+    /// Organisation: same as group + all in sharedOrganisation
+    /// all: public song
+    /// </summary>
+    
+
+    /// <summary>
+    /// This is the whole song, which contains one or more voices 
     /// </summary>
     public class Song : ICreatedAndUpdated
     {
@@ -20,6 +30,7 @@ namespace Dissimilis.DbContext.Models.Song
         [MaxLength(500)]
         public string Title { get; set; }
 
+        public DateTimeOffset? Deleted { get; set; }
 
         /// <summary>
         /// The composer of the song
@@ -61,8 +72,42 @@ namespace Dissimilis.DbContext.Models.Song
         public int? UpdatedById { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
 
+        /// <summary>
+        /// Notes that describes the song
+        /// </summary>
+        public string SongNotes { get; set; }
+
+        /// <summary>
+        /// The speed of the song in BPM
+        /// ( set a max range of 256) 
+        /// </summary>
+        [Range(0, 256)]
+        public int? Speed { get; set; }
+
+        /// <summary>
+        /// how hard the song is to play
+        /// (could change the range)
+        /// </summary>
+        [Range(1, 10)]
+        public int? DegreeOfDifficulty { get; set; }
+
         public ICollection<SongVoice> Voices { get; set; } = new List<SongVoice>();
 
-        
+        /// <summary>
+        /// The protection level of the song, a inner scope to easy set a song private
+        /// </summary>
+        public ProtectionLevels ProtectionLevel { get; set; }
+        /// <summary>
+        /// the users with write permission on the song
+        /// </summary>
+        public ICollection<SongSharedUser> SharedUsers { get; set; } = new List<SongSharedUser>();
+
+        /// <summary>
+        /// The groups with read permission on the song
+        /// </summary>
+        public ICollection<SongGroupTag> GroupTags { get; set; } = new List<SongGroupTag>();
+        public ICollection<SongOrganisationTag> OrganisationTags { get; set; } = new List<SongOrganisationTag>();
+
+        public ICollection<SongSnapshot> Snapshots { get; set; } = new List<SongSnapshot>();
     }
 }

@@ -1,12 +1,16 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class DuplicateSongCommand : IRequest<UpdatedSongCommandDto>
     {
@@ -22,25 +26,39 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class DuplicateSongCommandHandler : IRequestHandler<DuplicateSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public DuplicateSongCommandHandler(Repository repository, IAuthService authService)
+        public DuplicateSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
+            _IPermissionCheckerService = IPermissionCheckerService;
             _authService = authService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(DuplicateSongCommand request, CancellationToken cancellationToken)
         {
-            var duplicateFromSong = await _repository.GetFullSongById(request.SongId, cancellationToken);
-
-            var duplicatedSong = duplicateFromSong.Clone(request.Command.Title);
-
+            var duplicateFromSong = await _songRepository.GetFullSongById(request.SongId, cancellationToken);
             var currentUser = _authService.GetVerifiedCurrentUser();
-            duplicatedSong.SetUpdated(currentUser.Id);
 
-            await _repository.SaveAsync(duplicatedSong, cancellationToken);
+            if (!await _IPermissionCheckerService.CheckPermission(duplicateFromSong, currentUser, Operation.Get, cancellationToken)) throw new UnauthorizedAccessException();
+
+            Song duplicatedSong = null;
+
+            using (var transaction = _songRepository.Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    duplicatedSong = duplicateFromSong.CloneWithUpdatedArrangerId(currentUser.Id, request.Command.Title);
+                    duplicatedSong.SetUpdated(currentUser.Id);
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+            }
+            await _songRepository.SaveAsync(duplicatedSong, cancellationToken);
 
             return new UpdatedSongCommandDto(duplicatedSong);
         }

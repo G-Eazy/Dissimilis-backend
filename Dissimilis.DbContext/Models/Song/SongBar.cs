@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -14,10 +15,10 @@ namespace Dissimilis.DbContext.Models.Song
         /// </summary>
         [Key]
         public int Id { get; set; }
-
+        
 
         /// <summary>
-        /// Priority of the bar in a spesific part
+        /// Priority of the bar in a spesific voice
         /// </summary>
         public int Position { get; set; }
 
@@ -32,14 +33,15 @@ namespace Dissimilis.DbContext.Models.Song
         public bool RepAfter { get; set; }
 
         /// <summary>
-        /// if 0, there is no house. otherwise it should follow an order
+        /// If 0, there is no volta bracket. Otherwise it should follow an order
+        /// A volta bracket is the equivalent to "hus" in Norwegian music theory.
         /// </summary>
-        public int? House { get; set; }
+        public int? VoltaBracket { get; set; }
 
 
         /// <summary>
-        /// The part it is linked to
-        /// and the corresponding PartId
+        /// The voice it is linked to
+        /// and the corresponding VoiceId
         /// </summary>
         public SongVoice SongVoice { get; set; }
         public int SongVoiceId { get; set; }
@@ -61,7 +63,7 @@ namespace Dissimilis.DbContext.Models.Song
         {
             return new SongBar()
             {
-                House = House,
+                VoltaBracket = VoltaBracket,
                 RepAfter = RepAfter,
                 RepBefore = RepBefore,
                 Position = Position,

@@ -1,13 +1,33 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using Dissimilis.Core.Collections;
+using Dissimilis.DbContext.Models;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Exceptions;
 using Dissimilis.WebAPI.Extensions.Interfaces;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
+using Dissimilis.WebAPI.Controllers.BoNote.DtoModelsOut;
+using Newtonsoft.Json;
+using Dissimilis.DbContext;
 
 namespace Dissimilis.WebAPI.Extensions.Models
 {
     public static class SongExtension
     {
+        /// <summary>
+        /// Return true if the given user have readpermission on the song in the expression
+        /// </summary>
+        /// <param name="user"> The user to chek for</param>
+        /// <returns> true if readpermission</returns>
+        public static Expression<Func<Song, bool>> ReadAccessToSong(User user)
+        {
+            return (song => song.ProtectionLevel == ProtectionLevels.Public
+            || song.ArrangerId == user.Id
+            || song.SharedUsers.Any(shared => shared.UserId == user.Id));
+        }
+
         /// <summary>
         /// Get max bar positions for a song
         /// </summary>
@@ -47,7 +67,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
                 highestBarNumber++;
                 while (songVoice.SongBars.Count < maxBarCount)
                 {
-                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToArray();
+                    songVoice.SongBars = songVoice.SongBars.Concat(new[] { new SongBar(highestBarNumber++) }).ToList();
                 }
 
                 songVoice.SortBars();
@@ -211,7 +231,7 @@ namespace Dissimilis.WebAPI.Extensions.Models
         /// <param name="masterVoice"></param>
         public static void SyncVoicesFrom(this Song song, SongVoice masterVoice)
         {
-            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToArray();
+            var otherVoices = song.Voices.Where(v => v.Id != masterVoice.Id).ToList();
             if (!otherVoices.Any())
             {
                 return;
@@ -224,27 +244,30 @@ namespace Dissimilis.WebAPI.Extensions.Models
             {
                 foreach (var otherVoice in otherVoices)
                 {
-                    var masterBar = masterVoice.SongBars.ToArray()[i];
-                    var slaveBar = otherVoice.SongBars.ToArray()[i];
+                    var masterBar = masterVoice.SongBars.ToList()[i];
+                    var slaveBar = otherVoice.SongBars.ToList()[i];
 
-                    slaveBar.House = masterBar.House;
+                    slaveBar.VoltaBracket = masterBar.VoltaBracket;
                     slaveBar.RepAfter = masterBar.RepAfter;
                     slaveBar.RepBefore = masterBar.RepBefore;
                 }
             }
 
         }
-
-        public static Song Clone(this Song song, string title = null)
+        public static Song CloneWithUpdatedArrangerId(this Song song, int arrangerId, string title = null)
         {
             return new Song()
             {
                 Title = title ?? song.Title,
                 Denominator = song.Denominator,
                 Numerator = song.Numerator,
-                ArrangerId = song.ArrangerId,
-                Voices = song.Voices.Select(v => v.Clone()).ToArray()
-            };
+                Speed = song.Speed,
+                ArrangerId = arrangerId,
+                DegreeOfDifficulty = song.DegreeOfDifficulty,
+                ProtectionLevel = song.ProtectionLevel,
+                SongNotes = song.SongNotes,
+                Voices = song.Voices.Select(v => v.Clone(v.VoiceName)).ToArray()
+            }; 
         }
 
         public static Song Transpose(this Song song, int transpose = 0)
@@ -252,6 +275,66 @@ namespace Dissimilis.WebAPI.Extensions.Models
             song.Voices = song.Voices.Select(v => v.Transpose(transpose)).ToArray();
 
             return song;
+        }
+
+
+        public static void Undo(this Song song)
+        {
+            if (song.Snapshots.Count == 0)
+                throw new NotFoundException("No more snapshots to pop...");
+
+            SongSnapshot snapshot = song.PopSnapshot(true);
+            SongByIdDto deserialisedSong = JsonConvert.DeserializeObject<SongByIdDto>(snapshot.SongObjectJSON);
+            
+            song.Title = deserialisedSong.Title;
+            song.UpdatedBy = snapshot.CreatedBy;
+            song.UpdatedOn = DateTimeOffset.Now;
+            song.Composer = deserialisedSong.Composer;
+            song.Speed = deserialisedSong.Speed;
+            song.SongNotes = deserialisedSong.SongNotes;
+            song.Voices = SongVoiceExtension.GetSongVoicesFromDto(song, snapshot, deserialisedSong.Voices);
+        }
+
+        /// <summary>
+        /// This method should be called before any action that updates a song, except when the song itself is created.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <param name="user"></param>
+        public static void PerformSnapshot(this Song song, User user)
+        {
+            string JSONsnapshot = JsonConvert.SerializeObject(new SongByIdDto(song));
+
+            if(song.Snapshots.Count >= 5)
+            {
+                song.PopSnapshot(false);
+            }
+
+            SongSnapshot snapshot = new SongSnapshot()
+            {
+                SongId = song.Id,
+                CreatedById = user.Id,
+                CreatedOn = DateTimeOffset.Now,
+                SongObjectJSON = JSONsnapshot
+            };
+
+            song.Snapshots.Add(snapshot);
+        }
+
+        public static SongSnapshot PopSnapshot(this Song song, bool descendingOrder)
+        {
+            SongSnapshot result = null;
+            SongSnapshot[] orderedSnapshots;
+            if (song.Snapshots.Count > 0)
+            {
+                if(descendingOrder)
+                    orderedSnapshots = song.Snapshots.OrderByDescending(s => s.CreatedOn).ToArray();
+                else
+                    orderedSnapshots = song.Snapshots.OrderBy(s => s.CreatedOn).ToArray();
+
+                result = orderedSnapshots.First();
+                song.Snapshots.Remove(result);
+            }
+            return result;
         }
     }
 }

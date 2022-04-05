@@ -1,16 +1,19 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
+using Dissimilis.WebAPI.Controllers.BoGroup.Query;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.MultipleBars;
+using Dissimilis.WebAPI.Controllers.BoOrganisation.Query;
 using Dissimilis.WebAPI.Controllers.BoSong;
-using Dissimilis.WebAPI.Controllers.BoSong.Commands;
-using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
-using Dissimilis.WebAPI.Controllers.BoVoice;
-using Dissimilis.WebAPI.Extensions.Models;
 using Dissimilis.WebAPI.xUnit.Setup;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 using static Dissimilis.WebAPI.xUnit.Extensions;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.AddTags;
+using Dissimilis.WebAPI.Controllers.BoSong.Commands.ShareSong;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
 
 namespace Dissimilis.WebAPI.xUnit.Tests
 {
@@ -25,287 +28,425 @@ namespace Dissimilis.WebAPI.xUnit.Tests
         }
 
         [Fact]
-        public void TestMaxBarPositionFunction()
+        public async Task TestMyLibaryShowAllSongsCreatedByCurrentUser()
         {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            // Expect 4 parts, but starting at 0
-            NewSong(2, 4).GetMaxBarPosition().ShouldBe(4 - 1);
+            var songDtos = await _mediator.Send(new QuerySongSearch(MyLibarySearchQueryDto(DeepPurpleFanUser.Id)));
 
-            // Expect 6 parts, but starting at 0
-            NewSong(3, 4).GetMaxBarPosition().ShouldBe(6 - 1);
+            songDtos.Length.ShouldBe(2);
 
-            // Expect 8 parts, but starting at 0 
-            NewSong(4, 4).GetMaxBarPosition().ShouldBe(8 - 1);
-
-            // Expect 12 parts, but starting at 0
-            NewSong(6, 4).GetMaxBarPosition().ShouldBe(12 - 1);
-
-            // Expect 6 parts, but starting at 0
-            NewSong(6, 8).GetMaxBarPosition().ShouldBe(6 - 1);
+            songDtos.Any(song => song.SongId == SmokeOnTheWaterSong.Id).ShouldBeTrue();     
+            songDtos.Any(song => song.SongId == SpeedKingSong.Id).ShouldBeTrue();
         }
 
         [Fact]
-        public async Task TestSearchForSongs()
+        public async Task TestSearchForAllSongsAsRegularUserDoesGivePublicSongs()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
 
-            var createSongDto = CreateSongDto(4, 4);
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
-
-            //Search for the user who created the song
+            //Search for all songs.
             var searchQueryDto = SearchQueryDto();
-            var songDtos = await mediator.Send(new QuerySongSearch(searchQueryDto));
+            var songDtos = await _mediator.Send(new QuerySongSearch(searchQueryDto));
 
-            songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
+            songDtos.Length.ShouldBe(4);
+
+            //Verify that all public songs are included.
+            songDtos.Any(song => song.SongId == LisaGikkTilSkolenSong.Id).ShouldBeTrue();
+            songDtos.Any(song => song.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            songDtos.Any(song => song.SongId == DovregubbensHallSong.Id).ShouldBeTrue();
+            songDtos.Any(song => song.SongId == BegyntePåBunnen.Id).ShouldBeTrue();
+        }
+        [Fact]
+        public async Task TestSearchForAllSongsAsRegularUserDoesNotGivePrivateSongs()
+        {
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            //Search for all songs created by Deep Purple fan.
+            var searchQueryDto = SearchQueryDto();
+            var songDtos = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+
+            songDtos.Length.ShouldBe(4);
+
+            //Verify that private songs are not included.
+            songDtos.Any(song => song.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
+            songDtos.Any(song => song.SongId == DuHastSong.Id).ShouldBeFalse();
+            songDtos.Any(song => song.SongId == BabySong.Id).ShouldBeFalse();
         }
 
         [Fact]
-        public async Task TestGetSongsFromMyLibrary()
+        public async Task TestSearchFilterWhenGroupSpecified()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            var createSongDto = CreateSongDto(4, 4);
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
-            var songDtos = await mediator.Send(new QuerySongToLibrary());
+            CreateAndAddGroupTagIfNotExsisting(SpeedKingSong.Id, TrondheimGroup.Id);
 
-            songDtos.Any(s => s.SongId == updatedSongCommandDto.SongId).ShouldBeTrue();
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
+
+            int[] groupWithOneSong = { TrondheimGroup.Id };
+            int[] EmptyList = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithOneSong, EmptyList);
+            var TrondheimSong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimSong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimSong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
         }
 
         [Fact]
-        public async Task TestNewSongSave()
+        public async Task TestSearchFilterWhenOrganisations()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
 
-            var createSongDto = CreateSongDto(4, 4);
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(createSongDto));
-            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            CreateAndAddOrganisationTagIfNotExisting(SpeedKingSong.Id, NorwayOrganisation.Id);
 
-            createSongDto.Title.ShouldBe(songDto.Title, "Title not the same after creating");
-            createSongDto.Numerator.ShouldBe(songDto.Numerator, "Numerator not the same after creating");
-            createSongDto.Denominator.ShouldBe(songDto.Denominator, "Denominator not the same after creating");
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
 
-            Assert.Single(songDto.Voices);
-
-            songDto.Voices.FirstOrDefault()?.Bars.FirstOrDefault()?.Chords.FirstOrDefault()?.Length.ShouldBe(8, "Length of standard pause chord is not correct");
+            int[] orgWithOneSong = { NorwayOrganisation.Id };
+            int[] EmptyList = Array.Empty<int>();
+            var searchQueryDto = GroupOrgSearchQueryDto(EmptyList, orgWithOneSong);
+            var NorwaySong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            NorwaySong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            NorwaySong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
         }
 
         [Fact]
-        public async Task TestGetTransposedCopyOfSong()
+        public async Task TestSearchFilterGroupsAndOrganisationsSameOrg()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            
+            CreateAndAddOrganisationTagIfNotExisting(SpeedKingSong.Id, NorwayOrganisation.Id);
+            CreateAndAddGroupTagIfNotExsisting(SmokeOnTheWaterSong.Id, TrondheimGroup.Id);
 
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(CreateSongDto(4, 4)));
-            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
 
-            var firstVoice = songDto.Voices.First();
-
-            // populate a voice with bars and notes
-            var firstVoiceFirstBar = firstVoice.Bars.First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFirstBar.BarId, CreateNoteDto(0, 8, new[] { "A", "C" })));
-
-            var firstVoiceSecondBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto()));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceSecondBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "Z", "H" })));
-
-            var firstVoiceThirdBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 1)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceThirdBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "E", "D" })));
-
-            // transpose song by +3
-            var transposedSongByPlus3 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = 3, Title = $"{songDto.Title} (transposed +3)" }));
-            var songDtoPlus3 = await mediator.Send(new QuerySongById(transposedSongByPlus3.SongId));
-
-            // transpose song by -5
-            var transposedSongByMinus5 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = -5, Title = $"{songDto.Title} (transposed -5)" }));
-            var songDtoMinus5 = await mediator.Send(new QuerySongById(transposedSongByMinus5.SongId));
-
-            // transpose song by -15
-            var transposedSongByMinus15 = await mediator.Send(new CreateTransposedSongCommand(songDto.SongId, new TransposeSongDto { Transpose = -15 }));
-            var songDtoMinus15 = await mediator.Send(new QuerySongById(transposedSongByMinus15.SongId));
-
-            // check titles
-            songDtoPlus3.Title.ShouldBe($"{songDto.Title} (transposed +3)");
-            songDtoMinus5.Title.ShouldBe($"{songDto.Title} (transposed -5)");
-
-            // check copies created
-            songDto.SongId.ShouldNotBe(songDtoPlus3.SongId);
-            songDto.SongId.ShouldNotBe(songDtoMinus5.SongId);
-            songDtoPlus3.SongId.ShouldNotBe(songDtoMinus5.SongId);
-            (songDto.SongId == songDtoPlus3.SongId).ShouldBeFalse();
-
-            // check copies of notes created
-            songDtoPlus3.Voices[0].Bars[0].Chords[0].Notes[0].ShouldNotBe(
-                firstVoiceFirstBar.Chords[0].Notes[0]);
-
-            // check noteValues transposed +3
-            var firstCheck = songDtoPlus3.Voices[0].Bars[0].Chords[0].Notes;
-            firstCheck.ShouldBe(new[] { "C", "D#" }, "First copied chord value not as expected");
-
-            var secondCheck = songDtoPlus3.Voices[0].Bars[1].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            secondCheck.ShouldBe(new[] { "D" }, "First copied chord value not as expected");
-
-            var thirdCheck = songDtoPlus3.Voices[0].Bars[2].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            thirdCheck.ShouldBe(new[] { "G", "F" }, "First copied chord value not as expected");
-
-            // check noteValues transposed -5
-            var fourthCheck = songDtoMinus5.Voices[0].Bars[0].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            fourthCheck.ShouldBe(new[] { "E", "G" }, "First copied chord value not as expected");
-
-            var fifthCheck = songDtoMinus5.Voices[0].Bars[1].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            fifthCheck.ShouldBe(new[] { "F#" }, "First copied chord value not as expected");
-
-            var sixthCheck = songDtoMinus5.Voices[0].Bars[2].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            sixthCheck.ShouldBe(new[] { "H", "A" }, "First copied chord value not as expected");
-
-            // check noteValues transposed -15
-            var seventhCheck = songDtoMinus15.Voices[0].Bars[0].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            seventhCheck.ShouldBe(new[] { "F#", "A" }, "First copied chord value not as expected");
-
-            var eightCheck = songDtoMinus15.Voices[0].Bars[1].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            eightCheck.ShouldBe(new[] { "G#" }, "First copied chord value not as expected");
-
-            var ninthCheck = songDtoMinus15.Voices[0].Bars[2].Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            ninthCheck.ShouldBe(new[] { "C#", "H" }, "First copied chord value not as expected");
+            int[] orgWithOneSong = { NorwayOrganisation.Id };
+            int[] groupWithSong = { TrondheimGroup.Id};
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithSong, orgWithOneSong);
+            var TrondheimNorwaySong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimNorwaySong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimNorwaySong.Any(s => s.SongId == SmokeOnTheWaterSong.Id).ShouldBeTrue();
+            TrondheimNorwaySong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
         }
+        [Fact]
+        public async Task TestSearchFilterGroupsAndOrganisationsDifferentOrg()
+        {
+            //Set current user to regular user with no songs.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            CreateAndAddGroupTagIfNotExsisting(SpeedKingSong.Id, TrondheimGroup.Id);
+
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+            CreateAndAddOrganisationTagIfNotExisting(BegyntePåBunnen.Id, GuatemalaOrganisation.Id);
+            
+            UpdateAllSongs();
+            _testServerFixture.GetContext().SaveChanges();
+
+            int[] orgWithOneSong = { GuatemalaOrganisation.Id };
+            int[] groupWithSong = { TrondheimGroup.Id };
+            var searchQueryDto = GroupOrgSearchQueryDto(groupWithSong, orgWithOneSong);
+            var TrondheimGuatemalaSong = await _mediator.Send(new QuerySongSearch(searchQueryDto));
+            TrondheimGuatemalaSong.Any(s => s.SongId == SpeedKingSong.Id).ShouldBeTrue();
+            TrondheimGuatemalaSong.Any(s => s.SongId == SmokeOnTheWaterSong.Id).ShouldBeFalse();
+            TrondheimGuatemalaSong.Any(s => s.SongId == (LisaGikkTilSkolenSong.Id)).ShouldBeFalse();
+            TrondheimGuatemalaSong.Any(s => s.SongId == BegyntePåBunnen.Id).ShouldBeTrue();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllGroups()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ALL", null));
+
+            groups.Length.ShouldBe(GetAllGroups().Count);
+            groups.Any(g => g.GroupId == SandvikaGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeTrue();
+
+        }
+        [Fact]
+        public async Task TestGetAllGroupsInOrganisation()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ALL", NorwayOrganisation.Id));
+
+            groups.Length.ShouldBe(GetAllGroups().Where(group => group.OrganisationId == NorwayOrganisation.Id).ToArray().Length);
+            groups.Any(g => g.GroupId == SandvikaGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == QuetzaltenangoGroup.Id).ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestGetAllGroupsMember()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("MEMBER", null));
+
+            groups.Count().ShouldBe(1);
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeFalse();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllGroupsAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            var groups = await _mediator.Send(new QueryGetGroups("ADMIN", null));
+
+            groups.Count().ShouldBe(1);
+            groups.Any(g => g.GroupId == TrondheimGroup.Id).ShouldBeTrue();
+            groups.Any(g => g.GroupId == BergenGroup.Id).ShouldBeFalse();
+
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisations()
+        {
+            TestServerFixture.ChangeCurrentUserId(NoSongsUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("ALL"));
+
+            orgs.Count().ShouldBe(GetAllOrganisations().Count());
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisationsAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(NorwayAdminUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("ADMIN"));
+
+            orgs.Length.ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
+        }
+        [Fact]
+        public async Task TestGetAllOrganisationsMember()
+        {
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("MEMBER"));
+
+            orgs.Length.ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestGetAllOrganisationsGroupAdmin()
+        {
+            TestServerFixture.ChangeCurrentUserId(TrondheimAdminUser.Id);
+
+            var orgs = await _mediator.Send(new QueryGetOrganisations("GROUPADMIN"));
+
+            orgs.Length.ShouldBe(1);
+            orgs.Any(g => g.OrganisationId == GuatemalaOrganisation.Id).ShouldBeFalse();
+            orgs.Any(g => g.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestShareSongWithUser()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, OralBeeFanUser.Email));
+            UpdateAllSongs();
+            SpeedKingSong.SharedUsers.Any(u => u.UserId == OralBeeFanUser.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestRemoveShareSongWithUser()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            CreateAndAddSharedUserIfNotExisting(SpeedKingSong.Id, GuatemalaAdminUser.Id);
+            _testServerFixture.GetContext().SaveChanges();
+
+            await _mediator.Send(new RemoveShareSongUserCommand(SpeedKingSong.Id, GuatemalaAdminUser.Id));
+            UpdateAllSongs();
+            SpeedKingSong.SharedUsers.Any(u => u.UserId == GuatemalaAdminUser.Id).ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task TestCannotShareWithCurrentUser()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            await Should.ThrowAsync<Exception>(async () =>
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, DeepPurpleFanUser.Email)));
+        }
+
+        [Fact]
+        public async Task TestCannotShareWithSameUserTwice()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            CreateAndAddSharedUserIfNotExisting(SpeedKingSong.Id, GuatemalaAdminUser.Id);
+            await Should.ThrowAsync<Exception>(async () =>
+            await _mediator.Send(new ShareSongUserCommand(SpeedKingSong.Id, GuatemalaAdminUser.Email)));
+        }
+
+        [Fact]
+        public async Task TestUpdateSongProtectionLevel()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            await _mediator.Send(new ChangeProtectionLevelSongCommand(new UpdateProtectionLevelDto() { ProtectionLevel = "Private"}, SpeedKingSong.Id));
+            UpdateAllSongs();
+            SpeedKingSong.ProtectionLevel.ShouldBe(ProtectionLevels.Private);
+            await _mediator.Send(new ChangeProtectionLevelSongCommand(new UpdateProtectionLevelDto() { ProtectionLevel = "Public" }, SpeedKingSong.Id));
+            UpdateAllSongs();
+            SpeedKingSong.ProtectionLevel.ShouldBe(ProtectionLevels.Public);
+        }
+
+
+        [Fact]
+        public async Task TestAddGroupTag()
+        {
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+
+            int[] groupTag= { QuetzaltenangoGroup.Id };
+
+            await _mediator.Send(new UpdateTagGroupCommand(Baris.Id, groupTag));
+            _testServerFixture.GetContext().SongGroupTags.Any(gt => gt.SongId == Baris.Id && gt.GroupId == QuetzaltenangoGroup.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestOrganisationTag()
+        {
+            TestServerFixture.ChangeCurrentUserId(OralBeeFanUser.Id);
+
+            int[] OrgTag = { GuatemalaOrganisation.Id };
+
+            await _mediator.Send(new UpdateTagOrganisationCommand(Baris.Id, OrgTag));
+            _testServerFixture.GetContext().SongOrganisationTags.Any(ot => ot.SongId == Baris.Id && ot.OrganisationId == GuatemalaOrganisation.Id).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task TestChangeFrom2to1Tag()
+        {
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
+            CreateAndAddGroupTagIfNotExsisting(SpeedKingSong.Id, TrondheimGroup.Id);
+            CreateAndAddOrganisationTagIfNotExisting(SpeedKingSong.Id, NorwayOrganisation.Id);
+
+            int[] OrgTag = { NorwayOrganisation.Id };
+            int[] groupTag = Array.Empty<int>();
+
+            await _mediator.Send(new UpdateTagOrganisationCommand(SpeedKingSong.Id, OrgTag));
+            await _mediator.Send(new UpdateTagGroupCommand(SpeedKingSong.Id, groupTag));
+
+            _testServerFixture.GetContext().SaveChanges();
+            SpeedKingSong.OrganisationTags.Count.ShouldBe(1);
+            SpeedKingSong.GroupTags.Count.ShouldBe(0);
+            _testServerFixture.GetContext().SongOrganisationTags.Any(ot => ot.SongId == SpeedKingSong.Id && ot.OrganisationId == NorwayOrganisation.Id).ShouldBeTrue();
+        }
+
+        //[Fact]
+        //public async Task TestNewSongSave()
+        //{
+        //  var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+
+        //    //Update songs from database after change.
+        //    var updatedSongs = UpdateAllSongs();
+
+        //    //Fetch newly created song.
+        //    var createdSong = updatedSongs.SingleOrDefault(song => song.Id == updatedSongCommandDto.SongId);
+
+        //    //Verify values on newly created song.
+        //    createdSong.Numerator.ShouldBe(4);
+        //    createdSong.Denominator.ShouldBe(4);
+        //    createdSong.Title.ShouldBe("Peer Gynt");
+        //    Assert.Single(createdSong.Voices);
+
+        //    createdSong
+        //        .Voices.FirstOrDefault()
+        //        ?.SongBars.FirstOrDefault()
+        //        ?.Notes.FirstOrDefault()
+        //        ?.Length.ShouldBe(8, "Length of standard pause chord is not correct");
+
+        //    _testServerFixture.GetContext().Database.CurrentTransaction.Rollback();
+        //}
 
 
         [Fact]
         public async Task TestCopyBars()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            //Change current user to Deep Purple fan.
+            TestServerFixture.ChangeCurrentUserId(DeepPurpleFanUser.Id);
 
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(CreateSongDto(4, 4)));
-            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            var mainVoiceBarCount = SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.Count;
+            var newBarPosition = mainVoiceBarCount;
+            var copyLength = 1;
+            var barToCopy = SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.FirstOrDefault();
 
-            var firstVoice = songDto.Voices.First();
+            //Execute copying command.
+            await _mediator.Send(new CopyBarsCommand(SmokeOnTheWaterSong.Id, CreateCopyBarsDto(barToCopy.Position, copyLength, mainVoiceBarCount)));
 
-            // populate a voice with bars and notes
-            var firstVoiceFirstBar = firstVoice.Bars.First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFirstBar.BarId, CreateNoteDto(6, 2, new[] { "H" })));
+            //Update songs from database after change.
+            UpdateAllSongs();
 
-            var firstVoiceSecondBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto()));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceSecondBar.SongBarId, CreateNoteDto(0, 2, value: new[] { "A" })));
+            //Verify that a new bar was created.
+            SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.Count.ShouldBe(mainVoiceBarCount + copyLength);
 
-            var firstVoiceThirdBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 1)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceThirdBar.SongBarId, CreateNoteDto(2, 6, value: new[] { "C" })));
+            //Fetch newly created bar.
+            var barCopy = SmokeOnTheWaterSong
+                .Voices.SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.FirstOrDefault(bar => bar.Position == mainVoiceBarCount);
 
-            var firstVoiceFourthBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 2, repAfter: true)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFourthBar.SongBarId, CreateNoteDto(0, 8)));
-
-            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.Length.ShouldBe(1, "It is supposed to be only one voice");
-
-            // make another voice, and set notes on 1 and 2
-            var secondVoiceId = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
-            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            var secondVoice = songDto.Voices.First(v => v.SongVoiceId == secondVoiceId.SongVoiceId);
-            var secondVoiceFirstBar = secondVoice.Bars.OrderBy(b => b.Position).First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceFirstBar.BarId, CreateNoteDto(0, 2, value: new[] { "F" })));
-            var secondVoiceSecondBar = secondVoice.Bars.OrderBy(b => b.Position).Skip(1).First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceSecondBar.BarId, CreateNoteDto(2, 6, value: new[] { "G" })));
-
-            songDto.Voices.First().Bars.Length.ShouldBe(4, "It should be 4 bars before copying");
-
-
-            // do Copying
-            await mediator.Send(new CopyBarsCommand(songDto.SongId, CreateCopyBarsDto(1, 2, 4)));
-            var afterCopySongDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-
-            // single check
-            var fistCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 4)
-                .Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            fistCheck.ShouldBe(new[] { "H" }, "First copied chord value not as expected");
-
-            var secondCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 5)
-                            .Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            secondCheck.ShouldBe(new[] { "A" }, "Second copied chord value not as expected");
-
-            // Check that the first voice is the main voice and that the next voice is not the main
-            afterCopySongDto.Voices[0].IsMain.ShouldBe(true);
-            afterCopySongDto.Voices[1].IsMain.ShouldBe(false);
-
-            // check index
-            afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoiceFirstBar.SongVoiceId).Bars.Length.ShouldBe(6, "It should be 6 bars after copying");
-            var index = 1;
-            foreach (var bar in afterCopySongDto.Voices.First().Bars)
-            {
-                bar.Position.ShouldBe(index++, "Index is not as expected after copying");
-            }
-
+            //Verify that values are copied from source bar.
+            barToCopy.ShouldBeEquivalentTo(barToCopy);
 
             // check that value in bar position 1 and 2 are equal to 4 and 5 in all voices
-            foreach (var voiceAfterCopy in afterCopySongDto.Voices)
-            {
-                var firstBarAfterCopy = voiceAfterCopy.Bars.First(b => b.Position == 1);
-                var fourthBarAfterCopy = voiceAfterCopy.Bars.First(b => b.Position == 4);
-                firstBarAfterCopy.CheckBarEqualTo(fourthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 1 against 4 after copy");
+            //foreach (var voiceAfterCopy in SmokeOnTheWaterSong.Voices)
+            //{
+            //    var firstBarAfterCopy = voiceAfterCopy.SongBars.First(b => b.Position == 1);
+            //    var fourthBarAfterCopy = voiceAfterCopy.SongBars.First(b => b.Position == 4);
+            //    firstBarAfterCopy.CheckBarEqualTo(fourthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 1 against 4 after copy");
 
-                var secondBarAfterCopy = voiceAfterCopy.Bars.First(b => b.Position == 2);
-                var fifthBarAfterCopy = voiceAfterCopy.Bars.First(b => b.Position == 5);
-                secondBarAfterCopy.CheckBarEqualTo(fifthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 2 against 5 after copy");
+            //    var secondBarAfterCopy = voiceAfterCopy.SongBars.First(b => b.Position == 2);
+            //    var fifthBarAfterCopy = voiceAfterCopy.SongBars.First(b => b.Position == 5);
+            //    secondBarAfterCopy.CheckBarEqualTo(fifthBarAfterCopy, includeNoteComparison: true, stepDescription: "Position 2 against 5 after copy");
 
-            }
-
+            //}
         }
 
         [Fact]
         public async Task TestMoveBars()
         {
-            var mediator = _testServerFixture.GetServiceProvider().GetService<IMediator>();
+            //Set user to Justin Bieber fan.
+            TestServerFixture.ChangeCurrentUserId(JustinBieberFanUser.Id);
 
-            var updatedSongCommandDto = await mediator.Send(new CreateSongCommand(CreateSongDto(4, 4)));
-            var songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
+            // Execute move command.
+            var barToMove = BabySong
+                .Voices.SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.SingleOrDefault(bar => bar.Position == 0);
 
-            var firstVoice = songDto.Voices.First();
+            await _mediator.Send(new MoveBarsCommand(BabySong.Id, CreateMoveBarsDto(barToMove.Position, 1, 2)));
 
-            // populate a voice with bars and notes
-            var firstVoiceFirstBar = firstVoice.Bars.First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFirstBar.BarId, CreateNoteDto(0, 8, new[] { "A", "C" })));
+            //Fetch songs from database after change.
+            UpdateAllSongs();
 
-            var firstVoiceSecondBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto()));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceSecondBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "A", "H" })));
-
-            var firstVoiceThirdBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 1)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceThirdBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "C", "D" })));
-
-            var firstVoiceFourthBar = await mediator.Send(new CreateSongBarCommand(songDto.SongId, firstVoice.SongVoiceId, CreateBarDto(house: 2, repAfter: true)));
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, firstVoice.SongVoiceId, firstVoiceFourthBar.SongBarId, CreateNoteDto(0, 8, value: new[] { "C", "H" })));
-
-            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            songDto.Voices.Length.ShouldBe(1, "It is supposed to be only one voice");
-
-            // make another voice, and set notes on 1 and 2
-            var secondVoiceId = await mediator.Send(new CreateSongVoiceCommand(songDto.SongId, CreateSongVoiceDto("SecondVoice")));
-
-            songDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-            var secondVoice = songDto.Voices.First(v => v.SongVoiceId == secondVoiceId.SongVoiceId);
-
-            var secondVoiceFirstBar = secondVoice.Bars.OrderBy(b => b.Position).First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceFirstBar.BarId, CreateNoteDto(0, 2, value: new[] { "F" })));
-
-            var secondVoiceSecondBar = secondVoice.Bars.OrderBy(b => b.Position).Skip(1).First();
-            await mediator.Send(new CreateSongNoteCommand(songDto.SongId, secondVoice.SongVoiceId, secondVoiceSecondBar.BarId, CreateNoteDto(2, 6, value: new[] { "G" })));
-            songDto.Voices.First().Bars.Length.ShouldBe(4, "It should be 4 bars before moving");
-
-
-            // do Moving
-            await mediator.Send(new MoveBarsCommand(songDto.SongId, CreateMoveBarsDto(0, 2, 3)));
-            var afterCopySongDto = await mediator.Send(new QuerySongById(updatedSongCommandDto.SongId));
-
-            // single check
-            var fistCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 1).Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            fistCheck.ShouldBe(new[] { "C", "D" }, "First copied chord value not as expected");
-
-            var secondCheck = afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoice.SongVoiceId).Bars.First(b => b.Position == 4).Chords.FirstOrDefault(n => n.ChordId != null).Notes;
-            secondCheck.ShouldBe(new[] { "C", "H" }, "Second copied chord value not as expected");
-
-            // check index
-            afterCopySongDto.Voices.First(v => v.SongVoiceId == firstVoiceFirstBar.SongVoiceId).Bars.Length.ShouldBe(4, "It should be 4 bars after moving");
-            var index = 1;
-            foreach (var bar in afterCopySongDto.Voices.First().Bars)
-            {
-                bar.Position.ShouldBe(index++, "Index is not as expected after copying");
-            }
-
+            //Verify that requested bar is moved to requested position.
+            BabySong.Voices
+                .SingleOrDefault(voice => voice.VoiceName == "Main")
+                .SongBars.SingleOrDefault(bar => bar.Position == 2)
+                .Id.ShouldBe(barToMove.Id);
         }
     }
 }

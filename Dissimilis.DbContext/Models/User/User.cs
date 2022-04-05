@@ -22,6 +22,10 @@ namespace Dissimilis.DbContext.Models
         [MaxLength(200)]
         public string MsId { get; set; }
 
+        /// <summary>
+        /// Boolean value to check if the user is systemAdmin, 
+        /// </summary>
+        public bool IsSystemAdmin { get; set; }
 
         /// <summary>
         /// Email address of user
@@ -43,18 +47,31 @@ namespace Dissimilis.DbContext.Models
         public Country Country { get; set; }
         public int? CountryId { get; set; }
 
-        /// <summary>
-        /// The Organisation object associated with this user
-        /// </summary>
-        public Organisation Organisation { get; set; }
-        public int? OrganisationId { get; set; }
-
         public ICollection<Song.Song> SongsArranged { get; set; } = new List<Song.Song>();
         public ICollection<Song.Song> SongsCreated { get; set; } = new List<Song.Song>();
         public ICollection<Song.Song> SongsUpdated { get; set; } = new List<Song.Song>();
         public ICollection<SongVoice> SongVoiceCreated { get; set; } = new List<SongVoice>();
         public ICollection<SongVoice> SongVoiceUpdated { get; set; } = new List<SongVoice>();
 
+
+        public ICollection<Group> GroupsCreated { get; set; } = new List<Group>();
+
+        public ICollection<Organisation> OrganisationsCreated { get; set; } = new List<Organisation>();
+
+        /// <summary>
+        /// the different groups this user is in with the corresponding role
+        /// </summary>
+        public ICollection<GroupUser> Groups { get; set; } = new List<GroupUser>();
+
+        /// <summary>
+        /// the different Organisations this user is in with the corresponding role
+        /// </summary>
+        public ICollection<OrganisationUser> Organisations { get; set; } = new List<OrganisationUser>();
+
+        /// <summary>
+        /// the different songs this user has write permission on
+        /// </summary>
+        public ICollection<SongSharedUser> SongsShared { get; set; } = new List<SongSharedUser>();
 
         /// <summary>
         /// Empty constructor for User
@@ -68,12 +85,12 @@ namespace Dissimilis.DbContext.Models
         /// <param name="email"></param>
         /// <param name="organisationId"></param>
         /// <param name="countryId"></param>
-        public User(string name, string email, int? organisationId = null, int? countryId = null)
+        public User(string name, string email, int? countryId = null)
         {
             this.Email = email;
-            this.OrganisationId = organisationId;
             this.Name = name;
             this.CountryId = countryId;
         }
+        
     }
 }

@@ -9,7 +9,7 @@
 
 # Migration help
 ## Add another migration
-    dotnet ef migrations add InitialMigration --project Dissimilis.DbContext. --startup-project Dissimilis.WebAPI --context DissimilisDbContext
+    dotnet ef migrations add InitialMigration --project Dissimilis.DbContext --startup-project Dissimilis.WebAPI --context DissimilisDbContext
 
 
 ## Remove last migration

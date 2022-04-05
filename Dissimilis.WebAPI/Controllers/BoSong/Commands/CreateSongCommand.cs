@@ -1,12 +1,15 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Dissimilis.DbContext.Models.Enums;
 using Dissimilis.DbContext.Models.Song;
 using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsIn;
+using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
 
-namespace Dissimilis.WebAPI.Controllers.BoSong
+namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
     public class CreateSongCommand : IRequest<UpdatedSongCommandDto>
     {
@@ -20,42 +23,45 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
 
     public class CreateSongCommandHandler : IRequestHandler<CreateSongCommand, UpdatedSongCommandDto>
     {
-        private readonly Repository _repository;
+        private readonly SongRepository _songRepository;
         private readonly IAuthService _authService;
+        private readonly IPermissionCheckerService _IPermissionCheckerService;
 
-        public CreateSongCommandHandler(Repository repository, IAuthService authService)
+        public CreateSongCommandHandler(SongRepository songRepository, IAuthService authService, IPermissionCheckerService IPermissionCheckerService)
         {
-            _repository = repository;
+            _songRepository = songRepository;
             _authService = authService;
+            _IPermissionCheckerService = IPermissionCheckerService;
         }
 
         public async Task<UpdatedSongCommandDto> Handle(CreateSongCommand request, CancellationToken cancellationToken)
         {
             var currentUser = _authService.GetVerifiedCurrentUser();
-
             var song = new Song()
             {
                 Title = request.Command.Title,
                 Numerator = request.Command.Numerator,
                 Denominator = request.Command.Denominator,
-                ArrangerId = currentUser.Id
+                ArrangerId = currentUser.Id,
+                ProtectionLevel = ProtectionLevels.Private
             };
+            if(!await _IPermissionCheckerService.CheckPermission(song, currentUser, Operation.Create, cancellationToken)) throw new UnauthorizedAccessException();
 
             song.SetCreated(currentUser.Id);
-            await _repository.SaveAsync(song, cancellationToken);
+            await _songRepository.SaveAsync(song, cancellationToken);
 
             var mainVoice = new SongVoice()
             {
                 SongId = song.Id,
                 VoiceNumber = 1,
+                VoiceName = "Main",
                 IsMainVoice = true,
                 SongBars = new SongBar[] { new SongBar() { Position = 1 } }
             };
 
             song.Voices.Add(mainVoice);
             mainVoice.SetCreated(currentUser.Id);
-
-            await _repository.UpdateAsync(cancellationToken);
+            await _songRepository.UpdateAsync(cancellationToken);
 
             return new UpdatedSongCommandDto(song);
         }
