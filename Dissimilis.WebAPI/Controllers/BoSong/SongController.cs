@@ -83,6 +83,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         /// </summary>
         /// <param name="songId"></param>
         /// <returns></returns>
+        
+        [HttpGet("{songId:int}/Generate")]
+        [ProducesResponseType(typeof(SongByIdDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GenerateSongFile(int songId)
         {
             var fileBytes = new byte[0];

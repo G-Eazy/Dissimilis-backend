@@ -11,7 +11,7 @@ using Dissimilis.WebAPI.Extensions.Models;
 using System;
 using Dissimilis.WebAPI.Services;
 using System.Collections.Generic;
-
+using System.IO;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong
 {
@@ -24,6 +24,22 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             Context = context;
         }
 
+        /// <summary>
+        /// Compile song from JSON to MP3
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException"></exception>
+
+        public async Task<Song> CompileMp3ById(int songId, CancellationToken cancellationToken)
+        {
+            Song jsonObject = await GetSongById(songId, cancellationToken);
+
+            return jsonObject;
+
+        }
+
+       
         public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
         {
             var song = await Context.Songs
