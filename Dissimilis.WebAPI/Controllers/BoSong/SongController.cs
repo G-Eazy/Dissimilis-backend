@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Dissimilis.WebAPI.Controllers.BoSong.Commands;
@@ -75,6 +76,24 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             var result = await _mediator.Send(new QuerySongById(item.SongId));
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get mp3 of song by Id 
+        /// </summary>
+        /// <param name="songId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> GenerateSongFile(int songId)
+        {
+            var fileBytes = new byte[0];
+            string fileLocation = "/SongFiles/PianoMan.mp3";
+
+            var fs = new FileStream(fileLocation, FileMode.Open, FileAccess.Read);
+            var br = new BinaryReader(fs);
+            long numBytes = new FileInfo(fileLocation).Length;
+            fileBytes = br.ReadBytes((int)numBytes);
+
+            return File(fileBytes, "audio/mpeg", "SongName");
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 .ToArrayAsync(cancellationToken);
         }
 
-        public async Task<PagedResult<User>> GetPagedUsersInMyGroups(UsersInMyGroupsDto user, User currentUser, CancellationToken cancellationToken)
+        public async Task<PagedResult<User>> GetPagedUsersInMyGroups(UsersInMyGroupsDto searchDto, User currentUser, CancellationToken cancellationToken)
         {
             var query = _context.Users
                 .OrderBy(u => u.Email)
@@ -47,26 +47,26 @@ namespace Dissimilis.WebAPI.Controllers.BoUser
                 query = query.Where(u => u.Groups.Any(g => myGroupIds.Contains(g.GroupId)));
             }
 
-            if (user.SearchText.NotNullOrWhiteSpace())
+            if (searchDto.SearchText.NotNullOrWhiteSpace())
             {
-                var searchText = $"%{user.SearchText.Trim()}%";
+                var searchText = $"%{searchDto.SearchText.Trim()}%";
                 query = query.Where(u => EF.Functions.Like(u.Name, searchText) ||
                                          EF.Functions.Like(u.Email, searchText));
             }
 
-            if (user.OrganizationFilter.Any())
+            if (searchDto.OrganizationFilter.Any())
             {
-                query = query.Where(u => u.Organisations.Any(o => user.OrganizationFilter.Contains(o.OrganisationId)));
+                query = query.Where(u => u.Organisations.Any(o => searchDto.OrganizationFilter.Contains(o.OrganisationId)));
             }
 
-            if (user.GroupFilter.Any())
+            if (searchDto.GroupFilter.Any())
             {
-                query = query.Where(u => u.Groups.Any(o => user.GroupFilter.Contains(o.GroupId)));
+                query = query.Where(u => u.Groups.Any(o => searchDto.GroupFilter.Contains(o.GroupId)));
             }
 
 
             var result = await query
-                .GetPaged(user, cancellationToken);
+                .GetPaged(searchDto, cancellationToken);
 
             return result;
         }
