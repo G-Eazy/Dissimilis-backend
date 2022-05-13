@@ -24,36 +24,6 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
             Context = context;
         }
 
-        /// <summary>
-        /// Compile song from JSON to MP3
-        /// </summary>
-        /// <param name="songId"></param>
-        /// <returns></returns>
-        /// <exception cref="NotFoundException"></exception>
-
-        public async Task<Song> CompileMp3ById(int songId, CancellationToken cancellationToken)
-        {
-            Song jsonObject = await GetSongById(songId, cancellationToken);
-
-            var allNotes = new List<string>();
-            foreach (var voice in jsonObject.Voices)
-            {
-                foreach(var bar in voice.SongBars)
-                {
-                    foreach(var note in bar.Notes)
-                    {
-                        allNotes.Add(note.ChordName);
-                        Console.Write(note + " ");
-
-                    }
-                }
-            }
-
-
-            return jsonObject;
-
-        }
-
        
         public async Task<Song> GetSongById(int songId, CancellationToken cancellationToken)
         {

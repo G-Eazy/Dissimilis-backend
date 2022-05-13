@@ -4,6 +4,7 @@
 		<TargetFramework>net5.0-windows</TargetFramework>
 		<UserSecretsId>c0bc65ef-b037-417d-86ca-62dbc46fbabe</UserSecretsId>
 		<StartupObject>Dissimilis.WebAPI.Program</StartupObject>
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

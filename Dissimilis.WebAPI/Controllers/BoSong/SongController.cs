@@ -89,15 +89,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GenerateSongFile(int songId)
         {
-            var fileBytes = new byte[0];
-            string fileLocation = Path.Combine(Environment.CurrentDirectory,  "SongFiles", "PianoMan.mp3");
-
-            var fs = new FileStream(fileLocation, FileMode.Open, FileAccess.Read);
-            var br = new BinaryReader(fs);
-            long numBytes = new FileInfo(fileLocation).Length;
-            fileBytes = br.ReadBytes((int)numBytes);
-
-            return File(fileBytes, "audio/mpeg", "SongName");
+            var mem = await _mediator.Send(new CompileSongCommand(songId));
+            mem.Seek(0, SeekOrigin.Begin);
+            return File(mem, "audio/mpeg", "SongName");
         }
 
         /// <summary>
