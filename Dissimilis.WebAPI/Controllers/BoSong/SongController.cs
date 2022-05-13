@@ -90,7 +90,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         public async Task<IActionResult> GenerateSongFile(int songId)
         {
             var fileBytes = new byte[0];
-            string fileLocation = "/SongFiles/PianoMan.mp3";
+            string fileLocation = Path.Combine(Environment.CurrentDirectory,  "SongFiles", "PianoMan.mp3");
 
             var fs = new FileStream(fileLocation, FileMode.Open, FileAccess.Read);
             var br = new BinaryReader(fs);

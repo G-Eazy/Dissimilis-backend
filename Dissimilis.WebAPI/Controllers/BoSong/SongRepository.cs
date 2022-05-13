@@ -35,6 +35,21 @@ namespace Dissimilis.WebAPI.Controllers.BoSong
         {
             Song jsonObject = await GetSongById(songId, cancellationToken);
 
+            var allNotes = new List<string>();
+            foreach (var voice in jsonObject.Voices)
+            {
+                foreach(var bar in voice.SongBars)
+                {
+                    foreach(var note in bar.Notes)
+                    {
+                        allNotes.Add(note.ChordName);
+                        Console.Write(note + " ");
+
+                    }
+                }
+            }
+
+
             return jsonObject;
 
         }
