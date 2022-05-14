@@ -56,7 +56,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
             var jsonObject = await _songRepository.GetSongById(request.songId, cancellationToken);
             var bpm1 = jsonObject.Speed;
-            var bpm = 120;
+            var bpm = 50;
             if (bpm1 is not null)
                 bpm = bpm1.Value;
 
@@ -98,7 +98,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                     }
                     catch (Exception ex)
                     {
-                        break;
+                        fullNoteList.Add("Z");
+                        noteLengths.Add(CalculateNoteLength(bpm, new TimeSpan(0, 0, 0, 1)));
                     }
                 }
             }
@@ -116,6 +117,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                 var outputNote = Path.Combine(basePath, "CutFiles", noteArray[i] + ".wav");
                 listme.Add(outputNote);
                 var noteDuration = noteLengthArray[i];
+                if (noteArray[i] == "Z")
+                {
+                    noteDuration = new TimeSpan(0, 0, 0, 0, 944);
+                }
                 TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0, 0), noteDuration); // todo: 225 minus
 
                 //audioList.Add(new AudioFileReader(outputNote));
