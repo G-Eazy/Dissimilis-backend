@@ -10,6 +10,8 @@ using Dissimilis.WebAPI.Controllers.BoSong.DtoModelsOut;
 using Dissimilis.WebAPI.Extensions.Interfaces;
 using Dissimilis.WebAPI.Services;
 using MediatR;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 {
@@ -39,6 +41,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
         public async Task<MemoryStream> Handle(CompileSongCommand request, CancellationToken cancellationToken)
         {
             var jsonObject = await _songRepository.GetSongById(request.songId, cancellationToken);
+            var takt = jsonObject.Numerator;
+            var bpm = jsonObject.Speed;
+
 
             var notes = new List<string>();
             foreach (var voice in jsonObject.Voices)
@@ -47,20 +52,29 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                 {
                     foreach(var note in bar.Notes)
                     {
+                        // Breaks on chords
                         notes.Add(note.NoteValues);
-                        Console.WriteLine(note.ChordName);
                     }
                 }
 
 
                 break; //after first voice
             }
-            
+            var basePath = Path.Combine(Environment.CurrentDirectory, "SongFiles");
+            var audioList = new List<AudioFileReader>();
+            foreach (var note in notes)
+            {
+                var path = Path.Combine(basePath, "samples", note + ".mp3");
+                audioList.Add(new AudioFileReader(path));
 
-
+            }
 
 
             var songName = jsonObject.Title;
+            var playlist = new ConcatenatingSampleProvider(audioList);
+            WaveFileWriter.CreateWaveFile16(Path.Combine(basePath, songName), playlist);
+
+
 
             var fileBytes = new byte[0];
             string fileLocation = Path.Combine(Environment.CurrentDirectory,  "SongFiles", songName);
