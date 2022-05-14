@@ -40,6 +40,19 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
         public async Task<MemoryStream> Handle(CompileSongCommand request, CancellationToken cancellationToken)
         {
+            /*
+            var noo = new List<string>() { "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "Z"};
+            var basePath2 = Path.Combine(Environment.CurrentDirectory, "SongFiles");
+            foreach (var no in noo)
+            {
+                var baseNote = Path.Combine(basePath2, "samples", no + ".waw");
+                var outputNote = Path.Combine(basePath2, "samples2", no + ".wav");
+                TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0, 0), new TimeSpan(0, 0, 0, 5));
+            }
+
+
+            return null;
+            */
 
             var jsonObject = await _songRepository.GetSongById(request.songId, cancellationToken);
             var takt = jsonObject.Numerator;
@@ -70,6 +83,8 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
                         positionCounter++;
                     }
+
+                    // fill remaining empty sounds or dont end bar with silence
                 }
 
                 break; //after first voice
@@ -84,10 +99,10 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
             var audioList = new List<AudioFileReader>();
             for (var i = 0; i < noteArray.Length; i++)
             {
-                var baseNote = Path.Combine(basePath, "samples", noteArray[i] + ".waw");
-                var outputNote = Path.Combine(basePath, "CutFiles", noteArray[i] + ".waw");
+                var baseNote = Path.Combine(basePath, "samples2", noteArray[i] + ".wav");
+                var outputNote = Path.Combine(basePath, "CutFiles", noteArray[i] + ".wav");
                 var noteDuration = noteLengthArray[i];
-                TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0), noteDuration);
+                TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0, 225), noteDuration);
 
 
                 audioList.Add(new AudioFileReader(outputNote));

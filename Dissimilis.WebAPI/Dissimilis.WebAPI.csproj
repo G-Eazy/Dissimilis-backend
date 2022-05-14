@@ -59,6 +59,7 @@
 		<Folder Include="Exceptions\" />
 		<Folder Include="Properties\" />
 		<Folder Include="SongFiles\CutFiles\" />
+		<Folder Include="SongFiles\samples2\" />
 	</ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\BoOrganisation\Query\" />
