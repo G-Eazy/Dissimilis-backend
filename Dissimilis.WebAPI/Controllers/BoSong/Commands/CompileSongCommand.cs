@@ -55,58 +55,76 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
             */
 
             var jsonObject = await _songRepository.GetSongById(request.songId, cancellationToken);
-            var takt = jsonObject.Numerator;
             var bpm1 = jsonObject.Speed;
             var bpm = 120;
             if (bpm1 is not null)
                 bpm = bpm1.Value;
 
-
-            var notes = new List<string>();
+            var noteList = new List<Dictionary<int, string>>();
+            var notes = new Dictionary<int, string>();
             var noteLengths = new List<TimeSpan>();
             foreach (var voice in jsonObject.Voices)
             {
                 foreach (var bar in voice.SongBars)
                 {
+                    notes = new Dictionary<int, string>();
                     var positionCounter = 0;
                     foreach (var note in bar.Notes)
                     {
-                        // Breaks on chords and long notes
-                        if (positionCounter != note.Position)
-                        {
-                            notes.Add("Z");
-                            noteLengths.Add(CalculateNoteLength(bpm, new TimeSpan(0, 0, 0, 1)));
-
-                        }
-                        notes.Add(note.NoteValues);
+                        notes[note.Position] = note.NoteValues;
                         noteLengths.Add(CalculateNoteLength(bpm, new TimeSpan(0, 0, 0, note.Length)));
 
                         positionCounter++;
                     }
 
                     // fill remaining empty sounds or dont end bar with silence
+                noteList.Add(notes);
                 }
 
                 break; //after first voice
             }
+            
+            
+            
+            var fullNoteList = new List<string>();
+            foreach (var subDict in noteList)
+            {
+                for(int i = 0;i < 8; i++)
+                {
+                    try
+                    {
+                        fullNoteList.Add(subDict[i]);
 
+                    }
+                    catch (Exception ex)
+                    {
+                        break;
+                    }
+                }
+            }
 
-            var noteArray = notes.ToArray();
+            var noteArray = fullNoteList.ToArray();
             var noteLengthArray = noteLengths.ToArray();
 
             // Add sound file for each note
             var basePath = Path.Combine(Environment.CurrentDirectory, "SongFiles");
             var audioList = new List<AudioFileReader>();
+            var listme = new List<string>();
             for (var i = 0; i < noteArray.Length; i++)
             {
                 var baseNote = Path.Combine(basePath, "samples2", noteArray[i] + ".wav");
                 var outputNote = Path.Combine(basePath, "CutFiles", noteArray[i] + ".wav");
+                listme.Add(outputNote);
                 var noteDuration = noteLengthArray[i];
-                TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0, 225), noteDuration);
+                TrimWavFile(baseNote, outputNote, new TimeSpan(0, 0, 0, 0, 0), noteDuration); // todo: 225 minus
 
+                //audioList.Add(new AudioFileReader(outputNote));
 
-                audioList.Add(new AudioFileReader(outputNote));
+            }
 
+            foreach (var sfs in listme)
+            {
+                audioList.Add(new AudioFileReader(sfs));
             }
 
             // create songfile from notes
@@ -126,7 +144,7 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
 
         }
 
-        private static TimeSpan CalculateNoteLength(int bpm, TimeSpan noteLength)
+        private TimeSpan CalculateNoteLength(int bpm, TimeSpan noteLength)
         {
             var eights = ((1000 * 60) / bpm) / 2;
             var len = noteLength.TotalSeconds;
@@ -141,9 +159,9 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                 return new TimeSpan(0, 0, 0, baseval, (int) (ms - baseval*1000) );
             }
         }
-        private static void TrimWavFile(string inPath, string outPath, TimeSpan cutFromStart, TimeSpan cutFromEnd)
+        private void TrimWavFile(string inPath, string outPath, TimeSpan cutFromStart, TimeSpan cutFromEnd)
         {
-            var diff = (int) Math.Abs((new TimeSpan(0, 0, 0, 5) - cutFromEnd).TotalMilliseconds);
+            var diff = (int) Math.Abs((new TimeSpan(0, 0, 0, 5, 719) - cutFromEnd).TotalMilliseconds);
             cutFromEnd = new TimeSpan(0, 0, 0, 0, diff);
             using (WaveFileReader reader = new WaveFileReader(inPath))
             {
@@ -159,10 +177,12 @@ namespace Dissimilis.WebAPI.Controllers.BoSong.Commands
                     int endPos = (int)reader.Length - endBytes;
 
                     TrimWavFile(reader, writer, startPos, endPos);
+                    writer.Close();
+                    reader.Close();
                 }
             }
         }
-        private static void TrimWavFile(WaveFileReader reader, WaveFileWriter writer, int startPos, int endPos)
+        private void TrimWavFile(WaveFileReader reader, WaveFileWriter writer, int startPos, int endPos)
         {
             reader.Position = startPos;
             byte[] buffer = new byte[1024];
